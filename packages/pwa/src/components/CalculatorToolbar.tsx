@@ -8,7 +8,7 @@ import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
 import { Button } from "@trizum/ui/Button";
-import { SheetBottomFill } from "@trizum/ui/SheetBottomFill";
+import { SheetSurface } from "@trizum/ui/SheetSurface";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { cn } from "@trizum/ui/utils";
@@ -1076,15 +1076,14 @@ export function CalculatorToolbar({
           photoIds={attachmentPhotoIds}
           sheetHeight={mobileSheetHeight}
         />
-        <SheetBottomFill />
         <Sheet.Container
           ref={toolbarRef}
           role="application"
           aria-label={t`Calculator`}
           data-presence-proxy-element-id={presenceElementId}
-          className="border-accent-200/80 to-accent-50/95 pb-safe dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 right-0 mx-auto w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border bg-gradient-to-b from-white via-white shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:shadow-none"
+          className="right-0 mx-auto w-full max-w-xl"
         >
-          {calculatorContent}
+          <SheetSurface contentClassName="pb-safe">{calculatorContent}</SheetSurface>
         </Sheet.Container>
       </Sheet>
     );

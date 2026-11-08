@@ -24,7 +24,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { SheetBottomFill } from "./SheetBottomFill.js";
+import { SheetSurface } from "./SheetSurface.js";
 import { Icon, type IconProps } from "./Icon.js";
 import { cn, type ClassName } from "./utils.js";
 
@@ -79,7 +79,6 @@ export function ModalSheet({
       {...props}
     >
       <OverlayProvider>
-        <SheetBottomFill />
         <FocusScope contain restoreFocus>
           <AccessibleSheetContainer
             ariaLabel={ariaLabel}
@@ -148,23 +147,20 @@ function AccessibleSheetContainer({
 
   return (
     <ModalSheetContext value={contextValue}>
-      <Sheet.Container
-        className={cn(
-          "right-0 mx-auto mt-12 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border border-accent-200/80 bg-gradient-to-b from-white via-white to-accent-50/95 shadow-[0_-10px_40px_rgba(15,23,42,0.24)] sm:mt-0 sm:rounded-[1.75rem] dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 dark:shadow-none",
-          className,
-        )}
-      >
-        <div
-          {...mergeProps(overlayProps, modalProps, dialogProps)}
-          ref={containerRef}
-          aria-describedby={hasDescription ? descriptionId : undefined}
-          aria-labelledby={hasTitle ? titleId : undefined}
-          className="flex min-h-0 flex-1 flex-col outline-hidden"
-        >
-          {isDismissable ? <DismissButton onDismiss={close} /> : null}
-          {children}
-          {isDismissable ? <DismissButton onDismiss={close} /> : null}
-        </div>
+      <Sheet.Container className={cn("right-0 mx-auto mt-12 w-full max-w-xl sm:mt-0", className)}>
+        <SheetSurface>
+          <div
+            {...mergeProps(overlayProps, modalProps, dialogProps)}
+            ref={containerRef}
+            aria-describedby={hasDescription ? descriptionId : undefined}
+            aria-labelledby={hasTitle ? titleId : undefined}
+            className="flex min-h-0 flex-1 flex-col outline-hidden"
+          >
+            {isDismissable ? <DismissButton onDismiss={close} /> : null}
+            {children}
+            {isDismissable ? <DismissButton onDismiss={close} /> : null}
+          </div>
+        </SheetSurface>
       </Sheet.Container>
     </ModalSheetContext>
   );

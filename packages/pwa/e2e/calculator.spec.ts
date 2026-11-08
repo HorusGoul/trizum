@@ -79,15 +79,25 @@ async function navigateToAddExpense({
 }
 
 test.describe("Expense calculator", () => {
-  test("keeps the overdrag fill aligned at wider mobile widths", async ({ harness, page }) => {
+  test("keeps one continuous sheet surface during overdrag at wider mobile widths", async ({
+    harness,
+    page,
+  }) => {
     await page.setViewportSize({ width: 700, height: 800 });
     await navigateToAddExpense({ autoOpenCalculator: false, harness });
     await page.getByRole("button", { name: "Open calculator", exact: true }).click();
 
     const calculator = page.getByRole("application", { name: "Calculator" });
     await expect(calculator).toBeVisible();
+    await expect
+      .poll(async () => {
+        const box = await calculator.boundingBox();
+
+        return box ? Math.abs(box.y + box.height - 800) : Infinity;
+      })
+      .toBeLessThan(1);
     const handle = page.locator("[data-calculator-sheet-drag-handle]");
-    const fill = page.locator("[data-sheet-bottom-fill]");
+    const surface = page.locator("[data-sheet-surface]");
     const handleBox = await handle.boundingBox();
 
     if (!handleBox) throw new Error("Expected a visible calculator drag handle");
@@ -97,25 +107,40 @@ test.describe("Expense calculator", () => {
     await page.mouse.down();
     await page.mouse.move(x, y - 100, { steps: 10 });
 
-    await expect.poll(async () => (await fill.boundingBox())?.height ?? 0).toBeGreaterThan(0);
+    await expect(calculator).toHaveCSS("border-bottom-width", "0px");
+    await expect(surface).toHaveCSS("border-bottom-width", "1px");
+    await expect
+      .poll(async () => {
+        const box = await calculator.boundingBox();
+
+        return box ? box.y + box.height : Infinity;
+      })
+      .toBeLessThan(800);
     await expect
       .poll(async () => {
         const containerBox = await calculator.boundingBox();
-        const fillBox = await fill.boundingBox();
+        const surfaceBox = await surface.boundingBox();
 
-        if (!containerBox || !fillBox) return Infinity;
+        if (!containerBox || !surfaceBox) return Infinity;
 
         return Math.max(
-          Math.abs(containerBox.x - fillBox.x),
-          Math.abs(containerBox.x + containerBox.width - fillBox.x - fillBox.width),
-          Math.abs(containerBox.y + containerBox.height - fillBox.y),
-          Math.abs(fillBox.y + fillBox.height - 800),
+          Math.abs(containerBox.x - surfaceBox.x),
+          Math.abs(containerBox.width - surfaceBox.width),
+          Math.abs(containerBox.y - surfaceBox.y),
+          Math.abs(surfaceBox.y + surfaceBox.height - 800),
         );
       })
       .toBeLessThan(1);
+    await page.screenshot({ path: test.info().outputPath("calculator-overdrag.png") });
 
     await page.mouse.up();
-    await expect.poll(async () => (await fill.boundingBox())?.height ?? 0).toBe(0);
+    await expect
+      .poll(async () => {
+        const box = await calculator.boundingBox();
+
+        return box ? Math.abs(box.y + box.height - 800) : Infinity;
+      })
+      .toBeLessThan(1);
   });
 
   test("keeps the calculator button aligned when the amount is invalid", async ({

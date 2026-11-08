@@ -53,6 +53,76 @@ async function openExpenseTemplatePicker(page: Page, partyId: string) {
 }
 
 test.describe("Expense templates", () => {
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`keeps the sheet border at the screen edge during overdrag in ${colorScheme} mode`, async ({
+      harness,
+      page,
+    }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ colorScheme });
+
+      const seededParty = await harness.seedJoinedParty({
+        fixture: createPartyFixture(),
+        memberParticipantId: defaultParticipants.blair.id,
+      });
+
+      await createExpenseTemplate(harness, page, seededParty.partyId, {
+        expenseTitle: "Groceries",
+        name: "Weekly groceries",
+      });
+      await harness.navigate(`/party/${seededParty.partyId}`);
+      await openExpenseTemplatePicker(page, seededParty.partyId);
+      // The app currently boots with a fixed dark class; exercise both surface palettes.
+      await page.evaluate(
+        (dark) => document.documentElement.classList.toggle("dark", dark),
+        colorScheme === "dark",
+      );
+      const container = page.locator(".react-modal-sheet-container");
+      const surface = page.locator("[data-sheet-surface]");
+      const handle = page.locator("[data-modal-sheet-drag-handle]");
+      await expect
+        .poll(async () => {
+          const box = await container.boundingBox();
+
+          return box ? Math.abs(box.y + box.height - 844) : Infinity;
+        })
+        .toBeLessThan(1);
+      const box = await handle.boundingBox();
+
+      if (!box) throw new Error("Expected a visible sheet drag handle");
+      const x = box.x + box.width / 2;
+      const y = box.y + box.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      await page.mouse.move(x, y - 160, { steps: 12 });
+      await expect
+        .poll(async () => {
+          const box = await container.boundingBox();
+
+          return box ? box.y + box.height : Infinity;
+        })
+        .toBeLessThan(824);
+      await expect(container).toHaveCSS("border-bottom-width", "0px");
+      await expect(surface).toHaveCSS("border-bottom-width", "1px");
+      await expect
+        .poll(async () => {
+          const box = await surface.boundingBox();
+
+          return box ? Math.abs(box.y + box.height - 844) : Infinity;
+        })
+        .toBeLessThan(1);
+      await page.screenshot({ path: test.info().outputPath("sheet-overdrag.png") });
+      await page.mouse.up();
+      await expect
+        .poll(async () => {
+          const box = await container.boundingBox();
+
+          return box ? Math.abs(box.y + box.height - 844) : Infinity;
+        })
+        .toBeLessThan(1);
+    });
+  }
+
   test("uses the settings structure and validates template fields inline", async ({
     harness,
     page,
