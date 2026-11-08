@@ -103,7 +103,7 @@ it("advertises narrow tools with accurate hints and a sandboxed MCP Apps resourc
   });
 });
 
-it.each([2, 3, 4, 5])(
+it.each([2, 3, 4, 5, 6])(
   "keeps published widget v%s readable for cached tool metadata",
   async (version) => {
     const { client } = await connect();

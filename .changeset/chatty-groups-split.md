@@ -41,3 +41,6 @@ Keep previously published widget URLs readable for clients with cached tool
 metadata, and reduce embedded font payloads while retaining the shared UI.
 
 Use the host’s frame for the embedded widget, removing its nested card surface.
+
+Apply trizum’s shared background colors to the widget document and include
+responsive content padding in host-driven height measurements.

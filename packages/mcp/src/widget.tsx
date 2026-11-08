@@ -48,7 +48,7 @@ export function PartyCard({
     }).format(Number(amount));
 
   return (
-    <main className="text-accent-950 dark:text-accent-50 space-y-6 text-sm">
+    <main className="text-accent-950 dark:text-accent-50 space-y-6 p-5 text-sm sm:p-6">
       <header className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight wrap-anywhere">
           {party.symbol} {party.name}

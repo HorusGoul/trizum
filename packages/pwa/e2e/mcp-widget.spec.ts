@@ -98,6 +98,10 @@ for (const outcome of ["success", "rejected", "unsupported"] as const) {
               send({ id: message.id, result: { isError: outcome === "rejected" } });
             }
           }
+
+          if (message.method === "ui/notifications/size-changed") {
+            frame.style.height = `${message.params.height}px`;
+          }
         });
         frame.srcdoc = widgetHtml;
       },
@@ -111,9 +115,21 @@ for (const outcome of ["success", "rejected", "unsupported"] as const) {
     await expect(frame.locator("main")).toHaveCSS("border-radius", "0px");
     await expect(frame.locator("main")).toHaveCSS("border-top-width", "0px");
 
-    for (const element of ["html", "body", "main"]) {
-      await expect(frame.locator(element)).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    }
+    const background = await frame.locator("body").evaluate((body, theme) => {
+      const sample = document.createElement("div");
+      sample.style.backgroundColor = `var(--color-accent-${theme === "dark" ? "950" : "50"})`;
+      body.append(sample);
+      const color = getComputedStyle(sample).backgroundColor;
+      sample.remove();
+
+      return color;
+    }, theme);
+
+    expect(background).not.toBe("rgba(0, 0, 0, 0)");
+    await expect(frame.locator("html")).toHaveCSS("background-color", background);
+    await expect(frame.locator("body")).toHaveCSS("background-color", background);
+    await expect(frame.locator("main")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(frame.locator("main")).toHaveCSS("padding", "20px");
 
     expect(
       await frame.locator("main").evaluate(async () => {
@@ -134,6 +150,11 @@ for (const outcome of ["success", "rejected", "unsupported"] as const) {
       }),
     ).toBeVisible();
     const button = frame.getByRole("button", { name: openLabel });
+    await expect
+      .poll(() =>
+        button.evaluate((element) => window.innerHeight - element.getBoundingClientRect().bottom),
+      )
+      .toBeGreaterThanOrEqual(20);
     const icon = button.locator("svg");
     expect(
       await icon.evaluate((element) =>
@@ -183,6 +204,13 @@ for (const outcome of ["success", "rejected", "unsupported"] as const) {
     expect(
       await frame.locator("body").evaluate((body) => body.scrollWidth <= body.clientWidth),
     ).toBe(true);
+    await page.setViewportSize({ width: 800, height: 800 });
+    await expect(frame.locator("main")).toHaveCSS("padding", "24px");
+    await expect
+      .poll(() =>
+        button.evaluate((element) => window.innerHeight - element.getBoundingClientRect().bottom),
+      )
+      .toBeGreaterThanOrEqual(24);
     expect(errors).toEqual([]);
     expect(requests.filter((url) => /^https?:/.test(url))).toEqual([]);
     expect(context.pages()).toHaveLength(1);
