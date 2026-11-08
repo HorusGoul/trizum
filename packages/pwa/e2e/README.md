@@ -138,10 +138,55 @@ storage. The reference checkout needs its own `vp install` and dependency builds
 `visual-report/comparison.html` is a standalone before/after report with a screen
 selector. `visual-report/index.html` is the detailed Playwright report with failure
 diffs and traces. `summary.json` records exact refs and outcomes. The CI workflow
-builds current main and uploads the reports and PNGs on success or failure.
+builds current main and uploads `visual-comparison-<attempt>` (reports, traces,
+and PNGs) and `visual-pr-report-<attempt>` (data for the PR comment) on success
+or failure. Artifacts expire after seven days.
 
 Expected PNGs are captured from the reference during the same run, rather than
 committing platform-specific snapshots. The suite is intentionally separate from
 normal E2E tests and checks visual parity for refactors: intended design changes
 will produce failing comparisons for review. Do not use snapshot update flags to
 approve differences in this suite; they must be reviewed against main.
+
+### Reviewing failures in a PR
+
+[Publish Visual Regression Report](../../../.github/workflows/visual-regression-report.yml)
+updates one identifiable `github-actions[bot]` comment after each PR run. Only
+failed comparisons appear, each in a collapsible section labeled with browser,
+viewport, locale, and screen/test. A Markdown table shows the baseline before and
+PR after images; a pixel diff appears below when captured. Missing screenshots
+are labeled explicitly. The run and downloadable full report are linked. Passing,
+cancelled, incomplete, and publication-error runs replace old failure images with
+their current status. Outdated heads and older attempts cannot overwrite a newer
+report. The report does not approve changes or alter the visual check result.
+
+The publisher runs trusted code from the default branch through `workflow_run`,
+without installing dependencies, restoring caches, or executing PR code. It
+validates the data-only artifact, restricts image filenames, rejects symlinks and
+non-PNGs, and bounds report/image sizes. PR association and current head/attempt
+come from GitHub APIs, including for forks with an empty run-to-PR association.
+Fork test runs retain read-only permissions and still follow GitHub's contributor
+workflow-approval policy. Only the publisher has `actions: read`, `contents: write`,
+and `pull-requests: write`. It uses the automatic token; no PAT or new secret is
+needed.
+
+Failed PNGs are stored by content hash on the separate
+`visual-regression-reports` branch, never on `main` or a PR branch. Comments use
+immutable commit-pinned `raw.githubusercontent.com` URLs, with no artifact ZIP
+URLs or expiring tokens as image sources. Before commenting, the publisher checks
+each URL without authentication for `image/png` and exact bytes. These images
+remain publicly readable after the seven-day full-report artifact expires.
+Keep this branch/history to retain old comments' images; its deduplicated image
+storage grows over time and has no automatic deletion policy. Only PNGs are
+published publicly, not traces or HTML from an untrusted PR.
+
+This publication method requires a public GitHub.com repository and repository
+rules that permit the automatic token to create/update the report branch and
+write PR comments. If publication is denied, the publisher fails visibly and
+attempts to replace the old comment with a publication-error notice and run link.
+Private repositories need a different public image host; this publisher refuses
+to claim private raw URLs will render. The trusted workflow becomes active only
+after it lands on the default branch, so its own introduction PR needs a manually
+prepared example. Older PR branches also need to incorporate the new reporter
+from `main` before they can produce the data artifact. It never publishes from
+a PR's untrusted workflow code.

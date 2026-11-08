@@ -3,10 +3,13 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { Failure } from "./pr-report.ts";
 import type { FullConfig, Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 
 interface Comparison {
   name: string;
+  project: string;
+  test: string;
   status: string;
   reference?: string;
   candidate?: string;
@@ -30,6 +33,8 @@ async function image(file?: string) {
 export default class VisualReporter implements Reporter {
   private results: {
     name: string;
+    project: string;
+    test: string;
     result: Pick<TestResult, "status" | "attachments" | "errors">;
   }[] = [];
   private outputDir: string;
@@ -52,6 +57,8 @@ export default class VisualReporter implements Reporter {
   ) {
     this.results.push({
       name: `${test.parent.project()?.name}: ${test.titlePath().slice(-2).join(" / ")}`,
+      project: test.parent.project()?.name ?? "unknown",
+      test: test.titlePath().slice(-2).join(" / "),
       result,
     });
   }
@@ -59,8 +66,10 @@ export default class VisualReporter implements Reporter {
   async onExit() {
     // Playwright does not await onTestEnd; load attachments during finalization.
     const comparisons: Comparison[] = await Promise.all(
-      this.results.map(async ({ name, result }) => ({
+      this.results.map(async ({ name, project, test, result }) => ({
         name,
+        project,
+        test,
         status: result.status,
         reference: await image(
           result.attachments.find((attachment) => attachment.name === "origin-main")?.path,
@@ -108,6 +117,50 @@ export default class VisualReporter implements Reporter {
         null,
         2,
       ),
+    );
+    // A small, data-only artifact crosses into the trusted PR publisher.
+    const reportDir = path.join(this.outputDir, "github-report");
+    await mkdir(reportDir, { recursive: true });
+    const failures = [];
+
+    for (const [index, comparison] of comparisons.entries()) {
+      if (!["failed", "timedOut", "interrupted"].includes(comparison.status)) continue;
+
+      const files: Pick<Failure, "before" | "after" | "diff"> = {};
+
+      for (const [role, source] of [
+        ["before", comparison.reference],
+        ["after", comparison.candidate],
+        ["diff", comparison.diff],
+      ] as const) {
+        if (!source) continue;
+
+        const filename = `${index}-${role}.png`;
+        await writeFile(
+          path.join(reportDir, filename),
+          Buffer.from(source.split(",")[1], "base64"),
+        );
+        files[role] = filename;
+      }
+
+      failures.push({
+        project: comparison.project,
+        test: comparison.test,
+        status: comparison.status,
+        ...files,
+      });
+    }
+
+    await writeFile(
+      path.join(reportDir, "report.json"),
+      JSON.stringify({
+        version: 1,
+        reference: this.reference,
+        candidate: this.candidate,
+        total: comparisons.length,
+        passed,
+        failures,
+      }),
     );
     process.stdout.write(
       `Visual comparison report: ${path.join(this.outputDir, "comparison.html")}\n`,
