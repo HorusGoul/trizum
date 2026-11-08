@@ -24,7 +24,6 @@
 - [ ] I've run `vp run test` and all tests pass
 - [ ] I've run `vp run build`
 - [ ] I've added tests for new functionality (if applicable)
-- [ ] I've covered changed Automerge write paths with real-document round-trip tests (if applicable)
 - [ ] I've run `vp run lingui:extract` (if I added new strings)
 - [ ] I've added a changeset (if this is a user-facing change)
 
