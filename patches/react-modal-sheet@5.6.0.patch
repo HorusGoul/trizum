@@ -1,0 +1,376 @@
+diff --git a/dist/index.js b/dist/index.js
+index c033003905791f5339535f7ce33b7914109c1d91..861ad21ccf1f7b9373a7b124d80a132bce029e46 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -689,34 +689,39 @@ function useSheetState({
+   const onOpen = useStableCallback(() => _onOpen == null ? void 0 : _onOpen());
+   const onClosing = useStableCallback(() => _onClosing == null ? void 0 : _onClosing());
+   React.useEffect(() => {
+-    if (isOpen && state === "closed") {
++    if (isOpen && (state === "closed" || state === "closing")) {
+       setState("opening");
+     } else if (!isOpen && (state === "open" || state === "opening")) {
+       setState("closing");
+     }
+   }, [isOpen, state]);
+   React.useEffect(() => {
++    let active = true;
+     async function handle() {
+       switch (state) {
+         case "closed":
+           await (onClosed == null ? void 0 : onClosed());
+           break;
+         case "opening":
++          if (!isOpen) return;
+           await (onOpening == null ? void 0 : onOpening());
+-          setState("open");
++          if (active) setState("open");
+           break;
+         case "open":
++          if (!isOpen) return;
+           await (onOpen == null ? void 0 : onOpen());
+           break;
+         case "closing":
++          if (isOpen) return;
+           await (onClosing == null ? void 0 : onClosing());
+-          setState("closed");
++          if (active) setState("closed");
+           break;
+       }
+     }
+     handle().catch((error) => {
+       console.error("Internal sheet state error:", error);
+     });
+-  }, [state]);
++    return () => { active = false; };
++  }, [state, isOpen]);
+   return state;
+ }
+@@ -1053,13 +1058,22 @@ var Sheet = React.forwardRef(
+   }, ref) => {
+     const [sheetBoundsRef, sheetBounds] = useMeasure__default.default();
+     const sheetRef = React.useRef(null);
++    const transitionRequest = React.useRef({ isOpen });
++    const initializedContainer = React.useRef(null);
++    const openingFreshContainer = React.useRef(false);
++    const openingPosition = React.useRef(0);
++    useIsomorphicLayoutEffect(() => {
++      transitionRequest.current = { isOpen };
++    }, [isOpen]);
+     const sheetHeight = Math.round(sheetBounds.height);
+     const [currentSnap, setCurrentSnap] = React.useState(initialSnap);
+     const { windowHeight } = useDimensions();
+     const closedY = sheetHeight > 0 ? sheetHeight : windowHeight;
++    const closedYValue = react.useMotionValue(closedY);
++    const entryReady = react.useMotionValue(false);
+     const y = react.useMotionValue(closedY);
+     const yInverted = react.useTransform(y, (val) => Math.max(sheetHeight - val, 0));
+-    const yProgress = react.useTransform(y, (val) => clamp(1 - val / closedY, 0, 1));
++    const yProgress = react.useTransform(() => clamp(1 - y.get() / closedYValue.get(), 0, 1));
+     const indicatorRotation = react.useMotionValue(0);
+     const shouldReduceMotion = react.useReducedMotion();
+     const reduceMotion = Boolean(prefersReducedMotion || shouldReduceMotion);
+@@ -1068,13 +1082,15 @@ var Sheet = React.forwardRef(
+       ...reduceMotion ? REDUCED_MOTION_TWEEN_CONFIG : tweenConfig
+     };
+     const zIndex = react.useTransform(
+-      y,
+-      (val) => val + 2 >= closedY ? -1 : (style == null ? void 0 : style.zIndex) ?? 9999
++      () => y.get() + 2 >= closedYValue.get() ? -1 : (style == null ? void 0 : style.zIndex) ?? 9999
+     );
+     const visibility = react.useTransform(
+-      y,
+-      (val) => val + 2 >= closedY ? "hidden" : "visible"
++      [entryReady, y, closedYValue],
++      ([ready, position, closedPosition]) => !ready || position + 2 >= closedPosition ? "hidden" : "visible"
+     );
++    useIsomorphicLayoutEffect(() => {
++      closedYValue.set(closedY);
++    }, [closedY, closedYValue]);
+     const snapPoints = React.useMemo(() => {
+       return snapPointsProp && sheetHeight > 0 ? computeSnapPoints({ sheetHeight, snapPointsProp }) : [];
+     }, [sheetHeight, snapPointsProp == null ? void 0 : snapPointsProp.join("")]);
+@@ -1149,6 +1165,8 @@ var Sheet = React.forwardRef(
+       }
+     });
+     const onDragStart = useStableCallback((event, info) => {
++      transitionRequest.current = { isOpen };
++      y.stop();
+       blurActiveInput();
+       onDragStartProp == null ? void 0 : onDragStartProp(event, info);
+     });
+@@ -1158,12 +1176,26 @@ var Sheet = React.forwardRef(
+       const velocity = y.getVelocity();
+       if (velocity > 0) indicatorRotation.set(10);
+       if (velocity < 0) indicatorRotation.set(-10);
+-      y.set(Math.max(currentY + info.delta.y, 0));
++      // Recover pointer distance above the top so reversing the drag stays continuous.
++      const dragY = (currentY < 0 ? currentY / 0.2 : currentY) + info.delta.y;
++      y.set(dragY < 0 ? dragY * 0.2 : dragY);
+     });
+     const onDragEnd = useStableCallback((event, info) => {
+       blurActiveInput();
+       onDragEndProp == null ? void 0 : onDragEndProp(event, info);
+       const currentY = y.get();
++      if (currentY < 0) {
++        motion.animate(y, 0, reduceMotion ? animationOptions : {
++          type: "spring",
++          stiffness: 400,
++          damping: 30,
++          velocity: info.velocity.y * 0.2
++        });
++        const topSnap = snapPoints[snapPoints.length - 1];
++        if (topSnap) updateSnap(topSnap.snapIndex);
++        indicatorRotation.set(0);
++        return;
++      }
+       const result = classifyDragEnd({
+         y: currentY,
+         info,
+@@ -1204,20 +1236,56 @@ var Sheet = React.forwardRef(
+     const state = useSheetState({
+       isOpen,
+       onOpen: async () => {
++        const request = transitionRequest.current;
++        if (!request.isOpen) return;
+         onOpenStart == null ? void 0 : onOpenStart();
+-        await waitForElement("react-modal-sheet-container");
++        // Paint the mounted starting pose before animating, including after a full unmount.
++        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
++        if (request !== transitionRequest.current) return;
++        if (!sheetRef.current || (initialSnap !== undefined && sheetHeight === 0)) await waitForElement("react-modal-sheet-container");
++        if (request !== transitionRequest.current) return;
++        if (openingFreshContainer.current) {
++          const height = Math.round(sheetRef.current.getBoundingClientRect().height);
++          closedYValue.set(height);
++          openingPosition.current = height;
++          y.jump(height);
++        }
++        entryReady.set(true);
+         const initialSnapPoint = initialSnap !== void 0 ? getSnapPoint(initialSnap) : null;
+         const yTo = (initialSnapPoint == null ? void 0 : initialSnapPoint.snapValueY) ?? 0;
+-        await react.animate(y, yTo, animationOptions);
++        await react.animate(y, [openingPosition.current, yTo], animationOptions);
++        if (request !== transitionRequest.current) return;
+         if (initialSnap !== void 0) updateSnap(initialSnap);
+         onOpenEnd == null ? void 0 : onOpenEnd();
+       },
+       onClosing: async () => {
++        const request = transitionRequest.current;
++        if (request.isOpen) return;
+         onCloseStart == null ? void 0 : onCloseStart();
+         await react.animate(y, closedY, animationOptions);
++        if (request !== transitionRequest.current) return;
+         onCloseEnd == null ? void 0 : onCloseEnd();
+       }
+     });
++    useIsomorphicLayoutEffect(() => {
++      if (state === "closed") {
++        entryReady.set(false);
++        initializedContainer.current = null;
++      }
++      if (state !== "opening" || !sheetRef.current) return;
++      const height = Math.round(sheetRef.current.getBoundingClientRect().height);
++      if (height <= 0) return;
++      closedYValue.set(height);
++      y.stop();
++      // A fresh container starts closed; an interrupted close keeps its current pose.
++      openingFreshContainer.current = initializedContainer.current !== sheetRef.current;
++      if (openingFreshContainer.current) {
++        entryReady.set(false);
++        y.jump(height);
++        initializedContainer.current = sheetRef.current;
++      }
++      openingPosition.current = y.get();
++    }, [state, closedYValue, y]);
+     const dragProps = {
+       drag: "y",
+       dragElastic: 0,
+diff --git a/dist/index.mjs b/dist/index.mjs
+index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..36a10c0acb355acd608741f180ffcf8187f63a58 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -682,34 +682,39 @@ function useSheetState({
+   const onOpen = useStableCallback(() => _onOpen == null ? void 0 : _onOpen());
+   const onClosing = useStableCallback(() => _onClosing == null ? void 0 : _onClosing());
+   useEffect(() => {
+-    if (isOpen && state === "closed") {
++    if (isOpen && (state === "closed" || state === "closing")) {
+       setState("opening");
+     } else if (!isOpen && (state === "open" || state === "opening")) {
+       setState("closing");
+     }
+   }, [isOpen, state]);
+   useEffect(() => {
++    let active = true;
+     async function handle() {
+       switch (state) {
+         case "closed":
+           await (onClosed == null ? void 0 : onClosed());
+           break;
+         case "opening":
++          if (!isOpen) return;
+           await (onOpening == null ? void 0 : onOpening());
+-          setState("open");
++          if (active) setState("open");
+           break;
+         case "open":
++          if (!isOpen) return;
+           await (onOpen == null ? void 0 : onOpen());
+           break;
+         case "closing":
++          if (isOpen) return;
+           await (onClosing == null ? void 0 : onClosing());
+-          setState("closed");
++          if (active) setState("closed");
+           break;
+       }
+     }
+     handle().catch((error) => {
+       console.error("Internal sheet state error:", error);
+     });
+-  }, [state]);
++    return () => { active = false; };
++  }, [state, isOpen]);
+   return state;
+ }
+@@ -1046,13 +1051,22 @@ var Sheet = forwardRef(
+   }, ref) => {
+     const [sheetBoundsRef, sheetBounds] = useMeasure();
+     const sheetRef = useRef(null);
++    const transitionRequest = useRef({ isOpen });
++    const initializedContainer = useRef(null);
++    const openingFreshContainer = useRef(false);
++    const openingPosition = useRef(0);
++    useIsomorphicLayoutEffect(() => {
++      transitionRequest.current = { isOpen };
++    }, [isOpen]);
+     const sheetHeight = Math.round(sheetBounds.height);
+     const [currentSnap, setCurrentSnap] = useState(initialSnap);
+     const { windowHeight } = useDimensions();
+     const closedY = sheetHeight > 0 ? sheetHeight : windowHeight;
++    const closedYValue = useMotionValue(closedY);
++    const entryReady = useMotionValue(false);
+     const y = useMotionValue(closedY);
+     const yInverted = useTransform(y, (val) => Math.max(sheetHeight - val, 0));
+-    const yProgress = useTransform(y, (val) => clamp(1 - val / closedY, 0, 1));
++    const yProgress = useTransform(() => clamp(1 - y.get() / closedYValue.get(), 0, 1));
+     const indicatorRotation = useMotionValue(0);
+     const shouldReduceMotion = useReducedMotion();
+     const reduceMotion = Boolean(prefersReducedMotion || shouldReduceMotion);
+@@ -1061,13 +1075,15 @@ var Sheet = forwardRef(
+       ...reduceMotion ? REDUCED_MOTION_TWEEN_CONFIG : tweenConfig
+     };
+     const zIndex = useTransform(
+-      y,
+-      (val) => val + 2 >= closedY ? -1 : (style == null ? void 0 : style.zIndex) ?? 9999
++      () => y.get() + 2 >= closedYValue.get() ? -1 : (style == null ? void 0 : style.zIndex) ?? 9999
+     );
+     const visibility = useTransform(
+-      y,
+-      (val) => val + 2 >= closedY ? "hidden" : "visible"
++      [entryReady, y, closedYValue],
++      ([ready, position, closedPosition]) => !ready || position + 2 >= closedPosition ? "hidden" : "visible"
+     );
++    useIsomorphicLayoutEffect(() => {
++      closedYValue.set(closedY);
++    }, [closedY, closedYValue]);
+     const snapPoints = useMemo(() => {
+       return snapPointsProp && sheetHeight > 0 ? computeSnapPoints({ sheetHeight, snapPointsProp }) : [];
+     }, [sheetHeight, snapPointsProp == null ? void 0 : snapPointsProp.join("")]);
+@@ -1142,6 +1158,8 @@ var Sheet = forwardRef(
+       }
+     });
+     const onDragStart = useStableCallback((event, info) => {
++      transitionRequest.current = { isOpen };
++      y.stop();
+       blurActiveInput();
+       onDragStartProp == null ? void 0 : onDragStartProp(event, info);
+     });
+@@ -1151,12 +1169,26 @@ var Sheet = forwardRef(
+       const velocity = y.getVelocity();
+       if (velocity > 0) indicatorRotation.set(10);
+       if (velocity < 0) indicatorRotation.set(-10);
+-      y.set(Math.max(currentY + info.delta.y, 0));
++      // Recover pointer distance above the top so reversing the drag stays continuous.
++      const dragY = (currentY < 0 ? currentY / 0.2 : currentY) + info.delta.y;
++      y.set(dragY < 0 ? dragY * 0.2 : dragY);
+     });
+     const onDragEnd = useStableCallback((event, info) => {
+       blurActiveInput();
+       onDragEndProp == null ? void 0 : onDragEndProp(event, info);
+       const currentY = y.get();
++      if (currentY < 0) {
++        animate(y, 0, reduceMotion ? animationOptions : {
++          type: "spring",
++          stiffness: 400,
++          damping: 30,
++          velocity: info.velocity.y * 0.2
++        });
++        const topSnap = snapPoints[snapPoints.length - 1];
++        if (topSnap) updateSnap(topSnap.snapIndex);
++        indicatorRotation.set(0);
++        return;
++      }
+       const result = classifyDragEnd({
+         y: currentY,
+         info,
+@@ -1197,20 +1229,56 @@ var Sheet = forwardRef(
+     const state = useSheetState({
+       isOpen,
+       onOpen: async () => {
++        const request = transitionRequest.current;
++        if (!request.isOpen) return;
+         onOpenStart == null ? void 0 : onOpenStart();
+-        await waitForElement("react-modal-sheet-container");
++        // Paint the mounted starting pose before animating, including after a full unmount.
++        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
++        if (request !== transitionRequest.current) return;
++        if (!sheetRef.current || (initialSnap !== undefined && sheetHeight === 0)) await waitForElement("react-modal-sheet-container");
++        if (request !== transitionRequest.current) return;
++        if (openingFreshContainer.current) {
++          const height = Math.round(sheetRef.current.getBoundingClientRect().height);
++          closedYValue.set(height);
++          openingPosition.current = height;
++          y.jump(height);
++        }
++        entryReady.set(true);
+         const initialSnapPoint = initialSnap !== void 0 ? getSnapPoint(initialSnap) : null;
+         const yTo = (initialSnapPoint == null ? void 0 : initialSnapPoint.snapValueY) ?? 0;
+-        await animate(y, yTo, animationOptions);
++        await animate(y, [openingPosition.current, yTo], animationOptions);
++        if (request !== transitionRequest.current) return;
+         if (initialSnap !== void 0) updateSnap(initialSnap);
+         onOpenEnd == null ? void 0 : onOpenEnd();
+       },
+       onClosing: async () => {
++        const request = transitionRequest.current;
++        if (request.isOpen) return;
+         onCloseStart == null ? void 0 : onCloseStart();
+         await animate(y, closedY, animationOptions);
++        if (request !== transitionRequest.current) return;
+         onCloseEnd == null ? void 0 : onCloseEnd();
+       }
+     });
++    useIsomorphicLayoutEffect(() => {
++      if (state === "closed") {
++        entryReady.set(false);
++        initializedContainer.current = null;
++      }
++      if (state !== "opening" || !sheetRef.current) return;
++      const height = Math.round(sheetRef.current.getBoundingClientRect().height);
++      if (height <= 0) return;
++      closedYValue.set(height);
++      y.stop();
++      // A fresh container starts closed; an interrupted close keeps its current pose.
++      openingFreshContainer.current = initializedContainer.current !== sheetRef.current;
++      if (openingFreshContainer.current) {
++        entryReady.set(false);
++        y.jump(height);
++        initializedContainer.current = sheetRef.current;
++      }
++      openingPosition.current = y.get();
++    }, [state, closedYValue, y]);
+     const dragProps = {
+       drag: "y",
+       dragElastic: 0,

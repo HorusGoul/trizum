@@ -2,7 +2,7 @@ import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
-import { IconButton } from "#src/ui/IconButton.js";
+import { IconButton } from "@trizum/ui/IconButton";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";

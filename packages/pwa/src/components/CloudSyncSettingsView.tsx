@@ -47,7 +47,7 @@ import { useCloudSyncAccountState } from "#src/hooks/useCloudSyncAccountState.ts
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
-import { Button } from "#src/ui/Button.tsx";
+import { Button } from "@trizum/ui/Button";
 
 const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
 const SIGN_IN_SUCCESS_EXIT_ANIMATION_MS = 180;

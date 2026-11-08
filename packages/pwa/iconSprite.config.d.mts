@@ -1,4 +1,4 @@
-import type { IconSpriteConfig } from "../icon-sprite/src/index.ts";
+import type { IconSpriteConfig } from "@trizum/icon-sprite";
 
 declare const config: IconSpriteConfig;
 

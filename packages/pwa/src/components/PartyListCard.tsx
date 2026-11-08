@@ -12,12 +12,12 @@ import {
 } from "react-aria";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { type ComponentProps, type ReactNode, useState } from "react";
-import { useMediaQuery } from "#src/hooks/useMediaQuery.js";
+import { useMediaQuery } from "@trizum/ui/useMediaQuery";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import { Icon } from "#src/ui/Icon.js";
-import { IconButton } from "#src/ui/IconButton.js";
-import { Menu, MenuItem } from "#src/ui/Menu.js";
+import { Icon } from "@trizum/ui/Icon";
+import { IconButton } from "@trizum/ui/IconButton";
+import { Menu, MenuItem } from "@trizum/ui/Menu";
 import {
   ModalSheet,
   ModalSheetAction,
@@ -27,8 +27,8 @@ import {
   ModalSheetHeader,
   ModalSheetSection,
   ModalSheetTitle,
-} from "#src/ui/ModalSheet.js";
-import { cn } from "#src/ui/utils.js";
+} from "@trizum/ui/ModalSheet";
+import { cn } from "@trizum/ui/utils";
 
 export interface PartyListCardAction {
   key: string;

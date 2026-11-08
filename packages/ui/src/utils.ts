@@ -1,0 +1,114 @@
+import clsx, { type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export type ClassName = ClassValue;
+
+export function cn(...className: ClassName[]) {
+  return twMerge(clsx(className));
+}
+
+const isBoolean = <Value>(maybeBoolean: Value): maybeBoolean is Value & boolean =>
+  maybeBoolean === true || maybeBoolean === false;
+
+const toStringIfBoolean = <Value>(value: Value): string | Exclude<Value, boolean> => {
+  if (isBoolean(value)) return String(value);
+
+  // SAFETY: The boolean branch returned above, leaving only the non-boolean members of Value.
+  return value as Exclude<Value, boolean>;
+};
+
+function isSimpleSubset<SchemaVariants extends Variants>(
+  a: Omit<CompoundVariant<SchemaVariants>, "classes">,
+  b: Options<SchemaVariants>,
+) {
+  return Object.entries(a).every(([key, value]) => {
+    // SAFETY: Removing classes from CompoundVariant leaves only keys supplied by the variant schema.
+    return b[key as keyof SchemaVariants] === value;
+  });
+}
+
+type Variants = {
+  [key: string]: {
+    [key: string]: string;
+  };
+};
+
+type CompoundVariant<SchemaVariants extends Variants> = {
+  [Key in keyof SchemaVariants]?: keyof SchemaVariants[Key];
+} & {
+  classes: string;
+};
+
+type Options<SchemaVariants extends Variants> = {
+  [Key in keyof SchemaVariants]?: keyof SchemaVariants[Key];
+};
+
+type Schema<SchemaVariants extends Variants> = {
+  base: string;
+  defaultVariants: {
+    [K in keyof SchemaVariants]: keyof SchemaVariants[K];
+  };
+  variants: SchemaVariants;
+  compoundVariants: CompoundVariant<SchemaVariants>[];
+};
+
+export type VariantsFromProps<
+  Props extends Record<string, unknown>,
+  RequiredProps = Required<Props>,
+> = {
+  [Key in keyof RequiredProps]: RequiredProps[Key] extends string | symbol | number
+    ? {
+        [Variant in RequiredProps[Key]]: string;
+      }
+    : never;
+};
+
+// Read the emitted function parameter directly so declaration consumers retain
+// the same named variant keys as source consumers.
+export type VariantProps<CvaFn> = CvaFn extends (...args: infer Args) => string
+  ? NonNullable<Args[0]>
+  : never;
+
+export const cva =
+  <SchemaVariants extends Variants>(schema: Partial<Schema<SchemaVariants>> = {}) =>
+  (options: Options<SchemaVariants> = {}, classNames: ClassName = []) => {
+    const { base, defaultVariants = {}, variants = {}, compoundVariants = [] } = schema;
+
+    const optionsWithUndefinedsRemoved = { ...options };
+
+    for (const key in optionsWithUndefinedsRemoved) {
+      if (
+        Object.hasOwn(optionsWithUndefinedsRemoved, key) &&
+        optionsWithUndefinedsRemoved[key] === undefined
+      ) {
+        delete optionsWithUndefinedsRemoved[key];
+      }
+    }
+
+    const currentOptions = {
+      ...defaultVariants,
+      ...optionsWithUndefinedsRemoved,
+    };
+
+    return cn([
+      base,
+      Object.keys(variants).map((variantName) => {
+        // @ts-expect-error - idc about the types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return variants[variantName][
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          toStringIfBoolean(options[variantName]) ||
+            // @ts-expect-error - idc about the types
+            defaultVariants[variantName]
+        ];
+      }),
+      compoundVariants.reduce<string[]>((list, { classes, ...compoundVariantOptions }) => {
+        if (isSimpleSubset<SchemaVariants>(compoundVariantOptions, currentOptions)) {
+          list.push(classes);
+        }
+
+        return list;
+      }, []),
+      classNames,
+    ]);
+  };

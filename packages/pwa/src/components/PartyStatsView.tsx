@@ -16,8 +16,8 @@ import {
   type PartyStatsTimeframe,
 } from "#src/lib/partyStats.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.js";
-import { Avatar } from "#src/ui/Avatar.tsx";
-import { Button } from "#src/ui/Button.tsx";
+import { Avatar } from "@trizum/ui/Avatar";
+import { Button } from "@trizum/ui/Button";
 import {
   CalendarCell,
   CalendarGrid,
@@ -26,11 +26,11 @@ import {
   CalendarHeaderCell,
   CalendarHeading,
   RangeCalendar,
-} from "#src/ui/Calendar.tsx";
-import { Icon } from "#src/ui/Icon.js";
-import { Popover, PopoverDialog, PopoverTrigger } from "#src/ui/Popover.tsx";
-import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import { cn } from "#src/ui/utils.js";
+} from "@trizum/ui/Calendar";
+import { Icon } from "@trizum/ui/Icon";
+import { Popover, PopoverDialog, PopoverTrigger } from "@trizum/ui/Popover";
+import { AppSelect, SelectItem } from "@trizum/ui/Select";
+import { cn } from "@trizum/ui/utils";
 import {
   Suspense,
   startTransition,

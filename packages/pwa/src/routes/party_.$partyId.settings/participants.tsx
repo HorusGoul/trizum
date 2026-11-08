@@ -7,7 +7,7 @@ import { Suspense, useId } from "react";
 import { toast } from "sonner";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.js";
 import { useParty } from "#src/hooks/useParty.js";
-import { IconButton } from "#src/ui/IconButton.js";
+import { IconButton } from "@trizum/ui/IconButton";
 import { NewPartyParticipantInput } from "./-components/NewPartyParticipantInput.js";
 import { PartyParticipantsField } from "./-components/PartyParticipantsField.js";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";

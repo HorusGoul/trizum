@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { appWorker } from "#src/lib/appWorker/client.ts";
-import { Button } from "#src/ui/Button.tsx";
+import { Button } from "@trizum/ui/Button";
 import type { Party } from "#src/models/party.ts";
 
 export function SuccessState({ partyId }: { partyId: Party["id"] }) {

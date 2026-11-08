@@ -1,3 +1,4 @@
+import { PwaUIProvider } from "#src/components/PwaUIProvider.js";
 // @vitest-environment jsdom
 
 import { act } from "react";
@@ -48,28 +49,30 @@ async function render(nextStatus: PremiumStatus = "free", nextVisible = true) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <AdvertisingProvider
-          value={{
-            privacyOptionsRequired: false,
-            presentInterstitialOpportunity: () => false,
-            registerProtectedFlow,
-            showPrivacyOptions: async () => undefined,
-          }}
-        >
-          <PremiumContextProvider
+        <PwaUIProvider>
+          <AdvertisingProvider
             value={{
-              status,
-              isPremium: status === "premium",
-              hasActiveSubscription: status === "premium",
-              presentPaywall,
-              presentCustomerCenter: async () => undefined,
+              privacyOptionsRequired: false,
+              presentInterstitialOpportunity: () => false,
+              registerProtectedFlow,
+              showPrivacyOptions: async () => undefined,
             }}
           >
-            <RepoContext value={runtime.repo}>
-              <RouterProvider router={router} />
-            </RepoContext>
-          </PremiumContextProvider>
-        </AdvertisingProvider>
+            <PremiumContextProvider
+              value={{
+                status,
+                isPremium: status === "premium",
+                hasActiveSubscription: status === "premium",
+                presentPaywall,
+                presentCustomerCenter: async () => undefined,
+              }}
+            >
+              <RepoContext value={runtime.repo}>
+                <RouterProvider router={router} />
+              </RepoContext>
+            </PremiumContextProvider>
+          </AdvertisingProvider>
+        </PwaUIProvider>
       </I18nProvider>,
     ),
   );

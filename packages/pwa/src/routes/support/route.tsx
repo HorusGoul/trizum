@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { BackButton } from "#src/components/BackButton.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Icon } from "@trizum/ui/Icon";
 import { createFileRoute } from "@tanstack/react-router";
 import { FAQItem } from "./-components/FAQItem.js";
 import { SupportLink } from "./-components/SupportLink.js";

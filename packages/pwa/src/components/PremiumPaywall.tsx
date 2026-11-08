@@ -19,10 +19,10 @@ import {
   getCurrentPremiumPaywallLoadState,
   type PremiumPaywallLoadState,
 } from "#src/lib/premium/premiumPaywallState.ts";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
-import { IconButton } from "#src/ui/IconButton.tsx";
-import { cn } from "#src/ui/utils.ts";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
+import { IconButton } from "@trizum/ui/IconButton";
+import { cn } from "@trizum/ui/utils";
 
 import { PremiumCodeRedemption } from "./PremiumCodeRedemption.tsx";
 

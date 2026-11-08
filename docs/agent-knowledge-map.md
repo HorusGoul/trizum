@@ -73,6 +73,9 @@ Until the repo has formal code ownership, the maintainer who changes one of
 these surfaces in a PR is responsible for keeping its adjacent agent-facing docs
 current.
 
+The internal design system lives in [`packages/ui/README.md`](../packages/ui/README.md).
+Read it when changing shared components, themes, package localization, or Storybook.
+
 The analytics package map and design rationale live in
 [`packages/analytics/README.md`](../packages/analytics/README.md).
 Use [the analytics-events skill](../.agents/skills/analytics-events/SKILL.md) when

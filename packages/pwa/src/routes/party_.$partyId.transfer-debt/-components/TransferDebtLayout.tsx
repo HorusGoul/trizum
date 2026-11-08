@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.tsx";
-import { IconButton } from "#src/ui/IconButton.tsx";
+import { IconButton } from "@trizum/ui/IconButton";
 
 export function TransferDebtLayout({
   title,

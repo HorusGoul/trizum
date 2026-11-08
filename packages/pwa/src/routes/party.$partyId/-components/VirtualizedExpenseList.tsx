@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { List, useListRef, type RowComponentProps } from "react-window";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
 import type { Expense } from "#src/models/expense.js";
-import { Skeleton } from "#src/ui/Skeleton.tsx";
+import { Skeleton } from "@trizum/ui/Skeleton";
 import { ExpenseItem } from "./ExpenseItem.js";
 
 const EXPENSE_ROW_GAP = 16;

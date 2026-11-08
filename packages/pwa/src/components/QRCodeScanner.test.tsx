@@ -1,3 +1,4 @@
+import { PwaUIProvider } from "#src/components/PwaUIProvider.js";
 // @vitest-environment jsdom
 
 import { I18nProvider } from "@lingui/react";
@@ -43,11 +44,13 @@ async function render(validate?: (value: string) => true | string) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <QRCodeScanner
-          onResult={onResult}
-          validate={validate}
-          createDetector={() => ({ detect })}
-        />
+        <PwaUIProvider>
+          <QRCodeScanner
+            onResult={onResult}
+            validate={validate}
+            createDetector={() => ({ detect })}
+          />
+        </PwaUIProvider>
       </I18nProvider>,
     ),
   );

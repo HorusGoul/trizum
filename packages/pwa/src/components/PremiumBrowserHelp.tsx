@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
-import { IconButton } from "#src/ui/IconButton.tsx";
+import { IconButton } from "@trizum/ui/IconButton";
 
 export function PremiumBrowserHelp({ onClose }: { onClose: () => void }) {
   return (

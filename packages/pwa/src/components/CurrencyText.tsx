@@ -1,4 +1,4 @@
-import { cn } from "#src/ui/utils.js";
+import { cn } from "@trizum/ui/utils";
 import { dinero, toDecimal } from "dinero.js";
 import { getDisplayDineroCurrency, type CurrencyCode } from "#src/lib/money.ts";
 

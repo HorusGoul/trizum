@@ -6,7 +6,7 @@ import {
   validatePartySymbol,
   validatePartyTitle,
 } from "#src/lib/validation.js";
-import { AppTextField } from "#src/ui/fields/TextField.js";
+import { AppTextField } from "@trizum/ui/fields/TextField";
 import type { PartyDetailsFormValues } from "./types.js";
 
 export function PartySettingsDetailsFields({ form }: { form: AppFormApi<PartyDetailsFormValues> }) {

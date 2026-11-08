@@ -3,7 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { Suspense } from "react";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import type { ExpenseTemplateEditorValues } from "#src/models/expenseTemplate.ts";
-import { IconButton } from "#src/ui/IconButton.tsx";
+import { IconButton } from "@trizum/ui/IconButton";
 import { PartySettingsHeader } from "./PartySettingsHeader.tsx";
 
 export function ExpenseTemplateEditorHeader({

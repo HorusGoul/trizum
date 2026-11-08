@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { toast } from "sonner";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
 import { trackEvent } from "#src/lib/analytics.ts";
 
 export function BizumItem({ phoneNumber }: { phoneNumber: string }) {

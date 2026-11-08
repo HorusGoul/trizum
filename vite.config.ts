@@ -18,6 +18,7 @@ const rootAppCommandMessage = [
 // and package-local `vp check .` commands skip the same generated outputs.
 const ignorePatterns = [
   ".agent/**",
+  ".visual-reference/**",
   ".agents/**",
   ".claude/**",
   ".codex/**",
@@ -31,6 +32,11 @@ const ignorePatterns = [
   ".vite-hooks/**",
   "tools/oxlint/anti-slop/**",
   "**/dist/**",
+  "**/storybook-static/**",
+  "**/visual-results/**",
+  "**/visual-report/**",
+  "packages/ui/src/generated/**",
+  "**/locales/*/messages.ts",
   "**/node_modules/**",
   "**/coverage/**",
   "**/.tanstack/**",
@@ -187,6 +193,7 @@ const toolingConfig = {
         command: "vp run --filter @trizum/pwa check && vp check",
         dependsOn: [
           "@trizum/logging#build",
+          "@trizum/ui#build",
           "@trizum/pwa#codegen",
           "@trizum/revenuecat-api#generate",
         ],

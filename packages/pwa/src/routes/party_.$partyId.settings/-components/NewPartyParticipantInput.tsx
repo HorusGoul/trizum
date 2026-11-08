@@ -2,8 +2,8 @@ import { t } from "@lingui/core/macro";
 import { focusInputIntoView } from "#src/lib/focusInputIntoView.ts";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import { validatePartyParticipantName } from "#src/lib/validation.js";
-import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/fields/TextField.js";
+import { IconButton } from "@trizum/ui/IconButton";
+import { AppTextField } from "@trizum/ui/fields/TextField";
 import type { AddPartyParticipantFormValues } from "./types.js";
 
 export function NewPartyParticipantInput({

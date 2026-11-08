@@ -152,14 +152,14 @@ For translation guidelines, see [`packages/pwa/locale/AGENTS.md`](./packages/pwa
 
 ### Component Organization
 
-| Directory         | Purpose                                            |
-| ----------------- | -------------------------------------------------- |
-| `src/ui/`         | Design system components (buttons, inputs, modals) |
-| `src/components/` | Application-specific components                    |
-| `src/routes/`     | Route/page components (TanStack Router)            |
-| `src/hooks/`      | Custom React hooks                                 |
-| `src/lib/`        | Utility functions and helpers                      |
-| `src/models/`     | Automerge document types and schemas               |
+| Directory         | Purpose                                                            |
+| ----------------- | ------------------------------------------------------------------ |
+| `packages/ui/`    | Shared design system (components, themes, localization, Storybook) |
+| `src/components/` | Application-specific components                                    |
+| `src/routes/`     | Route/page components (TanStack Router)                            |
+| `src/hooks/`      | Custom React hooks                                                 |
+| `src/lib/`        | Utility functions and helpers                                      |
+| `src/models/`     | Automerge document types and schemas                               |
 
 **Co-location is encouraged** — keep related files close to where they're used.
 

@@ -4,7 +4,7 @@ The main React application, with offline-first Automerge state and a Cloudflare 
 
 ## Start here
 
-- [Routes](./src/routes), [design system](./src/ui), and [app components](./src/components).
+- [Routes](./src/routes), [design system](../ui/README.md), and [app components](./src/components).
 - [Business logic](./src/lib) and [domain models](./src/models).
 - [Package tasks](./vite.config.ts) and [scripts](./package.json).
 - **Change UI or client state:** [PWA conventions](../../docs/agents/pwa.md).
@@ -22,10 +22,18 @@ The main React application, with offline-first Automerge state and a Cloudflare 
 - `src/routeTree.gen.ts` is generated. Do not edit it manually.
 - `src/generated/iconSprite.gen.ts` and `src/generated/iconSprite.svg` are
   generated from the available icon catalog and current icon usage.
-  `src/generated/tw-dynamic-themes.css` is generated from the default dynamic
-  theme hue. These files are intentionally untracked; regenerate them with
+  Both files are intentionally untracked; regenerate them with
   `vp run codegen`, or let the package scripts do it automatically instead of
-  hand-editing them.
+  hand-editing them. Icon generation scans the app and design-system source.
+
+## Shared UI setup
+
+- `src/components/PwaUIProvider.tsx` bridges the active Lingui locale and generated
+  icon sprite into `@trizum/ui`. Shared fonts, resets, tokens, and animations come
+  from `@trizum/ui/styles.css`; `src/index.css` owns the app root sizing.
+- `src/lib/i18n.ts` merges the package's compiled catalogs with PWA catalogs.
+  Extract PWA messages only from this package's source; shared UI catalogs are
+  maintained in `packages/ui`.
 
 ## Validation
 

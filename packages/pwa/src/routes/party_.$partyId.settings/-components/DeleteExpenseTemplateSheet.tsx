@@ -7,7 +7,7 @@ import {
   ModalSheetHeader,
   ModalSheetSection,
   ModalSheetTitle,
-} from "#src/ui/ModalSheet.tsx";
+} from "@trizum/ui/ModalSheet";
 
 export function DeleteExpenseTemplateSheet({
   isOpen,

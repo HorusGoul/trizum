@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import type { PartyParticipant } from "#src/models/party.ts";
-import { Avatar } from "#src/ui/Avatar.tsx";
+import { Avatar } from "@trizum/ui/Avatar";
 
 export function TransferParticipantAvatar({
   participant,

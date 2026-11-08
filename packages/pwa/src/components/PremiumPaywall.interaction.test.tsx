@@ -1,3 +1,4 @@
+import { PwaUIProvider } from "#src/components/PwaUIProvider.js";
 // @vitest-environment jsdom
 
 import { act, type ComponentProps } from "react";
@@ -29,14 +30,16 @@ async function render(isOpen = true, sessionId = 1, userId = "user-1") {
   await act(async () => {
     root.render(
       <I18nProvider i18n={i18n}>
-        <PremiumPaywall
-          services={services}
-          isOpen={isOpen}
-          onEntitlementChange={onEntitlementChange}
-          onOpenChange={onOpenChange}
-          sessionId={sessionId}
-          userId={userId}
-        />
+        <PwaUIProvider>
+          <PremiumPaywall
+            services={services}
+            isOpen={isOpen}
+            onEntitlementChange={onEntitlementChange}
+            onOpenChange={onOpenChange}
+            sessionId={sessionId}
+            userId={userId}
+          />
+        </PwaUIProvider>
       </I18nProvider>,
     );
   });

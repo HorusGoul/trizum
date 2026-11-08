@@ -277,6 +277,104 @@ test.describe("Expense log", () => {
     await expect(page).not.toHaveURL(/[?&]media=/);
   });
 
+  test("continues gallery dismissal after release and retains the photo through button close", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+    await page.locator('input[aria-label="Upload photo"]').setInputFiles("public/pwa-192x192.png");
+    const attachment = page.getByRole("button", { name: "View photo" });
+    await attachment.click();
+    const image = page.locator("[data-media-gallery-image]");
+    await expect(image).toBeVisible();
+    await expect(page.locator("[data-media-gallery-overlay]")).not.toHaveAttribute(
+      "data-entering",
+      "true",
+    );
+    const box = await image.boundingBox();
+
+    if (!box) throw new Error("Expected the gallery image");
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x, y + 160, { steps: 4 });
+    await expect.poll(async () => (await image.boundingBox())?.y ?? 0).toBeGreaterThan(box.y + 150);
+    const releasedBox = await image.boundingBox();
+    await page.mouse.up();
+    await expect(image).toHaveCount(1);
+    await expect
+      .poll(async () => (await image.boundingBox())?.y ?? 0)
+      .toBeGreaterThan(releasedBox?.y ?? Infinity);
+    await expect(page).not.toHaveURL(/[?&]media=/);
+    await expect(image).toHaveCount(0);
+    await attachment.click();
+    await expect(image).toBeVisible();
+
+    const slowExit = await page.addStyleTag({
+      content: "[data-media-gallery-overlay][data-exiting] { animation-duration: 1s !important; }",
+    });
+
+    await page.getByRole("button", { name: "Close", exact: true }).click({ force: true });
+    await expect(page.locator("[data-media-gallery-overlay]")).toHaveAttribute(
+      "data-exiting",
+      "true",
+    );
+    await expect(image).toHaveCount(1);
+    await slowExit.evaluate((element) => element.parentNode?.removeChild(element));
+    await expect(image).toHaveCount(0);
+  });
+
+  test("keeps the gallery backdrop opaque during off-center pinch zoom", async ({
+    harness,
+    page,
+  }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+    await page.locator('input[aria-label="Upload photo"]').setInputFiles("public/pwa-192x192.png");
+    await page.getByRole("button", { name: "View photo" }).click();
+    const image = page.locator("[data-media-gallery-image]");
+    const overlay = page.locator("[data-media-gallery-overlay]");
+    await expect(image).toBeVisible();
+    const box = await image.boundingBox();
+
+    if (!box) throw new Error("Expected the gallery image");
+
+    for (const deltaY of [-20, -50, -100, 600]) {
+      // Ctrl+wheel is use-gesture's desktop pinch input, including rubber-banding below 1x.
+      await image.dispatchEvent("wheel", {
+        deltaY,
+        ctrlKey: true,
+        clientX: box.x + box.width / 2,
+        clientY: box.y + box.height / 2 - 70,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      const scale = expect.poll(() =>
+        image.evaluate(
+          (element) => new DOMMatrixReadOnly(getComputedStyle(element.parentElement!).transform).a,
+        ),
+      );
+
+      if (deltaY < 0) await scale.toBeGreaterThan(1);
+      else await scale.toBeLessThan(1);
+
+      await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
+    }
+  });
+
   test("restores the gallery backdrop after closing with a drag gesture", async ({
     harness,
     page,

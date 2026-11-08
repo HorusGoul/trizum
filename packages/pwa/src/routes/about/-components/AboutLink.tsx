@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Icon, type IconProps } from "#src/ui/Icon.js";
+import { Icon, type IconProps } from "@trizum/ui/Icon";
 
 interface AboutLinkProps {
   href: string;

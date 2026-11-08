@@ -1,6 +1,6 @@
 {
   "name": "@trizum/analytics",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "Privacy-aware InsightFlare analytics for trizum",
   "keywords": [],

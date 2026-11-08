@@ -9,7 +9,7 @@ import {
 } from "#src/models/expense.ts";
 import type { MediaFile } from "#src/models/media.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
-import { Avatar } from "#src/ui/Avatar.tsx";
+import { Avatar } from "@trizum/ui/Avatar";
 import { getLogger } from "#src/lib/log.ts";
 import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";

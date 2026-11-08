@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, LazyMotion, domAnimation, m as motion } from "motion/react";
 import { BarcodeDetector } from "#src/lib/qr.js";
 import { getLogger } from "#src/lib/log.ts";
-import { TrizumSpinner } from "./TrizumSpinner.js";
-import { Icon } from "#src/ui/Icon.js";
-import { cn } from "#src/ui/utils.js";
+import { TrizumSpinner } from "@trizum/ui/TrizumSpinner";
+import { Icon } from "@trizum/ui/Icon";
+import { cn } from "@trizum/ui/utils";
 
 const logger = getLogger("components", "QRCodeScanner");
 

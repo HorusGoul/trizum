@@ -2,9 +2,9 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { type ReactNode } from "react";
 import type { LinkedAuthAccount } from "#src/lib/auth-client.ts";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon, type IconProps } from "#src/ui/Icon.tsx";
-import { cn } from "#src/ui/utils.js";
+import { Button } from "@trizum/ui/Button";
+import { Icon, type IconProps } from "@trizum/ui/Icon";
+import { cn } from "@trizum/ui/utils";
 
 export function CloudSyncAccountSettings({
   email,

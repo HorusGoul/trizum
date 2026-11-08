@@ -33,6 +33,10 @@ peerDependencyRules:
 catalog:
   "@modelcontextprotocol/ext-apps": 2.0.4
   "@modelcontextprotocol/sdk": 1.32.2
+  oxc-transform-react: 0.152.0
+  storybook: 10.6.5
+  "@storybook/react-vite": 10.6.5
+  "@storybook/addon-docs": 10.6.5
   bs58check: 4.0.0
   "@typescript/native": npm:typescript@7.0.2
   "@automerge/automerge": 3.5.0
@@ -181,4 +185,5 @@ minimumReleaseAgeExclude:
   - "@vitest/*"
 patchedDependencies:
   "@capacitor-community/admob@8.2.1": patches/@capacitor-community__admob@8.2.1.patch
+  react-modal-sheet@5.6.0: patches/react-modal-sheet@5.6.0.patch
   vite-plugin-top-level-await@1.6.0: patches/vite-plugin-top-level-await@1.6.0.patch
