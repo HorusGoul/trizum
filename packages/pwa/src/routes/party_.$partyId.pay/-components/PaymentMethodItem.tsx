@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { getPaymentLink, paymentMethodLabels } from "#src/lib/paymentMethods.ts";
 import type { PaymentMethodType } from "#src/models/paymentMethod.ts";
+import { PaymentMethodIcon } from "#src/components/PaymentMethodIcon.tsx";
 
 export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; details: string }) {
   const { t } = useLingui();
@@ -23,7 +24,10 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
 
   return (
     <section className="dark:bg-accent-900 flex flex-col gap-3 rounded-xl bg-white p-4">
-      <h3 className="text-lg font-semibold">{methodName}</h3>
+      <h3 className="flex items-center gap-3 text-lg font-semibold">
+        <PaymentMethodIcon type={type} />
+        {methodName}
+      </h3>
       {type === "bizum" ? (
         <p className="text-accent-700 dark:text-accent-300">
           <Trans>Copy the phone number and pay through Bizum using your bank app.</Trans>

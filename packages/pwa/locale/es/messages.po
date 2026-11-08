@@ -323,11 +323,11 @@ msgstr "Añadir participante"
 msgid "Add password sign-in"
 msgstr "Añadir inicio de sesión con contraseña"
 
-#: src/components/PaymentMethodsEditor.tsx:75
+#: src/components/PaymentMethodsEditor.tsx:80
 msgid "Add payment method"
 msgstr "Añadir método de pago"
 
-#: src/components/PaymentMethodsEditor.tsx:29
+#: src/components/PaymentMethodsEditor.tsx:30
 msgid "Add the ways people can pay you. These details are shared with everyone in your groups."
 msgstr "Añade las formas en las que pueden pagarte. Estos datos se comparten con todos los participantes de tus Grupos."
 
@@ -747,7 +747,7 @@ msgstr "Escudo Caboverdiano"
 msgid "Cash App"
 msgstr "Cash App"
 
-#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:7
+#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:9
 msgid "Cash or other ways"
 msgstr "Efectivo u otras formas"
 
@@ -820,7 +820,7 @@ msgstr "Yuan Chino"
 msgid "Choose a destination party"
 msgstr "Elige un grupo de destino"
 
-#: src/components/PaymentMethodsEditor.tsx:76
+#: src/components/PaymentMethodsEditor.tsx:81
 msgid "Choose a payment method"
 msgstr "Elige un método de pago"
 
@@ -1026,7 +1026,7 @@ msgstr "Colaboradores"
 msgid "Copy code"
 msgstr "Copiar código"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:47
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:51
 msgid "Copy details"
 msgstr "Copiar datos"
 
@@ -1034,7 +1034,7 @@ msgstr "Copiar datos"
 msgid "Copy party link"
 msgstr "Copiar enlace del grupo"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:29
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:33
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicación de tu banco."
 
@@ -1066,7 +1066,7 @@ msgstr "No se pudo aplicar la configuración en la nube"
 msgid "Could not connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:20
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:21
 msgid "Could not copy payment details. You can select and copy them manually."
 msgstr "No se han podido copiar los datos de pago. Puedes seleccionarlos y copiarlos manualmente."
 
@@ -1655,11 +1655,11 @@ msgstr "Dalasi Gambiano"
 msgid "Georgian Lari"
 msgstr "Lari Georgiano"
 
-#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:10
+#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:12
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otra forma diferente a las descritas anteriormente."
 
-#: src/components/PaymentMethodsEditor.tsx:26
+#: src/components/PaymentMethodsEditor.tsx:27
 msgid "Get paid"
 msgstr "Recibir pagos"
 
@@ -2525,7 +2525,7 @@ msgstr "¿Usar solo plantillas personalizadas?"
 msgid "Only your own debt can be transferred"
 msgstr "Solo puedes transferir tus propias deudas"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:42
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:46
 msgid "Open {methodName}"
 msgstr "Abrir {methodName}"
 
@@ -2827,7 +2827,7 @@ msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricou
 msgid "Pay"
 msgstr "Pagar"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:18
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:19
 msgid "Payment details copied"
 msgstr "Datos de pago copiados"
 
@@ -3104,13 +3104,13 @@ msgstr "Canjea tu oferta"
 msgid "Reload"
 msgstr "Recargar"
 
-#: src/components/PaymentMethodsEditor.tsx:68
+#: src/components/PaymentMethodsEditor.tsx:73
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:72
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantRow.tsx:49
 msgid "Remove"
 msgstr "Eliminar"
 
-#: src/components/PaymentMethodsEditor.tsx:61
+#: src/components/PaymentMethodsEditor.tsx:66
 msgid "Remove {methodName}"
 msgstr "Eliminar {methodName}"
 

@@ -327,11 +327,11 @@ msgstr "Add participant"
 msgid "Add password sign-in"
 msgstr "Add password sign-in"
 
-#: src/components/PaymentMethodsEditor.tsx:75
+#: src/components/PaymentMethodsEditor.tsx:80
 msgid "Add payment method"
 msgstr "Add payment method"
 
-#: src/components/PaymentMethodsEditor.tsx:29
+#: src/components/PaymentMethodsEditor.tsx:30
 msgid "Add the ways people can pay you. These details are shared with everyone in your groups."
 msgstr "Add the ways people can pay you. These details are shared with everyone in your groups."
 
@@ -767,7 +767,7 @@ msgstr "Cape Verdean Escudo"
 msgid "Cash App"
 msgstr "Cash App"
 
-#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:7
+#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:9
 msgid "Cash or other ways"
 msgstr "Cash or other ways"
 
@@ -844,7 +844,7 @@ msgstr "Chinese Yuan"
 msgid "Choose a destination party"
 msgstr "Choose a destination party"
 
-#: src/components/PaymentMethodsEditor.tsx:76
+#: src/components/PaymentMethodsEditor.tsx:81
 msgid "Choose a payment method"
 msgstr "Choose a payment method"
 
@@ -1050,7 +1050,7 @@ msgstr "Contributors"
 msgid "Copy code"
 msgstr "Copy code"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:47
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:51
 msgid "Copy details"
 msgstr "Copy details"
 
@@ -1058,7 +1058,7 @@ msgstr "Copy details"
 msgid "Copy party link"
 msgstr "Copy party link"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:29
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:33
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copy the phone number and pay through Bizum using your bank app."
 
@@ -1090,7 +1090,7 @@ msgstr "Could not apply cloud settings"
 msgid "Could not connect sign-in method"
 msgstr "Could not connect sign-in method"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:20
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:21
 msgid "Could not copy payment details. You can select and copy them manually."
 msgstr "Could not copy payment details. You can select and copy them manually."
 
@@ -1699,11 +1699,11 @@ msgstr "Gambian Dalasi"
 msgid "Georgian Lari"
 msgstr "Georgian Lari"
 
-#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:10
+#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:12
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 
-#: src/components/PaymentMethodsEditor.tsx:26
+#: src/components/PaymentMethodsEditor.tsx:27
 msgid "Get paid"
 msgstr "Get paid"
 
@@ -2581,7 +2581,7 @@ msgstr "Only use custom templates?"
 msgid "Only your own debt can be transferred"
 msgstr "Only your own debt can be transferred"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:42
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:46
 msgid "Open {methodName}"
 msgstr "Open {methodName}"
 
@@ -2895,7 +2895,7 @@ msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc1
 msgid "Pay"
 msgstr "Pay"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:18
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:19
 msgid "Payment details copied"
 msgstr "Payment details copied"
 
@@ -3176,13 +3176,13 @@ msgstr "Redeem your offer"
 msgid "Reload"
 msgstr "Reload"
 
-#: src/components/PaymentMethodsEditor.tsx:68
+#: src/components/PaymentMethodsEditor.tsx:73
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:72
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantRow.tsx:49
 msgid "Remove"
 msgstr "Remove"
 
-#: src/components/PaymentMethodsEditor.tsx:61
+#: src/components/PaymentMethodsEditor.tsx:66
 msgid "Remove {methodName}"
 msgstr "Remove {methodName}"
 
