@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn, type ClassName } from "./utils.js";
-import { Suspense, use, useEffect, useRef } from "react";
+import { Suspense, use, useEffect, useEffectEvent, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
 import {
   LazyMotion,
@@ -281,7 +281,10 @@ export default function MediaGallery(props: MediaGalleryProps) {
     }
   });
 
+  const resetDragProgress = useEffectEvent(() => onDragProgress?.(0));
+
   useEffect(() => {
+    resetDragProgress();
     x.stop();
     y.stop();
     scale.stop();

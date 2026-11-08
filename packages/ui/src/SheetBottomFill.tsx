@@ -9,6 +9,7 @@ export function SheetBottomFill() {
   return (
     <motion.div
       aria-hidden="true"
+      data-sheet-bottom-fill=""
       className="from-accent-50/95 to-accent-50/95 dark:from-accent-900 dark:to-accent-900 pointer-events-none absolute inset-x-0 bottom-0 z-[2] mx-auto w-full max-w-xl bg-linear-to-b"
       style={{ height }}
     />

@@ -8,3 +8,5 @@ Improve gallery flick dismissal and backdrop tracking, pull-to-refresh resistanc
 Allow shared and calculator sheets to stretch above their highest snap point with resistance and spring back on release.
 
 Keep the sheet background covering the bottom edge during upward overdrag and spring-back.
+
+Align the calculator sheet and bottom fill across mobile widths, and restore the gallery backdrop when reopening during its exit animation.
