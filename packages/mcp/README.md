@@ -193,7 +193,9 @@ styles and uses Button (including its async pending state), Avatar, Alert, Icon,
 and UIProvider. Its icon sprite is generated with the UI package’s icon helper.
 Lingui loads the UI package’s English/Spanish catalogs alongside host-supplied
 labels; the host’s initial theme and theme changes select the shared light/dark
-styles. The MCP HTML embeds scripts, CSS, fonts, and the sprite, so the sandbox
+styles. The widget leaves its document background transparent and uses the host’s
+outer frame, with no nested card border or surface. The MCP HTML embeds scripts,
+CSS, fonts, and the sprite, so the sandbox
 needs no network access for rendering. Worker tasks build this package before
 importing its server and raw widget assets.
 

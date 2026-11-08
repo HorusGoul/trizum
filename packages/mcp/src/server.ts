@@ -24,7 +24,7 @@ import {
 import { createWidgetHtml } from "./widgetHtml.js";
 
 // Keep published URLs readable when a host still has an earlier tool definition cached.
-const resourceVersions = [5, 4, 3, 2] as const;
+const resourceVersions = [6, 5, 4, 3, 2] as const;
 const resourceUri = `ui://trizum/party-v${resourceVersions[0]}.html`;
 
 export interface McpAppOptions {

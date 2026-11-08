@@ -108,7 +108,13 @@ for (const outcome of ["success", "rejected", "unsupported"] as const) {
     await expect(frame.getByRole("heading", { name: "🏝️ Weekend" })).toBeVisible();
     await expect(frame.locator("html")).toHaveAttribute("lang", locale);
     await expect(frame.locator("html")).toHaveCSS("color-scheme", theme);
-    await expect(frame.locator("main")).toHaveCSS("border-radius", "24px");
+    await expect(frame.locator("main")).toHaveCSS("border-radius", "0px");
+    await expect(frame.locator("main")).toHaveCSS("border-top-width", "0px");
+
+    for (const element of ["html", "body", "main"]) {
+      await expect(frame.locator(element)).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    }
+
     expect(
       await frame.locator("main").evaluate(async () => {
         await document.fonts.ready;

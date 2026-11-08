@@ -39,3 +39,5 @@ and follow the MCP host’s light/dark theme while retaining sandbox-safe naviga
 
 Keep previously published widget URLs readable for clients with cached tool
 metadata, and reduce embedded font payloads while retaining the shared UI.
+
+Use the host’s frame for the embedded widget, removing its nested card surface.

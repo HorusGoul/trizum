@@ -11,6 +11,13 @@ html.dark {
   color-scheme: dark;
 }
 
+html,
+body,
+html.dark,
+html.dark body {
+  background-color: transparent;
+}
+
 body {
   min-width: 0;
   padding: 1rem;
