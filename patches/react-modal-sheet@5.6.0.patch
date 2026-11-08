@@ -1,0 +1,80 @@
+diff --git a/dist/index.js b/dist/index.js
+index c033003905791f5339535f7ce33b7914109c1d91..d51355cad0d4366f302cfdb027a48669ecad7c62 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1149,6 +1149,7 @@ var Sheet = React.forwardRef(
+       }
+     });
+     const onDragStart = useStableCallback((event, info) => {
++      y.stop();
+       blurActiveInput();
+       onDragStartProp == null ? void 0 : onDragStartProp(event, info);
+     });
+@@ -1158,12 +1159,26 @@ var Sheet = React.forwardRef(
+       const velocity = y.getVelocity();
+       if (velocity > 0) indicatorRotation.set(10);
+       if (velocity < 0) indicatorRotation.set(-10);
+-      y.set(Math.max(currentY + info.delta.y, 0));
++      // Recover pointer distance above the top so reversing the drag stays continuous.
++      const dragY = (currentY < 0 ? currentY / 0.2 : currentY) + info.delta.y;
++      y.set(dragY < 0 ? dragY * 0.2 : dragY);
+     });
+     const onDragEnd = useStableCallback((event, info) => {
+       blurActiveInput();
+       onDragEndProp == null ? void 0 : onDragEndProp(event, info);
+       const currentY = y.get();
++      if (currentY < 0) {
++        animate(y, 0, reduceMotion ? animationOptions : {
++          type: "spring",
++          stiffness: 400,
++          damping: 30,
++          velocity: info.velocity.y * 0.2
++        });
++        const topSnap = snapPoints[snapPoints.length - 1];
++        if (topSnap) updateSnap(topSnap.snapIndex);
++        indicatorRotation.set(0);
++        return;
++      }
+       const result = classifyDragEnd({
+         y: currentY,
+         info,
+diff --git a/dist/index.mjs b/dist/index.mjs
+index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..b7d94ead293570ca899ffd7cbe979c9f3e33176f 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -1142,6 +1142,7 @@ var Sheet = forwardRef(
+       }
+     });
+     const onDragStart = useStableCallback((event, info) => {
++      y.stop();
+       blurActiveInput();
+       onDragStartProp == null ? void 0 : onDragStartProp(event, info);
+     });
+@@ -1151,12 +1152,26 @@ var Sheet = forwardRef(
+       const velocity = y.getVelocity();
+       if (velocity > 0) indicatorRotation.set(10);
+       if (velocity < 0) indicatorRotation.set(-10);
+-      y.set(Math.max(currentY + info.delta.y, 0));
++      // Recover pointer distance above the top so reversing the drag stays continuous.
++      const dragY = (currentY < 0 ? currentY / 0.2 : currentY) + info.delta.y;
++      y.set(dragY < 0 ? dragY * 0.2 : dragY);
+     });
+     const onDragEnd = useStableCallback((event, info) => {
+       blurActiveInput();
+       onDragEndProp == null ? void 0 : onDragEndProp(event, info);
+       const currentY = y.get();
++      if (currentY < 0) {
++        animate(y, 0, reduceMotion ? animationOptions : {
++          type: "spring",
++          stiffness: 400,
++          damping: 30,
++          velocity: info.velocity.y * 0.2
++        });
++        const topSnap = snapPoints[snapPoints.length - 1];
++        if (topSnap) updateSnap(topSnap.snapIndex);
++        indicatorRotation.set(0);
++        return;
++      }
+       const result = classifyDragEnd({
+         y: currentY,
+         info,
