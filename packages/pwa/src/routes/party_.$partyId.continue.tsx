@@ -100,7 +100,13 @@ function AiInvite() {
   return (
     <main className="container flex min-h-full flex-col justify-center gap-8 px-5 py-10 sm:px-8">
       <header className="space-y-4">
-        <span className="text-accent-600 dark:text-accent-300 text-sm font-semibold">trizum</span>
+        <img
+          src="/pwa-192x192.png"
+          alt="trizum"
+          width={64}
+          height={64}
+          className="size-16 rounded-2xl"
+        />
         <h1 className="text-3xl font-bold tracking-tight">
           <Trans>Your group is ready</Trans>
         </h1>

@@ -34,6 +34,7 @@ second JSON copy, preserving the full structured data for follow-up actions.
 
 Return canonical app-associated invite URLs from all MCP hosts. Installed apps can
 open directly; browser visitors receive app-download or web choices on a separate
-custom domain hosted by the same Worker. Preserve the party through desktop QR
-codes, invite copying and the existing web join flow. Track only approved campaign
-labels under existing analytics privacy gates, with no deferred-install tracking.
+custom domain hosted by the same Worker, with the existing trizum logo identifying
+the download page. Preserve the party through desktop QR codes, invite copying
+and the existing web join flow. Track only approved campaign labels under existing
+analytics privacy gates, with no deferred-install tracking.

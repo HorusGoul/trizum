@@ -347,7 +347,7 @@ msgstr "Advanced"
 msgid "Afghan Afghani"
 msgstr "Afghan Afghani"
 
-#: src/routes/party_.$partyId.continue.tsx:121
+#: src/routes/party_.$partyId.continue.tsx:127
 msgid "After installing, reopen this invite to join your group. No account is needed."
 msgstr "After installing, reopen this invite to join your group. No account is needed."
 
@@ -379,7 +379,7 @@ msgstr "All expense checks passed"
 msgid "All time"
 msgstr "All time"
 
-#: src/routes/party_.$partyId.continue.tsx:132
+#: src/routes/party_.$partyId.continue.tsx:138
 msgid "Already have trizum? Open your group"
 msgstr "Already have trizum? Open your group"
 
@@ -1015,7 +1015,7 @@ msgstr "Connections"
 msgid "Contact Us"
 msgstr "Contact Us"
 
-#: src/routes/party_.$partyId.continue.tsx:167
+#: src/routes/party_.$partyId.continue.tsx:173
 msgid "Continue on the web"
 msgstr "Continue on the web"
 
@@ -1039,7 +1039,7 @@ msgstr "Contributors"
 msgid "Copy code"
 msgstr "Copy code"
 
-#: src/routes/party_.$partyId.continue.tsx:183
+#: src/routes/party_.$partyId.continue.tsx:189
 msgid "Copy invite link"
 msgstr "Copy invite link"
 
@@ -1692,7 +1692,7 @@ msgstr "Get in touch with the person to make the payment in cash or a different 
 msgid "Get it on Google Play"
 msgstr "Get it on Google Play"
 
-#: src/routes/party_.$partyId.continue.tsx:111
+#: src/routes/party_.$partyId.continue.tsx:117
 msgid "Get the app to track shared expenses with your group, even offline."
 msgstr "Get the app to track shared expenses with your group, even offline."
 
@@ -1952,7 +1952,7 @@ msgstr "Invalid trizum party code"
 msgid "Invalid trizum party link"
 msgstr "Invalid trizum party link"
 
-#: src/routes/party_.$partyId.continue.tsx:141
+#: src/routes/party_.$partyId.continue.tsx:147
 msgid "Invite QR code"
 msgstr "Invite QR code"
 
@@ -2610,7 +2610,7 @@ msgstr "Open parenthesis"
 msgid "Open the installed trizum app and sign in to the account you want to use for Premium."
 msgstr "Open the installed trizum app and sign in to the account you want to use for Premium."
 
-#: src/routes/party_.$partyId.continue.tsx:139
+#: src/routes/party_.$partyId.continue.tsx:145
 msgid "Open this invite on your phone"
 msgstr "Open this invite on your phone"
 
@@ -2806,7 +2806,7 @@ msgstr "Party is completely balanced!"
 msgid "Party leaderboard"
 msgstr "Party leaderboard"
 
-#: src/routes/party_.$partyId.continue.tsx:176
+#: src/routes/party_.$partyId.continue.tsx:182
 #: src/routes/party_.$partyId.share.tsx:50
 msgid "Party link copied to clipboard!"
 msgstr "Party link copied to clipboard!"
@@ -3330,7 +3330,7 @@ msgstr "Select emoji"
 msgid "Select everyone now and automatically include new participants."
 msgstr "Select everyone now and automatically include new participants."
 
-#: src/routes/party_.$partyId.continue.tsx:188
+#: src/routes/party_.$partyId.continue.tsx:194
 msgid "Select this link to copy your invite:"
 msgstr "Select this link to copy your invite:"
 
@@ -4603,7 +4603,7 @@ msgstr "Your account could not be checked. Connect to the internet and try again
 msgid "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."
 msgstr "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."
 
-#: src/routes/party_.$partyId.continue.tsx:105
+#: src/routes/party_.$partyId.continue.tsx:111
 msgid "Your group is ready"
 msgstr "Your group is ready"
 
