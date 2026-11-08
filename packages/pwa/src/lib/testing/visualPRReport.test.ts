@@ -111,7 +111,10 @@ function server() {
       return new Response(png, { headers: { "content-type": "image/png" } });
     }
 
-    const route = url.split(`/repos/${repository}/`)[1];
+    const root = `https://api.github.com/repos/${repository}`;
+
+    if (url === `${root}/`) return new Response(null, { status: 404 });
+    const route = url === root ? "" : url.slice(root.length + 1);
     const method = init?.method ?? "GET";
 
     if (method !== "GET")
@@ -263,6 +266,17 @@ describe("PR comment format", () => {
     expect(renderComment({ runURL: "run", attempt: 1, head }, report())).toContain(
       "| No image captured | No image captured |",
     );
+  });
+});
+
+describe("GitHub API URLs", () => {
+  it.each([
+    ["", "https://api.github.com/repos/HorusGoul/trizum"],
+    ["git/blobs", "https://api.github.com/repos/HorusGoul/trizum/git/blobs"],
+  ])("constructs the exact endpoint for route %s", async (route, url) => {
+    const transport = vi.fn<typeof fetch>().mockResolvedValue(Response.json({}));
+    await githubClient(repository, "token", transport).request("GET", route);
+    expect(transport).toHaveBeenCalledWith(url, expect.objectContaining({ method: "GET" }));
   });
 });
 

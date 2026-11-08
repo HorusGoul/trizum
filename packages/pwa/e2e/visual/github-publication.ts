@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { setTimeout } from "node:timers/promises";
 import { commentMarker, reportBranch, type ReportImage } from "./pr-report.ts";
 
@@ -17,7 +19,9 @@ export class GitHubError extends Error {
 export function githubClient(repository: string, token: string, transport = fetch): GitHub {
   return {
     async request<T>(method: string, route: string, body?: string): Promise<T> {
-      const response = await transport(`https://api.github.com/repos/${repository}/${route}`, {
+      const endpoint = `https://api.github.com/repos/${repository}${route ? `/${route}` : ""}`;
+
+      const response = await transport(endpoint, {
         method,
         body,
         headers: {
