@@ -26,6 +26,9 @@ Build the embedded widget with shared trizum UI components, fonts, icons and the
 colors. Follow host light/dark themes, keep previously published widget URLs
 readable, embed all assets, and include responsive padding in host height
 measurements. Use host-mediated navigation and a copyable fallback.
+Describe the widget's contents to ChatGPT and request brief confirmations without
+duplicating its balances, expenses and links in the assistant response. Retain
+text summaries for explicit requests and clients without widget support.
 
 Return canonical app-associated invite URLs from all MCP hosts. Installed apps can
 open directly; browser visitors receive app-download or web choices on a separate

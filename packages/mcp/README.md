@@ -193,6 +193,13 @@ verified ChatGPT mobile size limit. Published resource URLs remain registered as
 compatibility aliases so cached tool definitions can still read the card after
 an update. New tool metadata advertises the latest URI.
 
+The resource's `openai/widgetDescription` tells ChatGPT what the widget already
+shows. Server instructions ask for one short confirmation when the widget is
+displayed, without repeating balances, expenses or links in a second card or
+table. Explicit requests for text or shareable links still receive them, and
+clients without UI can summarize the unchanged structured results. These are
+model-facing hints; live conversations must verify the resulting narration.
+
 ## Connect a development app
 
 1. Run `vp run dev` from the workspace root. Use the printed local URL with
