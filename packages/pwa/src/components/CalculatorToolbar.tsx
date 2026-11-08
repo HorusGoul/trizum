@@ -8,6 +8,7 @@ import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
 import { Button } from "@trizum/ui/Button";
+import { SheetBottomFill } from "@trizum/ui/SheetBottomFill";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { cn } from "@trizum/ui/utils";
@@ -1075,6 +1076,7 @@ export function CalculatorToolbar({
           photoIds={attachmentPhotoIds}
           sheetHeight={mobileSheetHeight}
         />
+        <SheetBottomFill />
         <Sheet.Container
           ref={toolbarRef}
           role="application"

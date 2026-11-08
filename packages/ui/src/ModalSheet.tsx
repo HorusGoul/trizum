@@ -24,6 +24,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { SheetBottomFill } from "./SheetBottomFill.js";
 import { Icon, type IconProps } from "./Icon.js";
 import { cn, type ClassName } from "./utils.js";
 
@@ -78,6 +79,7 @@ export function ModalSheet({
       {...props}
     >
       <OverlayProvider>
+        <SheetBottomFill />
         <FocusScope contain restoreFocus>
           <AccessibleSheetContainer
             ariaLabel={ariaLabel}
