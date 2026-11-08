@@ -12,3 +12,5 @@ Stretch one continuous sheet surface, including its background, border, and shad
 Align the calculator sheet and bottom fill across mobile widths, and restore the gallery backdrop when reopening during its exit animation.
 
 Start cold sheet openings from their measured height, synchronize backdrop visibility and progress, and use a gentler shared iOS-style opening curve.
+
+Keep repeated sheet openings animated, reverse interrupted closes without resetting position, and discard superseded transition completions.

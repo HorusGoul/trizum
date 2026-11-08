@@ -53,10 +53,12 @@ async function openExpenseTemplatePicker(page: Page, partyId: string) {
 }
 
 test.describe("Expense templates", () => {
-  test("starts the first sheet opening at its measured edge without backdrop flashes", async ({
+  test("animates initial and settled sheet reopenings without backdrop flashes", async ({
     harness,
     page,
   }) => {
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 390, height: 844 });
 
     const seededParty = await harness.seedJoinedParty({
@@ -70,14 +72,13 @@ test.describe("Expense templates", () => {
     });
     await harness.navigate(`/party/${seededParty.partyId}`);
 
-    // Capture the actual first mount, before any sheet measurements are cached.
-    const frames = await page
-      .getByRole("button", { name: "Add an expense" })
-      .evaluate(async (button) => {
+    await expect(page.getByText("Expense template created")).toBeHidden();
+
+    for (let cycle = 0; cycle < 8; cycle++) {
+      // Record actual motion on every complete open/close cycle.
+      const framesPromise = page.evaluate(async () => {
         const frames: { time: number; y: number; height: number; opacity: number }[] = [];
         const start = performance.now();
-        // SAFETY: The locator targets the Add an expense button; native click lets sampling start in the same browser task.
-        (button as HTMLButtonElement).click();
         await new Promise<void>((resolve) => {
           const sample = () => {
             const container = document.querySelector(".react-modal-sheet-container");
@@ -109,18 +110,111 @@ test.describe("Expense templates", () => {
         return frames;
       });
 
-    await test.info().attach("first-open-frames", {
-      body: JSON.stringify(frames),
-      contentType: "application/json",
-    });
-    expect(frames.length).toBeGreaterThan(2);
-    expect(frames[0].y).toBeLessThanOrEqual(frames[0].height + 2);
+      await page.getByRole("button", { name: "Add an expense" }).click();
+      const frames = await framesPromise;
 
-    for (let index = 1; index < frames.length; index++) {
-      expect(frames[index].opacity + 0.02).toBeGreaterThanOrEqual(frames[index - 1].opacity);
+      await test.info().attach(`open-cycle-${cycle}-frames`, {
+        body: JSON.stringify(frames),
+        contentType: "application/json",
+      });
+      expect(frames.length).toBeGreaterThan(2);
+      expect(frames[0].y).toBeLessThanOrEqual(frames[0].height + 2);
+
+      for (let index = 1; index < frames.length; index++) {
+        expect(frames[index].opacity + 0.02).toBeGreaterThanOrEqual(frames[index - 1].opacity);
+      }
+
+      const movingFrames = frames.filter((frame) => frame.y > 1 && frame.y < frame.height - 1);
+      expect(movingFrames.length).toBeGreaterThan(3);
+      expect(frames.at(-1)?.opacity).toBe(1);
+
+      if (cycle % 2 === 0) {
+        const handle = await page.locator("[data-modal-sheet-drag-handle]").boundingBox();
+
+        if (!handle) throw new Error("Expected a sheet drag handle");
+        const x = handle.x + handle.width / 2;
+        const y = handle.y + handle.height / 2;
+        await page.mouse.move(x, y);
+        await page.mouse.down();
+        await page.mouse.move(x, y + 350, { steps: 10 });
+        await page.mouse.up();
+      } else {
+        await page.locator(".react-modal-sheet-backdrop").click({ position: { x: 20, y: 20 } });
+      }
+
+      await expect(page.locator(".react-modal-sheet-container")).toHaveCount(0);
     }
+  });
 
-    expect(frames.at(-1)?.opacity).toBe(1);
+  test("reverses an interrupted close from its current position without resetting", async ({
+    harness,
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    const party = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await createExpenseTemplate(harness, page, party.partyId, { name: "Template" });
+    await harness.navigate(`/party/${party.partyId}`);
+    await openExpenseTemplatePicker(page, party.partyId);
+    const container = page.locator(".react-modal-sheet-container");
+    const backdrop = page.locator(".react-modal-sheet-backdrop");
+    await expect(backdrop).toHaveCSS("opacity", "1");
+
+    await backdrop.click({ position: { x: 20, y: 20 } });
+
+    const trace = await page
+      .getByRole("button", { name: "Add an expense", exact: true, includeHidden: true })
+      .evaluate(async (button) => {
+        const backdrop = document.querySelector(".react-modal-sheet-backdrop");
+
+        if (!(button instanceof HTMLElement) || !(backdrop instanceof HTMLElement))
+          throw new Error("Expected sheet controls");
+        const frames: { y: number; height: number }[] = [];
+        await new Promise<void>((resolve) => {
+          const waitForClosing = () => {
+            const panel = document.querySelector(".react-modal-sheet-container");
+
+            if (!panel) throw new Error("Sheet closed before interruption");
+            const y = new DOMMatrixReadOnly(getComputedStyle(panel).transform).m42;
+            const height = panel.getBoundingClientRect().height;
+
+            if (y > height * 0.2 && y < height * 0.8) {
+              button.click();
+              resolve();
+            } else requestAnimationFrame(waitForClosing);
+          };
+
+          requestAnimationFrame(waitForClosing);
+        });
+        await new Promise<void>((resolve) => {
+          const sample = () => {
+            const panel = document.querySelector(".react-modal-sheet-container");
+
+            if (panel)
+              frames.push({
+                y: new DOMMatrixReadOnly(getComputedStyle(panel).transform).m42,
+                height: panel.getBoundingClientRect().height,
+              });
+            else frames.push({ y: Infinity, height: 0 });
+
+            if (frames.length < 45) requestAnimationFrame(sample);
+            else resolve();
+          };
+
+          requestAnimationFrame(sample);
+        });
+
+        return frames;
+      });
+
+    expect(trace.every((frame) => frame.y < frame.height - 2)).toBe(true);
+    expect(trace.filter((frame) => frame.y > 1).length).toBeGreaterThan(2);
+    expect(trace.at(-1)?.y).toBe(0);
   });
 
   for (const colorScheme of ["light", "dark"] as const) {
