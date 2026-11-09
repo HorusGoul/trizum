@@ -10,7 +10,7 @@ const decimalSchema = z.string().regex(/^-?(0|[1-9]\d{0,11})(\.\d{1,6})?$/);
 
 export const receiptSchema = z.strictObject({
   merchantName: z.string().trim().min(1).max(200).nullable(),
-  titleSuggestions: z.array(z.string().trim().min(1).max(50)).max(2),
+  titleSuggestions: z.array(z.string().trim().min(1).max(50)).max(3),
   total: decimalSchema.nullable(),
   currency: z
     .string()

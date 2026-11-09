@@ -112,16 +112,22 @@ test("discards without applying any fields", async () => {
   expect(onAccept).not.toHaveBeenCalled();
 });
 
-test("chooses an alternative title without editing it or applying it early", async () => {
-  await render(false, ["Coffee", "Café"]);
+test("defaults to the receipt-language title and can accept its translation", async () => {
+  await render(false, ["Cafetería", "Coffee", "Cafés"]);
   expect(document.querySelector('input[type="text"]')).toBeNull();
   const options = document.querySelectorAll<HTMLInputElement>('input[type="radio"]');
-  expect(Array.from(options, (option) => option.value)).toEqual(["Coffee", "Café", "Market"]);
+  expect(Array.from(options, (option) => option.value)).toEqual([
+    "Cafetería",
+    "Coffee",
+    "Cafés",
+    "Market",
+  ]);
+  expect(options[0].checked).toBe(true);
   await act(async () => options[1].click());
   expect(options[1].checked).toBe(true);
   expect(onAccept).not.toHaveBeenCalled();
   await act(async () => button("Accept suggestions").click());
-  expect(onAccept).toHaveBeenCalledExactlyOnceWith({ name: "Café", amount: 12.34 });
+  expect(onAccept).toHaveBeenCalledExactlyOnceWith({ name: "Coffee", amount: 12.34 });
 });
 
 test("can pick the merchant fallback and still exclude the title", async () => {

@@ -112,22 +112,33 @@ describe("receipt analysis authorization and contract", () => {
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
-  test("passes the app language to title generation and keeps the merchant separate", async () => {
-    const { partyId, owner } = await boostedParty();
-    const titledReceipt = { ...receipt, titleSuggestions: ["Cafetería", "Cafés"] };
-    run.mockResolvedValue(completion(JSON.stringify(titledReceipt)));
-    const response = await harness.requestReceipt(partyId, image, owner.cookie, "es");
-    expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual(titledReceipt);
-    expect(run.mock.calls[0][1].messages).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          role: "system",
-          content: expect.stringContaining("Write titleSuggestions in Spanish"),
-        }),
-      ]),
-    );
-  });
+  test.each(["en", "es"] as const)(
+    "keeps receipt-language and %s title choices in ranked order",
+    async (locale) => {
+      const { partyId, owner } = await boostedParty();
+
+      const titledReceipt = {
+        ...receipt,
+        titleSuggestions:
+          locale === "en" ? ["Cafetería", "Coffee", "Cafés"] : ["コーヒー", "Café", "喫茶店"],
+      };
+
+      run.mockResolvedValue(completion(JSON.stringify(titledReceipt)));
+      const response = await harness.requestReceipt(partyId, image, owner.cookie, locale);
+      expect(response.status).toBe(200);
+      await expect(response.json()).resolves.toEqual(titledReceipt);
+      expect(run.mock.calls[0][1].messages).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            role: "system",
+            content: expect.stringContaining(
+              `The app language is ${locale === "es" ? "Spanish" : "English"}. Prefer the receipt language for the first title and include an app-language alternative when different.`,
+            ),
+          }),
+        ]),
+      );
+    },
+  );
   test.each(["length", "content_filter", "tool_calls"])(
     "rejects a Gemma completion stopped by %s",
     async (finishReason) => {
@@ -199,6 +210,7 @@ describe("receipt analysis authorization and contract", () => {
     "bad json",
     JSON.stringify({ ...receipt, total: 12.34 }),
     JSON.stringify({ ...receipt, total: "NaN" }),
+    JSON.stringify({ ...receipt, titleSuggestions: ["Cafetería", "Coffee", "Cafés", "Café"] }),
   ])("sanitizes invalid provider responses", async (response) => {
     const { partyId, owner } = await boostedParty();
     run.mockResolvedValue(completion(response));

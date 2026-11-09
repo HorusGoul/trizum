@@ -255,7 +255,7 @@ msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o regi
 msgid "Accent color"
 msgstr "Color de acento"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:148
+#: src/components/ReceiptSuggestionsSheet.tsx:158
 msgid "Accept suggestions"
 msgstr "Aceptar sugerencias"
 
@@ -1288,7 +1288,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:151
+#: src/components/ReceiptSuggestionsSheet.tsx:161
 msgid "Discard"
 msgstr "Descartar"
 
@@ -2365,7 +2365,7 @@ msgstr "No se encontraron emojis"
 msgid "No expense templates yet"
 msgstr "Todavía no hay plantillas de gasto"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:133
+#: src/components/ReceiptSuggestionsSheet.tsx:142
 msgid "No new title or total could be suggested. Your edits are kept."
 msgstr "No hay nuevas sugerencias de título o importe total. Se mantienen tus cambios."
 
@@ -3787,7 +3787,7 @@ msgstr "El grupo puede haber sido eliminado por otro miembro."
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "El grupo anterior perderá su impulso. No podrás volver a mover Party Boost durante siete días."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:122
+#: src/components/ReceiptSuggestionsSheet.tsx:131
 msgid "The receipt currency differs from this party’s currency. The total cannot be applied."
 msgstr "La moneda del recibo es distinta de la del Grupo. No se puede aplicar el importe total."
 
@@ -3895,8 +3895,8 @@ msgid "Timeframe"
 msgstr "Período"
 
 #: src/components/ExpenseEditor.tsx:461
-#: src/components/ReceiptSuggestionsSheet.tsx:73
-#: src/components/ReceiptSuggestionsSheet.tsx:82
+#: src/components/ReceiptSuggestionsSheet.tsx:77
+#: src/components/ReceiptSuggestionsSheet.tsx:86
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Title"
 msgstr "Título"
@@ -3940,6 +3940,10 @@ msgstr "Paʻanga Tongano"
 #: src/components/PartyStatsView.tsx:428
 msgid "Top spender"
 msgstr "Quién más ha pagado"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:120
+msgid "Total"
+msgstr "Total"
 
 #: src/components/PartyStatsView.tsx:262
 msgid "Total paid by each participant in the selected timeframe."

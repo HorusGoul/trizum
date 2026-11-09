@@ -49,10 +49,14 @@ extraction prompt requests the final printed total including tax and discounts,
 never tendered cash, change, or an inferred sum. Currency is an ISO code only
 when visibly identified; ambiguous symbols remain unknown.
 
-`titleSuggestions` contains up to two short activity titles in the app's language
-(`en` or `es`; omitted locale defaults to English), grounded in the receipt's
-items or clear context. Coffee purchases can suggest “Coffee” or “Café” instead
-of the merchant's legal business name. The first title is the default suggestion;
+`titleSuggestions` contains up to three short activity titles grounded in the
+receipt's items or clear context. The prompt requests the first title in the
+receipt's predominant language when identifiable, followed by an app-language
+alternative if different (`en` or `es`; omitted locale defaults to English).
+For a Spanish coffee receipt in an English app, choices can be “Cafetería”,
+“Coffee”, and “Cafés”. An unclear receipt language falls back to the app language.
+The model should offer multiple useful choices when supported, without padding
+with duplicates or invented context. The first title is the default suggestion;
 the original merchant is retained separately as the last fallback. Unsupported
 activity titles are omitted, and no model confidence percentages are shown.
 The sheet offers distinct activity titles and the merchant as horizontally
@@ -66,6 +70,5 @@ and disables totals with a known currency mismatch or precision the editor
 cannot represent. Removing a receipt or leaving the editor discards late results.
 Analysis runs without loading or error toasts. Each photo has a gently glowing
 ring until its request finishes or times out; reduced motion uses a static ring.
-Failures and receipts with no
-extractable title or total produce no suggestion sheet and leave attachments
-and manual expense entry usable.
+Failures and receipts with no extractable title or total produce no suggestion
+sheet and leave attachments and manual expense entry usable.

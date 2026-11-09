@@ -16,7 +16,7 @@ import type { Receipt } from "#src/lib/api/receiptContract.ts";
 import { getReceiptTitleOptions, type ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
 
 const suggestionRowClassName =
-  "w-full min-h-20 flex-row-reverse justify-between gap-4 rounded-[1.35rem] px-4 py-4 text-left data-[selected]:bg-accent-100 dark:data-[selected]:bg-accent-900 data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-900";
+  "w-full min-h-16 flex-row-reverse gap-4 rounded-[1.35rem] px-safe-or-4 sm:px-safe-or-5 py-2.5 text-left data-[selected]:bg-accent-100 dark:data-[selected]:bg-accent-900 data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-900";
 
 export function ReceiptSuggestionsSheet({
   receipt,
@@ -48,7 +48,7 @@ export function ReceiptSuggestionsSheet({
     >
       <ModalSheetHeader>
         <ModalSheetSection>
-          <div className="text-accent-950 dark:text-accent-50 flex items-center gap-2">
+          <div className="text-accent-950 dark:text-accent-50 flex items-center gap-4">
             <Icon icon="lucide.sparkles" className="size-5" />
             <ModalSheetTitle>
               <Trans>Premium suggestions</Trans>
@@ -60,7 +60,7 @@ export function ReceiptSuggestionsSheet({
         </ModalSheetSection>
       </ModalSheetHeader>
       <ModalSheetContent>
-        <ModalSheetSection className="flex flex-col gap-4 py-4">
+        <div className="flex flex-col gap-2 py-2">
           {suggestions.name !== undefined ? (
             <div className="min-w-0">
               <Checkbox
@@ -68,11 +68,15 @@ export function ReceiptSuggestionsSheet({
                 isSelected={useTitle}
                 onChange={setUseTitle}
               >
-                <span className="flex min-w-0 flex-col gap-1">
+                <span className="grid min-w-0 flex-1 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5">
+                  <Icon
+                    icon="lucide.type"
+                    className="text-accent-700 dark:text-accent-300 size-5"
+                  />
                   <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">
                     <Trans>Title</Trans>
                   </span>
-                  <span className="text-accent-950 dark:text-accent-50 text-lg font-semibold break-words">
+                  <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold break-words">
                     {selectedTitle}
                   </span>
                 </span>
@@ -86,7 +90,7 @@ export function ReceiptSuggestionsSheet({
                     setSelectedTitle(title);
                     setUseTitle(true);
                   }}
-                  className="no-scrollbar mt-2 flex gap-2 overflow-x-auto overscroll-x-contain p-1"
+                  className="no-scrollbar px-safe-or-4 sm:px-safe-or-5 mt-1 flex gap-2 overflow-x-auto overscroll-x-contain py-1"
                 >
                   {titleOptions.map((title) => (
                     <Radio
@@ -107,50 +111,57 @@ export function ReceiptSuggestionsSheet({
               isSelected={useTotal}
               onChange={setUseTotal}
             >
-              <span className="flex min-w-0 flex-col gap-1">
+              <span className="grid min-w-0 flex-1 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5">
+                <Icon
+                  icon="lucide.receipt-text"
+                  className="text-accent-700 dark:text-accent-300 size-5"
+                />
                 <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">
-                  <Trans>Total, including tax and discounts</Trans>
+                  <Trans>Total</Trans>
                 </span>
-                <span className="text-accent-950 dark:text-accent-50 text-lg font-semibold">
+                <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold">
                   {receipt.total} {receipt.currency}
                 </span>
               </span>
             </Checkbox>
           ) : null}
-          {suggestions.currencyMismatch ? (
-            <p className="text-accent-700 dark:text-accent-300 text-sm">
-              <Trans>
-                The receipt currency differs from this party’s currency. The total cannot be
-                applied.
-              </Trans>{" "}
-              <span className="font-semibold">
-                {receipt.total} {receipt.currency}
-              </span>
-            </p>
-          ) : null}
-          {suggestions.name === undefined && suggestions.amount === undefined ? (
-            <p className="text-accent-700 dark:text-accent-300 text-sm">
-              <Trans>No new title or total could be suggested. Your edits are kept.</Trans>
-            </p>
-          ) : null}
-          <Button
-            color="accent"
-            isDisabled={!hasSelection}
-            onPress={() => {
-              const values: Partial<ReceiptDraftValues> = {};
+          <ModalSheetSection className="flex flex-col gap-2 pt-2">
+            {suggestions.currencyMismatch ? (
+              <p className="text-accent-700 dark:text-accent-300 text-sm">
+                <Trans>
+                  The receipt currency differs from this party’s currency. The total cannot be
+                  applied.
+                </Trans>{" "}
+                <span className="font-semibold">
+                  {receipt.total} {receipt.currency}
+                </span>
+              </p>
+            ) : null}
+            {suggestions.name === undefined && suggestions.amount === undefined ? (
+              <p className="text-accent-700 dark:text-accent-300 text-sm">
+                <Trans>No new title or total could be suggested. Your edits are kept.</Trans>
+              </p>
+            ) : null}
+            <Button
+              color="accent"
+              isDisabled={!hasSelection}
+              onPress={() => {
+                const values: Partial<ReceiptDraftValues> = {};
 
-              if (useTitle && suggestions.name !== undefined) values.name = selectedTitle;
+                if (useTitle && suggestions.name !== undefined) values.name = selectedTitle;
 
-              if (useTotal && suggestions.amount !== undefined) values.amount = suggestions.amount;
-              onAccept(values);
-            }}
-          >
-            <Trans>Accept suggestions</Trans>
-          </Button>
-          <Button color="input-like" onPress={onDiscard}>
-            <Trans>Discard</Trans>
-          </Button>
-        </ModalSheetSection>
+                if (useTotal && suggestions.amount !== undefined)
+                  values.amount = suggestions.amount;
+                onAccept(values);
+              }}
+            >
+              <Trans>Accept suggestions</Trans>
+            </Button>
+            <Button color="input-like" onPress={onDiscard}>
+              <Trans>Discard</Trans>
+            </Button>
+          </ModalSheetSection>
+        </div>
       </ModalSheetContent>
     </ModalSheet>
   );
