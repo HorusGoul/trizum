@@ -110,14 +110,14 @@ bundle exec fastlane build_release
 # Deploy to TestFlight
 bundle exec fastlane deploy_testflight
 
-# Full App Store deployment with metadata
+# Full App Store deployment with metadata and submission for review
 bundle exec fastlane deploy_appstore_full
 
-# Full deployment and submit for review
-bundle exec fastlane deploy_appstore_full submit_for_review:true
+# Upload without submitting for review
+bundle exec fastlane deploy_appstore_full submit_for_review:false
 
 # Auto-release after approval
-bundle exec fastlane deploy_appstore_full submit_for_review:true automatic_release:true
+bundle exec fastlane deploy_appstore_full automatic_release:true
 
 # Update metadata only (no new build)
 bundle exec fastlane upload_metadata
