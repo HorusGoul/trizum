@@ -946,7 +946,7 @@ function PhotosField({ form, value, onChange, onViewPhoto }: PhotosFieldProps) {
 
   return (
     <ReceiptPhotosField
-      key={JSON.stringify([party.id, userId, isBoosted])}
+      key={JSON.stringify([party.id, userId, isBoosted, party.currency])}
       form={form}
       value={value}
       onChange={onChange}
@@ -974,28 +974,21 @@ function ReceiptPhotosField({
   userId: string | undefined;
   isBoosted: boolean;
 }) {
-  const { analyze, result, dismiss, scanningPhotoIds } = useReceiptSuggestions({
-    partyId,
-    userId,
-    isBoosted,
-    photoIds: value,
-    getValues: () => ({ name: form.state.values.name, amount: form.state.values.amount }),
-    getPhotoIds: () => form.state.values.photos,
-  });
-
   const current = useStore(form.store, (state) => ({
     name: state.values.name,
     amount: state.values.amount,
   }));
 
-  const suggestions = result
-    ? getReceiptSuggestions({
-        receipt: result.receipt,
-        currency,
-        baseline: result.baseline,
-        current,
-      })
-    : null;
+  const { analyze, result, suggestions, dismiss, scanningPhotoIds } = useReceiptSuggestions({
+    partyId,
+    userId,
+    isBoosted,
+    currency,
+    current,
+    photoIds: value,
+    getValues: () => ({ name: form.state.values.name, amount: form.state.values.amount }),
+    getPhotoIds: () => form.state.values.photos,
+  });
 
   return (
     <>

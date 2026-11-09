@@ -13,3 +13,7 @@ Choose a receipt title from horizontally scrollable options before accepting it.
 Inset suggestion rows use input-style borders aligned with the sheet content, vertically centered icons, and checkboxes on the right. Reusable sheet choices share press, hover, and focus feedback with sheet actions. Title chips are visually compact while keeping comfortable touch targets.
 
 Receipt titles consider the printed transaction time and local context before suggesting a meal, with neutral item or category titles when the meal is uncertain.
+
+Browser and Android Back dismiss the top shared sheet before navigating, preserving the underlying expense draft. Sheet registration is automatic through the app's UI provider, respects non-dismissible sheets, and leaves no extra history entries after closing.
+
+Skip the suggestions sheet when neither the title nor total can be changed, including matching values, protected manual edits, or an inapplicable total. Empty results do not block other usable receipt suggestions or count as user discards.

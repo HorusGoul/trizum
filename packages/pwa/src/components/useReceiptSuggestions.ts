@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { trizumApiClient } from "#src/lib/trizumApiClient.ts";
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
-import type { ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
+import { getReceiptSuggestions, type ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 
 export interface ReceiptImage {
@@ -26,6 +26,8 @@ export function useReceiptSuggestions({
   partyId,
   userId,
   isBoosted,
+  currency,
+  current,
   photoIds,
   getValues,
   getPhotoIds,
@@ -34,6 +36,8 @@ export function useReceiptSuggestions({
   partyId: string;
   userId: string | undefined;
   isBoosted: boolean;
+  currency: string;
+  current: ReceiptDraftValues;
   photoIds: string[];
   getValues: () => ReceiptDraftValues;
   getPhotoIds: () => string[];
@@ -42,7 +46,7 @@ export function useReceiptSuggestions({
     trackEvent: typeof trackEvent;
   };
 }) {
-  const context = JSON.stringify([partyId, userId, isBoosted]);
+  const context = JSON.stringify([partyId, userId, isBoosted, currency]);
   const [results, setResults] = useState<ReceiptResult[]>([]);
   const [scanning, setScanning] = useState<ScanningReceipt[]>([]);
   const [requests] = useState(() => new Map<AbortController, ReturnType<typeof setTimeout>>());
@@ -99,6 +103,15 @@ export function useReceiptSuggestions({
             !getPhotoIds().includes(photoId)
           )
             return;
+
+          const suggestions = getReceiptSuggestions({
+            receipt,
+            currency,
+            current: getValues(),
+            baseline,
+          });
+
+          if (suggestions.name === undefined && suggestions.amount === undefined) return;
           setResults((current) => [...current, { context, photoId, receipt, baseline }]);
         })
         .finally(() => {
@@ -109,9 +122,27 @@ export function useReceiptSuggestions({
     }
   }
 
-  const result = results.find(
-    (result) => result.context === context && photoIds.includes(result.photoId),
-  );
+  const result = results.find((entry) => {
+    if (entry.context !== context || !photoIds.includes(entry.photoId)) return false;
+
+    const suggestions = getReceiptSuggestions({
+      receipt: entry.receipt,
+      currency,
+      current,
+      baseline: entry.baseline,
+    });
+
+    return suggestions.name !== undefined || suggestions.amount !== undefined;
+  });
+
+  const suggestions = result
+    ? getReceiptSuggestions({
+        receipt: result.receipt,
+        currency,
+        current,
+        baseline: result.baseline,
+      })
+    : undefined;
 
   function dismiss(accepted: boolean) {
     if (!result) return;
@@ -125,5 +156,5 @@ export function useReceiptSuggestions({
     entry.context === context && photoIds.includes(entry.photoId) ? [entry.photoId] : [],
   );
 
-  return { analyze, result, dismiss, scanningPhotoIds };
+  return { analyze, result, suggestions, dismiss, scanningPhotoIds };
 }

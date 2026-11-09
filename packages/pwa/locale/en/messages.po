@@ -259,7 +259,7 @@ msgstr "Absolutely! trizum works without requiring any account or sign-up. Just 
 msgid "Accent color"
 msgstr "Accent color"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:142
+#: src/components/ReceiptSuggestionsSheet.tsx:139
 msgid "Accept suggestions"
 msgstr "Accept suggestions"
 
@@ -1316,7 +1316,7 @@ msgstr "Destructive actions"
 msgid "Did you know?"
 msgstr "Did you know?"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:145
+#: src/components/ReceiptSuggestionsSheet.tsx:142
 msgid "Discard"
 msgstr "Discard"
 
@@ -1557,7 +1557,7 @@ msgid "Explore Premium"
 msgstr "Explore Premium"
 
 #: src/components/AvatarPicker.tsx:119
-#: src/components/ExpenseEditor.tsx:1154
+#: src/components/ExpenseEditor.tsx:1147
 #: src/components/QRCodeScanner.tsx:129
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
@@ -1606,7 +1606,7 @@ msgstr "Failed to update expense"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Failed to upload avatar. Please try again."
 
-#: src/components/ExpenseEditor.tsx:1127
+#: src/components/ExpenseEditor.tsx:1120
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
@@ -3023,8 +3023,8 @@ msgstr "Premium purchases restored."
 msgid "Premium status could not be checked. Try again."
 msgstr "Premium status could not be checked. Try again."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:41
-#: src/components/ReceiptSuggestionsSheet.tsx:52
+#: src/components/ReceiptSuggestionsSheet.tsx:43
+#: src/components/ReceiptSuggestionsSheet.tsx:54
 msgid "Premium suggestions"
 msgstr "Premium suggestions"
 
@@ -3142,7 +3142,7 @@ msgstr "Remove"
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
-#: src/components/ExpenseEditor.tsx:1247
+#: src/components/ExpenseEditor.tsx:1240
 msgid "Remove photo"
 msgstr "Remove photo"
 
@@ -3216,7 +3216,7 @@ msgstr "RevenueCat's Privacy Policy"
 msgid "Review expense"
 msgstr "Review expense"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:56
+#: src/components/ReceiptSuggestionsSheet.tsx:58
 msgid "Review the receipt details before applying them to your expense."
 msgstr "Review the receipt details before applying them to your expense."
 
@@ -3747,8 +3747,8 @@ msgstr "Tajikistani Somoni"
 
 #: src/components/AvatarPicker.tsx:167
 #: src/components/AvatarPicker.tsx:182
-#: src/components/ExpenseEditor.tsx:1175
-#: src/components/ExpenseEditor.tsx:1189
+#: src/components/ExpenseEditor.tsx:1168
+#: src/components/ExpenseEditor.tsx:1182
 msgid "Take photo"
 msgstr "Take photo"
 
@@ -3863,7 +3863,7 @@ msgstr "The party may have been deleted by another member."
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:115
+#: src/components/ReceiptSuggestionsSheet.tsx:117
 msgid "The receipt currency differs from this party’s currency. The total cannot be applied."
 msgstr "The receipt currency differs from this party’s currency. The total cannot be applied."
 
@@ -3971,8 +3971,8 @@ msgid "Timeframe"
 msgstr "Timeframe"
 
 #: src/components/ExpenseEditor.tsx:461
-#: src/components/ReceiptSuggestionsSheet.tsx:67
-#: src/components/ReceiptSuggestionsSheet.tsx:76
+#: src/components/ReceiptSuggestionsSheet.tsx:69
+#: src/components/ReceiptSuggestionsSheet.tsx:78
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Title"
 msgstr "Title"
@@ -4017,7 +4017,7 @@ msgstr "Tongan Paʻanga"
 msgid "Top spender"
 msgstr "Top spender"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:104
+#: src/components/ReceiptSuggestionsSheet.tsx:106
 msgid "Total"
 msgstr "Total"
 
@@ -4210,14 +4210,14 @@ msgstr "Updating trizum..."
 msgid "Upload malware or content designed to disrupt or damage the Service"
 msgstr "Upload malware or content designed to disrupt or damage the Service"
 
-#: src/components/ExpenseEditor.tsx:1012
+#: src/components/ExpenseEditor.tsx:1005
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
 #: src/components/AvatarPicker.tsx:176
 #: src/components/AvatarPicker.tsx:194
-#: src/components/ExpenseEditor.tsx:1184
-#: src/components/ExpenseEditor.tsx:1201
+#: src/components/ExpenseEditor.tsx:1177
+#: src/components/ExpenseEditor.tsx:1194
 msgid "Upload photo"
 msgstr "Upload photo"
 
@@ -4230,7 +4230,7 @@ msgstr "Uploading avatar..."
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
-#: src/components/ExpenseEditor.tsx:1098
+#: src/components/ExpenseEditor.tsx:1091
 msgid "Uploading..."
 msgstr "Uploading..."
 
@@ -4347,7 +4347,7 @@ msgstr "View on GitHub"
 msgid "View party"
 msgstr "View party"
 
-#: src/components/ExpenseEditor.tsx:1236
+#: src/components/ExpenseEditor.tsx:1229
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "View photo"

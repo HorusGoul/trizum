@@ -32,14 +32,18 @@ let controller: ReturnType<typeof useReceiptSuggestions>;
 function Harness({
   userId = "member",
   isBoosted = true,
+  currency = "EUR",
 }: {
   userId?: string;
   isBoosted?: boolean;
+  currency?: string;
 }) {
   const suggestions = useReceiptSuggestions({
     partyId: "party",
     userId,
     isBoosted,
+    currency,
+    current: draft,
     photoIds,
     getPhotoIds: () => photoIds,
     getValues: () => draft,
@@ -55,7 +59,9 @@ function Harness({
 
 async function render(props: ComponentProps<typeof Harness> = {}) {
   await act(async () =>
-    root.render(<Harness key={JSON.stringify([props.userId, props.isBoosted])} {...props} />),
+    root.render(
+      <Harness key={JSON.stringify([props.userId, props.isBoosted, props.currency])} {...props} />,
+    ),
   );
 }
 
@@ -85,6 +91,66 @@ afterEach(async () => {
 });
 
 describe("receipt suggestion lifecycle", () => {
+  test("stays silent when the extracted values already match the draft", async () => {
+    draft = { name: "Market", amount: 12.34 };
+    analyzeReceipt.mockResolvedValue(receipt);
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.result).toBeUndefined();
+    expect(controller.suggestions).toBeUndefined();
+    expect(controller.scanningPhotoIds).toEqual([]);
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    { total: "12.34", currency: "USD" },
+    { total: "1.005", currency: "EUR" },
+  ])("does not offer an unusable total when no title can be suggested (%j)", async (amount) => {
+    analyzeReceipt.mockResolvedValue({ ...receipt, merchantName: null, ...amount });
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.result).toBeUndefined();
+    expect(controller.scanningPhotoIds).toEqual([]);
+    expect(trackEvent).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  test("does not offer a sheet after both fields were edited during processing", async () => {
+    const pending = deferred<Receipt>();
+    analyzeReceipt.mockReturnValue(pending.promise);
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    draft = { name: "My title", amount: 20 };
+    await render();
+    await act(async () => pending.resolve(receipt));
+    expect(controller.result).toBeUndefined();
+    expect(draft).toEqual({ name: "My title", amount: 20 });
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
+  test("skips a queued result that lost all edits without blocking the next useful result", async () => {
+    photoIds = ["photo", "other-photo"];
+    analyzeReceipt
+      .mockResolvedValueOnce({ ...receipt, merchantName: null })
+      .mockResolvedValueOnce({ ...receipt, titleSuggestions: ["Coffee"], total: null });
+    await render();
+    await act(async () =>
+      controller.analyze([
+        { photoId: "photo", image: "receipt" },
+        { photoId: "other-photo", image: "other-receipt" },
+      ]),
+    );
+    expect(controller.result?.photoId).toBe("photo");
+    draft = { name: "", amount: 20 };
+    await render();
+    expect(controller.result?.photoId).toBe("other-photo");
+    expect(controller.suggestions).toMatchObject({ name: "Coffee", amount: undefined });
+    draft = { name: "My title", amount: 20 };
+    await render();
+    expect(controller.result).toBeUndefined();
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
   test("keeps each photo scanning until its own request settles", async () => {
     vi.useFakeTimers();
     const first = deferred<Receipt>();
@@ -219,6 +285,20 @@ describe("receipt suggestion lifecycle", () => {
     await act(async () => pending.resolve(receipt));
     expect(controller.result).toBeUndefined();
     await render({ userId: "member" });
+    expect(controller.result).toBeUndefined();
+  });
+
+  test("does not restore old scans after changing the party currency and returning", async () => {
+    const pending = deferred<Receipt>();
+    analyzeReceipt.mockReturnValue(pending.promise);
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    const signal = analyzeReceipt.mock.calls[0][2];
+    await render({ currency: "USD" });
+    expect(signal?.aborted).toBe(true);
+    await render();
+    await act(async () => pending.resolve(receipt));
+    expect(controller.scanningPhotoIds).toEqual([]);
     expect(controller.result).toBeUndefined();
   });
   test("does not restore a completed suggestion after leaving and returning to the account", async () => {

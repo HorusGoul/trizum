@@ -78,5 +78,8 @@ Analysis runs without loading or error toasts. Each photo has an inset gradient
 border with a circling highlight until its request finishes or times out;
 reduced motion uses a static border. The animation rotates only the gradient
 behind a fixed border mask, so it stays inside the thumbnail bounds.
-Failures and receipts with no extractable title or total produce no suggestion
-sheet and leave attachments and manual expense entry usable.
+Failures and receipts with no applicable title or total change produce no sheet
+and leave attachments and manual expense entry usable. Matching values, manual
+edits protected since upload, and totals that cannot be applied are filtered
+before display. Unusable queued results do not prevent later useful suggestions
+and do not emit a user-discard event.

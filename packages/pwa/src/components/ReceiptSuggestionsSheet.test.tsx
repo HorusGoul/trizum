@@ -42,7 +42,7 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 
-async function render(currencyMismatch = false, titleSuggestions: string[] = []) {
+async function render(currencyMismatch = false, titleSuggestions: string[] = [], hasEdits = true) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
@@ -56,8 +56,8 @@ async function render(currencyMismatch = false, titleSuggestions: string[] = [])
               items: [],
             }}
             suggestions={{
-              name: titleSuggestions[0] ?? "Market",
-              amount: currencyMismatch ? undefined : 12.34,
+              name: hasEdits ? (titleSuggestions[0] ?? "Market") : undefined,
+              amount: hasEdits && !currencyMismatch ? 12.34 : undefined,
               currencyMismatch,
             }}
             onAccept={onAccept}
@@ -86,6 +86,14 @@ test("accepts title and total only after the user confirms", async () => {
   expect(onAccept).not.toHaveBeenCalled();
   await act(async () => button("Accept suggestions").click());
   expect(onAccept).toHaveBeenCalledExactlyOnceWith({ name: "Market", amount: 12.34 });
+});
+
+test("does not render a sheet for unavailable edits, even with a currency warning", async () => {
+  await render(true, [], false);
+  expect(document.querySelector('[role="dialog"]')).toBeNull();
+  expect(document.body.textContent).not.toContain("Premium suggestions");
+  expect(onAccept).not.toHaveBeenCalled();
+  expect(onDiscard).not.toHaveBeenCalled();
 });
 
 test("settles sheet timers before the test document is disposed", async () => {

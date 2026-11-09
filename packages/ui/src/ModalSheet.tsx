@@ -31,6 +31,7 @@ import { sheetTweenConfig } from "./sheetMotion.js";
 import { SheetSurface } from "./SheetSurface.js";
 import { Icon, type IconProps } from "./Icon.js";
 import { Checkbox } from "./Checkbox.js";
+import { ModalSheetNavigationContext } from "./modalSheetNavigation.js";
 import { cn, type ClassName } from "./utils.js";
 
 interface ModalSheetContextValue {
@@ -74,40 +75,74 @@ export function ModalSheet({
   };
 
   return (
-    <Sheet
-      disableDismiss={disableDismiss ?? !isDismissable}
-      detent={detent}
-      isOpen={isOpen}
-      onClose={close}
-      style={{ zIndex: 50 }}
-      unstyled
-      tweenConfig={sheetTweenConfig}
-      {...props}
-    >
-      <OverlayProvider>
-        <FocusScope contain restoreFocus>
-          <AccessibleSheetContainer
-            ariaLabel={ariaLabel}
-            className={className}
-            close={close}
-            isDismissable={isDismissable}
-            isOpen={isOpen}
-          >
-            {children}
-          </AccessibleSheetContainer>
-        </FocusScope>
+    <>
+      <SheetBackNavigation
+        isOpen={isOpen}
+        isDismissable={isDismissable}
+        onOpenChange={onOpenChange}
+      />
+      <Sheet
+        disableDismiss={disableDismiss ?? !isDismissable}
+        detent={detent}
+        isOpen={isOpen}
+        onClose={close}
+        style={{ zIndex: 50 }}
+        unstyled
+        tweenConfig={sheetTweenConfig}
+        {...props}
+      >
+        <OverlayProvider>
+          <FocusScope contain restoreFocus>
+            <AccessibleSheetContainer
+              ariaLabel={ariaLabel}
+              className={className}
+              close={close}
+              isDismissable={isDismissable}
+              isOpen={isOpen}
+            >
+              {children}
+            </AccessibleSheetContainer>
+          </FocusScope>
 
-        <Sheet.Backdrop
-          className={cn("bg-accent-950/45 backdrop-blur-[2px]", overlayClassName)}
-          onContextMenu={(event) => {
-            onContextMenu?.(event);
-            event.preventDefault();
-          }}
-          onTap={isDismissable ? close : undefined}
-        />
-      </OverlayProvider>
-    </Sheet>
+          <Sheet.Backdrop
+            className={cn("bg-accent-950/45 backdrop-blur-[2px]", overlayClassName)}
+            onContextMenu={(event) => {
+              onContextMenu?.(event);
+              event.preventDefault();
+            }}
+            onTap={isDismissable ? close : undefined}
+          />
+        </OverlayProvider>
+      </Sheet>
+    </>
   );
+}
+
+// This sibling registers before the portal subtree, including initially open nested sheets.
+function SheetBackNavigation({
+  isOpen,
+  isDismissable,
+  onOpenChange,
+}: Pick<ModalSheetProps, "isOpen" | "onOpenChange"> & { isDismissable: boolean }) {
+  const navigation = use(ModalSheetNavigationContext);
+  const current = useRef({ isDismissable, onOpenChange });
+
+  useEffect(() => {
+    current.current = { isDismissable, onOpenChange };
+  }, [isDismissable, onOpenChange]);
+
+  useEffect(() => {
+    if (!isOpen || !navigation) return;
+
+    return navigation.register(() => {
+      if (!current.current.isDismissable || !current.current.onOpenChange) return false;
+      current.current.onOpenChange(false);
+
+      return true;
+    });
+  }, [isOpen, navigation]);
+
+  return null;
 }
 
 function AccessibleSheetContainer({

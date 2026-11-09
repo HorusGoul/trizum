@@ -33,6 +33,8 @@ export function ReceiptSuggestionsSheet({
   const [selectedTitle, setSelectedTitle] = useState(suggestions.name);
   const titleOptions = getReceiptTitleOptions(receipt);
 
+  if (suggestions.name === undefined && suggestions.amount === undefined) return null;
+
   const hasSelection =
     (useTitle && suggestions.name !== undefined) || (useTotal && suggestions.amount !== undefined);
 
@@ -119,11 +121,6 @@ export function ReceiptSuggestionsSheet({
                 <span className="font-semibold">
                   {receipt.total} {receipt.currency}
                 </span>
-              </p>
-            ) : null}
-            {suggestions.name === undefined && suggestions.amount === undefined ? (
-              <p className="text-accent-700 dark:text-accent-300 text-sm">
-                <Trans>No new title or total could be suggested. Your edits are kept.</Trans>
               </p>
             ) : null}
             <Button
