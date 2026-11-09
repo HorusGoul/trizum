@@ -36,6 +36,8 @@ export type ExpenseShare = ExpenseShareExact | ExpenseShareDivide;
 export interface ExpenseShareExact {
   type: "exact";
   value: number;
+  /** Hundredths in the currency of expense.originalAmount; value remains in party currency. */
+  originalAmount?: number;
 }
 
 export interface ExpenseParticipantPresence {
@@ -48,6 +50,8 @@ export interface ExpenseShareDivide {
   type: "divide";
   value: number;
   calculatedExact?: number;
+  /** Original-currency allocation in hundredths; value remains the split weight. */
+  originalAmount?: number;
 }
 
 export function exportIntoInput(expense: Expense): ExpenseInput[] {
@@ -308,7 +312,7 @@ export function calculateExpenseHash(expense: Partial<Expense>) {
         switch (share.type) {
           case "exact":
           case "divide":
-            return `${key}:${share.type}:${share.value}`;
+            return `${key}:${share.type}:${share.value}${share.originalAmount === undefined ? "" : `:original:${share.originalAmount}`}`;
           default:
             assertNever(share);
         }

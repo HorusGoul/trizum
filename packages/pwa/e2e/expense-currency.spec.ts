@@ -140,3 +140,76 @@ for (const width of [390, 1280]) {
     await expect(converted).toHaveValue("30");
   });
 }
+
+test("edits participant amounts in the expense currency and preserves their original values", async ({
+  harness,
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route("**/api/exchange-rates?base=EUR", (route) =>
+    route.fulfill({
+      json: {
+        base: "EUR",
+        rates: { EUR: { rate: 1, date: "2099-01-01" }, USD: { rate: 1.25, date: "2099-01-01" } },
+      },
+    }),
+  );
+
+  const { partyId } = await harness.seedJoinedParty({
+    fixture: createPartyFixture(),
+    memberParticipantId: defaultParticipants.blair.id,
+  });
+
+  await harness.navigate(`/party/${partyId}/add`);
+  await page.getByLabel("Title", { exact: true }).fill("Foreign participant amounts");
+  await page.getByLabel("Amount", { exact: true }).fill("120");
+  const includeAll = page.getByRole("checkbox", { name: "Include all", exact: true });
+  await includeAll.focus();
+  await includeAll.press("Space");
+  await expect(includeAll).toBeChecked();
+  await page.getByRole("button", { name: /Currency$/ }).click();
+  await page.getByRole("option", { name: /^USD/ }).click();
+  const alex = page.getByLabel("Amount for Alex", { exact: true });
+  const blair = page.getByLabel("Amount for Blair", { exact: true });
+  const casey = page.getByLabel("Amount for Casey", { exact: true });
+  await expect(alex).toHaveValue("40");
+  await expect(blair).toHaveValue("40");
+  await alex.fill("30");
+  await alex.blur();
+  await expect(blair).toHaveValue("45");
+  await page.getByRole("button", { name: "Increase shares for Blair", exact: true }).click();
+  await expect(blair).toHaveValue("60");
+  await expect(casey).toHaveValue("30");
+  await page.getByLabel("Exchange rate", { exact: true }).fill("0.75");
+  await page.getByLabel("Exchange rate", { exact: true }).blur();
+  await expect(page.getByLabel("Converted amount (EUR)", { exact: true })).toHaveValue("90");
+  await expect(alex).toHaveValue("30");
+  await page
+    .locator(
+      '[data-calculator-field-button][data-presence-proxy-element-id="participant-participant-alex"]',
+    )
+    .click();
+  const calculator = page.getByRole("application", { name: "Calculator" });
+  await calculator.getByRole("button", { name: "2", exact: true }).click();
+  await calculator.getByRole("button", { name: "4", exact: true }).click();
+  await expect(alex).toHaveValue("24");
+  await expect(blair).toHaveValue("64");
+  await expect(casey).toHaveValue("32");
+  await calculator.getByRole("button", { name: "Calculate result", exact: true }).click();
+  await expect(calculator).toBeHidden();
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  const detail = new ExpenseDetailPage(page);
+  await expect(detail.heading("Foreign participant amounts")).toBeVisible();
+  await expect(page.getByText(/18,00\s*€/, { exact: true })).toBeVisible();
+  await detail.openEdit();
+  await expect(alex).toHaveValue("24");
+  await expect(blair).toHaveValue("64");
+  await expect(casey).toHaveValue("32");
+  await page.getByLabel("Exchange rate", { exact: true }).fill("0.5");
+  await page.getByLabel("Exchange rate", { exact: true }).blur();
+  await expect(alex).toHaveValue("24");
+  await expect(page.getByLabel("Converted amount (EUR)", { exact: true })).toHaveValue("60");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(detail.heading("Foreign participant amounts")).toBeVisible();
+  await expect(page.getByText(/12,00\s*€/, { exact: true })).toBeVisible();
+});

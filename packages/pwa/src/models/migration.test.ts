@@ -126,7 +126,7 @@ test("persists original currency metadata through a real Automerge import", asyn
               name: "Dinner",
               paidAt: "2026-01-01T00:00:00.000Z",
               paidBy: { alice: 9000 },
-              shares: { alice: { type: "divide", value: 1 } },
+              shares: { alice: { type: "divide", value: 1, originalAmount: 10000 } },
               photos: [],
               originalAmount: { amount: 10000, currency: "USD" },
               exchangeRate: 0.9,
@@ -140,6 +140,7 @@ test("persists original currency metadata through a real Automerge import", asyn
     const chunk = (await repo.find<PartyExpenseChunk>(party.chunkRefs[0]!.chunkId)).doc();
     expect(chunk.expenses[0]).toMatchObject({
       paidBy: { alice: 9000 },
+      shares: { alice: { type: "divide", value: 1, originalAmount: 10000 } },
       originalAmount: { amount: 10000, currency: "USD" },
       exchangeRate: 0.9,
     });

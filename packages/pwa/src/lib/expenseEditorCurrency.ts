@@ -1,0 +1,119 @@
+import {
+  convertExpenseAmount,
+  convertExpenseAmountToOriginal,
+  type ExpenseConversionValues,
+} from "./currencyConversion";
+import { getExpenseEditorUnitShares, type ExpenseEditorShares } from "./expenseEditor";
+import { convertToUnits } from "./expenses";
+
+interface CurrencyValues extends ExpenseConversionValues {
+  amount: number;
+  shares: ExpenseEditorShares;
+}
+
+export function getExpenseEditorCurrencyAmount(values: CurrencyValues) {
+  return values.originalAmount ? values.originalAmount.amount / 100 : values.amount;
+}
+
+/** Only the editor draft uses exact shares in the selected expense currency. */
+export function getExpenseEditorDraftValues<T extends CurrencyValues>(values: T): T {
+  const { originalAmount, exchangeRate } = values;
+
+  if (!originalAmount) return { ...values, shares: clearOriginalAmounts(values.shares) };
+
+  const inferred = hasRate(exchangeRate)
+    ? convertShares(values.shares, convertToUnits(values.amount), originalAmount.amount, (amount) =>
+        convertExpenseAmountToOriginal(amount, exchangeRate),
+      )
+    : values.shares;
+
+  return {
+    ...values,
+    shares: Object.fromEntries(
+      Object.entries(values.shares).map(([id, share]) => [
+        id,
+        {
+          type: share.type,
+          value:
+            share.type === "exact" ? (share.originalAmount ?? inferred[id].value) : share.value,
+        },
+      ]),
+    ),
+  };
+}
+
+/** Saving and collaborative updates always receive exact shares in party currency. */
+export function getExpenseEditorStoredValues<T extends CurrencyValues>(values: T): T {
+  const { originalAmount, exchangeRate } = values;
+
+  if (!originalAmount) return { ...values, shares: clearOriginalAmounts(values.shares) };
+
+  const originalAmounts = getExpenseEditorUnitShares(originalAmount.amount / 100, values.shares);
+
+  const converted = hasRate(exchangeRate)
+    ? convertShares(values.shares, originalAmount.amount, convertToUnits(values.amount), (amount) =>
+        convertExpenseAmount(amount, exchangeRate),
+      )
+    : values.shares;
+
+  return {
+    ...values,
+    shares: Object.fromEntries(
+      Object.entries(converted).map(([id, share]) => [
+        id,
+        {
+          ...share,
+          originalAmount: originalAmounts[id],
+        },
+      ]),
+    ),
+  };
+}
+
+function hasRate(rate: number | null | undefined): rate is number {
+  return rate != null && Number.isFinite(rate) && rate > 0;
+}
+
+function clearOriginalAmounts(shares: ExpenseEditorShares): ExpenseEditorShares {
+  return Object.fromEntries(
+    Object.entries(shares).map(([id, { originalAmount: _originalAmount, ...share }]) => [
+      id,
+      share,
+    ]),
+  );
+}
+
+function convertShares(
+  shares: ExpenseEditorShares,
+  sourceAmount: number,
+  targetAmount: number,
+  convert: (amount: number) => number | undefined,
+): ExpenseEditorShares {
+  const entries = Object.entries(shares);
+  const sourceAmounts = getExpenseEditorUnitShares(sourceAmount / 100, shares);
+  const sharesTotal = Object.values(sourceAmounts).reduce((sum, amount) => sum + amount, 0);
+
+  // Convert a balanced split together so rounding cannot overdraw the remaining weighted shares.
+  if (sharesTotal === sourceAmount && sourceAmount > 0) {
+    const amounts = getExpenseEditorUnitShares(
+      targetAmount / 100,
+      Object.fromEntries(entries.map(([id]) => [id, { type: "divide", value: sourceAmounts[id] }])),
+    );
+
+    return Object.fromEntries(
+      entries.map(([id, share]) => [
+        id,
+        share.type === "exact" ? { type: "exact", value: amounts[id] } : share,
+      ]),
+    );
+  }
+
+  return Object.fromEntries(
+    entries.map(([id, share]) => [
+      id,
+      share.type === "exact"
+        ? { type: "exact", value: convert(share.value) ?? share.value }
+        : share,
+    ]),
+  );
+}

@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vite-plus/test";
-import { convertExpenseAmount, getExpenseConversionFields } from "./currencyConversion";
+import {
+  convertExpenseAmount,
+  convertExpenseAmountToOriginal,
+  getExpenseConversionFields,
+} from "./currencyConversion";
 import { calculateExpenseHash, exportIntoInput, type Expense } from "../models/expense";
 
 const expense: Expense = {
@@ -13,6 +17,25 @@ const expense: Expense = {
 };
 
 describe("currency conversion", () => {
+  test.each([
+    [2250, 0.75, 3000],
+    [9, 1.2, 8],
+    [3, 1.2, 2],
+    [100, 1e-7, 1000000000],
+    [100000000000000, 1e12, 100],
+  ])("restores %s hundredths at %s with exact half-even division", (amount, rate, expected) => {
+    expect(convertExpenseAmountToOriginal(amount, rate)).toBe(expected);
+  });
+
+  test("rejects invalid inverse conversions and unsafe results", () => {
+    for (const rate of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(convertExpenseAmountToOriginal(100, rate)).toBeUndefined();
+    }
+
+    expect(convertExpenseAmountToOriginal(-1, 0.75)).toBeUndefined();
+    expect(convertExpenseAmountToOriginal(0.5, 0.75)).toBeUndefined();
+    expect(convertExpenseAmountToOriginal(Number.MAX_SAFE_INTEGER, 0.1)).toBeUndefined();
+  });
   test.each([
     [10000, 0.9, 9000],
     [1500, 150, 225000],
@@ -51,6 +74,18 @@ describe("currency conversion", () => {
     expect(
       calculateExpenseHash({ ...converted, originalAmount: { amount: 9999, currency: "USD" } }),
     ).not.toBe(calculateExpenseHash(converted));
+  });
+
+  test("original share amounts affect hashes but never balance inputs", () => {
+    const original = { ...expense, shares: { bob: { type: "exact" as const, value: 9000 } } };
+
+    const withMetadata = {
+      ...original,
+      shares: { bob: { ...original.shares.bob, originalAmount: 10000 } },
+    };
+
+    expect(exportIntoInput(withMetadata)).toEqual(exportIntoInput(original));
+    expect(calculateExpenseHash(withMetadata)).not.toBe(calculateExpenseHash(original));
   });
 
   test("cleared conversion metadata does not write null or undefined into Automerge", () => {

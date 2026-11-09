@@ -2,10 +2,10 @@ import { convertExpenseAmount, type ExpenseConversionValues } from "./currencyCo
 import type { ExpenseUser } from "#src/lib/expenses.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { createMoney, getMoneyAmount } from "#src/lib/money.ts";
-import { getExpenseUnitShares } from "#src/models/expense.ts";
+import { getExpenseUnitShares, type Expense } from "#src/models/expense.ts";
 import { add, equal } from "dinero.js";
 
-export type ExpenseEditorShares = Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+export type ExpenseEditorShares = Expense["shares"];
 
 export interface ExpenseEditorValidationValues extends ExpenseConversionValues {
   amount: number;
@@ -121,7 +121,7 @@ function isExpenseEditorComplete(values: ExpenseEditorValidationValues) {
     (!values.originalAmount ||
       (values.exchangeRate != null &&
         values.originalAmount.amount > 0 &&
-        convertExpenseAmount(values.originalAmount.amount, values.exchangeRate) !== undefined)) &&
+        (convertExpenseAmount(values.originalAmount.amount, values.exchangeRate) ?? 0) > 0)) &&
     Boolean(values.paidBy) &&
     Object.keys(values.shares).length > 0
   );

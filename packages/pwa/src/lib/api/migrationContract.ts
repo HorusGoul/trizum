@@ -16,8 +16,13 @@ export const migrationExpenseShareSchema = z.discriminatedUnion("type", [
     type: z.literal("divide"),
     value: z.number(),
     calculatedExact: z.number().optional(),
+    originalAmount: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).optional(),
   }),
-  z.object({ type: z.literal("exact"), value: z.number() }),
+  z.object({
+    type: z.literal("exact"),
+    value: z.number(),
+    originalAmount: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).optional(),
+  }),
 ]);
 
 export const originalExpenseAmountSchema = z.object({
