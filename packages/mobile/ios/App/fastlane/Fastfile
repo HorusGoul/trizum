@@ -302,9 +302,9 @@ platform :ios do
   # ============================================
 
   desc "Full App Store deployment with metadata"
-  desc "Options: build_number, skip_screenshots (default: true), submit_for_review (default: false), automatic_release (default: false)"
+  desc "Options: build_number, skip_screenshots (default: true), submit_for_review (default: true), automatic_release (default: false)"
   lane :deploy_appstore_full do |options|
-    submit_for_review = options[:submit_for_review] || false
+    submit_for_review = options[:submit_for_review].nil? ? true : options[:submit_for_review]
     automatic_release = options[:automatic_release] || false
     skip_screenshots = options[:skip_screenshots].nil? ? true : options[:skip_screenshots]
 

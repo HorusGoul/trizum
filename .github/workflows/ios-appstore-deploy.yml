@@ -6,7 +6,7 @@ on:
       submit_for_review:
         description: "Submit for App Store review"
         required: false
-        default: false
+        default: true
         type: boolean
       automatic_release:
         description: "Automatically release after approval"
@@ -18,7 +18,7 @@ on:
       submit_for_review:
         description: "Submit for App Store review"
         required: false
-        default: false
+        default: true
         type: boolean
       automatic_release:
         description: "Automatically release after approval"
