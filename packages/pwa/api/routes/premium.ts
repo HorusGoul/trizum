@@ -94,7 +94,7 @@ export const premiumRoute = premiumApp
   .openapi(
     analyzeReceiptRoute,
     async (c) => {
-      const { partyDocumentId, image } = c.req.valid("json");
+      const { partyDocumentId, image, locale } = c.req.valid("json");
 
       try {
         const status = await getPartyBoostStatus({
@@ -140,7 +140,7 @@ export const premiumRoute = premiumApp
           );
         }
 
-        return c.json(await extractReceipt(image, c.env.AI), 200);
+        return c.json(await extractReceipt(image, c.env.AI, locale), 200);
       } catch {
         // Provider errors can contain the image or extracted data; never log them.
         return c.json(

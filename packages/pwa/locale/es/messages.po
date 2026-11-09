@@ -255,7 +255,7 @@ msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o regi
 msgid "Accent color"
 msgstr "Color de acento"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:111
+#: src/components/ReceiptSuggestionsSheet.tsx:121
 msgid "Accept suggestions"
 msgstr "Aceptar sugerencias"
 
@@ -1288,7 +1288,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:114
+#: src/components/ReceiptSuggestionsSheet.tsx:124
 msgid "Discard"
 msgstr "Descartar"
 
@@ -2365,7 +2365,7 @@ msgstr "No se encontraron emojis"
 msgid "No expense templates yet"
 msgstr "Todavía no hay plantillas de gasto"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:93
+#: src/components/ReceiptSuggestionsSheet.tsx:106
 msgid "No new title or total could be suggested. Your edits are kept."
 msgstr "No hay nuevas sugerencias de título o importe total. Se mantienen tus cambios."
 
@@ -2955,8 +2955,8 @@ msgstr "Se han restaurado las compras de Premium."
 msgid "Premium status could not be checked. Try again."
 msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:37
-#: src/components/ReceiptSuggestionsSheet.tsx:48
+#: src/components/ReceiptSuggestionsSheet.tsx:40
+#: src/components/ReceiptSuggestionsSheet.tsx:51
 msgid "Premium suggestions"
 msgstr "Sugerencias Premium"
 
@@ -3144,7 +3144,7 @@ msgstr "Política de privacidad de RevenueCat"
 msgid "Review expense"
 msgstr "Revisar gasto"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:52
+#: src/components/ReceiptSuggestionsSheet.tsx:55
 msgid "Review the receipt details before applying them to your expense."
 msgstr "Revisa los datos del recibo antes de aplicarlos al gasto."
 
@@ -3787,7 +3787,7 @@ msgstr "El grupo puede haber sido eliminado por otro miembro."
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "El grupo anterior perderá su impulso. No podrás volver a mover Party Boost durante siete días."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:82
+#: src/components/ReceiptSuggestionsSheet.tsx:95
 msgid "The receipt currency differs from this party’s currency. The total cannot be applied."
 msgstr "La moneda del recibo es distinta de la del Grupo. No se puede aplicar el importe total."
 
@@ -3895,7 +3895,7 @@ msgid "Timeframe"
 msgstr "Período"
 
 #: src/components/ExpenseEditor.tsx:461
-#: src/components/ReceiptSuggestionsSheet.tsx:62
+#: src/components/ReceiptSuggestionsSheet.tsx:69
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Title"
 msgstr "Título"
@@ -3948,7 +3948,7 @@ msgstr "Total pagado por cada participante en el período seleccionado."
 msgid "Total spent"
 msgstr "Total gastado"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:72
+#: src/components/ReceiptSuggestionsSheet.tsx:85
 msgid "Total, including tax and discounts"
 msgstr "Total, con impuestos y descuentos"
 

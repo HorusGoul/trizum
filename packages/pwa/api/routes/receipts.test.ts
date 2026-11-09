@@ -6,6 +6,7 @@ const image = "data:image/jpeg;base64,/9j/AA==";
 
 const receipt = {
   merchantName: "Corner shop",
+  titleSuggestions: [],
   total: "12.34",
   currency: "EUR",
   items: [{ name: "Apples", quantity: "0,750 kg", unitPrice: "2.490", lineTotal: "1.87" }],
@@ -74,6 +75,7 @@ describe("receipt analysis authorization and contract", () => {
 
     const multilingualReceipt = {
       merchantName: "東京マーケット / سوق",
+      titleSuggestions: [],
       total: "12.34",
       currency: "JPY",
       items: [
@@ -108,6 +110,22 @@ describe("receipt analysis authorization and contract", () => {
         store: false,
       }),
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+  });
+  test("passes the app language to title generation and keeps the merchant separate", async () => {
+    const { partyId, owner } = await boostedParty();
+    const titledReceipt = { ...receipt, titleSuggestions: ["Cafetería", "Cafés"] };
+    run.mockResolvedValue(completion(JSON.stringify(titledReceipt)));
+    const response = await harness.requestReceipt(partyId, image, owner.cookie, "es");
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual(titledReceipt);
+    expect(run.mock.calls[0][1].messages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          role: "system",
+          content: expect.stringContaining("Write titleSuggestions in Spanish"),
+        }),
+      ]),
     );
   });
   test.each(["length", "content_filter", "tool_calls"])(

@@ -2,13 +2,25 @@ import { describe, expect, test } from "vite-plus/test";
 import type { Receipt } from "./api/receiptContract";
 import { getReceiptSuggestions } from "./receiptSuggestions";
 
-const receipt: Receipt = { merchantName: "The market", total: "12.34", currency: "EUR", items: [] };
+const receipt: Receipt = {
+  merchantName: "The market",
+  titleSuggestions: [],
+  total: "12.34",
+  currency: "EUR",
+  items: [],
+};
+
 const baseline = { name: "", amount: 0 };
 
 const suggest = (data: Partial<Receipt> = {}, current = baseline) =>
   getReceiptSuggestions({ receipt: { ...receipt, ...data }, currency: "EUR", current, baseline });
 
 describe("receipt draft suggestions", () => {
+  test("prefers an activity title and falls back to the merchant only when needed", () => {
+    expect(suggest({ titleSuggestions: ["Cafetería", "Cafés"] }).name).toBe("Cafetería");
+    expect(suggest({ titleSuggestions: [] }).name).toBe("The market");
+    expect(suggest({ merchantName: null, titleSuggestions: ["Cafés"] }).name).toBe("Cafés");
+  });
   test("offers the merchant and printed total in editor units", () => {
     expect(suggest()).toEqual({ name: "The market", amount: 12.34, currencyMismatch: false });
   });
@@ -49,7 +61,7 @@ describe("receipt draft suggestions", () => {
     expect(suggest({ total: "1.000" }).amount).toBe(1);
   });
   test("handles unreadable receipts and bounds merchant titles to the editor limit", () => {
-    expect(suggest({ merchantName: null, total: null }).name).toBeUndefined();
+    expect(suggest({ merchantName: null, titleSuggestions: [], total: null }).name).toBeUndefined();
     expect(suggest({ merchantName: "A".repeat(100) }).name).toHaveLength(50);
   });
 });

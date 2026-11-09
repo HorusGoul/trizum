@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { partyDocumentIdSchema } from "./premiumContract";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../locales";
 
 export const MAX_RECEIPT_IMAGE_BYTES = 4 * 1024 * 1024;
 export const MAX_RECEIPT_REQUEST_BYTES = Math.ceil(MAX_RECEIPT_IMAGE_BYTES / 3) * 4 + 1024;
@@ -9,6 +10,7 @@ const decimalSchema = z.string().regex(/^-?(0|[1-9]\d{0,11})(\.\d{1,6})?$/);
 
 export const receiptSchema = z.strictObject({
   merchantName: z.string().trim().min(1).max(200).nullable(),
+  titleSuggestions: z.array(z.string().trim().min(1).max(50)).max(2),
   total: decimalSchema.nullable(),
   currency: z
     .string()
@@ -48,6 +50,7 @@ export function isReceiptImage(value: string) {
 
 export const receiptRequestSchema = z.strictObject({
   partyDocumentId: partyDocumentIdSchema,
+  locale: z.enum(SUPPORTED_LOCALES).default(DEFAULT_LOCALE),
   image: z
     .string()
     .max(MAX_RECEIPT_REQUEST_BYTES - 1024)

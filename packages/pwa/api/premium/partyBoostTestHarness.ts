@@ -241,7 +241,12 @@ export async function createPartyBoostTestHarness() {
 
       return premiumRoute.fetch(new Request(url, init), env, platform.ctx);
     },
-    async requestReceipt(partyDocumentId: string, image: string, cookie?: string) {
+    async requestReceipt(
+      partyDocumentId: string,
+      image: string,
+      cookie?: string,
+      locale: "en" | "es" = "en",
+    ) {
       const headers = new Headers({ "Content-Type": "application/json" });
 
       if (cookie) headers.set("Cookie", cookie);
@@ -250,7 +255,7 @@ export async function createPartyBoostTestHarness() {
         new Request("http://localhost:8787/receipts", {
           method: "POST",
           headers,
-          body: JSON.stringify({ partyDocumentId, image }),
+          body: JSON.stringify({ partyDocumentId, image, locale }),
         }),
         env,
         platform.ctx,

@@ -35,13 +35,13 @@ and third-party requests such as Tricount's upstream API and attachment download
 
 ## Receipt extraction
 
-`POST /api/premium/receipts` takes `{ partyDocumentId, image }`, where `image`
+`POST /api/premium/receipts` takes `{ partyDocumentId, image, locale }`, where `image`
 is a base64 JPEG, PNG, or WebP data URL (at most 4 MiB decoded). It requires a
 signed-in party member and an authoritative active Party Boost, including a fresh
 check of the boost owner's Premium and membership. The shared Automerge boost
 cache cannot authorize the request. Other party members do not need Premium.
 
-The response has `merchantName`, `total`, `currency`, and `items`. Each item has
+The response has `merchantName`, `titleSuggestions`, `total`, `currency`, and `items`. Each item has
 `name`, `quantity`, `unitPrice`, and `lineTotal`. Monetary values are decimal
 strings in major currency units. Quantities preserve the printed text and units;
 missing fields are `null`, and unreadable items produce an empty array. The
@@ -49,10 +49,19 @@ extraction prompt requests the final printed total including tax and discounts,
 never tendered cash, change, or an inferred sum. Currency is an ISO code only
 when visibly identified; ambiguous symbols remain unknown.
 
+`titleSuggestions` contains up to two short activity titles in the app's language
+(`en` or `es`; omitted locale defaults to English), grounded in the receipt's
+items or clear context. Coffee purchases can suggest “Coffee” or “Café” instead
+of the merchant's legal business name. The first title is the default suggestion;
+the original merchant is retained separately as the last fallback. Unsupported
+activity titles are omitted, and no model confidence percentages are shown.
+
 New attachments are analyzed from their locally prepared image while Automerge
 sync continues. Suggestions stay local to the editor. Accepting selected fields
 updates the draft; saving the expense uses the existing write path. The first
 version offers title and total only, preserves fields edited during processing,
 and disables totals with a known currency mismatch or precision the editor
 cannot represent. Removing a receipt or leaving the editor discards late results.
-Failures leave attachments and manual expense entry usable.
+Analysis runs without loading or error toasts. Failures and receipts with no
+extractable title or total produce no suggestion sheet and leave attachments
+and manual expense entry usable.

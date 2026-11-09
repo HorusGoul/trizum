@@ -1,4 +1,6 @@
 import { hc } from "hono/client";
+import { i18n } from "@lingui/core";
+import { getSupportedLocale } from "./locales";
 import type { PremiumRoute } from "../../api/routes/premium";
 import type { CloudSyncRoute } from "../../api/routes/cloud-sync";
 import type { MigrateRoute } from "../../api/routes/migrate";
@@ -151,7 +153,12 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
     },
     premium: {
       async analyzeReceipt(partyDocumentId, image, signal) {
-        const json = receiptRequestSchema.parse({ partyDocumentId, image });
+        const json = receiptRequestSchema.parse({
+          partyDocumentId,
+          image,
+          locale: getSupportedLocale(i18n.locale),
+        });
+
         const response = await getTransport().receipts.$post({ json }, { init: { signal } });
         const body: unknown = await response.json().catch(() => null);
 

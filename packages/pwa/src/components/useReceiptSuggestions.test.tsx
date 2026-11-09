@@ -8,7 +8,13 @@ import type { ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
 import { useReceiptSuggestions } from "./useReceiptSuggestions";
 
-const receipt: Receipt = { merchantName: "Market", total: "12.34", currency: "EUR", items: [] };
+const receipt: Receipt = {
+  merchantName: "Market",
+  titleSuggestions: [],
+  total: "12.34",
+  currency: "EUR",
+  items: [],
+};
 
 const analyzeReceipt =
   vi.fn<NonNullable<Parameters<typeof useReceiptSuggestions>[0]["services"]>["analyzeReceipt"]>();
@@ -85,7 +91,35 @@ describe("receipt suggestion lifecycle", () => {
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
     expect(controller.result?.receipt).toEqual(receipt);
-    expect(toast.dismiss).toHaveBeenCalledWith("reading");
+    expect(toast.loading).not.toHaveBeenCalled();
+    expect(toast.dismiss).not.toHaveBeenCalled();
+  });
+  test("stays silent when no receipt information could be extracted", async () => {
+    analyzeReceipt.mockResolvedValue({
+      merchantName: null,
+      titleSuggestions: [],
+      total: null,
+      currency: null,
+      items: [],
+    });
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.result).toBeUndefined();
+    expect(toast.loading).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+  test("can suggest an activity title when the merchant and total are unreadable", async () => {
+    analyzeReceipt.mockResolvedValue({
+      merchantName: null,
+      titleSuggestions: ["Coffee"],
+      total: null,
+      currency: null,
+      items: [],
+    });
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.result?.receipt.titleSuggestions).toEqual(["Coffee"]);
+    expect(toast.loading).not.toHaveBeenCalled();
   });
   test("times out analysis and clears its request timer", async () => {
     vi.useFakeTimers();
@@ -105,10 +139,8 @@ describe("receipt suggestion lifecycle", () => {
     await act(async () => vi.advanceTimersByTimeAsync(60_000));
     expect(signal?.aborted).toBe(true);
     expect(controller.result).toBeUndefined();
-    expect(toast.error).toHaveBeenCalledWith(
-      "Could not read this receipt. You can still enter the expense yourself.",
-    );
-    expect(toast.dismiss).toHaveBeenCalledWith("reading");
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(toast.dismiss).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
   });
   test("keeps the draft unchanged until acceptance and records explicit decisions", async () => {
@@ -172,7 +204,7 @@ describe("receipt suggestion lifecycle", () => {
     const signal = analyzeReceipt.mock.calls[0][2];
     await act(async () => root.render(null));
     expect(signal?.aborted).toBe(true);
-    expect(toast.dismiss).toHaveBeenCalledWith("reading");
+    expect(toast.dismiss).not.toHaveBeenCalled();
     await act(async () => pending.resolve(receipt));
     expect(trackEvent).not.toHaveBeenCalled();
   });
@@ -182,9 +214,7 @@ describe("receipt suggestion lifecycle", () => {
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
     expect(photoIds).toEqual(["photo"]);
     expect(draft).toEqual({ name: "", amount: 0 });
-    expect(toast.error).toHaveBeenCalledWith(
-      "Could not read this receipt. You can still enter the expense yourself.",
-    );
+    expect(toast.error).not.toHaveBeenCalled();
     expect(trackEvent).not.toHaveBeenCalled();
   });
 });

@@ -14,6 +14,9 @@ import {
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
 import type { ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
 
+const suggestionRowClassName =
+  "w-full min-h-20 gap-4 rounded-[1.35rem] px-4 py-4 text-left data-[selected]:bg-accent-100 dark:data-[selected]:bg-accent-900 data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-900";
+
 export function ReceiptSuggestionsSheet({
   receipt,
   suggestions,
@@ -56,22 +59,32 @@ export function ReceiptSuggestionsSheet({
       <ModalSheetContent>
         <ModalSheetSection className="flex flex-col gap-4 py-4">
           {suggestions.name !== undefined ? (
-            <Checkbox isSelected={useTitle} onChange={setUseTitle}>
+            <Checkbox
+              className={suggestionRowClassName}
+              isSelected={useTitle}
+              onChange={setUseTitle}
+            >
               <span className="flex flex-col gap-1">
-                <span className="text-sm">
+                <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">
                   <Trans>Title</Trans>
                 </span>
-                <span className="font-semibold">{suggestions.name}</span>
+                <span className="text-accent-950 dark:text-accent-50 text-base font-semibold">
+                  {suggestions.name}
+                </span>
               </span>
             </Checkbox>
           ) : null}
           {suggestions.amount !== undefined ? (
-            <Checkbox isSelected={useTotal} onChange={setUseTotal}>
+            <Checkbox
+              className={suggestionRowClassName}
+              isSelected={useTotal}
+              onChange={setUseTotal}
+            >
               <span className="flex flex-col gap-1">
-                <span className="text-sm">
+                <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">
                   <Trans>Total, including tax and discounts</Trans>
                 </span>
-                <span className="font-semibold">
+                <span className="text-accent-950 dark:text-accent-50 text-base font-semibold">
                   {receipt.total} {receipt.currency}
                 </span>
               </span>
@@ -93,9 +106,6 @@ export function ReceiptSuggestionsSheet({
               <Trans>No new title or total could be suggested. Your edits are kept.</Trans>
             </p>
           ) : null}
-          <p className="text-accent-600 dark:text-accent-400 text-xs">
-            <Trans>Suggestions can contain mistakes. Check them against your receipt.</Trans>
-          </p>
           <Button
             color="accent"
             isDisabled={!hasSelection}

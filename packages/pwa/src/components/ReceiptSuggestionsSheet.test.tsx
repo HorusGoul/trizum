@@ -50,6 +50,7 @@ async function render(currencyMismatch = false) {
           <ReceiptSuggestionsSheet
             receipt={{
               merchantName: "Market",
+              titleSuggestions: [],
               total: "12.34",
               currency: currencyMismatch ? "USD" : "EUR",
               items: [],

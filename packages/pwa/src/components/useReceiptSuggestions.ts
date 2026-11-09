@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { t } from "@lingui/core/macro";
-import { toast } from "sonner";
 import { trizumApiClient } from "#src/lib/trizumApiClient.ts";
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
 import type { ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
@@ -16,11 +14,6 @@ interface ReceiptResult {
   photoId: string;
   receipt: Receipt;
   baseline: ReceiptDraftValues;
-}
-
-interface ReceiptRequest {
-  toastId: string | number;
-  timeoutId: ReturnType<typeof setTimeout>;
 }
 
 export function useReceiptSuggestions({
@@ -45,7 +38,7 @@ export function useReceiptSuggestions({
 }) {
   const context = JSON.stringify([partyId, userId, isBoosted]);
   const [results, setResults] = useState<ReceiptResult[]>([]);
-  const [requests] = useState(() => new Map<AbortController, ReceiptRequest>());
+  const [requests] = useState(() => new Map<AbortController, ReturnType<typeof setTimeout>>());
   const activeContext = useRef<{ key: string } | null>(null);
   useEffect(() => {
     activeContext.current = { key: context };
@@ -53,10 +46,9 @@ export function useReceiptSuggestions({
     return () => {
       activeContext.current = null;
 
-      for (const [controller, request] of requests) {
-        clearTimeout(request.timeoutId);
+      for (const [controller, timeoutId] of requests) {
+        clearTimeout(timeoutId);
         controller.abort();
-        toast.dismiss(request.toastId);
       }
 
       requests.clear();
@@ -71,13 +63,17 @@ export function useReceiptSuggestions({
 
     for (const { photoId, image } of images) {
       const controller = new AbortController();
-      const toastId = toast.loading(t`Reading receipt for Premium suggestions…`);
       const timeoutId = setTimeout(() => controller.abort(), 60_000);
-      requests.set(controller, { toastId, timeoutId });
+      requests.set(controller, timeoutId);
       void services
         .analyzeReceipt(partyId, image, controller.signal)
+        .catch(() => null)
         .then((receipt) => {
           if (
+            receipt === null ||
+            (receipt.titleSuggestions.length === 0 &&
+              receipt.merchantName === null &&
+              receipt.total === null) ||
             controller.signal.aborted ||
             activeContext.current !== requestContext ||
             !getPhotoIds().includes(photoId)
@@ -85,15 +81,9 @@ export function useReceiptSuggestions({
             return;
           setResults((current) => [...current, { context, photoId, receipt, baseline }]);
         })
-        .catch(() => {
-          if (activeContext.current === requestContext && getPhotoIds().includes(photoId)) {
-            toast.error(t`Could not read this receipt. You can still enter the expense yourself.`);
-          }
-        })
         .finally(() => {
           clearTimeout(timeoutId);
           requests.delete(controller);
-          toast.dismiss(toastId);
         });
     }
   }

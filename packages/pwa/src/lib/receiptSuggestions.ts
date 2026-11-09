@@ -17,7 +17,7 @@ export function getReceiptSuggestions({
   baseline: ReceiptDraftValues;
 }) {
   const currencyMismatch = receipt.currency !== null && receipt.currency !== currency;
-  const title = receipt.merchantName?.slice(0, 50);
+  const title = (receipt.titleSuggestions[0] ?? receipt.merchantName)?.slice(0, 50);
 
   // The editor stores major units with two decimal places for every currency.
   // Never round away printed precision or silently convert another currency.
