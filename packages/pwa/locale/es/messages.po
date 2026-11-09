@@ -348,10 +348,9 @@ msgstr "Añadir participante"
 msgid "Add password sign-in"
 msgstr "Añadir inicio de sesión con contraseña"
 
-#: src/components/PaymentMethodsEditor.tsx:105
-#: src/components/PaymentMethodsEditor.tsx:106
-#: src/components/PaymentMethodsEditor.tsx:134
-#: src/components/PaymentMethodsEditor.tsx:144
+#: src/components/PaymentMethodsEditor.tsx:109
+#: src/components/PaymentMethodsEditor.tsx:125
+#: src/components/PaymentMethodsEditor.tsx:135
 msgid "Add payment method"
 msgstr "Añadir método de pago"
 
@@ -1724,7 +1723,7 @@ msgstr "Lari Georgiano"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otra forma diferente a las descritas anteriormente."
 
-#: src/components/PaymentMethodsEditor.tsx:77
+#: src/components/PaymentMethodsEditor.tsx:79
 msgid "Get paid"
 msgstr "Recibir pagos"
 
@@ -2916,7 +2915,8 @@ msgstr "Datos de pago copiados"
 msgid "Payment details must be 1000 characters or fewer."
 msgstr "Los datos de pago deben tener 1000 caracteres o menos."
 
-#: src/components/PaymentMethodsEditor.tsx:151
+#: src/components/PaymentMethodsEditor.tsx:113
+#: src/components/PaymentMethodsEditor.tsx:142
 msgid "Payment methods"
 msgstr "Métodos de pago"
 
@@ -3455,7 +3455,7 @@ msgstr "Gastos compartidos"
 msgid "Shared with everyone in this party"
 msgstr "Compartido con todos los miembros de este grupo"
 
-#: src/components/PaymentMethodsEditor.tsx:80
+#: src/components/PaymentMethodsEditor.tsx:82
 msgid "Shared with everyone in your groups."
 msgstr "Se comparte con todos los participantes de tus Grupos."
 

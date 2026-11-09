@@ -132,7 +132,7 @@ test.describe("Settings forms", () => {
 
     const usernameField = page.getByLabel("Username");
     await page.getByRole("button", { name: /Add payment method/ }).click();
-    await page.getByRole("option", { name: "Bizum", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Bizum", exact: true }).click();
     const phoneField = page.getByRole("textbox", { name: "Bizum", exact: true });
 
     await phoneField.fill(draftPhoneNumber);

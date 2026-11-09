@@ -352,10 +352,9 @@ msgstr "Add participant"
 msgid "Add password sign-in"
 msgstr "Add password sign-in"
 
-#: src/components/PaymentMethodsEditor.tsx:105
-#: src/components/PaymentMethodsEditor.tsx:106
-#: src/components/PaymentMethodsEditor.tsx:134
-#: src/components/PaymentMethodsEditor.tsx:144
+#: src/components/PaymentMethodsEditor.tsx:109
+#: src/components/PaymentMethodsEditor.tsx:125
+#: src/components/PaymentMethodsEditor.tsx:135
 msgid "Add payment method"
 msgstr "Add payment method"
 
@@ -1768,7 +1767,7 @@ msgstr "Georgian Lari"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 
-#: src/components/PaymentMethodsEditor.tsx:77
+#: src/components/PaymentMethodsEditor.tsx:79
 msgid "Get paid"
 msgstr "Get paid"
 
@@ -2984,7 +2983,8 @@ msgstr "Payment details copied"
 msgid "Payment details must be 1000 characters or fewer."
 msgstr "Payment details must be 1000 characters or fewer."
 
-#: src/components/PaymentMethodsEditor.tsx:151
+#: src/components/PaymentMethodsEditor.tsx:113
+#: src/components/PaymentMethodsEditor.tsx:142
 msgid "Payment methods"
 msgstr "Payment methods"
 
@@ -3527,7 +3527,7 @@ msgstr "Shared expenses"
 msgid "Shared with everyone in this party"
 msgstr "Shared with everyone in this party"
 
-#: src/components/PaymentMethodsEditor.tsx:80
+#: src/components/PaymentMethodsEditor.tsx:82
 msgid "Shared with everyone in your groups."
 msgstr "Shared with everyone in your groups."
 

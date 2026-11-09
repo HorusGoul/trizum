@@ -8,17 +8,12 @@ import {
   ModalSheetSection,
   ModalSheetTitle,
 } from "@trizum/ui/ModalSheet";
-import {
-  Select,
-  SelectItem,
-  SelectListBox,
-  SelectPopover,
-  SelectTrigger,
-  SelectValue,
-} from "@trizum/ui/Select";
+import { SelectItem } from "@trizum/ui/Select";
+import { Menu, MenuItem } from "@trizum/ui/Menu";
+import { Popover } from "@trizum/ui/Popover";
 import { useMediaQuery } from "@trizum/ui/useMediaQuery";
 import { useRef, useState } from "react";
-import { ListBox } from "react-aria-components";
+import { ListBox, MenuTrigger } from "react-aria-components";
 import { paymentMethodLabels } from "#src/lib/paymentMethods.ts";
 import {
   paymentMethodTypes,
@@ -56,19 +51,26 @@ export function PaymentMethodsEditor({
     }
   }
 
-  const options = available.map((type) => (
-    <SelectItem
-      key={type}
-      id={type}
-      textValue={t(paymentMethodLabels[type])}
-      className={isDesktop ? undefined : "px-0 py-2"}
-    >
-      <span className="flex min-h-9 items-center gap-3">
+  const options = available.map((type) => {
+    const methodName = t(paymentMethodLabels[type]);
+
+    const content = (
+      <span className="flex min-h-9 items-center gap-3 md:min-h-0">
         <PaymentMethodIcon type={type} size={20} />
-        {t(paymentMethodLabels[type])}
+        {methodName}
       </span>
-    </SelectItem>
-  ));
+    );
+
+    return isDesktop ? (
+      <MenuItem key={type} id={type} textValue={methodName} onAction={() => addMethod(type)}>
+        {content}
+      </MenuItem>
+    ) : (
+      <SelectItem key={type} id={type} textValue={methodName} className="px-0 py-2">
+        {content}
+      </SelectItem>
+    );
+  });
 
   return (
     <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-4 border-y py-6">
@@ -101,28 +103,17 @@ export function PaymentMethodsEditor({
       </div>
       {available.length > 0 ? (
         isDesktop ? (
-          <Select
-            aria-label={t`Add payment method`}
-            placeholder={t`Add payment method`}
-            selectedKey={null}
-            onSelectionChange={(key) => {
-              const type = available.find((type) => type === key);
-
-              if (type) addMethod(type);
-            }}
-          >
-            <SelectTrigger className="border-accent-200 dark:border-accent-700 min-h-11 rounded-xl bg-transparent dark:bg-transparent">
-              <span className="flex items-center gap-2">
-                <Icon icon="lucide.plus" width={18} height={18} />
-                <SelectValue className="data-[placeholder]:text-accent-700 dark:data-[placeholder]:text-accent-200" />
-              </span>
-            </SelectTrigger>
-            <SelectPopover>
+          <MenuTrigger isOpen={isPickerOpen} onOpenChange={setIsPickerOpen}>
+            <Button color="transparent" className="min-h-11 justify-start gap-2">
+              <Icon icon="lucide.plus" width={18} height={18} />
+              <Trans>Add payment method</Trans>
+            </Button>
+            <Popover placement="bottom start">
               <PaymentMethodPopoverContent onClose={finishAddingMethod}>
-                <SelectListBox>{options}</SelectListBox>
+                <Menu aria-label={t`Payment methods`}>{options}</Menu>
               </PaymentMethodPopoverContent>
-            </SelectPopover>
-          </Select>
+            </Popover>
+          </MenuTrigger>
         ) : (
           <>
             <Button

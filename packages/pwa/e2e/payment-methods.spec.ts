@@ -94,7 +94,7 @@ test("desktop settings retain edits through preview, copy, removal, and repeated
   await harness.seedPartyList({ username: "Alex", phone: "+34612345678" });
   await harness.navigate("/settings");
   await page.getByRole("button", { name: /Add payment method/ }).click();
-  await page.getByRole("option", { name: "Venmo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Venmo", exact: true }).click();
   const field = page.getByRole("textbox", { name: "Venmo", exact: true });
   await expect(field).toHaveAttribute("placeholder", "e.g. @yourname");
   await expect(
