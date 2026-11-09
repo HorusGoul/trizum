@@ -1015,7 +1015,7 @@ function ReceiptPhotosField({
         ) : null}
 
         {value.map((photoId, index) => (
-          <div key={photoId} className="relative shrink-0">
+          <div key={photoId} className="relative isolate shrink-0">
             <Suspense fallback={<Skeleton className="h-32 w-32" />}>
               <CurrentPhoto
                 key={photoId}
@@ -1242,7 +1242,7 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
       </Button>
       <Button
         color="input-like"
-        className="absolute -top-2 -right-2 h-auto w-auto rounded-full p-1"
+        className="absolute -top-2 -right-2 z-10 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
         aria-label={t`Remove photo`}
       >
