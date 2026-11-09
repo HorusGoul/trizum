@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "cleanup": "rm -rf .captures feature-graphics previews screenshots",
+    "cleanup": "rm -rf .captures feature-graphics previews screenshots creative-assets",
     "compose": "node src/compose-existing.ts",
     "feature-graphic": "node src/generate-feature-graphics.ts",
     "start": "node src/main.ts",
@@ -33,8 +33,10 @@
     "setup": "vp exec playwright install --with-deps --only-shell chromium"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "catalog:",
     "@trizum/logging": "workspace:*",
-    "playwright": "catalog:"
+    "playwright": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",

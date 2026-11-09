@@ -16,6 +16,8 @@ require "json"
 require "plist"
 require "spaceship/connect_api"
 require "timeout"
+require_relative "creative_assets"
+require_relative "creative_assets_api_client"
 
 IOS_APP_IDENTIFIER = "app.trizum.capacitor"
 IOS_APPSTORE_PROFILE_NAME = "App Store Profile"
@@ -43,6 +45,22 @@ Deliver::SyncScreenshots.prepend(BoundedScreenshotSync)
 default_platform(:ios)
 
 platform :ios do
+  desc "Upload and attach selected header/search creatives to the editable release version"
+  lane :upload_creative_assets do |options|
+    load_api_key
+    UI.user_error!("App Store Connect API credentials are required") unless Spaceship::ConnectAPI.token
+    uploader = CreativeAssets.new(
+      client: CreativeAssetsAPIClient.new(token: Spaceship::ConnectAPI.token),
+      manifest: File.expand_path("creative_assets/manifest.json", __dir__),
+      report: options[:report] || File.join(ENV.fetch("RUNNER_TEMP", Dir.tmpdir), "trizum-creative-assets.json"),
+      log: ->(message) { UI.message(message) }
+    )
+    uploader.run(
+      version: options[:app_version] || get_version_number(xcodeproj: "App.xcodeproj"),
+      preflight: options[:preflight].to_s == "true"
+    )
+  end
+
   desc "Load App Store Connect API Key"
   lane :load_api_key do
     if ENV["APP_STORE_CONNECT_API_KEY_ID"] && ENV["APP_STORE_CONNECT_API_ISSUER_ID"] && ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
@@ -325,6 +343,8 @@ platform :ios do
       version_check_wait_retry_limit: IOS_VERSION_CHECK_WAIT_RETRY_LIMIT,
       submission_information: app_store_submission_information
     )
+
+    upload_creative_assets
 
     if submit_for_review
       submit_processed_build_for_review(automatic_release: automatic_release)

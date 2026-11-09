@@ -1,11 +1,15 @@
 # trizum screenshots
 
-This package generates store and marketing screenshots with Playwright.
+This package generates store screenshots, creative artwork, and animated
+App Store headers with Playwright.
 
 ## Canonical Sources
 
 - [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
   are the source of truth for package tasks and scripts.
+- [`src/creative-assets`](./src/creative-assets/) contains the editable header animation,
+  search concepts, previews, and release selection tools. Read the
+  [creative asset guide](./docs/creative-assets.md) to regenerate or update them.
 - [`src/main.ts`](./src/main.ts) captures deterministic app states across
   locales and device profiles.
 - [`src/store-design.ts`](./src/store-design.ts) is the source of truth for

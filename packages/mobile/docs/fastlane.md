@@ -51,6 +51,14 @@ vp run ruby:check:android
 
 #### iOS (`packages/mobile/ios/App`)
 
+For product page header and search artwork automation, read the
+[creative asset guide](./app-store-creative-assets.md). The approved English and
+Spanish headers are uploaded and attached by `deploy_appstore_full` after
+metadata upload and before version review. Merging their files does not upload
+or publish anything. The same manifest supports future selected search artwork;
+search drafts are currently unselected. Editable source and regeneration commands
+are documented in the [creative generation guide](../../screenshots/docs/creative-assets.md).
+
 **Build Lanes:**
 
 | Lane            | Description                       |
@@ -71,11 +79,21 @@ vp run ruby:check:android
 
 **Metadata Lanes:**
 
-| Lane                 | Description                                       |
-| -------------------- | ------------------------------------------------- |
-| `download_metadata`  | Download existing metadata from App Store Connect |
-| `upload_metadata`    | Upload metadata only (no build)                   |
-| `upload_screenshots` | Upload screenshots only                           |
+| Lane                     | Description                                                                   |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| `download_metadata`      | Download existing metadata from App Store Connect                             |
+| `upload_metadata`        | Upload metadata only (no build)                                               |
+| `upload_screenshots`     | Upload screenshots only                                                       |
+| `upload_creative_assets` | Upload selected header/search images or videos and attach them to the release |
+
+The creative asset lane defaults to the native project's version. Use
+`upload_creative_assets app_version:1.14.0 preflight:true` to validate the selected
+file checksums and inspect Apple's current specifications, target localizations,
+and placement groups without uploading or changing placements. Normal release
+uploads reuse matching assets and placements. They replace only the selected
+locale/type/group slots after all selected assets finish processing. Other
+artwork is preserved. The selected creatives are reviewed and released with the
+app version.
 
 **Utility Lanes:**
 
