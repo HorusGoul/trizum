@@ -33,6 +33,13 @@ including when deployment fails. Its timeout allows for first-upload processing
 of both videos, with up to ten minutes of polling per video.
 The contract tests run through `vp run ruby:check:ios` in the mobile package.
 
+`HeaderAssetsAPIClient` limits both Spaceship's outer API retry loop and its
+inner HTTP transport retry loop to one attempt for POST. Other methods retain
+the pinned client's behavior and all requests retain its JWT middleware. The
+transport tests use that real client with Faraday's test adapter to simulate a
+lost response after a successful reservation or placement; no create request
+is replayed after a timeout or connection failure.
+
 Merging this integration performs no Apple mutations. The next normal App Store
 release uploads, reviews, and publishes these placements with its app version.
 There is no standalone submission, immediate live-page update, search placement,

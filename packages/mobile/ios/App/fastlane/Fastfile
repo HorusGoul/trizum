@@ -17,6 +17,7 @@ require "plist"
 require "spaceship/connect_api"
 require "timeout"
 require_relative "header_assets"
+require_relative "header_assets_api_client"
 
 IOS_APP_IDENTIFIER = "app.trizum.capacitor"
 IOS_APPSTORE_PROFILE_NAME = "App Store Profile"
@@ -49,7 +50,7 @@ platform :ios do
     load_api_key
     UI.user_error!("App Store Connect API credentials are required") unless Spaceship::ConnectAPI.token
     uploader = HeaderAssets.new(
-      client: Spaceship::ConnectAPI::Tunes::Client.new(token: Spaceship::ConnectAPI.token),
+      client: HeaderAssetsAPIClient.new(token: Spaceship::ConnectAPI.token),
       manifest: File.expand_path("creative_assets/header.json", __dir__),
       report: options[:report] || File.join(ENV.fetch("RUNNER_TEMP", Dir.tmpdir), "trizum-header-upload.json"),
       log: ->(message) { UI.message(message) }

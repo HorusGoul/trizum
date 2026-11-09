@@ -89,6 +89,8 @@ check_ios() {
     "fastlane/Deliverfile" \
     "fastlane/Fastfile" \
     "fastlane/header_assets.rb" \
+    "fastlane/header_assets_api_client.rb" \
+    "fastlane/header_assets_api_client_test.rb" \
     "fastlane/header_assets_test.rb" \
     "fastlane/Pluginfile"
   check_ios_podfile
@@ -96,6 +98,7 @@ check_ios() {
   (
     cd "$SCRIPT_DIR/ios/App"
     bundle exec ruby fastlane/header_assets_test.rb
+    bundle exec ruby fastlane/header_assets_api_client_test.rb
   )
   end_group
 }
