@@ -48,8 +48,8 @@ in local storage, and refreshes
 on mount, reconnect, and every six hours while open. Newer publication dates win
 per currency, so a fallback response cannot replace newer stored rates. Missing
 pairs require a manual rate. These are daily reference rates, not card settlement
-rates; the editor displays the reference value and date alongside the editable
-rate.
+rates; the editor prefills an editable rate and shows the converted total as
+read-only output.
 
 An expense's optional `originalAmount` stores `{ amount, currency }`, and
 `exchangeRate` stores party-currency units per original-currency unit. Both

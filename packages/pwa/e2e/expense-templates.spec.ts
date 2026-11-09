@@ -43,6 +43,8 @@ async function createExpenseTemplate(
 }
 
 async function openExpenseTemplatePicker(page: Page, partyId: string) {
+  // On narrow screens the creation toast overlaps the floating Add button.
+  await expect(page.getByText("Expense template created", { exact: true })).toBeHidden();
   await page.getByRole("button", { name: "Add an expense" }).click();
   const dialog = page.getByRole("dialog", { name: "Add an expense" });
 
@@ -116,7 +118,8 @@ test.describe("Expense templates", () => {
 
       // The paused clock cannot supply Playwright's actionability frames.
       await page.getByRole("button", { name: "Add an expense" }).click({ force: true });
-      await page.clock.runFor(1000);
+      // The sampler can run for 2000ms; advance past its deadline so awaiting it cannot deadlock.
+      await page.clock.runFor(2100);
       const frames = await framesPromise;
 
       await test.info().attach(`open-cycle-${cycle}-frames`, {
