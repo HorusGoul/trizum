@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, type ComponentProps } from "react";
+import { act, useEffect, type ComponentProps } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { i18n } from "@lingui/core";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
@@ -30,7 +30,7 @@ function Harness({
   userId?: string;
   isBoosted?: boolean;
 }) {
-  controller = useReceiptSuggestions({
+  const suggestions = useReceiptSuggestions({
     partyId: "party",
     userId,
     isBoosted,
@@ -40,7 +40,11 @@ function Harness({
     services,
   });
 
-  return <output>{controller.result?.receipt.merchantName}</output>;
+  useEffect(() => {
+    controller = suggestions;
+  }, [suggestions]);
+
+  return <output>{suggestions.result?.receipt.merchantName}</output>;
 }
 
 async function render(props: ComponentProps<typeof Harness> = {}) {
@@ -70,9 +74,43 @@ afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 describe("receipt suggestion lifecycle", () => {
+  test("starts analysis without modern AbortSignal static methods", async () => {
+    vi.stubGlobal("AbortSignal", { any: undefined, timeout: undefined });
+    analyzeReceipt.mockResolvedValue(receipt);
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.result?.receipt).toEqual(receipt);
+    expect(toast.dismiss).toHaveBeenCalledWith("reading");
+  });
+  test("times out analysis and clears its request timer", async () => {
+    vi.useFakeTimers();
+    analyzeReceipt.mockImplementation(
+      (_partyId, _image, signal) =>
+        new Promise((_resolve, reject) => {
+          signal?.addEventListener(
+            "abort",
+            () => reject(new DOMException("Aborted", "AbortError")),
+            { once: true },
+          );
+        }),
+    );
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    const signal = analyzeReceipt.mock.calls[0][2];
+    await act(async () => vi.advanceTimersByTimeAsync(60_000));
+    expect(signal?.aborted).toBe(true);
+    expect(controller.result).toBeUndefined();
+    expect(toast.error).toHaveBeenCalledWith(
+      "Could not read this receipt. You can still enter the expense yourself.",
+    );
+    expect(toast.dismiss).toHaveBeenCalledWith("reading");
+    expect(vi.getTimerCount()).toBe(0);
+  });
   test("keeps the draft unchanged until acceptance and records explicit decisions", async () => {
     analyzeReceipt.mockResolvedValue(receipt);
     await render();

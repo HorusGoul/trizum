@@ -18,6 +18,11 @@ interface ReceiptResult {
   baseline: ReceiptDraftValues;
 }
 
+interface ReceiptRequest {
+  toastId: string | number;
+  timeoutId: ReturnType<typeof setTimeout>;
+}
+
 export function useReceiptSuggestions({
   partyId,
   userId,
@@ -40,7 +45,7 @@ export function useReceiptSuggestions({
 }) {
   const context = JSON.stringify([partyId, userId, isBoosted]);
   const [results, setResults] = useState<ReceiptResult[]>([]);
-  const [requests] = useState(() => new Map<AbortController, string | number>());
+  const [requests] = useState(() => new Map<AbortController, ReceiptRequest>());
   const activeContext = useRef<{ key: string } | null>(null);
   useEffect(() => {
     activeContext.current = { key: context };
@@ -48,9 +53,10 @@ export function useReceiptSuggestions({
     return () => {
       activeContext.current = null;
 
-      for (const [request, toastId] of requests) {
-        request.abort();
-        toast.dismiss(toastId);
+      for (const [controller, request] of requests) {
+        clearTimeout(request.timeoutId);
+        controller.abort();
+        toast.dismiss(request.toastId);
       }
 
       requests.clear();
@@ -66,13 +72,10 @@ export function useReceiptSuggestions({
     for (const { photoId, image } of images) {
       const controller = new AbortController();
       const toastId = toast.loading(t`Reading receipt for Premium suggestions…`);
-      requests.set(controller, toastId);
+      const timeoutId = setTimeout(() => controller.abort(), 60_000);
+      requests.set(controller, { toastId, timeoutId });
       void services
-        .analyzeReceipt(
-          partyId,
-          image,
-          AbortSignal.any([controller.signal, AbortSignal.timeout(60_000)]),
-        )
+        .analyzeReceipt(partyId, image, controller.signal)
         .then((receipt) => {
           if (
             controller.signal.aborted ||
@@ -83,15 +86,12 @@ export function useReceiptSuggestions({
           setResults((current) => [...current, { context, photoId, receipt, baseline }]);
         })
         .catch(() => {
-          if (
-            !controller.signal.aborted &&
-            activeContext.current === requestContext &&
-            getPhotoIds().includes(photoId)
-          ) {
+          if (activeContext.current === requestContext && getPhotoIds().includes(photoId)) {
             toast.error(t`Could not read this receipt. You can still enter the expense yourself.`);
           }
         })
         .finally(() => {
+          clearTimeout(timeoutId);
           requests.delete(controller);
           toast.dismiss(toastId);
         });

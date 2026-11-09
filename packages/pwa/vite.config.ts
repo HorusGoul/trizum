@@ -260,7 +260,7 @@ export default defineConfig(({ mode }) => {
       name: "pwa",
     },
     plugins: [
-      ...(isTest ? [] : [cloudflare()]),
+      ...(isTest ? [] : [cloudflare({ remoteBindings: !process.env.CI })]),
       tanstackRouter(),
       tailwindcss(),
       react(),

@@ -14,6 +14,7 @@ const onAccept = vi.fn<(values: Partial<ReceiptDraftValues>) => void>();
 const onDiscard = vi.fn<() => void>();
 
 beforeEach(() => {
+  vi.useFakeTimers();
   vi.stubGlobal(
     "ResizeObserver",
     class {
@@ -35,6 +36,8 @@ beforeEach(() => {
 
 afterEach(async () => {
   await act(async () => root.unmount());
+  await act(async () => vi.runAllTimersAsync());
+  vi.useRealTimers();
   container.remove();
   vi.unstubAllGlobals();
 });
@@ -63,6 +66,8 @@ async function render(currencyMismatch = false) {
       </I18nProvider>,
     ),
   );
+  // Let the sheet's frame-delayed entrance settle while its container exists.
+  await act(async () => vi.runAllTimersAsync());
 }
 
 function button(text: string) {
@@ -80,6 +85,13 @@ test("accepts title and total only after the user confirms", async () => {
   expect(onAccept).not.toHaveBeenCalled();
   await act(async () => button("Accept suggestions").click());
   expect(onAccept).toHaveBeenCalledExactlyOnceWith({ name: "Market", amount: 12.34 });
+});
+
+test("settles sheet timers before the test document is disposed", async () => {
+  await render();
+  await act(async () => root.render(null));
+  await act(async () => vi.runAllTimersAsync());
+  expect(vi.getTimerCount()).toBe(0);
 });
 
 test("can accept only the total and disable acceptance with no fields selected", async () => {

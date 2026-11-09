@@ -1074,7 +1074,7 @@ msgstr "No se pudo cargar el estado de trizum cloud"
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
 
-#: src/components/useReceiptSuggestions.ts:91
+#: src/components/useReceiptSuggestions.ts:90
 msgid "Could not read this receipt. You can still enter the expense yourself."
 msgstr "No se ha podido leer este recibo. Puedes introducir el gasto manualmente."
 
@@ -3018,7 +3018,7 @@ msgstr "Captura de fotograma del código QR"
 msgid "Ranking based on how much each participant paid in the selected timeframe."
 msgstr "Clasificación según cuánto ha pagado cada participante en el período seleccionado."
 
-#: src/components/useReceiptSuggestions.ts:68
+#: src/components/useReceiptSuggestions.ts:74
 msgid "Reading receipt for Premium suggestions…"
 msgstr "Leyendo el recibo para las sugerencias Premium…"
 

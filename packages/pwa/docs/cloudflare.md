@@ -50,6 +50,11 @@ client API key is needed. Local Workers AI inference uses Cloudflare resources
 and requires a signed-in Wrangler account. Automated tests inject the provider
 and never send real receipts to AI.
 
+CI disables remote binding connections for local Vite development and preview
+servers, so browser and visual tests can boot without Cloudflare credentials.
+This local-server option does not remove AI from deployed PR previews or
+production Workers.
+
 `RECEIPT_RATE_LIMITER` allows ten analysis requests per signed-in account per
 minute in each Cloudflare location. This is an approximate abuse limit, not a
 global billing quota; see [Cloudflare's rate limiting semantics](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
