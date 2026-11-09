@@ -51,6 +51,12 @@ vp run ruby:check:android
 
 #### iOS (`packages/mobile/ios/App`)
 
+For product page header and search artwork automation, read the
+[creative asset guide](./app-store-creative-assets.md). The approved English and
+Spanish headers are uploaded and attached by `deploy_appstore_full` after
+metadata upload and before version review. Merging their files does not upload
+or publish anything. Search artwork is not configured.
+
 **Build Lanes:**
 
 | Lane            | Description                       |
@@ -71,11 +77,20 @@ vp run ruby:check:android
 
 **Metadata Lanes:**
 
-| Lane                 | Description                                       |
-| -------------------- | ------------------------------------------------- |
-| `download_metadata`  | Download existing metadata from App Store Connect |
-| `upload_metadata`    | Upload metadata only (no build)                   |
-| `upload_screenshots` | Upload screenshots only                           |
+| Lane                   | Description                                                             |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `download_metadata`    | Download existing metadata from App Store Connect                       |
+| `upload_metadata`      | Upload metadata only (no build)                                         |
+| `upload_screenshots`   | Upload screenshots only                                                 |
+| `upload_header_assets` | Upload approved headers and attach them to the editable release version |
+
+The header lane defaults to the native project's version. Use
+`upload_header_assets app_version:1.14.0 preflight:true` to validate the approved
+file checksums and inspect Apple's current specifications, target localizations,
+and placement groups without uploading or changing placements. Normal release
+uploads reuse matching assets and placements. They replace only matching header
+slots after both localized videos finish processing; screenshots and search
+artwork are preserved. Headers are reviewed and released with the app version.
 
 **Utility Lanes:**
 

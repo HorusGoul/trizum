@@ -16,6 +16,7 @@ require "json"
 require "plist"
 require "spaceship/connect_api"
 require "timeout"
+require_relative "header_assets"
 
 IOS_APP_IDENTIFIER = "app.trizum.capacitor"
 IOS_APPSTORE_PROFILE_NAME = "App Store Profile"
@@ -43,6 +44,22 @@ Deliver::SyncScreenshots.prepend(BoundedScreenshotSync)
 default_platform(:ios)
 
 platform :ios do
+  desc "Upload and attach approved header videos to the editable release version"
+  lane :upload_header_assets do |options|
+    load_api_key
+    UI.user_error!("App Store Connect API credentials are required") unless Spaceship::ConnectAPI.token
+    uploader = HeaderAssets.new(
+      client: Spaceship::ConnectAPI::Tunes::Client.new(token: Spaceship::ConnectAPI.token),
+      manifest: File.expand_path("creative_assets/header.json", __dir__),
+      report: options[:report] || File.join(ENV.fetch("RUNNER_TEMP", Dir.tmpdir), "trizum-header-upload.json"),
+      log: ->(message) { UI.message(message) }
+    )
+    uploader.run(
+      version: options[:app_version] || get_version_number(xcodeproj: "App.xcodeproj"),
+      preflight: options[:preflight].to_s == "true"
+    )
+  end
+
   desc "Load App Store Connect API Key"
   lane :load_api_key do
     if ENV["APP_STORE_CONNECT_API_KEY_ID"] && ENV["APP_STORE_CONNECT_API_ISSUER_ID"] && ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
@@ -325,6 +342,8 @@ platform :ios do
       version_check_wait_retry_limit: IOS_VERSION_CHECK_WAIT_RETRY_LIMIT,
       submission_information: app_store_submission_information
     )
+
+    upload_header_assets
 
     if submit_for_review
       submit_processed_build_for_review(automatic_release: automatic_release)

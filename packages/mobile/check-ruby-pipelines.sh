@@ -88,8 +88,16 @@ check_ios() {
     "fastlane/Appfile" \
     "fastlane/Deliverfile" \
     "fastlane/Fastfile" \
+    "fastlane/header_assets.rb" \
+    "fastlane/header_assets_test.rb" \
     "fastlane/Pluginfile"
   check_ios_podfile
+  start_group "iOS header upload contract"
+  (
+    cd "$SCRIPT_DIR/ios/App"
+    bundle exec ruby fastlane/header_assets_test.rb
+  )
+  end_group
 }
 
 case "$PLATFORM" in
