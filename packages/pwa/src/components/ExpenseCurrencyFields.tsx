@@ -163,8 +163,11 @@ export function ExpenseCurrencyFields({
 
           if (!isCurrencyCode(key) || key === currency) return;
           calculatorProps.onCloseCalculator?.();
+          // Currency selection relabels the entered amount, rather than converting it again.
+          const enteredAmount = original?.amount ?? convertToUnits(form.state.values.amount);
 
           if (key === partyCurrency) {
+            form.setFieldValue("amount", enteredAmount / 100);
             form.setFieldValue("originalAmount", null);
             form.setFieldValue("exchangeRate", null);
           } else {
@@ -172,7 +175,7 @@ export function ExpenseCurrencyFields({
             updateConversion(
               {
                 currency: key,
-                amount: original?.amount ?? convertToUnits(form.state.values.amount),
+                amount: enteredAmount,
               },
               rate,
             );

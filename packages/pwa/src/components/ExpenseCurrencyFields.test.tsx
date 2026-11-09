@@ -178,7 +178,7 @@ test("selects a foreign currency, edits its amount and rate, and switches back t
   });
   await choose("EUR");
   expect(field("Amount").readOnly).toBe(false);
-  expect(form.state.values).toMatchObject({ amount: 10, originalAmount: null, exchangeRate: null });
+  expect(form.state.values).toMatchObject({ amount: 40, originalAmount: null, exchangeRate: null });
 });
 
 test("accepts a manually entered rate for a currency with no reference rate", async () => {
@@ -214,4 +214,55 @@ test("uses the party currency as the API base and the converted amount currency"
     exchangeRate: 0.5,
   });
   expect(field("Converted amount (GBP)").readOnly).toBe(true);
+});
+
+test("keeps the entered amount unchanged through repeated currency round trips", async () => {
+  await render({ amount: 100 });
+
+  for (let cycle = 0; cycle < 3; cycle++) {
+    await choose("USD");
+    expect(field("Original amount (USD)").value).toBe("100");
+    expect(field("Converted amount (EUR)").value).toBe("50");
+    await choose("EUR");
+    expect(field("Amount").value).toBe("100");
+    expect(form.state.values).toMatchObject({
+      amount: 100,
+      originalAmount: null,
+      exchangeRate: null,
+    });
+  }
+});
+
+test("restores the entered amount after selecting a currency with no reference rate", async () => {
+  await render({ amount: 100 });
+  await choose("HRK");
+  expect(form.state.values).toMatchObject({
+    amount: 0,
+    originalAmount: { amount: 10000, currency: "HRK" },
+    exchangeRate: null,
+  });
+  await choose("EUR");
+  expect(form.state.values).toMatchObject({
+    amount: 100,
+    originalAmount: null,
+    exchangeRate: null,
+  });
+  expect(field("Amount").value).toBe("100");
+});
+
+test("retains a changed foreign amount when relabelling it with the party currency", async () => {
+  await render({
+    amount: 80,
+    originalAmount: { amount: 10000, currency: "USD" },
+    exchangeRate: 0.8,
+  });
+  await enter(field("Original amount (USD)"), "37.25");
+  await enter(field("Exchange rate"), "0.2");
+  await choose("EUR");
+  expect(field("Amount").value).toBe("37.25");
+  expect(form.state.values).toMatchObject({
+    amount: 37.25,
+    originalAmount: null,
+    exchangeRate: null,
+  });
 });

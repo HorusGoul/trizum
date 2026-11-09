@@ -46,12 +46,28 @@ for (const width of [390, 1280]) {
     expect(Math.abs(amountBox.y - currencyBox.y)).toBeLessThan(2);
     expect(currencyBox.x).toBeGreaterThan(amountBox.x + amountBox.width);
 
+    const original = page.getByLabel("Original amount (USD)", { exact: true });
+    const converted = page.getByLabel("Converted amount (EUR)", { exact: true });
+    await amount.fill("100");
+
+    for (let cycle = 0; cycle < 2; cycle++) {
+      await currency.click();
+      await page.getByRole("option", { name: /^USD/ }).click();
+      await expect(original).toHaveValue("100");
+      await expect(converted).toHaveValue("80");
+      await currency.click();
+      await page.getByRole("option", { name: /^EUR/ }).click();
+      await expect(amount).toHaveValue("100");
+    }
+
     await page.getByLabel("Title", { exact: true }).fill("Dinner abroad");
+    const includeAll = page.getByRole("checkbox", { name: "Include all", exact: true });
+    await includeAll.focus();
+    await includeAll.press("Space");
+    await expect(includeAll).toBeChecked();
     await currency.click();
     await page.getByRole("option", { name: /^USD/ }).click();
-    const original = page.getByLabel("Original amount (USD)", { exact: true });
     await original.fill("25");
-    const converted = page.getByLabel("Converted amount (EUR)", { exact: true });
     await expect(converted).toHaveJSProperty("readOnly", true);
     await expect(converted).toHaveCSS("border-top-style", "dashed");
     await expect(converted).toHaveValue("20");
@@ -74,7 +90,9 @@ for (const width of [390, 1280]) {
     await expect(converted).toHaveValue("18.75");
 
     if (width === 390) await page.setViewportSize({ width, height: 520 });
-    await page.getByRole("button", { name: "Open calculator", exact: true }).click();
+    await page
+      .locator('[data-calculator-field-button][data-presence-proxy-element-id="originalAmount"]')
+      .click();
     const calculator = page.getByRole("application", { name: "Calculator" });
     await expect(calculator).toBeVisible();
     await calculator.getByRole("button", { name: "4", exact: true }).click();
@@ -101,7 +119,6 @@ for (const width of [390, 1280]) {
     await calculator.getByRole("button", { name: "Calculate result", exact: true }).click();
     await expect(calculator).toBeHidden();
     await page.setViewportSize({ width, height: 844 });
-    await page.getByText("Include all", { exact: true }).click();
     await expect(page.getByText("All expense checks passed", { exact: true })).toBeVisible();
     await expect(page.getByText("Complete the required details", { exact: true })).toBeHidden();
     await expect(
