@@ -17,6 +17,7 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
   const copyDetails = useCopyPaymentDetails(details);
   const linkRef = useRef<HTMLAnchorElement>(null);
   const heldRef = useRef(false);
+  const suppressHeldClickRef = useRef(false);
 
   const { linkProps } = useLink(
     {
@@ -34,6 +35,7 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
     },
     onLongPress: () => {
       heldRef.current = true;
+      suppressHeldClickRef.current = true;
     },
   });
 
@@ -69,6 +71,17 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
           <a
             {...mergeProps(linkProps, longPressProps)}
             ref={linkRef}
+            onPointerDownCapture={() => {
+              suppressHeldClickRef.current = false;
+            }}
+            onClickCapture={(event) => {
+              // Cancelling usePress does not cancel every browser's native link click.
+              // A new pointer down starts a fresh action; detail 0 keeps keyboard/AT activation.
+              if (suppressHeldClickRef.current && event.detail > 0) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+            }}
             onPointerUpCapture={() => {
               // Keep clipboard access inside the release gesture on touch browsers.
               if (heldRef.current) {

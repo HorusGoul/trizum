@@ -1054,8 +1054,8 @@ msgstr "Continuar con Premium"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:90
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:99
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:103
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:112
 msgid "Copy {methodName} details"
 msgstr "Copiar datos de {methodName}"
 
@@ -1845,7 +1845,7 @@ msgstr "Oculta la opción en blanco al añadir un gasto."
 msgid "Hold for payment method actions"
 msgstr "Mantén pulsado para ver las opciones del método de pago"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:31
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:32
 msgid "Hold to copy payment details"
 msgstr "Mantén pulsado para copiar los datos de pago"
 
@@ -2606,7 +2606,7 @@ msgstr "¿Usar solo plantillas personalizadas?"
 msgid "Only your own debt can be transferred"
 msgstr "Solo puedes transferir tus propias deudas"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:82
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:95
 msgid "Open {methodName}"
 msgstr "Abrir {methodName}"
 

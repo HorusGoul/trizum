@@ -55,7 +55,22 @@ test("payment rows open links, copy independently, and cancel opening after a ho
     .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
     .toBe("@alex");
   await expect(venmo).toBeFocused();
+
+  // Some browsers deliver a compatibility click after the hold was cancelled.
+  const heldClickWasAllowed = await venmo.evaluate((link) =>
+    link.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true, button: 0, detail: 1 }),
+    ),
+  );
+
+  expect(heldClickWasAllowed).toBe(false);
   expect(context.pages()).toHaveLength(1);
+
+  const keyboardPopupPromise = page.waitForEvent("popup");
+  await venmo.press("Enter");
+  const keyboardPopup = await keyboardPopupPromise;
+  await expect(keyboardPopup).toHaveURL("https://venmo.com/u/alex");
+  await keyboardPopup.close();
 
   const popupPromise = page.waitForEvent("popup");
   await venmo.click();
@@ -166,6 +181,14 @@ test.describe("mobile payment settings", () => {
     await expect
       .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
       .toBe("@alex");
+
+    const heldClickWasAllowed = await link.evaluate((element) =>
+      element.dispatchEvent(
+        new MouseEvent("click", { bubbles: true, cancelable: true, button: 0, detail: 1 }),
+      ),
+    );
+
+    expect(heldClickWasAllowed).toBe(false);
     expect(context.pages()).toHaveLength(1);
     const popupPromise = page.waitForEvent("popup");
     await link.tap();

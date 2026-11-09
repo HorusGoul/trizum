@@ -1078,8 +1078,8 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:90
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:99
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:103
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:112
 msgid "Copy {methodName} details"
 msgstr "Copy {methodName} details"
 
@@ -1893,7 +1893,7 @@ msgstr "Hide the blank option when adding an expense."
 msgid "Hold for payment method actions"
 msgstr "Hold for payment method actions"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:31
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:32
 msgid "Hold to copy payment details"
 msgstr "Hold to copy payment details"
 
@@ -2662,7 +2662,7 @@ msgstr "Only use custom templates?"
 msgid "Only your own debt can be transferred"
 msgstr "Only your own debt can be transferred"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:82
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:95
 msgid "Open {methodName}"
 msgstr "Open {methodName}"
 
