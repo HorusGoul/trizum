@@ -85,6 +85,38 @@ afterEach(async () => {
 });
 
 describe("receipt suggestion lifecycle", () => {
+  test("keeps each photo scanning until its own request settles", async () => {
+    vi.useFakeTimers();
+    const first = deferred<Receipt>();
+    const second = deferred<Receipt>();
+    analyzeReceipt.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+    photoIds = ["photo", "other-photo"];
+    await render();
+    await act(async () =>
+      controller.analyze([
+        { photoId: "photo", image: "receipt" },
+        { photoId: "other-photo", image: "other-receipt" },
+      ]),
+    );
+    await act(async () => vi.advanceTimersByTimeAsync(30_000));
+    expect(controller.scanningPhotoIds).toEqual(["photo", "other-photo"]);
+    await act(async () => first.resolve(receipt));
+    expect(controller.scanningPhotoIds).toEqual(["other-photo"]);
+    await act(async () => second.resolve(receipt));
+    expect(controller.scanningPhotoIds).toEqual([]);
+  });
+
+  test("ends the scan on timeout even if the transport never settles", async () => {
+    vi.useFakeTimers();
+    analyzeReceipt.mockReturnValue(new Promise(() => {}));
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.scanningPhotoIds).toEqual(["photo"]);
+    await act(async () => vi.advanceTimersByTimeAsync(60_000));
+    expect(controller.scanningPhotoIds).toEqual([]);
+    expect(controller.result).toBeUndefined();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
   test("starts analysis without modern AbortSignal static methods", async () => {
     vi.stubGlobal("AbortSignal", { any: undefined, timeout: undefined });
     analyzeReceipt.mockResolvedValue(receipt);
@@ -170,6 +202,7 @@ describe("receipt suggestion lifecycle", () => {
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
     photoIds = [];
     await render();
+    expect(controller.scanningPhotoIds).toEqual([]);
     await act(async () => pending.resolve(receipt));
     expect(controller.result).toBeUndefined();
     expect(trackEvent).not.toHaveBeenCalled();
@@ -182,6 +215,7 @@ describe("receipt suggestion lifecycle", () => {
     const signal = analyzeReceipt.mock.calls[0][2];
     await render({ userId: "another-member" });
     expect(signal?.aborted).toBe(true);
+    expect(controller.scanningPhotoIds).toEqual([]);
     await act(async () => pending.resolve(receipt));
     expect(controller.result).toBeUndefined();
     await render({ userId: "member" });
@@ -216,6 +250,7 @@ describe("receipt suggestion lifecycle", () => {
     expect(draft).toEqual({ name: "", amount: 0 });
     expect(toast.error).not.toHaveBeenCalled();
     expect(trackEvent).not.toHaveBeenCalled();
+    expect(controller.scanningPhotoIds).toEqual([]);
   });
 });
 

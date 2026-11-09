@@ -42,7 +42,7 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 
-async function render(currencyMismatch = false) {
+async function render(currencyMismatch = false, titleSuggestions: string[] = []) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
@@ -50,13 +50,13 @@ async function render(currencyMismatch = false) {
           <ReceiptSuggestionsSheet
             receipt={{
               merchantName: "Market",
-              titleSuggestions: [],
+              titleSuggestions,
               total: "12.34",
               currency: currencyMismatch ? "USD" : "EUR",
               items: [],
             }}
             suggestions={{
-              name: "Market",
+              name: titleSuggestions[0] ?? "Market",
               amount: currencyMismatch ? undefined : 12.34,
               currencyMismatch,
             }}
@@ -110,6 +110,39 @@ test("discards without applying any fields", async () => {
   await act(async () => button("Discard").click());
   expect(onDiscard).toHaveBeenCalledOnce();
   expect(onAccept).not.toHaveBeenCalled();
+});
+
+test("chooses an alternative title without editing it or applying it early", async () => {
+  await render(false, ["Coffee", "Café"]);
+  expect(document.querySelector('input[type="text"]')).toBeNull();
+  const options = document.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+  expect(Array.from(options, (option) => option.value)).toEqual(["Coffee", "Café", "Market"]);
+  await act(async () => options[1].click());
+  expect(options[1].checked).toBe(true);
+  expect(onAccept).not.toHaveBeenCalled();
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenCalledExactlyOnceWith({ name: "Café", amount: 12.34 });
+});
+
+test("can pick the merchant fallback and still exclude the title", async () => {
+  await render(false, ["Coffee", "Café"]);
+  const options = document.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+  await act(async () => options[2].click());
+  const checkbox = document.querySelector<HTMLInputElement>('input[type="checkbox"]');
+  await act(async () => checkbox?.click());
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenCalledExactlyOnceWith({ amount: 12.34 });
+});
+
+test("selecting another title enables a previously excluded title", async () => {
+  await render(false, ["Coffee", "Café"]);
+  const checkbox = document.querySelector<HTMLInputElement>('input[type="checkbox"]');
+  await act(async () => checkbox?.click());
+  const option = document.querySelector<HTMLInputElement>('input[type="radio"][value="Café"]');
+  await act(async () => option?.click());
+  expect(checkbox?.checked).toBe(true);
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenCalledExactlyOnceWith({ name: "Café", amount: 12.34 });
 });
 
 test("offers only the title when the receipt currency differs", async () => {

@@ -16,6 +16,12 @@ interface ReceiptResult {
   baseline: ReceiptDraftValues;
 }
 
+interface ScanningReceipt {
+  context: string;
+  photoId: string;
+  controller: AbortController;
+}
+
 export function useReceiptSuggestions({
   partyId,
   userId,
@@ -38,6 +44,7 @@ export function useReceiptSuggestions({
 }) {
   const context = JSON.stringify([partyId, userId, isBoosted]);
   const [results, setResults] = useState<ReceiptResult[]>([]);
+  const [scanning, setScanning] = useState<ScanningReceipt[]>([]);
   const [requests] = useState(() => new Map<AbortController, ReturnType<typeof setTimeout>>());
   const activeContext = useRef<{ key: string } | null>(null);
   useEffect(() => {
@@ -63,8 +70,21 @@ export function useReceiptSuggestions({
 
     for (const { photoId, image } of images) {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60_000);
+
+      function finishScanning() {
+        if (activeContext.current === requestContext) {
+          setScanning((current) => current.filter((entry) => entry.controller !== controller));
+        }
+      }
+
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        requests.delete(controller);
+        finishScanning();
+      }, 60_000);
+
       requests.set(controller, timeoutId);
+      setScanning((current) => [...current, { context, photoId, controller }]);
       void services
         .analyzeReceipt(partyId, image, controller.signal)
         .catch(() => null)
@@ -84,6 +104,7 @@ export function useReceiptSuggestions({
         .finally(() => {
           clearTimeout(timeoutId);
           requests.delete(controller);
+          finishScanning();
         });
     }
   }
@@ -100,5 +121,9 @@ export function useReceiptSuggestions({
     );
   }
 
-  return { analyze, result, dismiss };
+  const scanningPhotoIds = scanning.flatMap((entry) =>
+    entry.context === context && photoIds.includes(entry.photoId) ? [entry.photoId] : [],
+  );
+
+  return { analyze, result, dismiss, scanningPhotoIds };
 }

@@ -255,7 +255,7 @@ msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o regi
 msgid "Accent color"
 msgstr "Color de acento"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:121
+#: src/components/ReceiptSuggestionsSheet.tsx:148
 msgid "Accept suggestions"
 msgstr "Aceptar sugerencias"
 
@@ -1288,7 +1288,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:124
+#: src/components/ReceiptSuggestionsSheet.tsx:151
 msgid "Discard"
 msgstr "Descartar"
 
@@ -1517,7 +1517,7 @@ msgid "Explore Premium"
 msgstr "Descubre Premium"
 
 #: src/components/AvatarPicker.tsx:119
-#: src/components/ExpenseEditor.tsx:1142
+#: src/components/ExpenseEditor.tsx:1154
 #: src/components/QRCodeScanner.tsx:129
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
@@ -1562,7 +1562,7 @@ msgstr "Error al actualizar el gasto"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
-#: src/components/ExpenseEditor.tsx:1115
+#: src/components/ExpenseEditor.tsx:1127
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
@@ -2365,7 +2365,7 @@ msgstr "No se encontraron emojis"
 msgid "No expense templates yet"
 msgstr "Todavía no hay plantillas de gasto"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:106
+#: src/components/ReceiptSuggestionsSheet.tsx:133
 msgid "No new title or total could be suggested. Your edits are kept."
 msgstr "No hay nuevas sugerencias de título o importe total. Se mantienen tus cambios."
 
@@ -2955,8 +2955,8 @@ msgstr "Se han restaurado las compras de Premium."
 msgid "Premium status could not be checked. Try again."
 msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:40
-#: src/components/ReceiptSuggestionsSheet.tsx:51
+#: src/components/ReceiptSuggestionsSheet.tsx:43
+#: src/components/ReceiptSuggestionsSheet.tsx:54
 msgid "Premium suggestions"
 msgstr "Sugerencias Premium"
 
@@ -3070,7 +3070,7 @@ msgstr "Eliminar"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/ExpenseEditor.tsx:1235
+#: src/components/ExpenseEditor.tsx:1247
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -3144,7 +3144,7 @@ msgstr "Política de privacidad de RevenueCat"
 msgid "Review expense"
 msgstr "Revisar gasto"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:55
+#: src/components/ReceiptSuggestionsSheet.tsx:58
 msgid "Review the receipt details before applying them to your expense."
 msgstr "Revisa los datos del recibo antes de aplicarlos al gasto."
 
@@ -3671,8 +3671,8 @@ msgstr "Somoni Tayiko"
 
 #: src/components/AvatarPicker.tsx:167
 #: src/components/AvatarPicker.tsx:182
-#: src/components/ExpenseEditor.tsx:1163
-#: src/components/ExpenseEditor.tsx:1177
+#: src/components/ExpenseEditor.tsx:1175
+#: src/components/ExpenseEditor.tsx:1189
 msgid "Take photo"
 msgstr "Hacer foto"
 
@@ -3787,7 +3787,7 @@ msgstr "El grupo puede haber sido eliminado por otro miembro."
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "El grupo anterior perderá su impulso. No podrás volver a mover Party Boost durante siete días."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:95
+#: src/components/ReceiptSuggestionsSheet.tsx:122
 msgid "The receipt currency differs from this party’s currency. The total cannot be applied."
 msgstr "La moneda del recibo es distinta de la del Grupo. No se puede aplicar el importe total."
 
@@ -3895,7 +3895,8 @@ msgid "Timeframe"
 msgstr "Período"
 
 #: src/components/ExpenseEditor.tsx:461
-#: src/components/ReceiptSuggestionsSheet.tsx:69
+#: src/components/ReceiptSuggestionsSheet.tsx:73
+#: src/components/ReceiptSuggestionsSheet.tsx:82
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Title"
 msgstr "Título"
@@ -3948,7 +3949,7 @@ msgstr "Total pagado por cada participante en el período seleccionado."
 msgid "Total spent"
 msgstr "Total gastado"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:85
+#: src/components/ReceiptSuggestionsSheet.tsx:112
 msgid "Total, including tax and discounts"
 msgstr "Total, con impuestos y descuentos"
 
@@ -4123,8 +4124,8 @@ msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:176
 #: src/components/AvatarPicker.tsx:194
-#: src/components/ExpenseEditor.tsx:1172
-#: src/components/ExpenseEditor.tsx:1189
+#: src/components/ExpenseEditor.tsx:1184
+#: src/components/ExpenseEditor.tsx:1201
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -4132,7 +4133,7 @@ msgstr "Subir foto"
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
-#: src/components/ExpenseEditor.tsx:1086
+#: src/components/ExpenseEditor.tsx:1098
 msgid "Uploading..."
 msgstr "Subiendo..."
 
@@ -4245,7 +4246,7 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:1224
+#: src/components/ExpenseEditor.tsx:1236
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "Ver foto"

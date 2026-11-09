@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
 import type { Receipt } from "./api/receiptContract";
-import { getReceiptSuggestions } from "./receiptSuggestions";
+import { getReceiptSuggestions, getReceiptTitleOptions } from "./receiptSuggestions";
 
 const receipt: Receipt = {
   merchantName: "The market",
@@ -16,6 +16,20 @@ const suggest = (data: Partial<Receipt> = {}, current = baseline) =>
   getReceiptSuggestions({ receipt: { ...receipt, ...data }, currency: "EUR", current, baseline });
 
 describe("receipt draft suggestions", () => {
+  test("offers distinct bounded titles in ranked order with the merchant last", () => {
+    expect(getReceiptTitleOptions({ ...receipt, titleSuggestions: ["Café", "Cafés"] })).toEqual([
+      "Café",
+      "Cafés",
+      "The market",
+    ]);
+    expect(
+      getReceiptTitleOptions({ ...receipt, titleSuggestions: ["The market", "The market"] }),
+    ).toEqual(["The market"]);
+    expect(
+      getReceiptTitleOptions({ ...receipt, titleSuggestions: [], merchantName: " A ".repeat(50) }),
+    ).toEqual([" A ".repeat(50).trim().slice(0, 50)]);
+    expect(getReceiptTitleOptions({ ...receipt, merchantName: null })).toEqual([]);
+  });
   test("prefers an activity title and falls back to the merchant only when needed", () => {
     expect(suggest({ titleSuggestions: ["Cafetería", "Cafés"] }).name).toBe("Cafetería");
     expect(suggest({ titleSuggestions: [] }).name).toBe("The market");

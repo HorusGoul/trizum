@@ -1,5 +1,14 @@
 @import "@trizum/ui/styles.css";
 
+@keyframes receipt-scan-glow {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 html,
 body,
 #root {

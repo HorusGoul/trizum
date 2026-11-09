@@ -55,6 +55,8 @@ items or clear context. Coffee purchases can suggest “Coffee” or “Café”
 of the merchant's legal business name. The first title is the default suggestion;
 the original merchant is retained separately as the last fallback. Unsupported
 activity titles are omitted, and no model confidence percentages are shown.
+The sheet offers distinct activity titles and the merchant as horizontally
+scrollable choices. The chosen title is read-only until accepted into the draft.
 
 New attachments are analyzed from their locally prepared image while Automerge
 sync continues. Suggestions stay local to the editor. Accepting selected fields
@@ -62,6 +64,8 @@ updates the draft; saving the expense uses the existing write path. The first
 version offers title and total only, preserves fields edited during processing,
 and disables totals with a known currency mismatch or precision the editor
 cannot represent. Removing a receipt or leaving the editor discards late results.
-Analysis runs without loading or error toasts. Failures and receipts with no
+Analysis runs without loading or error toasts. Each photo has a gently glowing
+ring until its request finishes or times out; reduced motion uses a static ring.
+Failures and receipts with no
 extractable title or total produce no suggestion sheet and leave attachments
 and manual expense entry usable.

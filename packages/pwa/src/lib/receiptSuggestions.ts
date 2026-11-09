@@ -5,6 +5,16 @@ export interface ReceiptDraftValues {
   amount: number;
 }
 
+export function getReceiptTitleOptions(receipt: Receipt): string[] {
+  const titles = [...receipt.titleSuggestions, receipt.merchantName].flatMap((title) => {
+    const value = title?.trim().slice(0, 50);
+
+    return value ? [value] : [];
+  });
+
+  return [...new Set(titles)];
+}
+
 export function getReceiptSuggestions({
   receipt,
   currency,
@@ -17,7 +27,7 @@ export function getReceiptSuggestions({
   baseline: ReceiptDraftValues;
 }) {
   const currencyMismatch = receipt.currency !== null && receipt.currency !== currency;
-  const title = (receipt.titleSuggestions[0] ?? receipt.merchantName)?.slice(0, 50);
+  const title = getReceiptTitleOptions(receipt)[0];
 
   // The editor stores major units with two decimal places for every currency.
   // Never round away printed precision or silently convert another currency.

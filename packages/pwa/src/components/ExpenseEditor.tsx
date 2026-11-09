@@ -51,7 +51,7 @@ import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.t
 import { cn } from "@trizum/ui/utils";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
-import { getReceiptSuggestions } from "#src/lib/receiptSuggestions.ts";
+import { getReceiptSuggestions, getReceiptTitleOptions } from "#src/lib/receiptSuggestions.ts";
 import { ReceiptSuggestionsSheet } from "./ReceiptSuggestionsSheet";
 import { useReceiptSuggestions, type ReceiptImage } from "./useReceiptSuggestions";
 
@@ -974,7 +974,7 @@ function ReceiptPhotosField({
   userId: string | undefined;
   isBoosted: boolean;
 }) {
-  const { analyze, result, dismiss } = useReceiptSuggestions({
+  const { analyze, result, dismiss, scanningPhotoIds } = useReceiptSuggestions({
     partyId,
     userId,
     isBoosted,
@@ -1015,17 +1015,25 @@ function ReceiptPhotosField({
         ) : null}
 
         {value.map((photoId, index) => (
-          <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
-            <CurrentPhoto
-              key={photoId}
-              photoId={photoId}
-              onRemove={() => {
-                onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
-                trackEvent("receipt_attachment_removed");
-              }}
-              onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
-            />
-          </Suspense>
+          <div key={photoId} className="relative shrink-0">
+            <Suspense fallback={<Skeleton className="h-32 w-32" />}>
+              <CurrentPhoto
+                key={photoId}
+                photoId={photoId}
+                onRemove={() => {
+                  onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
+                  trackEvent("receipt_attachment_removed");
+                }}
+                onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
+              />
+            </Suspense>
+            {scanningPhotoIds.includes(photoId) ? (
+              <div
+                aria-hidden="true"
+                className="border-accent-500 dark:border-accent-400 pointer-events-none absolute inset-0 rounded-xl border-2 shadow-[0_0_12px_2px_var(--color-accent-500)] motion-safe:animate-[receipt-scan-glow_1.8s_linear_infinite_alternate] dark:shadow-[0_0_12px_2px_var(--color-accent-400)]"
+              />
+            ) : null}
+          </div>
         ))}
         <AddPhotoButton
           onPhoto={(photo, images) => {
@@ -1051,7 +1059,11 @@ function ReceiptPhotosField({
 
             let applied = false;
 
-            if (values.name !== undefined && values.name === available.name) {
+            if (
+              available.name !== undefined &&
+              values.name !== undefined &&
+              getReceiptTitleOptions(result.receipt).includes(values.name)
+            ) {
               form.setFieldValue("name", values.name);
               applied = true;
             }
