@@ -433,6 +433,7 @@ overrides:
 patchedDependencies:
   '@capacitor-community/admob@8.2.1': 15953e1082871e5c959242e397a132e2d2a806c5145380e2a872b5fb98f4d93d
   react-modal-sheet@5.6.0: 7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245
+  sonner@2.0.8: 1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db
   vite-plugin-top-level-await@1.6.0: c1bf42ffb0231cba0eb2749d8dafd670e84b4e23e60ac3e49a14033034352cc2
 
 importers:
@@ -855,7 +856,7 @@ importers:
         version: 2.5.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       sonner:
         specifier: 'catalog:'
-        version: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       ulidx:
         specifier: 'catalog:'
         version: 2.4.1
@@ -1227,7 +1228,7 @@ importers:
         version: 5.6.0(patch_hash=7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245)(motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       sonner:
         specifier: 'catalog:'
-        version: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.7.0
@@ -14321,7 +14322,7 @@ snapshots:
       react-dom: 19.3.1(react@19.3.1)
       react-modal-sheet: 5.6.0(patch_hash=7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245)(motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-window: 2.5.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      sonner: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      sonner: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       ulidx: 2.4.1
       workbox-build: 7.4.1(@types/babel__core@7.20.5)(supports-color@10.2.2)
       workbox-window: 7.4.1
@@ -14422,7 +14423,7 @@ snapshots:
       react-aria-components: 1.19.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-dom: 19.3.1(react@19.3.1)
       react-modal-sheet: 5.6.0(patch_hash=7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245)(motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      sonner: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      sonner: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       tailwind-merge: 3.7.0
       tailwindcss: 4.3.3
       tailwindcss-animate: 1.0.7(tailwindcss@4.3.3)
@@ -18590,12 +18591,10 @@ snapshots:
 
   smob@1.5.0: {}
 
-  sonner@2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  sonner@2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
-    optionalDependencies:
-      '@types/react': 19.3.0
 
   source-map-js@1.2.2: {}
 
