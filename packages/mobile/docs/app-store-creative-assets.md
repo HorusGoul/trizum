@@ -29,9 +29,14 @@ hashes, discovers compatible image/video specs and mobile groups from Apple's
 current catalog, and requires the selected localizations on that exact editable
 iOS version. It processes every selected asset before changing any placement.
 
-Reference names contain the locale and full content hash, allowing subsequent
-releases to reuse the same library assets. Matching placements are retained;
-only selected locale/type/group slots are replaced. Asset
+Reference names contain the locale and full content hash, plus the selected
+poster timecode for videos. Identical selections reuse library assets; changing
+only the poster uploads a separate video, preserving any shared or live
+placements of the previous video. Legacy videos with hash-only reference names
+are left untouched and uploaded once under the new identity. Apple's
+[preview frame belongs to the shared video](https://developer.apple.com/documentation/appstoreconnectapi/uploading-and-managing-video-assets), so the lane never patches an existing video's
+poster. Matching placements are retained; only selected locale/type/group slots
+are replaced. Asset
 reservations and placement creation are not blindly retried. Processing and
 network requests have timeouts. A failure aborts the release lane before app
 review and records asset IDs, states, and any interrupted replacement in

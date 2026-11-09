@@ -5,7 +5,7 @@ require_relative "creative_assets"
 
 class CreativeAssetsClientFake
   Response = Struct.new(:body)
-  attr_reader :mutations, :requests
+  attr_reader :mutations, :requests, :videos
   attr_accessor :version_state, :processing_failure, :placement_failure, :transient_upload_state, :image_alpha_allowed
 
   def initialize(manifest)
@@ -15,6 +15,7 @@ class CreativeAssetsClientFake
     @videos = {}
     @images = {}
     @placements = { "en-US" => [], "es-ES" => [] }
+    @next_placement_id = 0
     @version_state = "PREPARE_FOR_SUBMISSION"
   end
 
@@ -67,7 +68,7 @@ class CreativeAssetsClientFake
     @mutations << [:post, path, body]
     data = body.fetch(:data)
     item = if %w[v1/appAssetLibraryVideos v1/appAssetLibraryImages].include?(path)
-             id = data.fetch(:attributes).fetch(:fileName)
+             id = "#{data.fetch(:attributes).fetch(:referenceName)}-#{@videos.length + @images.length}"
              attributes = data.fetch(:attributes).transform_keys(&:to_s).merge("state" => "AWAITING_UPLOAD", "specId" => (path.end_with?("Images") ? "search-image" : id.include?("search") ? "search-video" : "header-video"), "previewFrameImage" => { "state" => "COMPLETE" }, "uploadOperations" => [{ "method" => "PUT", "url" => "https://upload.example.test/part", "offset" => 0, "length" => data.fetch(:attributes).fetch(:fileSize), "requestHeaders" => [{ "name" => "Content-Type", "value" => "video/mp4" }] }])
              attributes.delete("previewFrameImage") if path.end_with?("Images")
              (path.end_with?("Images") ? @images : @videos)[id] = { "id" => id, "attributes" => attributes }
@@ -76,7 +77,7 @@ class CreativeAssetsClientFake
              relationships = data.fetch(:relationships).transform_keys(&:to_s)
              locale = relationships.fetch("appStoreVersionLocalization").fetch(:data).fetch(:id)
              relation = relationships.key?("video") ? "video" : "image"
-             item = { "id" => "new-#{@mutations.length}", "attributes" => data.fetch(:attributes).transform_keys(&:to_s), "relationships" => { relation => { "data" => { "id" => relationships.fetch(relation).fetch(:data).fetch(:id) } } } }
+             item = { "id" => "new-#{@next_placement_id += 1}", "attributes" => data.fetch(:attributes).transform_keys(&:to_s), "relationships" => { relation => { "data" => { "id" => relationships.fetch(relation).fetch(:data).fetch(:id) } } } }
              @placements.fetch(locale) << item
              item
            else raise "Unexpected POST: #{path}"
@@ -146,6 +147,56 @@ class CreativeAssetsTest < Minitest::Test
 
   def test_rerun_reuses_assets_and_placements
     run_creatives
+    @client.mutations.clear
+    @uploads.clear
+    run_creatives
+    assert_empty @client.mutations
+    assert_empty @uploads
+  end
+
+  def test_poster_only_selection_uploads_a_distinct_video_and_then_reuses_it
+    original = run_creatives
+    original_videos = JSON.parse(JSON.generate(@client.videos))
+    search = @client.seed_placement("en-US", "phone", "existing-search", "APP_STORE_SEARCH_RESULTS_ASSET")
+    @manifest.fetch("assets").first["preview_frame_time_code"] = "00:00:16:00"
+    File.write(@manifest_path, JSON.generate(@manifest))
+    @client.mutations.clear
+    @uploads.clear
+
+    updated = run_creatives
+    assert_equal 1, @uploads.length
+    assert_equal 3, @client.videos.length
+    old_en = original.fetch("assets").find { |asset| asset.fetch("locale") == "en-US" }
+    new_en = updated.fetch("assets").find { |asset| asset.fetch("locale") == "en-US" }
+    assert_equal old_en.fetch("sha256"), new_en.fetch("sha256")
+    refute_equal old_en.fetch("id"), new_en.fetch("id")
+    assert_equal "00:00:16:00", new_en.fetch("preview_frame_time_code")
+    assert_equal "00:00:16:00", @client.videos.fetch(new_en.fetch("id")).dig("attributes", "previewFrameTimeCode")
+    original_videos.each { |id, video| assert_equal video, @client.videos.fetch(id) }
+    assert_equal original.fetch("placements").select { |placement| placement.fetch("locale") == "es-ES" }, updated.fetch("placements").select { |placement| placement.fetch("locale") == "es-ES" }
+    assert updated.fetch("placements").select { |placement| placement.fetch("locale") == "en-US" }.all? { |placement| placement.fetch("asset_id") == new_en.fetch("id") }
+    refute @client.mutations.any? { |method, path| method == :delete && path.end_with?(search.fetch("id")) }
+    @client.mutations.clear
+    @uploads.clear
+    run_creatives
+    assert_empty @client.mutations
+    assert_empty @uploads
+  end
+
+  def test_legacy_hash_only_videos_remain_untouched_during_migration
+    run_creatives
+    @client.videos.each_value do |video|
+      video.fetch("attributes")["referenceName"].sub!(/-poster-.*\z/, "")
+    end
+    legacy_videos = JSON.parse(JSON.generate(@client.videos))
+    @client.mutations.clear
+    @uploads.clear
+
+    run_creatives
+    assert_equal 2, @uploads.length
+    assert_equal 4, @client.videos.length
+    legacy_videos.each { |id, video| assert_equal video, @client.videos.fetch(id) }
+    refute @client.mutations.any? { |method, path| method == :patch && legacy_videos.keys.any? { |id| path.end_with?(id) } }
     @client.mutations.clear
     @uploads.clear
     run_creatives

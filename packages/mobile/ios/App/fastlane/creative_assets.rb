@@ -99,6 +99,9 @@ class CreativeAssets
     kind = asset.fetch("placement_type") == "PRODUCT_PAGE_HEADER_ASSET" ? "header" : "search"
     type = resource(asset).fetch(:collection)
     reference = "trizum-#{kind}-#{asset.fetch('locale')}-#{asset.fetch('sha256')}"
+    # Posters belong to the shared video. Keep each selection immutable, and
+    # leave videos with the legacy hash-only reference untouched.
+    reference += "-poster-#{asset.fetch('preview_frame_time_code').tr(':', '-')}" if asset.fetch("media_type") == "video"
     matches = list("v1/appAssetLibraries/#{@result.fetch('library_id')}/#{resource(asset).fetch(:library)}", filter: { referenceName: reference, category: "CREATIVE_ASSETS" })
     raise "Ambiguous existing creative: #{reference}" if matches.length > 1
     entry = matches.first
@@ -153,7 +156,7 @@ class CreativeAssets
   end
 
   def record(asset, entry)
-    result = asset.slice("locale", "placement_type", "media_type", "sha256").merge("id" => entry.fetch("id"), "spec_id" => entry.fetch("attributes")["specId"], "state" => entry.fetch("attributes").fetch("state"))
+    result = asset.slice("locale", "placement_type", "media_type", "sha256", "preview_frame_time_code").merge("id" => entry.fetch("id"), "spec_id" => entry.fetch("attributes")["specId"], "state" => entry.fetch("attributes").fetch("state"))
     @result["assets"].reject! { |existing| asset_key(existing) == asset_key(asset) }
     @result["assets"] << result
     save_report
