@@ -7,7 +7,6 @@ import type { ExpenseEditorFormValues } from "./ExpenseEditor";
 import type { AppFormApi } from "../lib/reactFormTypes";
 import { CurrencyContext } from "./CurrencyContext";
 import { CurrencyField } from "./CurrencyField";
-import { CurrencyText } from "./CurrencyText";
 import type { CurrencyFieldProps } from "./CurrencyField";
 import { isCurrencyCode } from "../lib/money";
 import { useExchangeRates } from "../hooks/useExchangeRates";
@@ -37,7 +36,6 @@ export function ExpenseCurrencyFields({
   const partyCurrency = use(CurrencyContext);
   const table = useExchangeRates(partyCurrency);
   const original = useStore(form.store, (state) => state.values.originalAmount);
-  const amount = useStore(form.store, (state) => state.values.amount);
   const exchangeRate = useStore(form.store, (state) => state.values.exchangeRate);
   const currency = original?.currency ?? partyCurrency;
   const currencyNames = new Intl.DisplayNames([i18n.locale], { type: "currency" });
@@ -68,7 +66,7 @@ export function ExpenseCurrencyFields({
                 calculator
                 calculatorId="originalAmount"
                 calculatorAttachmentPhotoIds={photos}
-                label={t`Amount`}
+                label={t({ message: `Original amount (${currency})` })}
                 name={field.name}
                 value={(field.state.value?.amount ?? 0) / 100}
                 minValue={0}
@@ -118,6 +116,43 @@ export function ExpenseCurrencyFields({
           </form.Field>
         )}
       </CurrencyContext>
+      {original && (
+        <>
+          <form.Field name="amount">
+            {(field) => (
+              <CurrencyField
+                label={convertedAmountLabel}
+                name={field.name}
+                value={field.state.value}
+                isReadOnly
+                minValue={0}
+                className="min-w-0"
+                inputClassName="cursor-default border-dashed border-accent-300 bg-accent-100/50 font-semibold text-accent-600 dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200"
+              />
+            )}
+          </form.Field>
+          <form.Field name="exchangeRate">
+            {(field) => (
+              <AppNumberField
+                label={t`Exchange rate`}
+                description={rateDescription}
+                name={field.name}
+                value={field.state.value ?? Number.NaN}
+                onChange={(value) =>
+                  updateConversion(original, Number.isFinite(value) ? value : null)
+                }
+                minValue={0}
+                formatOptions={{ maximumSignificantDigits: 17, useGrouping: false }}
+                isInvalid={field.state.value != null && field.state.value <= 0}
+                errorMessage={t`Exchange rate must be greater than 0`}
+                className="min-w-0"
+                data-presence-element-id="exchangeRate"
+                {...createFieldFocusHandlers(field)}
+              />
+            )}
+          </form.Field>
+        </>
+      )}
       <AppSelect
         label={t`Currency`}
         items={currencies}
@@ -150,43 +185,6 @@ export function ExpenseCurrencyFields({
           </SelectItem>
         )}
       </AppSelect>
-      {original && (
-        <>
-          <form.Field name="exchangeRate">
-            {(field) => (
-              <AppNumberField
-                label={t`Exchange rate`}
-                description={rateDescription}
-                name={field.name}
-                value={field.state.value ?? Number.NaN}
-                onChange={(value) =>
-                  updateConversion(original, Number.isFinite(value) ? value : null)
-                }
-                minValue={0}
-                formatOptions={{ maximumSignificantDigits: 17, useGrouping: false }}
-                isInvalid={field.state.value != null && field.state.value <= 0}
-                errorMessage={t`Exchange rate must be greater than 0`}
-                className="min-w-0"
-                data-presence-element-id="exchangeRate"
-                {...createFieldFocusHandlers(field)}
-              />
-            )}
-          </form.Field>
-          <div className="flex min-w-0 flex-col gap-2">
-            <span className="text-sm leading-none font-medium">{convertedAmountLabel}</span>
-            <output
-              aria-label={convertedAmountLabel}
-              className="text-accent-700 dark:text-accent-200 flex h-10 items-center text-xl font-semibold tabular-nums"
-            >
-              <CurrencyText
-                amount={convertToUnits(amount)}
-                currency={partyCurrency}
-                variant="inherit"
-              />
-            </output>
-          </div>
-        </>
-      )}
     </>
   );
 }

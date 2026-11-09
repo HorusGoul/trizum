@@ -92,7 +92,7 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
-#: src/components/ExpenseCurrencyFields.tsx:52
+#: src/components/ExpenseCurrencyFields.tsx:50
 msgid "{partyCurrency} per 1 {currency}"
 msgstr "{partyCurrency} per 1 {currency}"
 
@@ -400,8 +400,7 @@ msgstr "Always include everyone"
 msgid "Always use default template"
 msgstr "Always use default template"
 
-#: src/components/ExpenseCurrencyFields.tsx:71
-#: src/components/ExpenseCurrencyFields.tsx:100
+#: src/components/ExpenseCurrencyFields.tsx:98
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:322
 msgid "Amount"
 msgstr "Amount"
@@ -414,7 +413,7 @@ msgstr "Amount for {0}"
 msgid "Amount for {participantName}"
 msgstr "Amount for {participantName}"
 
-#: src/components/ExpenseCurrencyFields.tsx:91
+#: src/components/ExpenseCurrencyFields.tsx:89
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
@@ -1031,7 +1030,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/components/ExpenseCurrencyFields.tsx:51
+#: src/components/ExpenseCurrencyFields.tsx:49
 msgid "Converted amount ({partyCurrency})"
 msgstr "Converted amount ({partyCurrency})"
 
@@ -1184,7 +1183,7 @@ msgstr "Cuban Convertible Peso"
 msgid "Cuban Peso"
 msgstr "Cuban Peso"
 
-#: src/components/ExpenseCurrencyFields.tsx:122
+#: src/components/ExpenseCurrencyFields.tsx:157
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:91
 msgid "Currency"
 msgstr "Currency"
@@ -1483,11 +1482,11 @@ msgstr "Everything is archived for now. You can reopen any party from the archiv
 msgid "Exact"
 msgstr "Exact"
 
-#: src/components/ExpenseCurrencyFields.tsx:158
+#: src/components/ExpenseCurrencyFields.tsx:137
 msgid "Exchange rate"
 msgstr "Exchange rate"
 
-#: src/components/ExpenseCurrencyFields.tsx:168
+#: src/components/ExpenseCurrencyFields.tsx:147
 msgid "Exchange rate must be greater than 0"
 msgstr "Exchange rate must be greater than 0"
 
@@ -2631,7 +2630,7 @@ msgstr "or enter code"
 msgid "or use email"
 msgstr "or use email"
 
-#: src/components/ExpenseCurrencyFields.tsx:108
+#: src/components/ExpenseCurrencyFields.tsx:69
 msgid "Original amount ({currency})"
 msgstr "Original amount ({currency})"
 

@@ -153,24 +153,22 @@ test("reopening a foreign expense preserves its saved rate through a late refere
   expect(form.state.values.amount).toBe(80);
   expect(form.state.values.exchangeRate).toBe(0.8);
   expect(field("Exchange rate").value).toBe("0.8");
-  expect(container.querySelector("output")?.textContent).toContain("80,00");
-  expect(container.querySelector("output input")).toBeNull();
+  expect(field("Converted amount (EUR)").value).toBe("80");
+  expect(field("Converted amount (EUR)").readOnly).toBe(true);
 });
 
 test("selects a foreign currency, edits its amount and rate, and switches back to the party currency", async () => {
   await render();
   expect(field("Amount").readOnly).toBe(false);
   await choose("USD");
-  expect(container.querySelector("output")?.getAttribute("aria-label")).toBe(
-    "Converted amount (EUR)",
-  );
-  expect(field("Amount").readOnly).toBe(false);
+  expect(field("Converted amount (EUR)").readOnly).toBe(true);
+  expect(field("Original amount (USD)").readOnly).toBe(false);
   expect(form.state.values).toMatchObject({
     amount: 50,
     originalAmount: { currency: "USD", amount: 10000 },
     exchangeRate: 0.5,
   });
-  await enter(field("Amount"), "40");
+  await enter(field("Original amount (USD)"), "40");
   expect(form.state.values.amount).toBe(20);
   await enter(field("Exchange rate"), "0.25");
   expect(form.state.values).toMatchObject({
@@ -215,7 +213,5 @@ test("uses the party currency as the API base and the converted amount currency"
     originalAmount: { currency: "USD", amount: 10000 },
     exchangeRate: 0.5,
   });
-  expect(container.querySelector("output")?.getAttribute("aria-label")).toBe(
-    "Converted amount (GBP)",
-  );
+  expect(field("Converted amount (GBP)").readOnly).toBe(true);
 });
