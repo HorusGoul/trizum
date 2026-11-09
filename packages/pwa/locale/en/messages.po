@@ -88,6 +88,11 @@ msgstr "{issueCount, plural, one {# warning} other {# warnings}}"
 msgid "{message}"
 msgstr "{message}"
 
+#: src/components/PaymentMethodEditorRow.tsx:89
+#: src/components/PaymentMethodEditorRow.tsx:139
+msgid "{methodName} actions"
+msgstr "{methodName} actions"
+
 #: src/routes/migrate_.tricount.tsx:321
 msgid "{name}"
 msgstr "{name}"
@@ -116,6 +121,14 @@ msgstr "{templateName} will become the default. New expenses will always start f
 msgid "{title} preview"
 msgstr "{title} preview"
 
+#: src/lib/paymentMethods.ts:33
+msgid "@revtag or Revolut.me link"
+msgstr "@revtag or Revolut.me link"
+
+#: src/lib/paymentMethods.ts:34
+msgid "@username or Venmo link"
+msgstr "@username or Venmo link"
+
 #: src/routes/about.tsx:158
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
@@ -128,6 +141,10 @@ msgstr "© {currentYear} trizum"
 msgid "© 2024 trizum. Open source software."
 msgstr "© 2024 trizum. Open source software."
 
+#: src/lib/paymentMethods.ts:30
+msgid "+34 612 345 678"
+msgstr "+34 612 345 678"
+
 #: src/routes/party_.$partyId.transfer-debt/-components/TransferReviewCard.tsx:57
 msgid "<0>{destinationCreditorName}</0> is owed by <1>{destinationDebtorName}</1>"
 msgstr "<0>{destinationCreditorName}</0> is owed by <1>{destinationDebtorName}</1>"
@@ -135,6 +152,10 @@ msgstr "<0>{destinationCreditorName}</0> is owed by <1>{destinationDebtorName}</
 #: src/routes/party_.$partyId.transfer-debt/-components/TransferReviewCard.tsx:49
 msgid "<0>{fromName}</0> stops owing <1>{toName}</1>"
 msgstr "<0>{fromName}</0> stops owing <1>{toName}</1>"
+
+#: src/lib/paymentMethods.ts:35
+msgid "$Cashtag or Cash App link"
+msgstr "$Cashtag or Cash App link"
 
 #: src/routes/terms/-components/AccountAndUsageTerms.tsx:9
 msgid "1. Acceptance of These Terms"
@@ -263,6 +284,10 @@ msgstr "Account created"
 msgid "Account deleted"
 msgstr "Account deleted"
 
+#: src/lib/paymentMethods.ts:31
+msgid "Account holder · IBAN or account number"
+msgstr "Account holder · IBAN or account number"
+
 #: src/lib/paymentMethods.ts:21
 msgid "Account holder, IBAN or account number, and any other details needed for a transfer."
 msgstr "Account holder, IBAN or account number, and any other details needed for a transfer."
@@ -327,7 +352,10 @@ msgstr "Add participant"
 msgid "Add password sign-in"
 msgstr "Add password sign-in"
 
-#: src/components/PaymentMethodsEditor.tsx:80
+#: src/components/PaymentMethodsEditor.tsx:88
+#: src/components/PaymentMethodsEditor.tsx:89
+#: src/components/PaymentMethodsEditor.tsx:115
+#: src/components/PaymentMethodsEditor.tsx:120
 msgid "Add payment method"
 msgstr "Add payment method"
 
@@ -848,6 +876,10 @@ msgstr "Choose a destination party"
 msgid "Choose a payment method"
 msgstr "Choose a payment method"
 
+#: src/routes/party_.$partyId.pay/route.tsx:119
+msgid "Choose how to pay. Hold a method to copy its details."
+msgstr "Choose how to pay. Hold a method to copy its details."
+
 #: src/routes/settings.tsx:440
 msgid "Choose monthly, annual, or lifetime access."
 msgstr "Choose monthly, annual, or lifetime access."
@@ -1046,11 +1078,17 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:90
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:99
+msgid "Copy {methodName} details"
+msgstr "Copy {methodName} details"
+
 #: src/components/PremiumCodeRedemption.tsx:91
 msgid "Copy code"
 msgstr "Copy code"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:51
+#: src/components/PaymentMethodEditorRow.tsx:75
+#: src/components/PaymentMethodEditorRow.tsx:171
 msgid "Copy details"
 msgstr "Copy details"
 
@@ -1090,7 +1128,7 @@ msgstr "Could not apply cloud settings"
 msgid "Could not connect sign-in method"
 msgstr "Could not connect sign-in method"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:21
+#: src/hooks/useCopyPaymentDetails.ts:14
 msgid "Could not copy payment details. You can select and copy them manually."
 msgstr "Could not copy payment details. You can select and copy them manually."
 
@@ -1457,11 +1495,11 @@ msgstr "Enjoy trizum ad-free"
 msgid "Enter a party link or code to join"
 msgstr "Enter a party link or code to join"
 
-#: src/lib/paymentMethods.ts:106
+#: src/lib/paymentMethods.ts:116
 msgid "Enter a valid username or a profile link for this payment service."
 msgstr "Enter a valid username or a profile link for this payment service."
 
-#: src/lib/paymentMethods.ts:99
+#: src/lib/paymentMethods.ts:109
 msgid "Enter payment details or remove this method."
 msgstr "Enter payment details or remove this method."
 
@@ -1703,7 +1741,7 @@ msgstr "Georgian Lari"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 
-#: src/components/PaymentMethodsEditor.tsx:27
+#: src/components/PaymentMethodsEditor.tsx:60
 msgid "Get paid"
 msgstr "Get paid"
 
@@ -1824,6 +1862,14 @@ msgstr "Hide password sign in"
 msgid "Hide the blank option when adding an expense."
 msgstr "Hide the blank option when adding an expense."
 
+#: src/components/PaymentMethodEditorRow.tsx:53
+msgid "Hold for payment method actions"
+msgstr "Hold for payment method actions"
+
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:31
+msgid "Hold to copy payment details"
+msgstr "Hold to copy payment details"
+
 #: src/routes/index.tsx:360
 msgid "Home"
 msgstr "Home"
@@ -1861,7 +1907,7 @@ msgstr "How Google uses information from partner apps"
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
-#: src/routes/party_.$partyId.pay/route.tsx:120
+#: src/routes/party_.$partyId.pay/route.tsx:115
 msgid "How to pay?"
 msgstr "How to pay?"
 
@@ -2216,7 +2262,7 @@ msgid "Manage your cloud account and synced data."
 msgstr "Manage your cloud account and synced data."
 
 #: src/routes/party_.$partyId.pay/route.tsx:91
-#: src/routes/party_.$partyId.pay/route.tsx:116
+#: src/routes/party_.$partyId.pay/route.tsx:136
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Mark as paid"
 msgstr "Mark as paid"
@@ -2287,6 +2333,11 @@ msgstr "Monthly"
 #: src/routes/terms/-components/PremiumTerms.tsx:32
 msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 msgstr "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
+
+#: src/components/PaymentMethodEditorRow.tsx:135
+#: src/components/PaymentMethodEditorRow.tsx:145
+msgid "More {methodName} actions"
+msgstr "More {methodName} actions"
 
 #: src/routes/new/route.tsx:270
 msgid "Moroccan Dirham"
@@ -2539,6 +2590,10 @@ msgstr "Older parties stay tucked away, not gone"
 msgid "Omani Rial"
 msgstr "Omani Rial"
 
+#: src/routes/party_.$partyId.pay/route.tsx:132
+msgid "Once you have sent the money, mark this debt as paid."
+msgstr "Once you have sent the money, mark this debt as paid."
+
 #: src/components/PremiumPaywall.tsx:180
 msgid "One Party Boost"
 msgstr "One Party Boost"
@@ -2581,7 +2636,7 @@ msgstr "Only use custom templates?"
 msgid "Only your own debt can be transferred"
 msgstr "Only your own debt can be transferred"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:46
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:82
 msgid "Open {methodName}"
 msgstr "Open {methodName}"
 
@@ -2895,17 +2950,25 @@ msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc1
 msgid "Pay"
 msgstr "Pay"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:19
+#: src/hooks/useCopyPaymentDetails.ts:12
 msgid "Payment details copied"
 msgstr "Payment details copied"
 
-#: src/lib/paymentMethods.ts:101
+#: src/lib/paymentMethods.ts:111
 msgid "Payment details must be 1000 characters or fewer."
 msgstr "Payment details must be 1000 characters or fewer."
+
+#: src/components/PaymentMethodsEditor.tsx:125
+msgid "Payment methods"
+msgstr "Payment methods"
 
 #: src/lib/paymentMethods.ts:12
 msgid "PayPal"
 msgstr "PayPal"
+
+#: src/lib/paymentMethods.ts:32
+msgid "PayPal.Me username or link"
+msgstr "PayPal.Me username or link"
 
 #: src/routes/party_.$partyId.settings/index.tsx:38
 msgid "People"
@@ -3079,6 +3142,11 @@ msgstr "Premium status could not be checked. Try again."
 msgid "Premium, made for sharing."
 msgstr "Premium, made for sharing."
 
+#: src/components/PaymentMethodEditorRow.tsx:71
+#: src/components/PaymentMethodEditorRow.tsx:160
+msgid "Preview payment link"
+msgstr "Preview payment link"
+
 #: src/components/MediaGallery.tsx:269
 msgid "Previous"
 msgstr "Previous"
@@ -3176,7 +3244,6 @@ msgstr "Redeem your offer"
 msgid "Reload"
 msgstr "Reload"
 
-#: src/components/PaymentMethodsEditor.tsx:73
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:72
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantRow.tsx:49
 msgid "Remove"
@@ -3189,6 +3256,11 @@ msgstr "Remove {methodName}"
 #: src/components/AvatarPicker.tsx:153
 msgid "Remove avatar"
 msgstr "Remove avatar"
+
+#: src/components/PaymentMethodEditorRow.tsx:78
+#: src/components/PaymentMethodEditorRow.tsx:181
+msgid "Remove payment method"
+msgstr "Remove payment method"
 
 #: src/components/ExpenseEditor.tsx:1124
 msgid "Remove photo"
@@ -3365,6 +3437,10 @@ msgstr "Send us an email and we'll get back to you as soon as possible."
 msgid "Serbian Dinar"
 msgstr "Serbian Dinar"
 
+#: src/lib/paymentMethods.ts:36
+msgid "Service name and payment details"
+msgstr "Service name and payment details"
+
 #: src/routes/settings_.cloud-sync.tsx:901
 msgid "Set up"
 msgstr "Set up"
@@ -3424,6 +3500,10 @@ msgstr "Shared expenses"
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:101
 msgid "Shared with everyone in this party"
 msgstr "Shared with everyone in this party"
+
+#: src/components/PaymentMethodsEditor.tsx:63
+msgid "Shared with everyone in your groups."
+msgstr "Shared with everyone in your groups."
 
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Shares.tsx:19
 msgid "Shares"

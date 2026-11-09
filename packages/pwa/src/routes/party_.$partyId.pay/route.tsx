@@ -111,20 +111,12 @@ function RouteComponent() {
           </div>
         </div>
 
-        <Button color="accent" className="font-semibold" onPress={onMarkAsPaid}>
-          <Icon icon="lucide.circle-check" width={20} height={20} className="mr-2" />
-          <Trans>Mark as paid</Trans>
-        </Button>
-
-        <h2 className="mt-2 text-xl font-semibold">
+        <h2 className="mt-2 text-base font-semibold">
           <Trans>How to pay?</Trans>
         </h2>
 
-        <p className="text-lg">
-          <Trans>
-            Here&apos;s a list of ways you can pay, once done, press the button above to mark the
-            expense as paid in this trizum party.
-          </Trans>
+        <p className="text-accent-700 dark:text-accent-300 -mt-2 text-sm">
+          <Trans>Choose how to pay. Hold a method to copy its details.</Trans>
         </p>
 
         {paymentMethodTypes.map((type) => {
@@ -135,6 +127,15 @@ function RouteComponent() {
           ) : null;
         })}
         <CashItem />
+        <div className="border-accent-200 dark:border-accent-800 mt-2 flex flex-col gap-3 border-t pt-5">
+          <p className="text-accent-700 dark:text-accent-300 text-sm">
+            <Trans>Once you have sent the money, mark this debt as paid.</Trans>
+          </p>
+          <Button color="accent" className="min-h-12 font-semibold" onPress={onMarkAsPaid}>
+            <Icon icon="lucide.circle-check" width={20} height={20} className="mr-2" />
+            <Trans>Mark as paid</Trans>
+          </Button>
+        </div>
       </div>
 
       <div className="h-16 shrink-0" />

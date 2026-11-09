@@ -26,6 +26,16 @@ export const paymentMethodDescriptions = {
   other: msg`Describe how to pay you, including the service name and your payment details.`,
 };
 
+export const paymentMethodPlaceholders = {
+  bizum: msg`+34 612 345 678`,
+  "bank-transfer": msg`Account holder · IBAN or account number`,
+  paypal: msg`PayPal.Me username or link`,
+  revolut: msg`@revtag or Revolut.me link`,
+  venmo: msg`@username or Venmo link`,
+  "cash-app": msg`$Cashtag or Cash App link`,
+  other: msg`Service name and payment details`,
+};
+
 const paymentProfiles = {
   paypal: { host: "paypal.me", prefix: "/", handle: /^[a-z0-9]{1,20}$/i },
   revolut: { host: "revolut.me", prefix: "/", handle: /^[a-z0-9][a-z0-9_.-]*$/i },
