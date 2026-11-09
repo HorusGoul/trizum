@@ -2,7 +2,7 @@ require "spaceship/connect_api"
 
 # Asset reservations and placement creation have no idempotency key. Spaceship
 # retries both above and below request(), so constrain both layers for POST.
-class HeaderAssetsAPIClient < Spaceship::ConnectAPI::Tunes::Client
+class CreativeAssetsAPIClient < Spaceship::ConnectAPI::Tunes::Client
   def post(url_or_path, body, tries: 1)
     previous = @single_attempt_post
     @single_attempt_post = true

@@ -1,21 +1,21 @@
 require "minitest/autorun"
 require "openssl"
-require_relative "header_assets_api_client"
+require_relative "creative_assets_api_client"
 
-class HeaderAssetsAPIClientTest < Minitest::Test
+class CreativeAssetsAPIClientTest < Minitest::Test
   def setup
     @token = Spaceship::ConnectAPI::Token.create(
       key_id: "test-key", issuer_id: "test-issuer",
       key: OpenSSL::PKey::EC.generate("prime256v1").to_pem, in_house: false
     )
     @stubs = Faraday::Adapter::Test::Stubs.new
-    @client = HeaderAssetsAPIClient.new(token: @token)
+    @client = CreativeAssetsAPIClient.new(token: @token)
     @client.instance_variable_get(:@client).builder.adapter(:test, @stubs)
     # Exercise the pinned retry implementation without its backoff delay.
     @client.define_singleton_method(:sleep) { |_seconds| }
   end
 
-  %w[appAssetLibraryVideos appAssetLibraryPlacements].each do |resource|
+  %w[appAssetLibraryVideos appAssetLibraryImages appAssetLibraryPlacements].each do |resource|
     [Faraday::TimeoutError, Faraday::ConnectionFailed].each do |failure|
       define_method("test_#{resource}_does_not_replay_#{failure.name.split('::').last}") do
         attempts = 0

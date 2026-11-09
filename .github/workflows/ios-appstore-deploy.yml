@@ -103,12 +103,12 @@ jobs:
             submit_for_review:${{ inputs.submit_for_review }} \
             automatic_release:${{ inputs.automatic_release }}
 
-      - name: Upload header asset report
+      - name: Upload creative asset report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ios-header-assets
-          path: ${{ runner.temp }}/trizum-header-upload.json
+          name: ios-creative-assets
+          path: ${{ runner.temp }}/trizum-creative-assets.json
           if-no-files-found: ignore
           retention-days: 14
 

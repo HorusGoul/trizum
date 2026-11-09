@@ -1,8 +1,10 @@
-Approved trizum header: people add receipts, combine expenses, and settle balances.
+Selected App Store creative assets
 
-English (en-US) and Spanish (es-ES), 3840x1646, 20 seconds, 60 fps, silent.
-Approved on 2026-11-09 after the lighter wordmark, smaller end lockup, and vertically centered balance blocks.
+The manifest.json file selects the exact reviewed files that the next full App Store release will upload and attach. Currently only the approved English and Spanish animated headers are selected.
 
-header.json pins the approved binaries by SHA-256 and selects the combined-total frame at 10.8 seconds. Poster PNGs are local reference; Apple generates its video poster from the timecode.
+Editable source: packages/screenshots/src/creative-assets/
+Generation, preview, validation, and selection commands: packages/screenshots/docs/creative-assets.md
 
-The normal deploy_appstore_full lane uploads and attaches these headers to its editable release version before app review. No standalone review or live-page publication runs when this change merges. See packages/mobile/docs/app-store-creative-assets.md.
+The headers are 3840x1646, 20 seconds, 60 fps, silent H.264. Their poster timecode is 00:00:10:48. PNG posters are local references; Apple generates the actual video poster from that timecode.
+
+Future selections may include header or search images/videos. Generation writes ignored review drafts. Only an explicit creative:prepare command changes these selected files and manifest. Merge alone does not upload or publish artwork.

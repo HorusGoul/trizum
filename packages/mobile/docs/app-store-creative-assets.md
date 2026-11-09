@@ -1,7 +1,7 @@
 # App Store creative assets: release integration and API research
 
 Researched **2026-11-09**. Read when changing product page header uploads or
-planning organic search artwork. Header upload and release placement are now
+updating organic search artwork. Header/search image/video upload and placement are now
 implemented locally; the remaining sections record the API research. No
 authenticated uploads, submissions, or publishing were performed during this work.
 
@@ -9,31 +9,39 @@ authenticated uploads, submissions, or publishing were performed during this wor
 
 The reviewed, dark-only animation lives in
 [`creative_assets`](../ios/App/fastlane/creative_assets/README.txt). Its
-[`header.json`](../ios/App/fastlane/creative_assets/header.json) pins the exact
+[`manifest.json`](../ios/App/fastlane/creative_assets/manifest.json) pins the exact
 English and Spanish MP4s by SHA-256. Both are 3840 × 1646, 20 seconds, 60 fps,
 silent H.264. The video poster timecode is `00:00:10:48` (10.8 seconds at 60 fps),
 showing the combined trip total before the repayments.
 
-`deploy_appstore_full` calls `upload_header_assets` after `deliver` creates or
+Editable animation, preview, and original search concept source now lives in
+[`packages/screenshots/src/creative-assets`](../../screenshots/src/creative-assets/).
+The [generation guide](../../screenshots/docs/creative-assets.md) covers local
+previews, exports, validation, and explicit selection. Generation writes ignored
+drafts. Only `creative:prepare` copies reviewed files into this selected manifest.
+The generic manifest supports header/search PNGs and MP4s; its current entries
+select only the approved header videos.
+
+`deploy_appstore_full` calls `upload_creative_assets` after `deliver` creates or
 updates the version and before submitting it for review. The lane uses the
 existing API key and the native version number. It validates the approved file
-hashes, discovers compatible video specs and header groups from Apple's current
-catalog, and requires both localizations on that exact editable iOS version.
-It uploads and processes both videos before replacing any header placements.
+hashes, discovers compatible image/video specs and mobile groups from Apple's
+current catalog, and requires the selected localizations on that exact editable
+iOS version. It processes every selected asset before changing any placement.
 
 Reference names contain the locale and full content hash, allowing subsequent
 releases to reuse the same library assets. Matching placements are retained;
-only occupied header slots for those locales/groups are replaced. Asset
+only selected locale/type/group slots are replaced. Asset
 reservations and placement creation are not blindly retried. Processing and
 network requests have timeouts. A failure aborts the release lane before app
 review and records asset IDs, states, and any interrupted replacement in
-the temporary directory's `trizum-header-upload.json` (or the lane's explicit
-`report` path). The release workflow retains that report as `ios-header-assets`,
+the temporary directory's `trizum-creative-assets.json` (or the lane's explicit
+`report` path). The release workflow retains that report as `ios-creative-assets`,
 including when deployment fails. Its timeout allows for first-upload processing
 of both videos, with up to ten minutes of polling per video.
 The contract tests run through `vp run ruby:check:ios` in the mobile package.
 
-`HeaderAssetsAPIClient` limits both Spaceship's outer API retry loop and its
+`CreativeAssetsAPIClient` limits both Spaceship's outer API retry loop and its
 inner HTTP transport retry loop to one attempt for POST. Other methods retain
 the pinned client's behavior and all requests retain its JWT middleware. The
 transport tests use that real client with Faraday's test adapter to simulate a
@@ -42,8 +50,8 @@ is replayed after a timeout or connection failure.
 
 Merging this integration performs no Apple mutations. The next normal App Store
 release uploads, reviews, and publishes these placements with its app version.
-There is no standalone submission, immediate live-page update, search placement,
-or automatic deployment added to the merge workflow. The image/poster PNGs in
+No standalone submission or automatic deployment is added to the merge workflow.
+Search artwork is supported by the adapter but remains unselected until reviewed. The image/poster PNGs in
 the directory are references; Apple generates the video's poster from its
 timecode. A live authenticated API test remains deferred to that release.
 
@@ -262,18 +270,18 @@ unmodeled resources. This reuses existing authentication without requiring nativ
 Admin, or App Manager access; the current key's effective permissions and account
 feature availability were not tested. [API access requirements][library].
 
-The implemented header lane preflights a locale/file manifest, uploads missing
-videos, records IDs, and attaches placements to an editable release version.
+The implemented creative lane preflights a locale/type/file manifest, uploads
+missing images or videos, records IDs, and attaches selected placements to an
+editable release version.
 Standalone review and live-version publishing remain separate future work.
 Do not fold these into the screenshot folder or assume `sync_screenshots`,
 `submit_for_review`, or `automatic_release` manages standalone creatives.
 
 Bound polling and HTTP retries; report asset IDs, states, `stateDetails`, and Apple
-error codes. `referenceName` is not a uniqueness guarantee: the header lane rejects
+error codes. `referenceName` is not a uniqueness guarantee: the creative lane rejects
 ambiguous duplicate matches instead of choosing arbitrarily. Reconcile before
 retrying an ambiguous POST. Preserve unrelated placements; do not copy screenshot
-synchronization's removal semantics. Broader image/search automation and durable
-cross-run recovery remain future work.
+synchronization's removal semantics. Standalone review and durable cross-run recovery remain future work.
 
 ## User-provided context
 
