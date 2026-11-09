@@ -140,7 +140,9 @@ test.describe("Settings forms", () => {
     await usernameField.evaluate((input: HTMLInputElement) => input.form?.requestSubmit());
 
     await expect(page).toHaveURL(/\/settings(?:\?.*)?$/);
-    await expect(phoneField).toHaveValue(draftPhoneNumber);
+    await expect(page.getByRole("button", { name: "Bizum actions", exact: true })).toContainText(
+      draftPhoneNumber,
+    );
     await expect(page.getByText("A name for the participant is required")).toBeVisible();
   });
 });

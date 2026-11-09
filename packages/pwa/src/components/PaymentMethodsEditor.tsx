@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@trizum/ui/Select";
 import { useMediaQuery } from "@trizum/ui/useMediaQuery";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ListBox } from "react-aria-components";
 import { paymentMethodLabels } from "#src/lib/paymentMethods.ts";
 import {
@@ -27,6 +27,7 @@ import {
 } from "#src/models/paymentMethod.ts";
 import { PaymentMethodIcon } from "./PaymentMethodIcon.tsx";
 import { PaymentMethodEditorRow } from "./PaymentMethodEditorRow.tsx";
+import { PaymentMethodPopoverContent } from "./PaymentMethodPopoverContent.tsx";
 
 export function PaymentMethodsEditor({
   value,
@@ -38,11 +39,21 @@ export function PaymentMethodsEditor({
   const { t } = useLingui();
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const pendingMethod = useRef<PaymentMethodType | null>(null);
   const available = paymentMethodTypes.filter((type) => value[type] === undefined);
 
   function addMethod(type: PaymentMethodType) {
-    onChange({ ...value, [type]: "" });
+    pendingMethod.current = type;
     setIsPickerOpen(false);
+  }
+
+  function finishAddingMethod() {
+    const type = pendingMethod.current;
+
+    if (type) {
+      pendingMethod.current = null;
+      onChange({ ...value, [type]: "" });
+    }
   }
 
   const options = available.map((type) => (
@@ -107,7 +118,9 @@ export function PaymentMethodsEditor({
               </span>
             </SelectTrigger>
             <SelectPopover>
-              <SelectListBox>{options}</SelectListBox>
+              <PaymentMethodPopoverContent onClose={finishAddingMethod}>
+                <SelectListBox>{options}</SelectListBox>
+              </PaymentMethodPopoverContent>
             </SelectPopover>
           </Select>
         ) : (
@@ -120,7 +133,11 @@ export function PaymentMethodsEditor({
               <Icon icon="lucide.plus" width={18} height={18} />
               <Trans>Add payment method</Trans>
             </Button>
-            <ModalSheet isOpen={isPickerOpen} onOpenChange={setIsPickerOpen}>
+            <ModalSheet
+              isOpen={isPickerOpen}
+              onOpenChange={setIsPickerOpen}
+              onCloseEnd={finishAddingMethod}
+            >
               <ModalSheetHeader>
                 <ModalSheetSection>
                   <ModalSheetTitle>
