@@ -2,10 +2,11 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { Button } from "@trizum/ui/Button";
-import { Checkbox } from "@trizum/ui/Checkbox";
 import { Icon } from "@trizum/ui/Icon";
 import {
   ModalSheet,
+  ModalSheetChoice,
+  ModalSheetChoices,
   ModalSheetContent,
   ModalSheetDescription,
   ModalSheetHeader,
@@ -14,9 +15,6 @@ import {
 } from "@trizum/ui/ModalSheet";
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
 import { getReceiptTitleOptions, type ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
-
-const suggestionRowClassName =
-  "w-full min-h-16 flex-row-reverse gap-4 rounded-[1.35rem] px-safe-or-4 sm:px-safe-or-5 py-2.5 text-left data-[selected]:bg-accent-100 dark:data-[selected]:bg-accent-900 data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-900";
 
 export function ReceiptSuggestionsSheet({
   receipt,
@@ -63,24 +61,16 @@ export function ReceiptSuggestionsSheet({
         <div className="flex flex-col gap-2 py-2">
           {suggestions.name !== undefined ? (
             <div className="min-w-0">
-              <Checkbox
-                className={suggestionRowClassName}
-                isSelected={useTitle}
-                onChange={setUseTitle}
-              >
-                <span className="grid min-w-0 flex-1 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5">
-                  <Icon
-                    icon="lucide.type"
-                    className="text-accent-700 dark:text-accent-300 size-5"
-                  />
-                  <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">
-                    <Trans>Title</Trans>
-                  </span>
-                  <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold break-words">
-                    {selectedTitle}
-                  </span>
-                </span>
-              </Checkbox>
+              <ModalSheetChoices>
+                <ModalSheetChoice
+                  icon="lucide.type"
+                  label={<Trans>Title</Trans>}
+                  isSelected={useTitle}
+                  onChange={setUseTitle}
+                >
+                  {selectedTitle}
+                </ModalSheetChoice>
+              </ModalSheetChoices>
               {titleOptions.length > 1 ? (
                 <RadioGroup
                   aria-label={t`Title`}
@@ -90,15 +80,17 @@ export function ReceiptSuggestionsSheet({
                     setSelectedTitle(title);
                     setUseTitle(true);
                   }}
-                  className="no-scrollbar px-safe-or-4 sm:px-safe-or-5 mt-1 flex gap-2 overflow-x-auto overscroll-x-contain py-1"
+                  className="no-scrollbar px-safe-or-4 sm:px-safe-or-5 flex gap-1 overflow-x-auto overscroll-x-contain"
                 >
                   {titleOptions.map((title) => (
                     <Radio
                       key={title}
                       value={title}
-                      className="border-accent-300 text-accent-700 dark:border-accent-700 dark:text-accent-200 data-[selected]:border-accent-500 data-[selected]:bg-accent-200 data-[selected]:text-accent-950 dark:data-[selected]:bg-accent-800 dark:data-[selected]:text-accent-50 data-[focus-visible]:outline-accent-500 relative flex min-h-11 shrink-0 cursor-pointer items-center rounded-full border px-4 text-sm select-none data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2"
+                      className="group/title relative flex min-h-11 shrink-0 cursor-pointer items-center outline-hidden select-none"
                     >
-                      {title}
+                      <span className="border-accent-300 text-accent-700 dark:border-accent-700 dark:text-accent-200 group-data-[selected]/title:border-accent-500 group-data-[selected]/title:bg-accent-200 group-data-[selected]/title:text-accent-950 dark:group-data-[selected]/title:bg-accent-800 dark:group-data-[selected]/title:text-accent-50 group-data-[focus-visible]/title:ring-accent-500 rounded-full border px-3 py-1 text-sm leading-5 group-data-[focus-visible]/title:ring-2 group-data-[focus-visible]/title:ring-offset-2">
+                        {title}
+                      </span>
                     </Radio>
                   ))}
                 </RadioGroup>
@@ -106,24 +98,16 @@ export function ReceiptSuggestionsSheet({
             </div>
           ) : null}
           {suggestions.amount !== undefined ? (
-            <Checkbox
-              className={suggestionRowClassName}
-              isSelected={useTotal}
-              onChange={setUseTotal}
-            >
-              <span className="grid min-w-0 flex-1 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5">
-                <Icon
-                  icon="lucide.receipt-text"
-                  className="text-accent-700 dark:text-accent-300 size-5"
-                />
-                <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">
-                  <Trans>Total</Trans>
-                </span>
-                <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold">
-                  {receipt.total} {receipt.currency}
-                </span>
-              </span>
-            </Checkbox>
+            <ModalSheetChoices>
+              <ModalSheetChoice
+                icon="lucide.receipt-text"
+                label={<Trans>Total</Trans>}
+                isSelected={useTotal}
+                onChange={setUseTotal}
+              >
+                {receipt.total} {receipt.currency}
+              </ModalSheetChoice>
+            </ModalSheetChoices>
           ) : null}
           <ModalSheetSection className="flex flex-col gap-2 pt-2">
             {suggestions.currencyMismatch ? (

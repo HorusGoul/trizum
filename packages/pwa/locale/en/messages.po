@@ -259,7 +259,7 @@ msgstr "Absolutely! trizum works without requiring any account or sign-up. Just 
 msgid "Accent color"
 msgstr "Accent color"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:158
+#: src/components/ReceiptSuggestionsSheet.tsx:142
 msgid "Accept suggestions"
 msgstr "Accept suggestions"
 
@@ -1316,7 +1316,7 @@ msgstr "Destructive actions"
 msgid "Did you know?"
 msgstr "Did you know?"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:161
+#: src/components/ReceiptSuggestionsSheet.tsx:145
 msgid "Discard"
 msgstr "Discard"
 
@@ -2417,7 +2417,7 @@ msgstr "No emoji found"
 msgid "No expense templates yet"
 msgstr "No expense templates yet"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:142
+#: src/components/ReceiptSuggestionsSheet.tsx:126
 msgid "No new title or total could be suggested. Your edits are kept."
 msgstr "No new title or total could be suggested. Your edits are kept."
 
@@ -3023,8 +3023,8 @@ msgstr "Premium purchases restored."
 msgid "Premium status could not be checked. Try again."
 msgstr "Premium status could not be checked. Try again."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:43
-#: src/components/ReceiptSuggestionsSheet.tsx:54
+#: src/components/ReceiptSuggestionsSheet.tsx:41
+#: src/components/ReceiptSuggestionsSheet.tsx:52
 msgid "Premium suggestions"
 msgstr "Premium suggestions"
 
@@ -3216,7 +3216,7 @@ msgstr "RevenueCat's Privacy Policy"
 msgid "Review expense"
 msgstr "Review expense"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:58
+#: src/components/ReceiptSuggestionsSheet.tsx:56
 msgid "Review the receipt details before applying them to your expense."
 msgstr "Review the receipt details before applying them to your expense."
 
@@ -3863,7 +3863,7 @@ msgstr "The party may have been deleted by another member."
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:131
+#: src/components/ReceiptSuggestionsSheet.tsx:115
 msgid "The receipt currency differs from this party’s currency. The total cannot be applied."
 msgstr "The receipt currency differs from this party’s currency. The total cannot be applied."
 
@@ -3971,8 +3971,8 @@ msgid "Timeframe"
 msgstr "Timeframe"
 
 #: src/components/ExpenseEditor.tsx:461
-#: src/components/ReceiptSuggestionsSheet.tsx:77
-#: src/components/ReceiptSuggestionsSheet.tsx:86
+#: src/components/ReceiptSuggestionsSheet.tsx:67
+#: src/components/ReceiptSuggestionsSheet.tsx:76
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Title"
 msgstr "Title"
@@ -4017,7 +4017,7 @@ msgstr "Tongan Paʻanga"
 msgid "Top spender"
 msgstr "Top spender"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:120
+#: src/components/ReceiptSuggestionsSheet.tsx:104
 msgid "Total"
 msgstr "Total"
 

@@ -135,6 +135,22 @@ describe("receipt analysis authorization and contract", () => {
               `The app language is ${locale === "es" ? "Spanish" : "English"}. Prefer the receipt language for the first title and include an app-language alternative when different.`,
             ),
           }),
+          expect.objectContaining({
+            role: "system",
+            content: expect.stringContaining("consider the printed transaction date and time"),
+          }),
+          expect.objectContaining({
+            role: "system",
+            content: expect.stringContaining(
+              'For a receipt from Spain printed at 18:00 with coffees, prefer "Cafés" / "Coffee" or "Cafetería", not "Desayuno" / "Breakfast".',
+            ),
+          }),
+          expect.objectContaining({
+            role: "system",
+            content: expect.stringContaining(
+              "Never use the current time, upload time or app language to guess when or where the purchase happened.",
+            ),
+          }),
         ]),
       );
     },

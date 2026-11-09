@@ -62,6 +62,12 @@ activity titles are omitted, and no model confidence percentages are shown.
 The sheet offers distinct activity titles and the merchant as horizontally
 scrollable choices. The chosen title is read-only until accepted into the draft.
 
+For meal titles, the prompt considers the printed transaction time and location
+alongside the purchased items. It prefers neutral item or category titles when
+context is unclear or the meal would be implausible locally; a Spanish receipt
+for coffees at 18:00 should suggest coffee rather than breakfast. Upload time
+and the app language do not establish when or where the purchase happened.
+
 New attachments are analyzed from their locally prepared image while Automerge
 sync continues. Suggestions stay local to the editor. Accepting selected fields
 updates the draft; saving the expense uses the existing write path. The first

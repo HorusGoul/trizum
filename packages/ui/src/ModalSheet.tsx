@@ -9,13 +9,16 @@ import {
 } from "react-aria";
 import {
   Button as AriaButton,
+  composeRenderProps,
   Heading,
   type ButtonProps as AriaButtonProps,
+  type ButtonRenderProps,
   type HeadingProps,
 } from "react-aria-components";
 import { Sheet, type SheetProps } from "react-modal-sheet";
 import {
   createContext,
+  type ComponentProps,
   type ComponentPropsWithoutRef,
   type ReactNode,
   use,
@@ -27,6 +30,7 @@ import {
 import { sheetTweenConfig } from "./sheetMotion.js";
 import { SheetSurface } from "./SheetSurface.js";
 import { Icon, type IconProps } from "./Icon.js";
+import { Checkbox } from "./Checkbox.js";
 import { cn, type ClassName } from "./utils.js";
 
 interface ModalSheetContextValue {
@@ -252,12 +256,38 @@ export function ModalSheetContent({ className, ...props }: ComponentPropsWithout
 
 export type ModalSheetActionTone = "default" | "danger";
 
+function sheetRowFeedback(
+  state: Pick<ButtonRenderProps, "isHovered" | "isFocusVisible" | "isPressed">,
+  tone: ModalSheetActionTone,
+) {
+  return cn(
+    "outline-hidden transition-[scale,background-color,box-shadow] duration-200 ease-in-out motion-reduce:scale-100 motion-reduce:transition-none",
+    tone === "danger" ? "text-rose-700 dark:text-rose-300" : "text-accent-950 dark:text-accent-50",
+    state.isHovered &&
+      (tone === "danger" ? "bg-rose-50 dark:bg-rose-950/30" : "bg-accent-100 dark:bg-accent-900"),
+    state.isFocusVisible &&
+      (tone === "danger"
+        ? "bg-rose-50 ring-2 ring-rose-300 dark:bg-rose-950/30 dark:ring-rose-800"
+        : "bg-accent-100 ring-2 ring-accent-300 dark:bg-accent-900 dark:ring-accent-700"),
+    state.isPressed &&
+      (tone === "danger"
+        ? "scale-[0.98] bg-rose-100 dark:bg-rose-950/50"
+        : "scale-[0.98] bg-accent-200 dark:bg-accent-800"),
+  );
+}
+
 export function ModalSheetSection({ className, ...props }: ComponentPropsWithoutRef<"div">) {
   return <div className={cn("px-safe-or-4 sm:px-safe-or-5", className)} {...props} />;
 }
 
 export function ModalSheetActions({ className, ...props }: ComponentPropsWithoutRef<"div">) {
   return <div className={cn("flex flex-col gap-1", className)} {...props} />;
+}
+
+export function ModalSheetChoices({ className, ...props }: ComponentPropsWithoutRef<"div">) {
+  return (
+    <div className={cn("px-safe-or-2 sm:px-safe-or-3 flex flex-col gap-1", className)} {...props} />
+  );
 }
 
 export function ModalSheetAction({
@@ -273,25 +303,11 @@ export function ModalSheetAction({
 }) {
   return (
     <AriaButton
-      className={({ defaultClassName, isFocusVisible, isHovered, isPressed }) =>
+      className={(state) =>
         cn(
-          defaultClassName,
-          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-[1.35rem] py-4 text-left outline-hidden transition-all duration-200 ease-in-out px-safe-or-4 sm:px-safe-or-5",
-          tone === "danger"
-            ? "text-rose-700 dark:text-rose-300"
-            : "text-accent-950 dark:text-accent-50",
-          isHovered &&
-            (tone === "danger"
-              ? "bg-rose-50 dark:bg-rose-950/30"
-              : "bg-accent-100 dark:bg-accent-900"),
-          isFocusVisible &&
-            (tone === "danger"
-              ? "bg-rose-50 ring-2 ring-rose-300 dark:bg-rose-950/30 dark:ring-rose-800"
-              : "bg-accent-100 ring-2 ring-accent-300 dark:bg-accent-900 dark:ring-accent-700"),
-          isPressed &&
-            (tone === "danger"
-              ? "scale-[0.98] bg-rose-100 dark:bg-rose-950/50"
-              : "scale-[0.98] bg-accent-200 dark:bg-accent-800"),
+          state.defaultClassName,
+          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-[1.35rem] py-4 text-left px-safe-or-4 sm:px-safe-or-5",
+          sheetRowFeedback(state, tone),
           className,
         )
       }
@@ -312,6 +328,45 @@ export function ModalSheetAction({
         {children}
       </span>
     </AriaButton>
+  );
+}
+
+export function ModalSheetChoice({
+  children,
+  className,
+  icon,
+  label,
+  ...props
+}: Omit<ComponentProps<typeof Checkbox>, "children"> & {
+  children: ReactNode;
+  icon: IconProps["icon"];
+  label: ReactNode;
+}) {
+  return (
+    <Checkbox
+      {...props}
+      className={composeRenderProps(className, (className, state) =>
+        cn(
+          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl px-2 py-2.5 text-left",
+          state.isSelected && "bg-accent-100 dark:bg-accent-900",
+          sheetRowFeedback(state, "default"),
+          className,
+        ),
+      )}
+    >
+      <span className="grid min-w-0 flex-1 grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5">
+        <Icon
+          icon={icon}
+          width={20}
+          height={20}
+          className="text-accent-700 dark:text-accent-200 size-5"
+        />
+        <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">{label}</span>
+        <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold break-words">
+          {children}
+        </span>
+      </span>
+    </Checkbox>
   );
 }
 
