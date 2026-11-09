@@ -5,7 +5,7 @@ require_relative "header_assets"
 class HeaderAssetsClientFake
   Response = Struct.new(:body)
   attr_reader :mutations, :requests
-  attr_accessor :version_state, :processing_failure, :placement_failure
+  attr_accessor :version_state, :processing_failure, :placement_failure, :transient_upload_state
 
   def initialize(manifest)
     @manifest = manifest
@@ -18,8 +18,9 @@ class HeaderAssetsClientFake
 
   def catalog
     {
-      "features" => [{ "featureId" => "APP_STORE_VERSIONS", "placementPolicies" => [{ "placementType" => "PRODUCT_PAGE_HEADER_ASSET", "groupLimits" => [{ "groupIds" => %w[phone tablet], "maxCount" => 1 }] }] }],
-      "placementTypes" => [{ "placementTypeId" => "PRODUCT_PAGE_HEADER_ASSET", "acceptsAssetCategories" => ["CREATIVE_ASSETS"], "specMappings" => %w[phone tablet].map { |group| { "placementGroupId" => group, "specs" => ["header-video"] } } }],
+      "placementProfileGroups" => [{ "placementProfileGroupId" => "phone", "platform" => "IPHONE_APP_STORE" }, { "placementProfileGroupId" => "tablet", "platform" => "IPAD_APP_STORE" }, { "placementProfileGroupId" => "desktop", "platform" => "MAC_APP_STORE" }],
+      "features" => [{ "featureId" => "APP_STORE_VERSIONS", "placementPolicies" => [{ "placementType" => "PRODUCT_PAGE_HEADER_ASSET", "groupLimits" => [{ "groupIds" => %w[phone tablet desktop], "maxCount" => 1 }] }] }],
+      "placementTypes" => [{ "placementTypeId" => "PRODUCT_PAGE_HEADER_ASSET", "acceptsAssetCategories" => ["CREATIVE_ASSETS"], "specMappings" => %w[phone tablet desktop].map { |group| { "placementGroupId" => group, "specs" => ["header-video"] } } }],
       "videoSpecs" => [{ "specId" => "header-video", "compatiblePlacementTypes" => ["PRODUCT_PAGE_HEADER_ASSET"], "dimensions" => { "minWidth" => 3840, "maxWidth" => 3840, "minHeight" => 1646, "maxHeight" => 1646 }, "fileExtensions" => [".mp4"], "audioRequired" => false, "frameRates" => [{ "minFps" => 60, "maxFps" => 60 }], "duration" => { "min" => "PT5S", "max" => "PT30S" }, "maxFileSize" => 20_000_000 }]
     }
   end
@@ -42,6 +43,10 @@ class HeaderAssetsClientFake
            when "v1/appAssetLibraries/library/videos" then @videos.values.select { |video| video.dig("attributes", "referenceName") == params.fetch(:filter).fetch(:referenceName) }
            when %r{\Av1/appAssetLibraryVideos/(.+)\z}
              video = @videos.fetch(Regexp.last_match(1))
+             if @transient_upload_state && !@transient_seen
+               @transient_seen = true
+               return Response.new({ "data" => video.merge("attributes" => video.fetch("attributes").merge("state" => "AWAITING_UPLOAD")) })
+             end
              video["attributes"]["state"] = "FAILED" if @processing_failure && video["id"].include?("es-ES")
              video
            else raise "Unexpected GET: #{path}"
@@ -120,6 +125,12 @@ class HeaderAssetsTest < Minitest::Test
     assert_equal %w[en-US es-ES], result.fetch("placements").map { |placement| placement.fetch("locale") }.uniq
     assert @client.mutations.all? { |_method, path| !path.include?("reviewSubmission") }
     assert @client.mutations.any? { |method, path, body| method == :patch && path.include?("Videos/") && body.dig(:data, :attributes) == { uploaded: true } }
+  end
+
+  def test_freshly_committed_upload_can_briefly_report_awaiting_upload
+    @client.transient_upload_state = true
+    result = run_headers
+    assert_equal 4, result.fetch("placements").length
   end
 
   def test_rerun_reuses_assets_and_placements

@@ -76,6 +76,7 @@ class HeaderAssets
     matches = list("v1/appAssetLibraries/#{@result.fetch('library_id')}/videos", filter: { referenceName: reference, category: "CREATIVE_ASSETS" })
     raise "Ambiguous existing header: #{reference}" if matches.length > 1
     video = matches.first
+    newly_reserved = video.nil?
     unless video
       video = post("v1/appAssetLibraryVideos", {
         type: "appAssetLibraryVideos",
@@ -94,7 +95,7 @@ class HeaderAssets
       state = attributes.fetch("state")
       @log.call("#{asset.fetch('locale')}: #{video.fetch('id')} #{state}")
       raise "Header processing failed: #{attributes['stateDetails']}" if state == "FAILED"
-      raise "Existing upload is incomplete; inspect asset #{@result['assets'].last['id']} before retrying" if state == "AWAITING_UPLOAD"
+      raise "Existing upload is incomplete; inspect asset #{@result['assets'].last['id']} before retrying" if state == "AWAITING_UPLOAD" && !newly_reserved
       preview = attributes["previewFrameImage"] || {}
       raise "Poster processing failed: #{preview['errors']}" if preview["state"] == "FAILED"
       if READY_STATES.include?(state) && preview["state"] == "COMPLETE"
@@ -148,9 +149,10 @@ class HeaderAssets
     groups = (policy || {}).fetch("groupLimits", []).select { |limit| limit.fetch("maxCount") > 0 }.flat_map { |limit| limit.fetch("groupIds") }
     placement_type = catalog.fetch("placementTypes").find { |item| item["placementTypeId"] == type }
     raise "Header creative assets are unavailable" unless placement_type && placement_type.fetch("acceptsAssetCategories").include?("CREATIVE_ASSETS")
+    mobile_groups = catalog.fetch("placementProfileGroups").select { |group| %w[IPHONE_APP_STORE IPAD_APP_STORE ANY].include?(group.fetch("platform")) }.map { |group| group.fetch("placementProfileGroupId") }
     @group_specs = placement_type.fetch("specMappings").filter_map do |mapping|
       specs = mapping.fetch("specs") & @result.fetch("compatible_spec_ids")
-      [mapping.fetch("placementGroupId"), specs] if groups.include?(mapping.fetch("placementGroupId")) && !specs.empty?
+      [mapping.fetch("placementGroupId"), specs] if groups.include?(mapping.fetch("placementGroupId")) && mobile_groups.include?(mapping.fetch("placementGroupId")) && !specs.empty?
     end.to_h
     raise "No supported header placement groups" if @group_specs.empty?
     localizations = list("v1/appStoreVersions/#{version.fetch('id')}/appStoreVersionLocalizations")
