@@ -26,7 +26,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "A sheet checkbox row with a leading icon, label, value, and the same press, hover, and focus feedback as sheet actions. ModalSheetChoices adds the inset gutter; the row padding keeps content aligned with standard sheet sections.",
+          "An input-style sheet checkbox row with an icon centered beside its label and value, and the same press, hover, and focus feedback as sheet actions. ModalSheetChoices aligns the row borders with standard sheet sections.",
       },
     },
   },

@@ -10,6 +10,6 @@ Expense titles describe the purchased items or activity, preferring the receipt'
 
 Choose a receipt title from horizontally scrollable options before accepting it. A gentle glow around each receipt photo stays active while analysis runs, with a static ring for reduced motion.
 
-Inset suggestion rows align leading icons with the sheet heading and keep checkboxes on the right. Reusable sheet choices share press, hover, and focus feedback with sheet actions. Title chips are visually compact while keeping comfortable touch targets.
+Inset suggestion rows use input-style borders aligned with the sheet content, vertically centered icons, and checkboxes on the right. Reusable sheet choices share press, hover, and focus feedback with sheet actions. Title chips are visually compact while keeping comfortable touch targets.
 
 Receipt titles consider the printed transaction time and local context before suggesting a meal, with neutral item or category titles when the meal is uncertain.

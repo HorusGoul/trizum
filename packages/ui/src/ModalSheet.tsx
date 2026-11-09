@@ -286,7 +286,7 @@ export function ModalSheetActions({ className, ...props }: ComponentPropsWithout
 
 export function ModalSheetChoices({ className, ...props }: ComponentPropsWithoutRef<"div">) {
   return (
-    <div className={cn("px-safe-or-2 sm:px-safe-or-3 flex flex-col gap-1", className)} {...props} />
+    <div className={cn("px-safe-or-4 sm:px-safe-or-5 flex flex-col gap-1", className)} {...props} />
   );
 }
 
@@ -347,8 +347,8 @@ export function ModalSheetChoice({
       {...props}
       className={composeRenderProps(className, (className, state) =>
         cn(
-          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl px-2 py-2.5 text-left",
-          state.isSelected && "bg-accent-100 dark:bg-accent-900",
+          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl border border-accent-500 bg-white px-3 py-2.5 text-left ring-offset-white dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
+          state.isSelected && "border-accent-600 dark:border-accent-400",
           sheetRowFeedback(state, "default"),
           className,
         ),
@@ -359,7 +359,7 @@ export function ModalSheetChoice({
           icon={icon}
           width={20}
           height={20}
-          className="text-accent-700 dark:text-accent-200 size-5"
+          className="text-accent-700 dark:text-accent-200 col-start-1 row-span-2 row-start-1 size-5 self-center"
         />
         <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">{label}</span>
         <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold break-words">
