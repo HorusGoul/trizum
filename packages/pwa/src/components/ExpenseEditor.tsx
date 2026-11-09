@@ -49,6 +49,11 @@ import {
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
 import { cn } from "@trizum/ui/utils";
+import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
+import { getReceiptSuggestions } from "#src/lib/receiptSuggestions.ts";
+import { ReceiptSuggestionsSheet } from "./ReceiptSuggestionsSheet";
+import { useReceiptSuggestions, type ReceiptImage } from "./useReceiptSuggestions";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -436,6 +441,7 @@ function ExpenseDetailsFields({
         <form.Field name="photos">
           {(field) => (
             <PhotosField
+              form={form}
               value={field.state.value}
               onChange={field.handleChange}
               onViewPhoto={onViewPhoto}
@@ -926,52 +932,145 @@ function calculateParticipantUnitAmounts(
 }
 
 interface PhotosFieldProps {
+  form: ExpenseEditorFormApi;
   value: MediaFile["id"][];
   onChange: (updater: Updater<MediaFile["id"][]>) => void;
   onViewPhoto?: (index: number) => void;
 }
 
-function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
-  return (
-    <div
-      className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
-      onWheel={(e) => {
-        // Translate scroll Y to X smoothly
-        e.currentTarget.scrollLeft += e.deltaY;
-      }}
-    >
-      {value.length === 0 ? (
-        <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
-          <span className="text-center text-sm">
-            <Trans>Upload or capture an image of your receipt</Trans>
-          </span>
-        </div>
-      ) : null}
+function PhotosField({ form, value, onChange, onViewPhoto }: PhotosFieldProps) {
+  const { party } = useCurrentParty();
+  const session = useAppSession();
+  const userId = session.data?.user.id;
+  const isBoosted = Object.keys(party.boost ?? {}).length > 0;
 
-      {value.map((photoId, index) => (
-        <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
-          <CurrentPhoto
-            key={photoId}
-            photoId={photoId}
-            onRemove={() => {
-              onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
-              trackEvent("receipt_attachment_removed");
-            }}
-            onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
-          />
-        </Suspense>
-      ))}
-      <AddPhotoButton
-        onPhoto={(photo) => {
-          onChange((prevPhotos) => [...prevPhotos, ...photo]);
+  return (
+    <ReceiptPhotosField
+      key={JSON.stringify([party.id, userId, isBoosted])}
+      form={form}
+      value={value}
+      onChange={onChange}
+      onViewPhoto={onViewPhoto}
+      partyId={party.id}
+      currency={party.currency}
+      userId={userId}
+      isBoosted={isBoosted}
+    />
+  );
+}
+
+function ReceiptPhotosField({
+  form,
+  value,
+  onChange,
+  onViewPhoto,
+  partyId,
+  currency,
+  userId,
+  isBoosted,
+}: PhotosFieldProps & {
+  partyId: string;
+  currency: string;
+  userId: string | undefined;
+  isBoosted: boolean;
+}) {
+  const { analyze, result, dismiss } = useReceiptSuggestions({
+    partyId,
+    userId,
+    isBoosted,
+    photoIds: value,
+    getValues: () => ({ name: form.state.values.name, amount: form.state.values.amount }),
+    getPhotoIds: () => form.state.values.photos,
+  });
+
+  const current = useStore(form.store, (state) => ({
+    name: state.values.name,
+    amount: state.values.amount,
+  }));
+
+  const suggestions = result
+    ? getReceiptSuggestions({
+        receipt: result.receipt,
+        currency,
+        baseline: result.baseline,
+        current,
+      })
+    : null;
+
+  return (
+    <>
+      <div
+        className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
+        onWheel={(e) => {
+          // Translate scroll Y to X smoothly
+          e.currentTarget.scrollLeft += e.deltaY;
         }}
-      />
-    </div>
+      >
+        {value.length === 0 ? (
+          <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
+            <span className="text-center text-sm">
+              <Trans>Upload or capture an image of your receipt</Trans>
+            </span>
+          </div>
+        ) : null}
+
+        {value.map((photoId, index) => (
+          <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
+            <CurrentPhoto
+              key={photoId}
+              photoId={photoId}
+              onRemove={() => {
+                onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
+                trackEvent("receipt_attachment_removed");
+              }}
+              onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
+            />
+          </Suspense>
+        ))}
+        <AddPhotoButton
+          onPhoto={(photo, images) => {
+            onChange((prevPhotos) => [...prevPhotos, ...photo]);
+            analyze(images);
+          }}
+        />
+      </div>
+      {result && suggestions ? (
+        <ReceiptSuggestionsSheet
+          key={result.photoId}
+          receipt={result.receipt}
+          suggestions={suggestions}
+          onDiscard={() => dismiss(false)}
+          onAccept={(values) => {
+            // Recheck against live form values before applying any selected field.
+            const available = getReceiptSuggestions({
+              receipt: result.receipt,
+              currency,
+              baseline: result.baseline,
+              current: form.state.values,
+            });
+
+            let applied = false;
+
+            if (values.name !== undefined && values.name === available.name) {
+              form.setFieldValue("name", values.name);
+              applied = true;
+            }
+
+            if (values.amount !== undefined && values.amount === available.amount) {
+              form.setFieldValue("amount", values.amount);
+              applied = true;
+            }
+
+            dismiss(applied);
+          }}
+        />
+      ) : null}
+    </>
   );
 }
 
 interface AddPhotoButtonProps {
-  onPhoto: (photos: MediaFile["id"][]) => void;
+  onPhoto: (photos: MediaFile["id"][], images: ReceiptImage[]) => void;
 }
 
 function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
@@ -987,15 +1086,27 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
     const toastId: string | number = toast.loading(t`Uploading...`);
 
     try {
-      const photoIds = await Promise.all(
+      const photos = await Promise.all(
         files.map(async (blob) => {
-          const [mediaFileId] = await createMediaFile(blob, {}, compressionPresets.balanced);
+          const [mediaFileId, handle] = await createMediaFile(
+            blob,
+            {},
+            compressionPresets.balanced,
+          );
 
-          return mediaFileId;
+          const media = handle.doc();
+
+          return {
+            photoId: mediaFileId,
+            image: `data:${media.metadata.mimeType ?? blob.type};base64,${media.encodedBlob.toString()}`,
+          };
         }),
       );
 
-      onPhoto(photoIds);
+      onPhoto(
+        photos.map((photo) => photo.photoId),
+        photos,
+      );
       trackEvent("receipt_attachments_added");
 
       toast.dismiss(toastId);

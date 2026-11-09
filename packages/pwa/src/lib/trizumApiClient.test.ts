@@ -4,6 +4,27 @@ import type { PartyBoostStatus } from "./api/premiumContract.ts";
 import { createTrizumApiClient, PartyBoostApiError } from "./trizumApiClient.ts";
 
 describe("TrizumApiClient", () => {
+  test("posts receipt images and validates extracted information", async () => {
+    const partyDocumentId = createDocumentId();
+    const image = "data:image/jpeg;base64,/9j/AA==";
+    const receipt = { merchantName: "Market", total: "1.23", currency: null, items: [] };
+
+    const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+      const request = new Request(input, init);
+      expect(request.method).toBe("POST");
+      expect(new URL(request.url).pathname).toBe("/api/premium/receipts");
+      await expect(request.json()).resolves.toEqual({ partyDocumentId, image });
+
+      return Response.json(receipt);
+    });
+
+    const client = createTestClient(fetch);
+    await expect(client.premium.analyzeReceipt(partyDocumentId, image)).resolves.toEqual(receipt);
+    fetch.mockResolvedValueOnce(Response.json({ ...receipt, total: 1.23 }));
+    await expect(client.premium.analyzeReceipt(partyDocumentId, image)).rejects.toThrow(
+      "Invalid input",
+    );
+  });
   test("gets Party Boost status through the typed transport", async () => {
     const partyDocumentId = createDocumentId();
     const status = createPartyBoostStatus(partyDocumentId);

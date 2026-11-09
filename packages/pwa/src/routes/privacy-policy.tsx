@@ -23,7 +23,7 @@ function renderPrivacyPolicyContent() {
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
         <p className="text-accent-600 dark:text-accent-400 text-sm">
-          <Trans>Last updated: October 4, 2026</Trans>
+          <Trans>Last updated: November 9, 2026</Trans>
         </p>
 
         <p className="text-accent-700 dark:text-accent-300">
@@ -198,6 +198,21 @@ function renderPrivacyPolicyContent() {
               <Trans>
                 Apple or Google processes your payment through your store account. trizum and
                 RevenueCat do not receive your full payment card details.
+              </Trans>
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+              <Trans>1.5 Receipt Suggestions</Trans>
+            </h3>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                When you attach a receipt while signed in to a Boosted party, we send the prepared
+                image to Cloudflare Workers AI to extract the business name, total, currency, and
+                item lines. Suggestions are returned to your editor and only update the expense when
+                you accept and save them. This analysis runs separately from your attachment's
+                normal storage and sync. We do not include receipt contents in analytics events or
+                application logs.
               </Trans>
             </p>
           </div>

@@ -20,7 +20,7 @@
   first-party client. UI code should call its domain methods instead of issuing
   raw requests to Worker routes.
 
-The first-party contract covers Party Boost, Cloud Sync settings and Tricount
+The first-party contract covers Party Boost, receipt extraction, Cloud Sync settings and Tricount
 imports. Shared runtime schemas live in `src/lib/api`; route definitions live in
 `api/contracts`. Cloud Sync's cache helpers retain the v1 local storage format
 and signed-out read behavior while delegating HTTP to the client. Tricount keeps
@@ -32,3 +32,27 @@ Sync failures use the documented JSON 500 response.
 The endpoint audit excludes Better Auth (owned by its auth client), health and
 OpenAPI discovery (not consumed by app code), static assets, HTML/social previews,
 and third-party requests such as Tricount's upstream API and attachment downloads.
+
+## Receipt extraction
+
+`POST /api/premium/receipts` takes `{ partyDocumentId, image }`, where `image`
+is a base64 JPEG, PNG, or WebP data URL (at most 4 MiB decoded). It requires a
+signed-in party member and an authoritative active Party Boost, including a fresh
+check of the boost owner's Premium and membership. The shared Automerge boost
+cache cannot authorize the request. Other party members do not need Premium.
+
+The response has `merchantName`, `total`, `currency`, and `items`. Each item has
+`name`, `quantity`, `unitPrice`, and `lineTotal`. Monetary values are decimal
+strings in major currency units. Quantities preserve the printed text and units;
+missing fields are `null`, and unreadable items produce an empty array. The
+extraction prompt requests the final printed total including tax and discounts,
+never tendered cash, change, or an inferred sum. Currency is an ISO code only
+when visibly identified; ambiguous symbols remain unknown.
+
+New attachments are analyzed from their locally prepared image while Automerge
+sync continues. Suggestions stay local to the editor. Accepting selected fields
+updates the draft; saving the expense uses the existing write path. The first
+version offers title and total only, preserves fields edited during processing,
+and disables totals with a known currency mismatch or precision the editor
+cannot represent. Removing a receipt or leaving the editor discards late results.
+Failures leave attachments and manual expense entry usable.

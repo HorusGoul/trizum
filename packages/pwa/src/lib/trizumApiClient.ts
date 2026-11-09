@@ -28,6 +28,12 @@ import {
 import { getAuthBaseURL } from "./authBaseUrl.ts";
 import { fetchWithNativeAuth } from "./nativeAuthSession.ts";
 import { getAppLink } from "./link";
+import {
+  receiptRequestSchema,
+  receiptSchema,
+  receiptErrorResponseSchema,
+  type Receipt,
+} from "./api/receiptContract";
 
 interface TrizumApiClientOptions {
   baseUrl: () => string;
@@ -45,6 +51,11 @@ export interface TrizumApiClient {
     importTricount: (key: string) => Promise<MigrationData>;
   };
   premium: {
+    analyzeReceipt: (
+      partyDocumentId: string,
+      image: string,
+      signal?: AbortSignal,
+    ) => Promise<Receipt>;
     activatePartyBoost: (partyDocumentId: string) => Promise<PartyBoostStatus>;
     getPartyBoostStatus: (partyDocumentId: string) => Promise<PartyBoostStatus>;
   };
@@ -139,6 +150,19 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
       },
     },
     premium: {
+      async analyzeReceipt(partyDocumentId, image, signal) {
+        const json = receiptRequestSchema.parse({ partyDocumentId, image });
+        const response = await getTransport().receipts.$post({ json }, { init: { signal } });
+        const body: unknown = await response.json().catch(() => null);
+
+        if (response.ok) return receiptSchema.parse(body);
+        const error = receiptErrorResponseSchema.safeParse(body);
+        throw new Error(
+          error.success
+            ? error.data.error.message
+            : "Receipt analysis returned an invalid response.",
+        );
+      },
       async activatePartyBoost(partyDocumentId) {
         const response = await getTransport()["party-boost"].$put({
           json: { partyDocumentId },

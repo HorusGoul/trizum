@@ -32,6 +32,14 @@
     },
   ],
   "send_email": [{ "name": "EMAIL" }],
+  "ai": { "binding": "AI" },
+  "ratelimits": [
+    {
+      "name": "RECEIPT_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 },
+    },
+  ],
   "services": [{ "binding": "SPYCAT", "service": "insightflare" }],
   "vars": {
     "APPLE_APP_BUNDLE_IDENTIFIER": "app.trizum.capacitor",

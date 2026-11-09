@@ -37,6 +37,28 @@ Local development does not contact it unless a local service is supplied;
 analytics remains disabled by default. Verify the binding through a deployed
 preview when testing the integration. See [`api/routes/spycat.ts`](../api/routes/spycat.ts).
 
+## Receipt analysis bindings
+
+`AI` runs receipt extraction with Cloudflare's
+[`@cf/google/gemma-4-26b-a4b-it`](https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/)
+vision model, high-detail image input, and strict JSON schema output. The extractor
+reads Gemma's chat-completion response and rejects truncated or refused output.
+Thinking is disabled for direct extraction within the request timeout, and
+`store: false` disables optional output storage for distillation or evaluations.
+`wrangler.jsonc` supplies the binding; no
+client API key is needed. Local Workers AI inference uses Cloudflare resources
+and requires a signed-in Wrangler account. Automated tests inject the provider
+and never send real receipts to AI.
+
+`RECEIPT_RATE_LIMITER` allows ten analysis requests per signed-in account per
+minute in each Cloudflare location. This is an approximate abuse limit, not a
+global billing quota; see [Cloudflare's rate limiting semantics](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
+Missing bindings, entitlement verification failures, malformed model output, or
+inference timeouts fail closed. Inference has a 45-second timeout. Receipt
+responses use `Cache-Control: no-store`; image contents and provider errors are
+not logged or stored by this endpoint. The original attachment still follows
+the normal Automerge storage and sync path.
+
 ## D1
 
 The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party

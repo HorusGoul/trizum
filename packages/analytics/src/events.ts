@@ -51,6 +51,10 @@ export const analyticsEvents = {
   receipt_attachments_added:
     "One batch of receipt attachments was prepared and added to the expense draft.",
   receipt_attachment_removed: "A receipt attachment was removed from the expense draft.",
+  receipt_suggestions_accepted:
+    "At least one selected receipt suggestion was applied to the expense draft, not yet saved.",
+  receipt_suggestions_discarded:
+    "Receipt suggestions were dismissed without applying any draft fields.",
   receipt_gallery_opened:
     "The receipt gallery was opened; changing slides does not emit another event.",
   join_qr_scanned: "A validated group QR code was received; joining is recorded separately.",

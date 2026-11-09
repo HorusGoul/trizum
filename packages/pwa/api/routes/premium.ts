@@ -1,6 +1,10 @@
 import type { AutomergeDocuments } from "../automergeDocuments";
 import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { $, OpenAPIHono } from "@hono/zod-openapi";
+import { bodyLimit } from "hono/body-limit";
+import { analyzeReceiptRoute } from "../contracts/receipts";
+import { MAX_RECEIPT_REQUEST_BYTES } from "../../src/lib/api/receiptContract";
+import { extractReceipt } from "../premium/receiptExtraction";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Context } from "hono";
 import { createAuth } from "../auth";
@@ -49,10 +53,120 @@ const premiumApp = $(
       c.set("session", session.session);
       c.set("user", session.user);
       await next();
+    })
+    .use(
+      "/receipts",
+      bodyLimit({
+        maxSize: MAX_RECEIPT_REQUEST_BYTES,
+        onError: (c) =>
+          c.json(
+            { error: { code: "invalid_receipt" as const, message: "Receipt image is too large." } },
+            413,
+          ),
+      }),
+    )
+    .use("/receipts", async (c, next) => {
+      c.header("Cache-Control", "no-store");
+
+      if (!c.env.RECEIPT_RATE_LIMITER || !c.env.AI) {
+        return c.json(
+          { error: { code: "unavailable" as const, message: "Receipt analysis is unavailable." } },
+          503,
+        );
+      }
+
+      const { success } = await c.env.RECEIPT_RATE_LIMITER.limit({ key: c.get("user").id });
+
+      if (!success) {
+        c.header("Retry-After", "60");
+
+        return c.json(
+          { error: { code: "rate_limited" as const, message: "Please try again in a minute." } },
+          429,
+        );
+      }
+
+      await next();
     }),
 );
 
 export const premiumRoute = premiumApp
+  .openapi(
+    analyzeReceiptRoute,
+    async (c) => {
+      const { partyDocumentId, image } = c.req.valid("json");
+
+      try {
+        const status = await getPartyBoostStatus({
+          apiKey: c.env.REVENUECAT_SECRET_API_KEY,
+          db: getApiDb(c.env.DB),
+          documents: c.get("documents"),
+          partyDocumentId,
+          projectId: c.env.REVENUECAT_PROJECT_ID,
+          sandboxUserId: c.env.PARTY_BOOST_SANDBOX_USER_ID,
+          userId: c.get("user").id,
+        });
+
+        if (!status) {
+          return c.json(
+            {
+              error: {
+                code: "membership_required" as const,
+                message: "Party membership is required.",
+              },
+            },
+            403,
+          );
+        }
+
+        if (!status.party.isBoosted) {
+          return c.json(
+            {
+              error: {
+                code: "boost_required" as const,
+                message: "An active Party Boost is required.",
+              },
+            },
+            403,
+          );
+        }
+
+        if (!c.env.AI) {
+          return c.json(
+            {
+              error: { code: "unavailable" as const, message: "Receipt analysis is unavailable." },
+            },
+            503,
+          );
+        }
+
+        return c.json(await extractReceipt(image, c.env.AI), 200);
+      } catch {
+        // Provider errors can contain the image or extracted data; never log them.
+        return c.json(
+          {
+            error: {
+              code: "unavailable" as const,
+              message: "Receipt analysis could not be completed.",
+            },
+          },
+          503,
+        );
+      }
+    },
+    (result, c) => {
+      if (!result.success)
+        return c.json(
+          {
+            error: {
+              code: "invalid_receipt" as const,
+              message: "A valid receipt image and party are required.",
+            },
+          },
+          400,
+        );
+    },
+  )
   .openapi(
     getPartyBoostRoute,
     async (c) => {

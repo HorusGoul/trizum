@@ -241,6 +241,21 @@ export async function createPartyBoostTestHarness() {
 
       return premiumRoute.fetch(new Request(url, init), env, platform.ctx);
     },
+    async requestReceipt(partyDocumentId: string, image: string, cookie?: string) {
+      const headers = new Headers({ "Content-Type": "application/json" });
+
+      if (cookie) headers.set("Cookie", cookie);
+
+      return premiumRoute.fetch(
+        new Request("http://localhost:8787/receipts", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ partyDocumentId, image }),
+        }),
+        env,
+        platform.ctx,
+      );
+    },
     async assignment(userId: string) {
       return env.DB.prepare("SELECT * FROM party_boost WHERE ownerUserId = ?").bind(userId).first<{
         pendingCleanupPartyDocumentId: string | null;
