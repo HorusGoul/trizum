@@ -74,7 +74,9 @@ updates the draft; saving the expense uses the existing write path. The first
 version offers title and total only, preserves fields edited during processing,
 and disables totals with a known currency mismatch or precision the editor
 cannot represent. Removing a receipt or leaving the editor discards late results.
-Analysis runs without loading or error toasts. Each photo has a gently glowing
-ring until its request finishes or times out; reduced motion uses a static ring.
+Analysis runs without loading or error toasts. Each photo has an inset gradient
+border with a circling highlight until its request finishes or times out;
+reduced motion uses a static border. The animation rotates only the gradient
+behind a fixed border mask, so it stays inside the thumbnail bounds.
 Failures and receipts with no extractable title or total produce no suggestion
 sheet and leave attachments and manual expense entry usable.

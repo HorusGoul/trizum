@@ -1030,7 +1030,7 @@ function ReceiptPhotosField({
             {scanningPhotoIds.includes(photoId) ? (
               <div
                 aria-hidden="true"
-                className="border-accent-500 dark:border-accent-400 pointer-events-none absolute inset-0 rounded-xl border-2 shadow-[0_0_12px_2px_var(--color-accent-500)] motion-safe:animate-[receipt-scan-glow_1.8s_linear_infinite_alternate] dark:shadow-[0_0_12px_2px_var(--color-accent-400)]"
+                className="receipt-scan-border pointer-events-none absolute inset-0 overflow-hidden rounded-xl"
               />
             ) : null}
           </div>
