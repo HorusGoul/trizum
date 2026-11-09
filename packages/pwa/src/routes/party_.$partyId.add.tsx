@@ -1,3 +1,4 @@
+import { getExpenseConversionFields } from "#src/lib/currencyConversion.ts";
 import {
   expenseEditorSearchSchema,
   optionalNonemptySearchTextSchema,
@@ -118,6 +119,7 @@ function AddExpense() {
         name: values.name,
         paidAt: values.paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+        ...getExpenseConversionFields(values),
         shares,
         photos: values.photos,
       });

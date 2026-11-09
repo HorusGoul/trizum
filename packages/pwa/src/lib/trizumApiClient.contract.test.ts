@@ -226,3 +226,50 @@ function documentId() {
 function createClient(fetch: typeof globalThis.fetch) {
   return createTrizumApiClient({ baseUrl: () => "https://trizum.test", fetch });
 }
+
+test("exchange rates use the public transport and validate its response", async () => {
+  const table = {
+    base: "EUR",
+    rates: { EUR: { rate: 1, date: "2026-11-06" }, USD: { rate: 1.1, date: "2026-11-06" } },
+  };
+
+  const publicFetch = vi.fn<typeof fetch>(async (input) => {
+    expect(new Request(input).url).toBe("https://trizum.test/api/exchange-rates?base=EUR");
+
+    return Response.json(table);
+  });
+
+  const privateFetch = vi.fn<typeof fetch>();
+
+  const client = createTrizumApiClient({
+    baseUrl: () => "https://trizum.test",
+    fetch: privateFetch,
+    publicFetch,
+  });
+
+  await expect(client.exchangeRates.get("EUR")).resolves.toEqual(table);
+  expect(privateFetch).not.toHaveBeenCalled();
+  await expect(
+    createClient(async () => Response.json({ rates: {} })).exchangeRates.get("EUR"),
+  ).rejects.toBeInstanceOf(ZodError);
+});
+
+test("requests rates with the party base and rejects a mismatched response base", async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>(async (input) => {
+    expect(new Request(input).url).toBe("https://trizum.test/api/exchange-rates?base=USD");
+
+    return Response.json({
+      base: "USD",
+      rates: { USD: { rate: 1, date: "2026-11-06" }, EUR: { rate: 0.9, date: "2026-11-06" } },
+    });
+  });
+
+  await expect(createClient(fetch).exchangeRates.get("USD")).resolves.toMatchObject({
+    base: "USD",
+  });
+  await expect(
+    createClient(async () =>
+      Response.json({ base: "EUR", rates: { EUR: { rate: 1, date: "2026-11-06" } } }),
+    ).exchangeRates.get("USD"),
+  ).rejects.toThrow("base does not match");
+});

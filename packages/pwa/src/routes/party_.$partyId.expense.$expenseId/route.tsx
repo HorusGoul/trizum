@@ -125,7 +125,11 @@ function ExpenseById() {
         </div>
 
         <div className="container flex flex-col gap-4 px-4 pt-4">
-          <Amount amount={getExpenseTotalAmount(expense)} />
+          <Amount
+            amount={getExpenseTotalAmount(expense)}
+            originalAmount={expense.originalAmount}
+            exchangeRate={expense.exchangeRate}
+          />
           <PaidBy {...expense} />
           <PaidAt {...expense} />
           <Photos photos={expense.photos} onOpenGallery={openGallery} />

@@ -13,6 +13,8 @@ export function getExpenseEditValues(expense: Expense, now = Date.now()) {
     paidBy: Object.keys(currentExpense.paidBy)[0],
     shares: currentExpense.shares,
     photos: currentExpense.photos,
+    originalAmount: currentExpense.originalAmount ?? null,
+    exchangeRate: currentExpense.exchangeRate ?? null,
   };
 }
 

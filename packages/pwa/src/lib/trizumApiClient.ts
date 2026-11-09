@@ -1,3 +1,10 @@
+import type { CurrencyCode } from "./money";
+import type { ExchangeRatesRoute } from "../../api/routes/exchange-rates";
+import {
+  exchangeRatesSchema,
+  exchangeRatesQuerySchema,
+  type ExchangeRates,
+} from "./api/exchangeRatesContract";
 import { hc } from "hono/client";
 import type { PremiumRoute } from "../../api/routes/premium";
 import type { CloudSyncRoute } from "../../api/routes/cloud-sync";
@@ -37,6 +44,7 @@ interface TrizumApiClientOptions {
 }
 
 export interface TrizumApiClient {
+  exchangeRates: { get: (base: CurrencyCode) => Promise<ExchangeRates> };
   cloudSync: {
     getSettings: () => Promise<GetCloudUserSettingsResponse>;
     saveSettings: (settings: CloudUserSettingsInput) => Promise<SaveCloudUserSettingsResponse>;
@@ -111,6 +119,29 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
   }
 
   return {
+    exchangeRates: {
+      async get(base) {
+        const query = exchangeRatesQuerySchema.parse({ base });
+
+        const transport = hc<ExchangeRatesRoute>(
+          new URL("/api/exchange-rates/", options.baseUrl()).toString(),
+          {
+            fetch: options.publicFetch ?? options.fetch,
+          },
+        );
+
+        const response = await transport.index.$get({ query });
+
+        if (!response.ok) throw new Error("Exchange rates are unavailable");
+
+        const table = exchangeRatesSchema.parse(await response.json());
+
+        if (table.base !== base)
+          throw new Error("Exchange rate base does not match the party currency");
+
+        return table;
+      },
+    },
     cloudSync: {
       async getSettings() {
         return parseCloudSyncResponse(

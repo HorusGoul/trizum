@@ -10,7 +10,7 @@ import { md5 } from "@takker/md5";
 import type { Party, PartyParticipant } from "./party";
 import { assertNever } from "#src/lib/assertNever.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { createMoney, getMoneyAmount } from "#src/lib/money.ts";
+import { createMoney, getMoneyAmount, type CurrencyCode } from "#src/lib/money.ts";
 
 const logger = getLogger("models", "expense");
 
@@ -22,6 +22,10 @@ export interface Expense {
   shares: Record<ExpenseUser, ExpenseShare>;
   photos: MediaFile["id"][];
   isTransfer?: boolean;
+  /** Original amount in hundredths, before conversion to the party currency. */
+  originalAmount?: { amount: number; currency: CurrencyCode };
+  /** Party-currency units per one original-currency unit. Never refreshed after saving. */
+  exchangeRate?: number;
   __hash: string;
   __editCopy?: Omit<Expense, "__editCopy">;
   __editCopyLastUpdatedAt?: Date;
@@ -311,6 +315,10 @@ export function calculateExpenseHash(expense: Partial<Expense>) {
       })
       .join(","),
     copy.photos?.join(","),
+    copy.originalAmount
+      ? `:original:${copy.originalAmount.currency}:${copy.originalAmount.amount}`
+      : "",
+    copy.exchangeRate === undefined ? "" : `:rate:${copy.exchangeRate}`,
   ].join("");
 
   const hash = md5(input);
