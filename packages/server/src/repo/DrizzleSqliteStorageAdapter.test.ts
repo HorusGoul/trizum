@@ -89,3 +89,17 @@ test("supports concurrent standalone chunk writes through the libSQL connection 
     expect.arrayContaining(keys.map((key, index) => ({ key, data: new Uint8Array([index, 2]) }))),
   );
 });
+
+test("persists receipt-sized and larger chunks without truncation", async () => {
+  for (const size of [165_052, 2 * 1024 * 1024]) {
+    const key = ["receipt-large", "snapshot", String(size)];
+    const bytes = new Uint8Array(size).fill(173);
+    await storage.save(key, bytes);
+    const loaded = await storage.load(key);
+    expect(loaded && Buffer.from(loaded).equals(bytes)).toBe(true);
+    const chunks = await storage.loadRange(["receipt-large", "snapshot", String(size)]);
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0].key).toEqual(key);
+    expect(chunks[0].data && Buffer.from(chunks[0].data).equals(bytes)).toBe(true);
+  }
+});
