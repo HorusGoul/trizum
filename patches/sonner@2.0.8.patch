@@ -1,0 +1,60 @@
+diff --git a/dist/index.js b/dist/index.js
+index 394dbc2272f43b84642b0f9d5cc7eb1eacb0ffb3..1ed5803deb402c8c7aa51b2333346de9c2e37c80 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -480,7 +480,10 @@ const TOAST_WIDTH = 356;
+ // Default gap between toasts
+ const GAP = 14;
+ // Threshold to dismiss a toast
+-const SWIPE_THRESHOLD = 45;
++const SWIPE_DISTANCE_RATIO = 0.4;
++const MIN_SWIPE_DISTANCE = 45;
++const MIN_FLICK_DISTANCE = 16;
++const SWIPE_VELOCITY_THRESHOLD = 0.5; // px/ms (500px/s)
+ // Equal to exit animation duration
+ const TIME_BEFORE_UNMOUNT = 200;
+ function cn(...classes) {
+@@ -774,7 +777,12 @@ const Toast = (props)=>{
+             // Movement towards a direction that isn't allowed is dampened, not blocked, so a fast
+             // flick can still pass the velocity check. Only dismiss if the direction is allowed.
+             const isAllowedDirection = swipeDirection === 'x' ? swipeDirections.includes(swipeAmountX > 0 ? 'right' : 'left') : swipeDirections.includes(swipeAmountY > 0 ? 'bottom' : 'top');
+-            if (isAllowedDirection && (Math.abs(swipeAmount) >= SWIPE_THRESHOLD || velocity > 0.11)) {
++            const element = toastRef.current;
++            const size = element ? (swipeDirection === 'x' ? element.offsetWidth : element.offsetHeight) : 0;
++            const distance = Math.abs(swipeAmount);
++            const distanceThreshold = Math.max(MIN_SWIPE_DISTANCE, size * SWIPE_DISTANCE_RATIO);
++            const isFlick = distance >= MIN_FLICK_DISTANCE && velocity > SWIPE_VELOCITY_THRESHOLD;
++            if (isAllowedDirection && (distance >= distanceThreshold || isFlick)) {
+                 setOffsetBeforeRemove(offset.current);
+                 toast.onDismiss == null ? void 0 : toast.onDismiss.call(toast, toast);
+                 if (swipeDirection === 'x') {
+diff --git a/dist/index.mjs b/dist/index.mjs
+index c124f821a68f7070647a5a04441d0caa53689662..ad970f8eb2c14c8b6833c2bb8832559264b48666 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -473,7 +473,10 @@ const TOAST_WIDTH = 356;
+ // Default gap between toasts
+ const GAP = 14;
+ // Threshold to dismiss a toast
+-const SWIPE_THRESHOLD = 45;
++const SWIPE_DISTANCE_RATIO = 0.4;
++const MIN_SWIPE_DISTANCE = 45;
++const MIN_FLICK_DISTANCE = 16;
++const SWIPE_VELOCITY_THRESHOLD = 0.5; // px/ms (500px/s)
+ // Equal to exit animation duration
+ const TIME_BEFORE_UNMOUNT = 200;
+ function cn(...classes) {
+@@ -767,7 +770,12 @@ const Toast = (props)=>{
+             // Movement towards a direction that isn't allowed is dampened, not blocked, so a fast
+             // flick can still pass the velocity check. Only dismiss if the direction is allowed.
+             const isAllowedDirection = swipeDirection === 'x' ? swipeDirections.includes(swipeAmountX > 0 ? 'right' : 'left') : swipeDirections.includes(swipeAmountY > 0 ? 'bottom' : 'top');
+-            if (isAllowedDirection && (Math.abs(swipeAmount) >= SWIPE_THRESHOLD || velocity > 0.11)) {
++            const element = toastRef.current;
++            const size = element ? (swipeDirection === 'x' ? element.offsetWidth : element.offsetHeight) : 0;
++            const distance = Math.abs(swipeAmount);
++            const distanceThreshold = Math.max(MIN_SWIPE_DISTANCE, size * SWIPE_DISTANCE_RATIO);
++            const isFlick = distance >= MIN_FLICK_DISTANCE && velocity > SWIPE_VELOCITY_THRESHOLD;
++            if (isAllowedDirection && (distance >= distanceThreshold || isFlick)) {
+                 setOffsetBeforeRemove(offset.current);
+                 toast.onDismiss == null ? void 0 : toast.onDismiss.call(toast, toast);
+                 if (swipeDirection === 'x') {

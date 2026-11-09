@@ -9,6 +9,7 @@ import {
 } from "./Toaster.config.js";
 
 export function Toaster() {
+  // Swipe intent thresholds are tuned in patches/sonner@2.0.8.patch.
   return (
     <SonnerToaster
       position="bottom-center"
