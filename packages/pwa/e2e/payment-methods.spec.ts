@@ -81,7 +81,10 @@ test("desktop settings retain edits through preview, copy, removal, and repeated
   await page.getByRole("button", { name: /Add payment method/ }).click();
   await page.getByRole("option", { name: "Venmo", exact: true }).click();
   const field = page.getByRole("textbox", { name: "Venmo", exact: true });
-  await expect(field).toHaveAttribute("placeholder", "@username or Venmo link");
+  await expect(field).toHaveAttribute("placeholder", "e.g. @yourname");
+  await expect(
+    page.getByText("Your Venmo username or profile link.", { exact: true }),
+  ).toBeVisible();
   await field.fill("@alex");
   await page.getByRole("button", { name: "Venmo actions", exact: true }).click();
   const previewPromise = page.context().waitForEvent("page");
@@ -201,7 +204,10 @@ test.describe("mobile payment settings", () => {
       .toBe("@alex");
     await expect(sheet).not.toBeVisible();
     await expect(field).toHaveValue("@alex");
-    await page.getByRole("button", { name: "More Venmo actions", exact: true }).tap();
+    await expect(page.getByRole("button", { name: "More Venmo actions", exact: true })).toHaveCount(
+      0,
+    );
+    await actions.tap();
     await sheet.getByRole("button", { name: "Remove payment method" }).tap();
     await expect(field).toHaveCount(0);
     await page.getByRole("button", { name: "Add payment method", exact: true }).tap();

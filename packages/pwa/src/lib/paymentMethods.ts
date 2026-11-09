@@ -27,13 +27,13 @@ export const paymentMethodDescriptions = {
 };
 
 export const paymentMethodPlaceholders = {
-  bizum: msg`+34 612 345 678`,
-  "bank-transfer": msg`Account holder · IBAN or account number`,
-  paypal: msg`PayPal.Me username or link`,
-  revolut: msg`@revtag or Revolut.me link`,
-  venmo: msg`@username or Venmo link`,
-  "cash-app": msg`$Cashtag or Cash App link`,
-  other: msg`Service name and payment details`,
+  bizum: msg`e.g. +34 612 345 678`,
+  "bank-transfer": msg`e.g. Alex · IBAN or account number`,
+  paypal: msg`e.g. paypal.me/yourname`,
+  revolut: msg`e.g. @yourname`,
+  venmo: msg`e.g. @yourname`,
+  "cash-app": msg`e.g. $yourname`,
+  other: msg`e.g. Wise · your payment details`,
 };
 
 const paymentProfiles = {

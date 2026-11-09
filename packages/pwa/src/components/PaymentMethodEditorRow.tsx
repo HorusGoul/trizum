@@ -7,6 +7,7 @@ import {
   ModalSheetActions,
   ModalSheetContent,
   ModalSheetHeader,
+  ModalSheetSection,
   ModalSheetTitle,
 } from "@trizum/ui/ModalSheet";
 import { Input, TextArea, TextField } from "@trizum/ui/fields/TextField";
@@ -55,7 +56,7 @@ export function PaymentMethodEditorRow({
   });
 
   const fieldClassName =
-    "min-h-11 w-full border-0 bg-transparent px-0 py-3 text-base shadow-none outline-none placeholder:text-accent-500 dark:bg-transparent dark:placeholder:text-accent-400 data-[focused]:ring-0 data-[focused]:ring-offset-0";
+    "min-h-11 w-full border-0 bg-transparent px-0 py-3 text-base font-medium shadow-none outline-none placeholder:font-normal placeholder:italic placeholder:text-accent-600 dark:bg-transparent dark:placeholder:text-accent-400 data-[focused]:ring-0 data-[focused]:ring-offset-0";
 
   function previewLink() {
     if (!href) return;
@@ -81,13 +82,13 @@ export function PaymentMethodEditorRow({
   );
 
   return (
-    <div className="group dark:bg-accent-900 bg-white px-3 first:rounded-t-xl last:rounded-b-xl">
-      <div className="focus-within:ring-accent-400 flex items-start gap-3 rounded-lg focus-within:ring-2">
+    <div className="group dark:bg-accent-900 focus-within:ring-accent-400 relative bg-white px-3 first:rounded-t-xl last:rounded-b-xl focus-within:z-10 focus-within:ring-2 focus-within:ring-inset">
+      <div className="flex items-start gap-3">
         <button
           {...mergeProps(buttonProps, longPressProps)}
           ref={actionRef}
           aria-label={t({ message: `${methodName} actions` })}
-          className="text-accent-700 dark:text-accent-200 focus-visible:ring-accent-500 flex min-h-12 w-11 shrink-0 touch-pan-y items-center justify-center self-start rounded-lg outline-hidden select-none [-webkit-touch-callout:none] focus-visible:ring-2 md:w-28 md:justify-start md:gap-2"
+          className="text-accent-700 dark:text-accent-200 flex min-h-12 w-11 shrink-0 touch-pan-y items-center justify-center self-start rounded-lg outline-hidden select-none [-webkit-touch-callout:none] md:w-28 md:justify-start md:gap-2"
         >
           <PaymentMethodIcon type={type} size={20} />
           <span className="hidden text-sm font-medium md:block">{methodName}</span>
@@ -122,7 +123,7 @@ export function PaymentMethodEditorRow({
           )}
           <Text
             slot="description"
-            className="text-accent-600 dark:text-accent-400 sr-only text-xs md:not-sr-only md:hidden md:pb-3 md:group-focus-within:block"
+            className="text-accent-600 dark:text-accent-400 sr-only text-xs md:not-sr-only md:block md:pb-3"
           >
             {t(paymentMethodDescriptions[type])}
           </Text>
@@ -133,25 +134,20 @@ export function PaymentMethodEditorRow({
             <IconButton
               icon="lucide.ellipsis"
               aria-label={t({ message: `More ${methodName} actions` })}
-              className="my-0.5 size-11 shrink-0 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+              className="text-accent-700 dark:text-accent-200 my-0.5 size-11 shrink-0 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
             />
             <Popover placement="bottom end">
               <Menu aria-label={t({ message: `${methodName} actions` })}>{menuItems}</Menu>
             </Popover>
           </MenuTrigger>
-        ) : (
-          <IconButton
-            icon="lucide.ellipsis"
-            aria-label={t({ message: `More ${methodName} actions` })}
-            onPress={() => setIsOpen(true)}
-            className="my-0.5 size-11 shrink-0"
-          />
-        )}
+        ) : null}
       </div>
       {!isDesktop ? (
         <ModalSheet isOpen={isOpen} onOpenChange={setIsOpen}>
-          <ModalSheetHeader className="px-5">
-            <ModalSheetTitle>{methodName}</ModalSheetTitle>
+          <ModalSheetHeader>
+            <ModalSheetSection>
+              <ModalSheetTitle>{methodName}</ModalSheetTitle>
+            </ModalSheetSection>
           </ModalSheetHeader>
           <ModalSheetContent>
             <ModalSheetActions>

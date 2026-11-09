@@ -88,8 +88,8 @@ msgstr "{issueCount, plural, one {# advertencia} other {# advertencias}}"
 msgid "{message}"
 msgstr "{message}"
 
-#: src/components/PaymentMethodEditorRow.tsx:89
-#: src/components/PaymentMethodEditorRow.tsx:139
+#: src/components/PaymentMethodEditorRow.tsx:90
+#: src/components/PaymentMethodEditorRow.tsx:140
 msgid "{methodName} actions"
 msgstr "Acciones de {methodName}"
 
@@ -348,10 +348,10 @@ msgstr "Añadir participante"
 msgid "Add password sign-in"
 msgstr "Añadir inicio de sesión con contraseña"
 
-#: src/components/PaymentMethodsEditor.tsx:88
-#: src/components/PaymentMethodsEditor.tsx:89
-#: src/components/PaymentMethodsEditor.tsx:115
-#: src/components/PaymentMethodsEditor.tsx:120
+#: src/components/PaymentMethodsEditor.tsx:94
+#: src/components/PaymentMethodsEditor.tsx:95
+#: src/components/PaymentMethodsEditor.tsx:121
+#: src/components/PaymentMethodsEditor.tsx:127
 msgid "Add payment method"
 msgstr "Añadir método de pago"
 
@@ -1063,8 +1063,8 @@ msgstr "Copiar datos de {methodName}"
 msgid "Copy code"
 msgstr "Copiar código"
 
-#: src/components/PaymentMethodEditorRow.tsx:75
-#: src/components/PaymentMethodEditorRow.tsx:171
+#: src/components/PaymentMethodEditorRow.tsx:76
+#: src/components/PaymentMethodEditorRow.tsx:167
 msgid "Copy details"
 msgstr "Copiar datos"
 
@@ -1369,6 +1369,31 @@ msgstr "Franco Yibutiano"
 #: src/routes/new/route.tsx:234
 msgid "Dominican Peso"
 msgstr "Peso Dominicano"
+
+#: src/lib/paymentMethods.ts:33
+#: src/lib/paymentMethods.ts:34
+msgid "e.g. @yourname"
+msgstr "p. ej. @tunombre"
+
+#: src/lib/paymentMethods.ts:30
+msgid "e.g. +34 612 345 678"
+msgstr "p. ej. +34 612 345 678"
+
+#: src/lib/paymentMethods.ts:35
+msgid "e.g. $yourname"
+msgstr "p. ej. $tunombre"
+
+#: src/lib/paymentMethods.ts:31
+msgid "e.g. Alex · IBAN or account number"
+msgstr "p. ej. Alex · IBAN o número de cuenta"
+
+#: src/lib/paymentMethods.ts:32
+msgid "e.g. paypal.me/yourname"
+msgstr "p. ej. paypal.me/tunombre"
+
+#: src/lib/paymentMethods.ts:36
+msgid "e.g. Wise · your payment details"
+msgstr "p. ej. Wise · tus datos de pago"
 
 #: src/routes/new/route.tsx:335
 msgid "East Caribbean Dollar"
@@ -1697,7 +1722,7 @@ msgstr "Lari Georgiano"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otra forma diferente a las descritas anteriormente."
 
-#: src/components/PaymentMethodsEditor.tsx:60
+#: src/components/PaymentMethodsEditor.tsx:66
 msgid "Get paid"
 msgstr "Recibir pagos"
 
@@ -1814,7 +1839,7 @@ msgstr "Ocultar inicio de sesión con contraseña"
 msgid "Hide the blank option when adding an expense."
 msgstr "Oculta la opción en blanco al añadir un gasto."
 
-#: src/components/PaymentMethodEditorRow.tsx:53
+#: src/components/PaymentMethodEditorRow.tsx:54
 msgid "Hold for payment method actions"
 msgstr "Mantén pulsado para ver las opciones del método de pago"
 
@@ -2282,8 +2307,7 @@ msgstr "Mensual"
 msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 msgstr "Las suscripciones mensuales y anuales se renuevan automáticamente por otro periodo de facturación salvo que las canceles a través de la tienda correspondiente antes de la renovación. El importe se carga en tu cuenta de la tienda al confirmar la compra y en cada renovación, según el precio mostrado por la tienda y sujeto a cualquier aviso previo o consentimiento que exijan la tienda o la legislación aplicable."
 
-#: src/components/PaymentMethodEditorRow.tsx:135
-#: src/components/PaymentMethodEditorRow.tsx:145
+#: src/components/PaymentMethodEditorRow.tsx:136
 msgid "More {methodName} actions"
 msgstr "Más opciones de {methodName}"
 
@@ -2890,7 +2914,7 @@ msgstr "Datos de pago copiados"
 msgid "Payment details must be 1000 characters or fewer."
 msgstr "Los datos de pago deben tener 1000 caracteres o menos."
 
-#: src/components/PaymentMethodsEditor.tsx:125
+#: src/components/PaymentMethodsEditor.tsx:134
 msgid "Payment methods"
 msgstr "Métodos de pago"
 
@@ -3074,8 +3098,8 @@ msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
 msgid "Premium, made for sharing."
 msgstr "Premium, pensado para compartir."
 
-#: src/components/PaymentMethodEditorRow.tsx:71
-#: src/components/PaymentMethodEditorRow.tsx:160
+#: src/components/PaymentMethodEditorRow.tsx:72
+#: src/components/PaymentMethodEditorRow.tsx:156
 msgid "Preview payment link"
 msgstr "Ver enlace de pago"
 
@@ -3185,8 +3209,8 @@ msgstr "Eliminar {methodName}"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/PaymentMethodEditorRow.tsx:78
-#: src/components/PaymentMethodEditorRow.tsx:181
+#: src/components/PaymentMethodEditorRow.tsx:79
+#: src/components/PaymentMethodEditorRow.tsx:177
 msgid "Remove payment method"
 msgstr "Eliminar método de pago"
 
@@ -3429,7 +3453,7 @@ msgstr "Gastos compartidos"
 msgid "Shared with everyone in this party"
 msgstr "Compartido con todos los miembros de este grupo"
 
-#: src/components/PaymentMethodsEditor.tsx:63
+#: src/components/PaymentMethodsEditor.tsx:69
 msgid "Shared with everyone in your groups."
 msgstr "Se comparte con todos los participantes de tus Grupos."
 

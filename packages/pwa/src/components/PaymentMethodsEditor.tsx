@@ -5,6 +5,7 @@ import {
   ModalSheet,
   ModalSheetContent,
   ModalSheetHeader,
+  ModalSheetSection,
   ModalSheetTitle,
 } from "@trizum/ui/ModalSheet";
 import {
@@ -45,7 +46,12 @@ export function PaymentMethodsEditor({
   }
 
   const options = available.map((type) => (
-    <SelectItem key={type} id={type} textValue={t(paymentMethodLabels[type])}>
+    <SelectItem
+      key={type}
+      id={type}
+      textValue={t(paymentMethodLabels[type])}
+      className={isDesktop ? undefined : "px-0 py-2"}
+    >
       <span className="flex min-h-9 items-center gap-3">
         <PaymentMethodIcon type={type} size={20} />
         {t(paymentMethodLabels[type])}
@@ -115,23 +121,26 @@ export function PaymentMethodsEditor({
               <Trans>Add payment method</Trans>
             </Button>
             <ModalSheet isOpen={isPickerOpen} onOpenChange={setIsPickerOpen}>
-              <ModalSheetHeader className="px-5">
-                <ModalSheetTitle>
-                  <Trans>Add payment method</Trans>
-                </ModalSheetTitle>
+              <ModalSheetHeader>
+                <ModalSheetSection>
+                  <ModalSheetTitle>
+                    <Trans>Add payment method</Trans>
+                  </ModalSheetTitle>
+                </ModalSheetSection>
               </ModalSheetHeader>
-              <ModalSheetContent className="px-3">
-                <ListBox
-                  aria-label={t`Payment methods`}
-                  selectionMode="single"
-                  onAction={(key) => {
-                    const type = available.find((type) => type === key);
+              <ModalSheetContent>
+                <ModalSheetSection>
+                  <ListBox
+                    aria-label={t`Payment methods`}
+                    onAction={(key) => {
+                      const type = available.find((type) => type === key);
 
-                    if (type) addMethod(type);
-                  }}
-                >
-                  {options}
-                </ListBox>
+                      if (type) addMethod(type);
+                    }}
+                  >
+                    {options}
+                  </ListBox>
+                </ModalSheetSection>
               </ModalSheetContent>
             </ModalSheet>
           </>
