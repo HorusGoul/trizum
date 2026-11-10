@@ -7,7 +7,9 @@
   "license": "MIT",
   "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/instrument.ts"
+  ],
   "imports": {
     "#*": "./*"
   },
