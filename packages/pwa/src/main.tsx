@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+import { createRecoveringStorage } from "./lib/recoveringStorage.ts";
 import {
   RouterProvider,
   createBrowserHistory,
@@ -151,7 +151,7 @@ function shouldPreserveCalculatorSearchScroll({
 
 // Create automerge repository
 const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("trizum"),
+  storage: createRecoveringStorage(),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
 });
 
