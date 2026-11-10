@@ -3024,7 +3024,7 @@ msgstr "Canjear en Google Play"
 msgid "Redeem your offer"
 msgstr "Canjea tu oferta"
 
-#: src/components/UpdateController.tsx:31
+#: src/components/UpdateController.tsx:32
 msgid "Reload"
 msgstr "Recargar"
 
@@ -4030,7 +4030,7 @@ msgstr "Unidad Previsional"
 msgid "Unpin party"
 msgstr "Desfijar grupo"
 
-#: src/components/UpdateController.tsx:29
+#: src/components/UpdateController.tsx:30
 #: src/routes/_home/route.tsx:71
 msgid "Update available"
 msgstr "Actualización disponible"
@@ -4059,7 +4059,7 @@ msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gasto
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
-#: src/components/UpdateController.tsx:74
+#: src/components/UpdateController.tsx:75
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
