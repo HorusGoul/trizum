@@ -52,17 +52,32 @@ export const imageUploadAccept =
 
 export const imageCaptureAccept = "image/*";
 
-export type ImageProcessingErrorCode = "heic_conversion_failed";
+export type ImageProcessingErrorCode = "heic_conversion_failed" | "image_processing_failed";
+
+type ImageProcessingStage = "normalize" | "decode_and_orient" | "encode" | "compress";
+
+interface ImageProcessingDiagnostics {
+  processingStage: ImageProcessingStage;
+  imageMimeType: string;
+  imageSizeBytes: number;
+  isHeic: boolean;
+}
 
 export class ImageProcessingError extends Error {
   declare cause?: unknown;
   readonly code: ImageProcessingErrorCode;
+  readonly diagnostics?: ImageProcessingDiagnostics;
 
-  constructor(code: ImageProcessingErrorCode, cause?: unknown) {
-    super(code);
+  constructor(
+    code: ImageProcessingErrorCode,
+    cause?: unknown,
+    diagnostics?: ImageProcessingDiagnostics,
+  ) {
+    super(diagnostics ? `Image processing failed during ${diagnostics.processingStage}` : code);
     this.name = "ImageProcessingError";
     this.code = code;
     this.cause = cause;
+    this.diagnostics = diagnostics;
   }
 }
 
@@ -365,6 +380,8 @@ export async function processImage(
     };
   }
 
+  let processingStage: ImageProcessingStage = "normalize";
+
   try {
     const originalOrientation = await readOrientation(file);
     const { file: normalizedFile, convertedFromHeic } = await normalizeImageFile(file);
@@ -372,11 +389,15 @@ export async function processImage(
     const normalizedOrientation =
       normalizedFile === file ? originalOrientation : await readOrientation(normalizedFile);
 
+    processingStage = "decode_and_orient";
+
     // First, correct orientation and remove EXIF data
     const { canvas: correctedCanvas, mimeType } = await correctOrientation(
       normalizedFile,
       normalizedOrientation ?? 1,
     );
+
+    processingStage = "encode";
 
     // Convert canvas to blob (this removes EXIF data)
     const correctedBlob = await canvasToBlob(correctedCanvas, mimeType, 0.9);
@@ -393,6 +414,8 @@ export async function processImage(
         type: mimeType,
         lastModified: normalizedFile.lastModified,
       });
+
+      processingStage = "compress";
 
       // Compress the image
       const compressedFile = await imageCompression(correctedFile, {
@@ -421,14 +444,17 @@ export async function processImage(
       convertedFromHeic,
     };
   } catch (error) {
-    logger.error("Image processing failed", { error });
-
-    if (error instanceof ImageProcessingError) {
-      throw error;
-    }
-
-    throw new Error(
-      `Failed to process image: ${error instanceof Error ? error.message : "Unknown error"}`,
+    // Keep a stable, own-property error title even when a dependency throws an
+    // accessor-backed exception. The original cause remains available for debugging.
+    throw new ImageProcessingError(
+      error instanceof ImageProcessingError ? error.code : "image_processing_failed",
+      error,
+      {
+        processingStage,
+        imageMimeType: file.type || "unspecified",
+        imageSizeBytes: file.size,
+        isHeic: isHeicImageFile(file),
+      },
     );
   }
 }

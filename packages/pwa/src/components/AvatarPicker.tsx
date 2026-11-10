@@ -9,6 +9,7 @@ import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useM
 import { useMediaFile } from "#src/hooks/useMediaFile.js";
 import {
   compressionPresets,
+  ImageProcessingError,
   imageCaptureAccept,
   imageUploadAccept,
   isSupportedImageFile,
@@ -75,7 +76,10 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
       toast.dismiss(toastId);
       toast.success(t`Avatar updated successfully`);
     } catch (error) {
-      logger.error("Failed to upload avatar", { error });
+      logger.error("Failed to upload avatar", {
+        error,
+        ...(error instanceof ImageProcessingError ? error.diagnostics : undefined),
+      });
       toast.dismiss(toastId);
       toast.error(
         getImageUploadErrorMessage(error) ?? t`Failed to upload avatar. Please try again.`,
