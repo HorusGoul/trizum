@@ -203,7 +203,7 @@ test.describe("mobile payment settings", () => {
     await page.getByRole("button", { name: "Add payment method", exact: true }).tap();
     const picker = page.getByRole("dialog", { name: "Add payment method", exact: true });
     await expect(picker).toBeVisible();
-    await picker.getByRole("option", { name: "Venmo", exact: true }).tap();
+    await picker.getByRole("button", { name: "Venmo", exact: true }).tap();
     await expect(picker).not.toBeVisible();
     const field = page.getByRole("textbox", { name: "Venmo", exact: true });
     await expect(field).toBeFocused();
@@ -251,8 +251,8 @@ test.describe("mobile payment settings", () => {
     await expect(actions).toHaveCount(0);
     await expect(field).toHaveCount(0);
     await page.getByRole("button", { name: "Add payment method", exact: true }).tap();
-    await expect(picker.getByRole("option", { name: "Venmo", exact: true })).toBeVisible();
-    await picker.getByRole("option", { name: "Other", exact: true }).tap();
+    await expect(picker.getByRole("button", { name: "Venmo", exact: true })).toBeVisible();
+    await picker.getByRole("button", { name: "Other", exact: true }).tap();
     const instructions = "Wise transfer\nContact Alex for the account details";
     const otherField = page.getByRole("textbox", { name: "Other", exact: true });
     await expect(otherField).toBeFocused();

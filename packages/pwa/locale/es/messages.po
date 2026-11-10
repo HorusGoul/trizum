@@ -348,9 +348,9 @@ msgstr "Añadir participante"
 msgid "Add password sign-in"
 msgstr "Añadir inicio de sesión con contraseña"
 
-#: src/components/PaymentMethodsEditor.tsx:109
-#: src/components/PaymentMethodsEditor.tsx:125
-#: src/components/PaymentMethodsEditor.tsx:135
+#: src/components/PaymentMethodsEditor.tsx:112
+#: src/components/PaymentMethodsEditor.tsx:128
+#: src/components/PaymentMethodsEditor.tsx:138
 msgid "Add payment method"
 msgstr "Añadir método de pago"
 
@@ -1723,7 +1723,7 @@ msgstr "Lari Georgiano"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otra forma diferente a las descritas anteriormente."
 
-#: src/components/PaymentMethodsEditor.tsx:79
+#: src/components/PaymentMethodsEditor.tsx:77
 msgid "Get paid"
 msgstr "Recibir pagos"
 
@@ -2915,8 +2915,7 @@ msgstr "Datos de pago copiados"
 msgid "Payment details must be 1000 characters or fewer."
 msgstr "Los datos de pago deben tener 1000 caracteres o menos."
 
-#: src/components/PaymentMethodsEditor.tsx:113
-#: src/components/PaymentMethodsEditor.tsx:142
+#: src/components/PaymentMethodsEditor.tsx:116
 msgid "Payment methods"
 msgstr "Métodos de pago"
 
@@ -4654,6 +4653,10 @@ msgstr "Podrás volver a mover Party Boost el {transferableDate}."
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:246
 msgid "Your Party Boost is active elsewhere and can be moved here."
 msgstr "Tu Party Boost está activo en otro grupo y puedes moverlo aquí."
+
+#: src/components/PaymentMethodsEditor.tsx:80
+msgid "Your payment details are shared with people in your groups to help them settle debts with you."
+msgstr "Tus datos de pago se comparten con las personas de tus Grupos para que puedan saldar sus deudas contigo."
 
 #: src/lib/paymentMethods.ts:22
 msgid "Your PayPal.Me username or profile link."
