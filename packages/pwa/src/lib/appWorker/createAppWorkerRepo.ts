@@ -2,7 +2,7 @@ import { Repo } from "@automerge/automerge-repo";
 import type { NetworkAdapterInterface } from "@automerge/automerge-repo/slim";
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+import { createRecoveringStorage } from "../recoveringStorage.ts";
 import type { AppWorkerInitializeOptions } from "./proxy.ts";
 
 export function createAppWorkerRepo(options: AppWorkerInitializeOptions) {
@@ -13,7 +13,7 @@ export function createAppWorkerRepo(options: AppWorkerInitializeOptions) {
   }
 
   return new Repo({
-    storage: new IndexedDBStorageAdapter("trizum"),
+    storage: createRecoveringStorage(),
     network,
   });
 }
