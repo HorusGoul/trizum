@@ -1,3 +1,4 @@
+import { checkServiceWorkerUpdate } from "#src/lib/checkServiceWorkerUpdate.ts";
 import { t } from "@lingui/core/macro";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
@@ -19,7 +20,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
     immediate: true,
     onRegisteredSW: (_url, registration) => {
       registrationRef.current = registration ?? null;
-      void registration?.update();
+      void checkServiceWorkerUpdate(registration);
     },
     onNeedRefresh() {
       if (!didCheckForUpdateRef.current) {
@@ -61,7 +62,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
         update,
         checkForUpdate: () => {
           didCheckForUpdateRef.current = true;
-          void registrationRef.current?.update();
+          void checkServiceWorkerUpdate(registrationRef.current);
         },
       }}
     >
