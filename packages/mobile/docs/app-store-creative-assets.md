@@ -72,7 +72,7 @@ The repository pins Fastlane **2.231.1** in
 [`Gemfile.lock`](../ios/App/Gemfile.lock). Its
 [`Fastfile`](../ios/App/fastlane/Fastfile) loads a base64 App Store Connect key,
 uploads metadata and screenshots through `deliver`, and bounds screenshot
-synchronization to five minutes. The
+synchronization to 15 minutes with five-minute processing passes. The
 [App Store workflow](../../../.github/workflows/ios-appstore-deploy.yml) generates
 screenshots and invokes `deploy_appstore_full`; it has no creative-asset input or
 upload step of its own; header upload now runs inside `deploy_appstore_full`.
