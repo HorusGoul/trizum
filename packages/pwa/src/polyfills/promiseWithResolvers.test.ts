@@ -3,7 +3,7 @@ import { expect, test } from "vite-plus/test";
 
 test("initializes the real worker proxy without native Promise.withResolvers", () => {
   // A separate realm prevents changing Promise for concurrently running tests.
-  const proxyUrl = new URL("./proxy.ts", import.meta.url).href;
+  const proxyUrl = new URL("../lib/appWorker/proxy.ts", import.meta.url).href;
 
   const output = execFileSync(
     process.execPath,
@@ -46,7 +46,7 @@ test("initializes the real worker proxy without native Promise.withResolvers", (
 });
 
 test("preserves native Promise.withResolvers", () => {
-  const compatibilityUrl = new URL("./promiseCompatibility.ts", import.meta.url).href;
+  const compatibilityUrl = new URL("./promiseWithResolvers.ts", import.meta.url).href;
 
   const output = execFileSync(
     process.execPath,

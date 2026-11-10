@@ -1,4 +1,4 @@
-import "./promiseCompatibility.ts";
+import "../../polyfills/promiseWithResolvers.ts";
 import { defineProxy } from "comctx";
 import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts";
 
