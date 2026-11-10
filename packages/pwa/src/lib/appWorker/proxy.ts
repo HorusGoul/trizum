@@ -1,3 +1,4 @@
+import "./promiseCompatibility.ts";
 import { defineProxy } from "comctx";
 import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts";
 
