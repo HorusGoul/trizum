@@ -137,10 +137,15 @@ Sentry on import.
 
 In general:
 
-- `error` logs are the main candidates for Sentry,
-- `warning` logs may go to Sentry only when they represent a serious operational
-  risk,
-- and `debug` or routine `info` logs should stay out of Sentry.
+- Send `warning`, `error`, and `fatal` records to Sentry wherever its SDK is enabled.
+- Warnings appear in Sentry Logs; errors and fatal records also create Sentry issues.
+- Keep `debug` and `info` records out of the Sentry sink. Console thresholds remain
+  runtime-specific.
+
+The PWA (including native wrappers) and sync server use `sentryLoggerConfig`
+from `@trizum/logging/sentry` for this routing policy. Runtime entry points still
+own SDK initialization and environment gates; console-only runtimes do not
+initialize Sentry.
 
 ## Ownership And Configuration
 
