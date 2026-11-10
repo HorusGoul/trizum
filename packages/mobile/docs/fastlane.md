@@ -86,6 +86,13 @@ are documented in the [creative generation guide](../../screenshots/docs/creativ
 | `upload_screenshots`     | Upload screenshots only                                                       |
 | `upload_creative_assets` | Upload selected header/search images or videos and attach them to the release |
 
+Screenshot synchronization polls Apple every 30 seconds. After five minutes of
+processing, incomplete screenshots enter Fastlane's delete-and-reupload retry
+path; completed screenshots are preserved. The entire synchronization has a
+15-minute limit, so persistent Apple processing failures still stop deployment
+before review submission. Timeout logs identify the affected screenshot IDs,
+filenames, and states.
+
 The creative asset lane defaults to the native project's version. Use
 `upload_creative_assets app_version:1.14.0 preflight:true` to validate the selected
 file checksums and inspect Apple's current specifications, target localizations,
