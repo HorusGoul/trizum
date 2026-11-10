@@ -1,5 +1,13 @@
 # @trizum/mobile
 
+## 1.13.5
+
+### Patch Changes
+
+- [#615](https://github.com/HorusGoul/trizum/pull/615) [`a9f2269`](https://github.com/HorusGoul/trizum/commit/a9f22695da66ba1d4c673a10c0b79a7dd0111c96) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Retry App Store screenshots that stall during processing so iOS releases can recover without re-uploading completed screenshots.
+- Updated dependencies []:
+  - @trizum/pwa@1.13.5
+
 ## 1.13.4
 
 ### Patch Changes

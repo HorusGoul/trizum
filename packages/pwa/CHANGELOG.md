@@ -1,5 +1,9 @@
 # @trizum/pwa
 
+## 1.13.5
+
+No changes in this release.
+
 ## 1.13.4
 
 ### Patch Changes
