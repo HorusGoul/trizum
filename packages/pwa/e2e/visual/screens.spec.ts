@@ -4,12 +4,17 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { expect, type Page, type Route } from "@playwright/test";
 import { createBrowserHarness, test, type BrowserHarness } from "../harness/trizum.fixture";
-import { createImbalancedPartyFixture, defaultParticipants } from "../harness/scenarios";
+import {
+  createImbalancedPartyFixture,
+  createPaymentPartyFixture,
+  defaultParticipants,
+} from "../harness/scenarios";
 
 type Screen =
   | "home"
   | "create-party"
   | "user-settings"
+  | "pay"
   | "expenses"
   | "balances"
   | "party-settings"
@@ -21,6 +26,7 @@ const screens: Screen[] = [
   "home",
   "create-party",
   "user-settings",
+  "pay",
   "expenses",
   "balances",
   "party-settings",
@@ -86,7 +92,7 @@ async function prepare(page: Page, harness: BrowserHarness, screen: Screen, loca
 
   if (partyScreen) {
     const party = await harness.seedJoinedParty({
-      fixture: createImbalancedPartyFixture(),
+      fixture: screen === "pay" ? createPaymentPartyFixture() : createImbalancedPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
 
@@ -108,7 +114,7 @@ async function prepare(page: Page, harness: BrowserHarness, screen: Screen, loca
   } else {
     await harness.seedPartyList({
       username: "Alex Rivera",
-      phone: "",
+      phone: screen === "user-settings" ? "+34612345678" : "",
       locale,
       hue: locale === "es" ? 150 : 250,
       autoOpenCalculator: false,
@@ -130,6 +136,10 @@ async function prepare(page: Page, harness: BrowserHarness, screen: Screen, loca
     if (screen === "balances") await harness.gotoParty(partyId, "balances");
     else if (screen === "party-settings") await harness.goto(`/party/${partyId}/settings`);
     else if (screen === "expense-form") await harness.goto(`/party/${partyId}/add`);
+    else if (screen === "pay")
+      await harness.goto(
+        `/party/${partyId}/pay?fromId=${defaultParticipants.blair.id}&toId=${defaultParticipants.alex.id}&amount=3000`,
+      );
     else {
       await harness.gotoParty(partyId);
       await expect(page.getByText("Cabin groceries").first()).toBeVisible();
@@ -172,19 +182,23 @@ async function prepare(page: Page, harness: BrowserHarness, screen: Screen, loca
     await expect(page.getByRole("dialog")).toContainText(labels.settings);
   else {
     const heading =
-      screen === "home"
-        ? labels.home
-        : screen === "create-party"
-          ? labels.create
-          : screen === "user-settings"
-            ? labels.settings
-            : screen === "party-settings"
-              ? labels.partySettings
-              : screen === "expense-form"
-                ? labels.expense
-                : screen === "expense-detail"
-                  ? "Cabin groceries"
-                  : /Weekend trip/;
+      screen === "pay"
+        ? locale === "es"
+          ? "Pagar"
+          : "Pay"
+        : screen === "home"
+          ? labels.home
+          : screen === "create-party"
+            ? labels.create
+            : screen === "user-settings"
+              ? labels.settings
+              : screen === "party-settings"
+                ? labels.partySettings
+                : screen === "expense-form"
+                  ? labels.expense
+                  : screen === "expense-detail"
+                    ? "Cabin groceries"
+                    : /Weekend trip/;
 
     await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
   }

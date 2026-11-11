@@ -8,10 +8,13 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
+import { Alert, AlertDescription } from "@trizum/ui/Alert";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { toast } from "sonner";
-import { BizumItem } from "./-components/BizumItem.js";
+import { PaymentMethodItem } from "./-components/PaymentMethodItem.tsx";
+import { getPaymentMethods } from "#src/lib/paymentMethods.ts";
+import { paymentMethodTypes } from "#src/models/paymentMethod.ts";
 import { CashItem } from "./-components/CashItem.js";
 
 interface PaySearchParams {
@@ -38,15 +41,6 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
   },
 });
 
-type PaymentMethod =
-  | {
-      type: "bizum";
-      phoneNumber: string;
-    }
-  | {
-      type: "cash";
-    };
-
 function RouteComponent() {
   const { fromId, toId, amount } = Route.useSearch();
   const { party, addExpenseToParty } = useCurrentParty();
@@ -58,10 +52,8 @@ function RouteComponent() {
   const fromName = from.name;
   const toName = to.name;
 
-  const methods: PaymentMethod[] = [
-    to.phone ? { type: "bizum", phoneNumber: to.phone } : null,
-    { type: "cash" },
-  ].filter((method): method is PaymentMethod => !!method);
+  const methods = getPaymentMethods(to);
+  const hasPaymentDetails = paymentMethodTypes.some((type) => methods[type]?.trim());
 
   function onMarkAsPaid() {
     const expensePromise = addExpenseToParty({
@@ -121,7 +113,7 @@ function RouteComponent() {
           </div>
         </div>
 
-        <Button color="accent" className="font-semibold" onPress={onMarkAsPaid}>
+        <Button color="accent" className="min-h-12 font-semibold" onPress={onMarkAsPaid}>
           <Icon icon="lucide.circle-check" width={20} height={20} className="mr-2" />
           <Trans>Mark as paid</Trans>
         </Button>
@@ -131,26 +123,28 @@ function RouteComponent() {
         </h2>
 
         <p className="text-lg">
-          <Trans>
-            Here&apos;s a list of ways you can pay, once done, press the button above to mark the
-            expense as paid in this trizum party.
-          </Trans>
+          <Trans>Send the money using one of the methods below, then mark this debt as paid.</Trans>
         </p>
 
-        {methods.map((method) => {
-          let element;
+        {hasPaymentDetails ? (
+          <Alert variant="info" role="note" className="py-2">
+            <Icon icon="lucide.info" />
+            <AlertDescription>
+              <Trans>Hold to copy payment details.</Trans>
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
-          switch (method.type) {
-            case "bizum":
-              element = <BizumItem phoneNumber={method.phoneNumber} />;
-              break;
-            case "cash":
-              element = <CashItem />;
-              break;
-          }
+        <div className="divide-accent-100 dark:divide-accent-800 divide-y rounded-xl">
+          {paymentMethodTypes.map((type) => {
+            const details = methods[type];
 
-          return <div key={method.type}>{element}</div>;
-        })}
+            return details?.trim() ? (
+              <PaymentMethodItem key={type} type={type} details={details} />
+            ) : null;
+          })}
+          <CashItem />
+        </div>
       </div>
 
       <div className="h-16 shrink-0" />

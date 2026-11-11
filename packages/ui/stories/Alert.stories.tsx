@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Compose AlertTitle and AlertDescription inside the semantic alert. Destructive is the existing error treatment.",
+          "Compose AlertTitle and AlertDescription inside the semantic alert. Info colors the icon with the accent palette; destructive provides the error treatment.",
       },
     },
   },
@@ -22,6 +22,16 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <Alert>
+      <Icon icon="lucide.info" />
+      <AlertTitle>Information</AlertTitle>
+      <AlertDescription>Your changes are saved locally.</AlertDescription>
+    </Alert>
+  ),
+};
+
+export const Info: Story = {
+  render: () => (
+    <Alert variant="info">
       <Icon icon="lucide.info" />
       <AlertTitle>Information</AlertTitle>
       <AlertDescription>Your changes are saved locally.</AlertDescription>

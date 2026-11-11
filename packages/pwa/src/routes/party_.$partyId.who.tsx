@@ -68,6 +68,7 @@ function Who() {
       trackEvent("party_joined");
       setParticipantDetails(participant.id, {
         phone: partyList.phone,
+        paymentMethods: partyList.paymentMethods ? { ...partyList.paymentMethods } : undefined,
         avatarId: partyList.avatarId,
       });
 
