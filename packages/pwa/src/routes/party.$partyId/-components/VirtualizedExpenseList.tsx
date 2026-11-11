@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { List, useDynamicRowHeight, useListRef, type RowComponentProps } from "react-window";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
 import type { Expense } from "#src/models/expense.js";
@@ -63,17 +63,33 @@ export function VirtualizedExpenseList({
   loadNext: () => void;
 }) {
   const listRef = useListRef(null);
+  const scrollRestorationCache = useScrollRestorationCache(`party-${partyId}-expense-list`);
 
   const rowHeight = useDynamicRowHeight({
     defaultRowHeight: EXPENSE_LIST_DEFAULT_ROW_HEIGHT,
     key: partyId,
+    initialRowHeights: expenses.map(
+      (expense) =>
+        scrollRestorationCache.initialRowHeights.get(expense.id) ?? EXPENSE_LIST_DEFAULT_ROW_HEIGHT,
+    ),
   });
 
-  const scrollRestorationCache = useScrollRestorationCache(`party-${partyId}-expense-list`);
   const loaderIndex = hasNext ? expenses.length : -1;
   const spacerIndex = expenses.length + (hasNext ? 1 : 0);
   const rowCount = spacerIndex + 1;
   const requestedNextPageRef = useRef(false);
+
+  // Restore pixels against the same measured layout, keyed by expense rather than row index.
+  useEffect(() => {
+    scrollRestorationCache.setRowHeights(
+      new Map(
+        expenses.map((expense, index) => [
+          expense.id,
+          rowHeight.getRowHeight(index) ?? EXPENSE_LIST_DEFAULT_ROW_HEIGHT,
+        ]),
+      ),
+    );
+  }, [expenses, rowHeight, scrollRestorationCache]);
 
   return (
     <div className="min-h-0 flex-1">
