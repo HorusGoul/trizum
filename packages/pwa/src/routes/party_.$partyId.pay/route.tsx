@@ -127,7 +127,7 @@ function RouteComponent() {
         </p>
 
         {hasPaymentDetails ? (
-          <Alert role="note" className="py-2">
+          <Alert variant="info" role="note" className="py-2">
             <Icon icon="lucide.info" />
             <AlertDescription>
               <Trans>Hold to copy payment details.</Trans>
