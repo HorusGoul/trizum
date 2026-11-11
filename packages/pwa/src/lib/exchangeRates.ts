@@ -5,18 +5,6 @@ import type { CurrencyCode } from "./money";
 
 export const EXCHANGE_RATES_REFRESH_MS = 6 * 60 * 60 * 1000;
 
-/** The table is quoted per party-currency unit; expenses need the inverse direction. */
-export function getExchangeRate(table: ExchangeRates, from: CurrencyCode) {
-  const quote = table.rates[from];
-
-  if (!quote) return undefined;
-  const rate = 1 / quote.rate;
-
-  if (!Number.isFinite(rate) || rate <= 0) return undefined;
-
-  return { rate, date: quote.date };
-}
-
 export function createExchangeRatesStore(
   base: CurrencyCode,
   {

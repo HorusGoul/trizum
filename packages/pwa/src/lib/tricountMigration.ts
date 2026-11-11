@@ -1,5 +1,6 @@
 import { isCurrencyCode } from "./money";
 import { getLogger } from "#src/lib/log.js";
+import type { Expense } from "#src/models/expense.js";
 import type {
   MigrationData,
   MigrationExpenseShare,

@@ -4,6 +4,18 @@ import type { CurrencyCode } from "./money";
 
 const bundledTable = exchangeRatesSchema.parse(snapshot);
 
+/** The table is quoted per party-currency unit; expenses need the inverse direction. */
+export function getExchangeRate(table: ExchangeRates, from: CurrencyCode) {
+  const quote = table.rates[from];
+
+  if (!quote) return undefined;
+  const rate = 1 / quote.rate;
+
+  if (!Number.isFinite(rate) || rate <= 0) return undefined;
+
+  return { rate, date: quote.date };
+}
+
 /** Rebase the compact bundled seed to the party currency before exposing it. */
 export function getBundledExchangeRates(base: CurrencyCode): ExchangeRates {
   if (base === bundledTable.base) return bundledTable;

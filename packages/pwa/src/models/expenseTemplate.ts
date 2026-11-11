@@ -1,8 +1,7 @@
 import { convertFromUnits, convertToUnits, type ExpenseUser } from "#src/lib/expenses.ts";
 import type { CurrencyCode } from "#src/lib/money.ts";
 import type { ExchangeRates } from "#src/lib/api/exchangeRatesContract.ts";
-import { getExchangeRate } from "#src/lib/exchangeRates.ts";
-import { getBundledExchangeRates } from "#src/lib/exchangeRateTables.ts";
+import { getExchangeRate, getBundledExchangeRates } from "#src/lib/exchangeRateTables.ts";
 import { convertExpenseAmount, type ExpenseConversionValues } from "#src/lib/currencyConversion.ts";
 import { getExpenseEditorStoredValues } from "#src/lib/expenseEditorCurrency.ts";
 import type { Expense } from "#src/models/expense.ts";

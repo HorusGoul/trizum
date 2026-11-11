@@ -9,7 +9,7 @@ import { CurrencyField } from "./CurrencyField";
 import type { CurrencyFieldProps } from "./CurrencyField";
 import { CurrencySelect } from "./CurrencySelect";
 import { useExchangeRates } from "../hooks/useExchangeRates";
-import { getExchangeRate } from "../lib/exchangeRates";
+import { getExchangeRate } from "../lib/exchangeRateTables";
 import { convertExpenseAmount } from "../lib/currencyConversion";
 import { convertToUnits } from "../lib/expenses";
 

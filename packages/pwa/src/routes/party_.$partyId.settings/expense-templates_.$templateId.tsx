@@ -9,7 +9,7 @@ import { CurrencyField } from "#src/components/CurrencyField.tsx";
 import { CurrencySelect } from "#src/components/CurrencySelect.tsx";
 import { CurrencyContext } from "#src/components/CurrencyContext.tsx";
 import { useExchangeRates } from "#src/hooks/useExchangeRates.ts";
-import { getExchangeRate } from "#src/lib/exchangeRates.ts";
+import { getExchangeRate } from "#src/lib/exchangeRateTables.ts";
 import { EmojiPicker } from "#src/components/EmojiPicker.tsx";
 import { ExpenseParticipantsSection } from "#src/components/ExpenseEditor.tsx";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.ts";

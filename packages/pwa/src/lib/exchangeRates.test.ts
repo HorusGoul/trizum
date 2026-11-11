@@ -1,10 +1,6 @@
-import { getBundledExchangeRates } from "./exchangeRateTables";
+import { getBundledExchangeRates, getExchangeRate } from "./exchangeRateTables";
 import { describe, expect, test, vi } from "vite-plus/test";
-import {
-  createExchangeRatesStore,
-  EXCHANGE_RATES_REFRESH_MS,
-  getExchangeRate,
-} from "./exchangeRates";
+import { createExchangeRatesStore, EXCHANGE_RATES_REFRESH_MS } from "./exchangeRates";
 import type { ExchangeRates } from "./api/exchangeRatesContract";
 
 const table: ExchangeRates = {
