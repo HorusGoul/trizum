@@ -5,6 +5,7 @@ import { configurePwaLogging } from "../src/lib/log";
 import app from "./worker";
 
 configurePwaLogging({
+  reset: true,
   consoleFormat: "json",
   lowestLevel: "info",
   extraSinks: { sentry: getSentrySink() },
