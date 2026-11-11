@@ -62,6 +62,8 @@ test.describe("Expense templates", () => {
     test.setTimeout(60_000);
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 390, height: 844 });
+    // Install before navigation: Motion captures requestAnimationFrame at import time.
+    await page.clock.install();
 
     const seededParty = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
@@ -75,17 +77,17 @@ test.describe("Expense templates", () => {
     await harness.navigate(`/party/${seededParty.partyId}`);
 
     await expect(page.getByText("Expense template created")).toBeHidden();
-    await page.clock.install();
 
     for (let cycle = 0; cycle < 8; cycle++) {
       // Drive every frame explicitly so a busy CI runner cannot skip the whole transition.
       await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
 
       // Record actual motion on every complete open/close cycle.
-      const framesPromise = page.evaluate(async () => {
+      const capture = await page.evaluateHandle(() => {
         const frames: { time: number; y: number; height: number; opacity: number }[] = [];
         const start = performance.now();
-        await new Promise<void>((resolve) => {
+
+        const result = new Promise<typeof frames>((resolve) => {
           const sample = () => {
             const container = document.querySelector(".react-modal-sheet-container");
             const backdrop = document.querySelector(".react-modal-sheet-backdrop");
@@ -107,20 +109,25 @@ test.describe("Expense templates", () => {
               (!latest || latest.opacity < 1 || latest.y !== 0 || frames.length < 3)
             )
               requestAnimationFrame(sample);
-            else resolve();
+            else resolve(frames);
           };
 
           requestAnimationFrame(sample);
         });
 
-        return frames;
+        return { frames: result };
       });
 
       // The paused clock cannot supply Playwright's actionability frames.
       await page.getByRole("button", { name: "Add an expense" }).click({ force: true });
-      // The sampler can run for 2000ms; advance past its deadline so awaiting it cannot deadlock.
-      await page.clock.runFor(2100);
-      const frames = await framesPromise;
+
+      // Advance through the sampler's deadline, including its final animation frame.
+      const [frames] = await Promise.all([
+        capture.evaluate((capture) => capture.frames),
+        page.clock.runFor(2016),
+      ]);
+
+      await capture.dispose();
 
       await test.info().attach(`open-cycle-${cycle}-frames`, {
         body: JSON.stringify(frames),
@@ -162,6 +169,7 @@ test.describe("Expense templates", () => {
   }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 390, height: 844 });
+    await page.clock.install();
 
     const party = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
@@ -174,34 +182,26 @@ test.describe("Expense templates", () => {
     const container = page.locator(".react-modal-sheet-container");
     const backdrop = page.locator(".react-modal-sheet-backdrop");
     await expect(backdrop).toHaveCSS("opacity", "1");
+    await expect
+      .poll(() =>
+        container.evaluate((panel) => new DOMMatrixReadOnly(getComputedStyle(panel).transform).m42),
+      )
+      .toBe(0);
 
-    await backdrop.click({ position: { x: 20, y: 20 } });
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
 
-    const trace = await page
+    // Register before dismissal; protocol latency must not consume the interruption window.
+    const capture = await page
       .getByRole("button", { name: "Add an expense", exact: true, includeHidden: true })
-      .evaluate(async (button) => {
+      .evaluateHandle((button) => {
         const backdrop = document.querySelector(".react-modal-sheet-backdrop");
 
         if (!(button instanceof HTMLElement) || !(backdrop instanceof HTMLElement))
           throw new Error("Expected sheet controls");
         const frames: { y: number; height: number }[] = [];
-        await new Promise<void>((resolve) => {
-          const waitForClosing = () => {
-            const panel = document.querySelector(".react-modal-sheet-container");
+        const start = performance.now();
 
-            if (!panel) throw new Error("Sheet closed before interruption");
-            const y = new DOMMatrixReadOnly(getComputedStyle(panel).transform).m42;
-            const height = panel.getBoundingClientRect().height;
-
-            if (y > height * 0.2 && y < height * 0.8) {
-              button.click();
-              resolve();
-            } else requestAnimationFrame(waitForClosing);
-          };
-
-          requestAnimationFrame(waitForClosing);
-        });
-        await new Promise<void>((resolve) => {
+        const result = new Promise<typeof frames>((resolve, reject) => {
           const sample = () => {
             const panel = document.querySelector(".react-modal-sheet-container");
 
@@ -213,14 +213,49 @@ test.describe("Expense templates", () => {
             else frames.push({ y: Infinity, height: 0 });
 
             if (frames.length < 45) requestAnimationFrame(sample);
-            else resolve();
+            else resolve(frames);
           };
 
-          requestAnimationFrame(sample);
+          const waitForClosing = () => {
+            const panel = document.querySelector(".react-modal-sheet-container");
+
+            if (!panel) {
+              reject(new Error("Sheet closed before interruption"));
+
+              return;
+            }
+
+            if (performance.now() - start >= 1000) {
+              reject(new Error("Sheet did not enter the closing range"));
+
+              return;
+            }
+
+            const y = new DOMMatrixReadOnly(getComputedStyle(panel).transform).m42;
+            const height = panel.getBoundingClientRect().height;
+
+            if (y > height * 0.2 && y < height * 0.8) {
+              button.click();
+              requestAnimationFrame(sample);
+            } else requestAnimationFrame(waitForClosing);
+          };
+
+          requestAnimationFrame(waitForClosing);
         });
 
-        return frames;
+        return { frames: result };
       });
+
+    // A paused clock cannot supply the actionability frames for a normal click.
+    await backdrop.click({ force: true, position: { x: 20, y: 20 } });
+
+    const [trace] = await Promise.all([
+      capture.evaluate((capture) => capture.frames),
+      page.clock.runFor(2016),
+    ]);
+
+    await capture.dispose();
+    await page.clock.resume();
 
     expect(trace.every((frame) => frame.y < frame.height - 2)).toBe(true);
     expect(trace.filter((frame) => frame.y > 1).length).toBeGreaterThan(2);

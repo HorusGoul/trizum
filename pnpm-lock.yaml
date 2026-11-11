@@ -431,8 +431,10 @@ overrides:
   vitest@*: 5.0.5
 
 patchedDependencies:
+  '@automerge/automerge-repo@2.5.6': a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019
   '@capacitor-community/admob@8.2.1': 15953e1082871e5c959242e397a132e2d2a806c5145380e2a872b5fb98f4d93d
   react-modal-sheet@5.6.0: 7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245
+  sonner@2.0.8: 1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db
   vite-plugin-top-level-await@1.6.0: c1bf42ffb0231cba0eb2749d8dafd670e84b4e23e60ac3e49a14033034352cc2
 
 importers:
@@ -653,7 +655,7 @@ importers:
         version: link:../logging
       '@trizum/pwa':
         specifier: workspace:*
-        version: file:packages/pwa(@libsql/client@0.18.0)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.11)(kysely@0.29.2)(supports-color@10.2.2)(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-preview@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5(vitest@5.0.5))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.5)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.1))(jsdom@30.1.3(@noble/hashes@2.4.0)))
+        version: file:packages/pwa(@libsql/client@0.18.0)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.11)(kysely@0.29.2)(supports-color@10.2.2)(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-preview@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5(vitest@5.0.5))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.5)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.1))(jsdom@30.1.3(@noble/hashes@2.4.0)))(wrangler@4.156.1(@types/node@26.6.5))
       capacitor-plugin-safe-area:
         specifier: 'catalog:'
         version: 5.0.1(@capacitor/core@8.5.3)
@@ -693,7 +695,7 @@ importers:
         version: 3.5.0
       '@automerge/automerge-repo':
         specifier: 'catalog:'
-        version: 2.5.6(supports-color@10.2.2)
+        version: 2.5.6(patch_hash=a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019)(supports-color@10.2.2)
       '@automerge/automerge-repo-network-messagechannel':
         specifier: 'catalog:'
         version: 2.5.6(supports-color@10.2.2)
@@ -757,6 +759,9 @@ importers:
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
         version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+      '@sentry/cloudflare':
+        specifier: 10.76.2
+        version: 10.76.2(wrangler@4.156.1(@types/node@26.6.5))
       '@sentry/react':
         specifier: 'catalog:'
         version: 10.76.2(react@19.3.1)
@@ -855,7 +860,7 @@ importers:
         version: 2.5.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       sonner:
         specifier: 'catalog:'
-        version: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       ulidx:
         specifier: 'catalog:'
         version: 2.4.1
@@ -1033,12 +1038,18 @@ importers:
 
   packages/screenshots:
     dependencies:
+      '@fontsource-variable/inter':
+        specifier: 'catalog:'
+        version: 5.3.0
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
       playwright:
         specifier: 'catalog:'
         version: 1.64.1
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
     devDependencies:
       '@trizum/tsconfig':
         specifier: workspace:*
@@ -1057,7 +1068,7 @@ importers:
         version: 3.5.0
       '@automerge/automerge-repo':
         specifier: 'catalog:'
-        version: 2.5.6(supports-color@10.2.2)
+        version: 2.5.6(patch_hash=a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019)(supports-color@10.2.2)
       '@automerge/automerge-repo-network-websocket':
         specifier: 'catalog:'
         version: 2.5.6(supports-color@10.2.2)
@@ -1227,7 +1238,7 @@ importers:
         version: 5.6.0(patch_hash=7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245)(motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       sonner:
         specifier: 'catalog:'
-        version: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.7.0
@@ -4973,6 +4984,18 @@ packages:
     resolution: {integrity: sha512-JbB/UTBPRQREkI6CaxD8Cs0ppNc3YT8CROgRV7WeaqPn7mZOAgTYqtcxiW/OF7OquOIHUd0u6gu2vL+g5ITdHQ==}
     engines: {node: '>= 18'}
     hasBin: true
+
+  '@sentry/cloudflare@10.76.2':
+    resolution: {integrity: sha512-6t9kG3gkBGYUAugNhaiUZA8IcU56C1ul6oVYjoRPUUomTHVIDK2vBVq5ZqBWAZiYSO34GJU9x+OMulz+vzIzpg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@cloudflare/workers-types': ^4.x || ^5.x
+      wrangler: ^4.x
+    peerDependenciesMeta:
+      '@cloudflare/workers-types':
+        optional: true
+      wrangler:
+        optional: true
 
   '@sentry/conventions@0.16.0':
     resolution: {integrity: sha512-fO9PLmHdVURcSPUpWCItWAtgKiMwGdJHbovoSEyLplX5sxs2ugvI4CBPTrkkgqhObnZOD0CnWBKDzSVQYBKEyQ==}
@@ -10543,7 +10566,7 @@ snapshots:
 
   '@automerge/automerge-repo-network-messagechannel@2.5.6(supports-color@10.2.2)':
     dependencies:
-      '@automerge/automerge-repo': 2.5.6(supports-color@10.2.2)
+      '@automerge/automerge-repo': 2.5.6(patch_hash=a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019)(supports-color@10.2.2)
       debug: 4.4.3(supports-color@10.2.2)
       eventemitter3: 5.0.4
     transitivePeerDependencies:
@@ -10551,7 +10574,7 @@ snapshots:
 
   '@automerge/automerge-repo-network-websocket@2.5.6(supports-color@10.2.2)':
     dependencies:
-      '@automerge/automerge-repo': 2.5.6(supports-color@10.2.2)
+      '@automerge/automerge-repo': 2.5.6(patch_hash=a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019)(supports-color@10.2.2)
       cbor-x: 1.6.4
       debug: 4.4.3(supports-color@10.2.2)
       eventemitter3: 5.0.4
@@ -10564,11 +10587,11 @@ snapshots:
 
   '@automerge/automerge-repo-storage-indexeddb@2.5.6(supports-color@10.2.2)':
     dependencies:
-      '@automerge/automerge-repo': 2.5.6(supports-color@10.2.2)
+      '@automerge/automerge-repo': 2.5.6(patch_hash=a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019)(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@automerge/automerge-repo@2.5.6(supports-color@10.2.2)':
+  '@automerge/automerge-repo@2.5.6(patch_hash=a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019)(supports-color@10.2.2)':
     dependencies:
       '@automerge/automerge': 3.5.0
       bs58check: 3.0.1
@@ -13770,6 +13793,15 @@ snapshots:
       '@sentry/cli-win32-i686': 3.8.2
       '@sentry/cli-win32-x64': 3.8.2
 
+  '@sentry/cloudflare@10.76.2(wrangler@4.156.1(@types/node@26.6.5))':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@sentry/core': 10.76.2
+      '@sentry/server-utils': 10.76.2
+      magic-string: 0.30.21
+    optionalDependencies:
+      wrangler: 4.156.1(@types/node@26.6.5)
+
   '@sentry/conventions@0.16.0': {}
 
   '@sentry/core@10.76.2':
@@ -14264,10 +14296,10 @@ snapshots:
       bs58check: 4.0.0
       zod: 4.6.7
 
-  '@trizum/pwa@file:packages/pwa(@libsql/client@0.18.0)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.11)(kysely@0.29.2)(supports-color@10.2.2)(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-preview@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5(vitest@5.0.5))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.5)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.1))(jsdom@30.1.3(@noble/hashes@2.4.0)))':
+  '@trizum/pwa@file:packages/pwa(@libsql/client@0.18.0)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.11)(kysely@0.29.2)(supports-color@10.2.2)(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-preview@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5(vitest@5.0.5))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.5)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.1))(jsdom@30.1.3(@noble/hashes@2.4.0)))(wrangler@4.156.1(@types/node@26.6.5))':
     dependencies:
       '@automerge/automerge': 3.5.0
-      '@automerge/automerge-repo': 2.5.6(supports-color@10.2.2)
+      '@automerge/automerge-repo': 2.5.6(patch_hash=a429e3298e1f3fec34f5cb9db576d8f79414c418d4677b0afe84c8b17a748019)(supports-color@10.2.2)
       '@automerge/automerge-repo-network-messagechannel': 2.5.6(supports-color@10.2.2)
       '@automerge/automerge-repo-network-websocket': 2.5.6(supports-color@10.2.2)
       '@automerge/automerge-repo-storage-indexeddb': 2.5.6(supports-color@10.2.2)
@@ -14289,6 +14321,7 @@ snapshots:
       '@opentf/std': '@jsr/opentf__std@0.12.0'
       '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+      '@sentry/cloudflare': 10.76.2(wrangler@4.156.1(@types/node@26.6.5))
       '@sentry/react': 10.76.2(react@19.3.1)
       '@sentry/vite-plugin': 5.4.1(rollup@4.65.1)(supports-color@10.2.2)
       '@takker/md5': '@jsr/takker__md5@0.1.0'
@@ -14321,7 +14354,7 @@ snapshots:
       react-dom: 19.3.1(react@19.3.1)
       react-modal-sheet: 5.6.0(patch_hash=7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245)(motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-window: 2.5.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      sonner: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      sonner: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       ulidx: 2.4.1
       workbox-build: 7.4.1(@types/babel__core@7.20.5)(supports-color@10.2.2)
       workbox-window: 7.4.1
@@ -14383,6 +14416,7 @@ snapshots:
       - vitest
       - vue
       - webpack
+      - wrangler
 
   '@trizum/react-suspense-cache@file:packages/react-suspense-cache(react@19.3.1)':
     dependencies:
@@ -14422,7 +14456,7 @@ snapshots:
       react-aria-components: 1.19.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-dom: 19.3.1(react@19.3.1)
       react-modal-sheet: 5.6.0(patch_hash=7ae15007fbe19f50887fefef774650357ea8e06df36290055526fd60ebce9245)(motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      sonner: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      sonner: 2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       tailwind-merge: 3.7.0
       tailwindcss: 4.3.3
       tailwindcss-animate: 1.0.7(tailwindcss@4.3.3)
@@ -18590,7 +18624,7 @@ snapshots:
 
   smob@1.5.0: {}
 
-  sonner@2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  sonner@2.0.8(patch_hash=1180c7f365fc7cf31518e46b334f7092fceb493440a656a471a8b71fdc3e31db)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)

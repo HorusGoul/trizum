@@ -140,3 +140,39 @@ category, and request method, redacted path, status, and duration properties.
 There should be no formatter-generated `%c`/`%o`, CSS styles, or ANSI escapes.
 Formatting does not itself redact sensitive values; see the
 [logging policy](../../../docs/logging.md).
+
+### Sentry
+
+[`api/sentryWorker.ts`](../api/sentryWorker.ts) configures LogTape for the Worker. The Cloudflare Sentry Vite plugin wraps the
+Hono app using options from [`api/instrument.server.ts`](../api/instrument.server.ts) with
+[`@sentry/cloudflare`](https://docs.sentry.io/platforms/javascript/guides/cloudflare/).
+It captures unhandled Hono errors (excluding expected 3xx/4xx HTTP exceptions),
+request traces, and outbound fetch/D1 spans. The SDK flushes through `waitUntil`.
+LogTape warnings go to Sentry Logs; errors also create issues. Info request
+completion logs remain in Cloudflare. Shared document-ID redaction covers SDK
+payloads and the LogTape sink. User identity, headers, bodies, and query
+parameters are excluded from SDK data collection.
+
+Production builds use the dedicated `trizum-worker` Sentry project with
+`runtime:cloudflare-worker`. Local development disables delivery. Builds also
+honor `VITE_APP_DISABLE_SENTRY=true`, keeping CI browser journeys out of Sentry. Worker bindings
+configure `SENTRY_DSN` (a public DSN stored in `vars`) and `SENTRY_ENVIRONMENT`; `SENTRY_ENABLED=false` disables
+delivery. Set the environment binding to `preview` for preview deployments that
+should be distinguished from production. `CF_VERSION_METADATA` identifies the
+Worker release. Builds inject debug IDs into both client and Worker output and
+upload their source maps when `SENTRY_AUTH_TOKEN` is available.
+
+After deployment, verify traces for `/api/health` in Sentry with the runtime tag.
+Exercise a failing dependency on a disposable preview and verify its error issue
+and structured log, with document IDs redacted. Local tests do not prove remote
+ingestion or source-map upload.
+
+The installed SDK requires `_experimental.autoInstrumentation` and
+`_experimental.useDiagnosticsChannelInjection` to enable the Vite plugin
+features. Both are enabled explicitly; the plugin is excluded from tests.
+`SENTRY_AUTH_TOKEN` remains a CI secret and is never deployed to the Worker.
+
+PR preview deployments set `SENTRY_ENVIRONMENT=preview` and upload source maps
+using the CI token. `POST /api/observability-check` emits a warning and throws a
+fixed test error in that environment, exercising Hono error capture without
+accessing user data or external services. It returns 404 in other environments.

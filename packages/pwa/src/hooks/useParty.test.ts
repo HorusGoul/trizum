@@ -195,6 +195,28 @@ describe("getPartyHelpers", () => {
     expect(partyHandle.doc().participants.bob?.alwaysUseDefaultExpenseTemplate).toBeUndefined();
   });
 
+  test("shares and removes receiving methods for only the selected participant", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    helpers.setParticipantDetails("alice", {
+      phone: "+34612345678",
+      paymentMethods: {
+        bizum: "+34612345678",
+        paypal: "https://paypal.me/Alice123",
+        other: "Wise: alice@example.com",
+      },
+    });
+    expect(partyHandle.doc().participants.alice?.paymentMethods).toEqual({
+      bizum: "+34612345678",
+      paypal: "https://paypal.me/Alice123",
+      other: "Wise: alice@example.com",
+    });
+    expect(partyHandle.doc().participants.bob?.paymentMethods).toBeUndefined();
+
+    helpers.setParticipantDetails("alice", { phone: "", paymentMethods: {} });
+    expect(partyHandle.doc().participants.alice?.paymentMethods).toEqual({});
+    expect(partyHandle.doc().participants.alice?.name).toBe("Alice");
+  });
+
   test("clears the default when deleting its expense template", () => {
     const { helpers, partyHandle } = createPartyHelpers();
     const template = createExpenseTemplate("groceries");

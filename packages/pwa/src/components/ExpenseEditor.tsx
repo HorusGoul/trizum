@@ -31,6 +31,7 @@ import type { MediaFile } from "#src/models/media.ts";
 import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 import {
   compressionPresets,
+  ImageProcessingError,
   imageCaptureAccept,
   imageUploadAccept,
 } from "#src/lib/imageCompression.ts";
@@ -994,7 +995,10 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
 
       toast.dismiss(toastId);
     } catch (error) {
-      logger.error("Failed to upload expense attachment", { error });
+      logger.error("Failed to upload expense attachment", {
+        error,
+        ...(error instanceof ImageProcessingError ? error.diagnostics : undefined),
+      });
       toast.error(getImageUploadErrorMessage(error) ?? t`Failed to upload, please try again`, {
         id: toastId,
       });

@@ -17,7 +17,8 @@ For repo-wide guidance on what to log and which severity level to use, see
   configuration helpers.
 - [`src/github-actions.ts`](./src/github-actions.ts) contains the GitHub
   Actions annotation sink entrypoint.
-- [`src/sentry.ts`](./src/sentry.ts) exports `sentryDocumentIdRedaction` from
+- [`src/sentry.ts`](./src/sentry.ts) exports `sentryLoggerConfig` for the
+  [Sentry routing policy](../../docs/logging.md#sentry) and `sentryDocumentIdRedaction` from
   `@trizum/logging/sentry`. Spread it into `Sentry.init()` to sanitize errors,
   breadcrumbs, logs, spans, and transactions that bypass LogTape sinks.
   When supplying other integrations, append

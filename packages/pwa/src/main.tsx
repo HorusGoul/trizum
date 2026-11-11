@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+import { createRecoveringStorage } from "./lib/recoveringStorage.ts";
 import {
   RouterProvider,
   createBrowserHistory,
@@ -37,7 +37,7 @@ import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
-import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
+import { sentryDocumentIdRedaction, sentryLoggerConfig } from "@trizum/logging/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging, getLogger } from "./lib/log.ts";
 import { appWorker, initializeAppWorker } from "./lib/appWorker/client.ts";
@@ -87,7 +87,7 @@ if (shouldInitializeSentry) {
     extraSinks: {
       sentry: getSentrySink(),
     },
-    extraLoggers: [{ category: [], lowestLevel: "error", sinks: ["sentry"] }],
+    extraLoggers: [sentryLoggerConfig],
   });
 } else {
   configurePwaLogging({
@@ -151,7 +151,7 @@ function shouldPreserveCalculatorSearchScroll({
 
 // Create automerge repository
 const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("trizum"),
+  storage: createRecoveringStorage(),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
 });
 

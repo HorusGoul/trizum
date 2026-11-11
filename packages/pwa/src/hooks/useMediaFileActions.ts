@@ -26,6 +26,8 @@ export function getImageUploadErrorMessage(cause: unknown): string | null {
   }
 
   switch (cause.code) {
+    case "image_processing_failed":
+      return null;
     case "heic_conversion_failed":
       return t`This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG.`;
   }
@@ -74,13 +76,20 @@ export function getMediaFileHelpers(
           processed: true,
         });
       } catch (error) {
-        logger.warning("Image compression failed, using original", { error });
-
         if (isHeicImageFile(file)) {
-          throw error instanceof ImageProcessingError
+          throw error instanceof ImageProcessingError && error.code === "heic_conversion_failed"
             ? error
-            : new ImageProcessingError("heic_conversion_failed", error);
+            : new ImageProcessingError(
+                "heic_conversion_failed",
+                error,
+                error instanceof ImageProcessingError ? error.diagnostics : undefined,
+              );
         }
+
+        logger.info("Using original image after processing failure", {
+          error,
+          ...(error instanceof ImageProcessingError ? error.diagnostics : undefined),
+        });
 
         // If compression fails for non-HEIC images, use the original blob
         compressionMetadata = omitUndefinedMetadataValues({

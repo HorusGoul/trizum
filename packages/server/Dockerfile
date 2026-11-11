@@ -71,7 +71,7 @@ RUN apt-get update -qq && \
 
 COPY packages/server/entrypoint.sh ./entrypoint.sh
 COPY packages/server/drizzle ./drizzle
-COPY --from=build /app/packages/server/build/cli.mjs ./server.mjs
+COPY --from=build /app/packages/server/build/ ./build/
 COPY --from=build /app/runtime-node-modules ./node_modules
 
 RUN chmod +x ./entrypoint.sh
