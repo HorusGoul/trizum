@@ -1,3 +1,4 @@
+import { ProfileNameView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
@@ -30,7 +31,7 @@ function createDraftParticipant(name: string): Pick<PartyParticipant, "id" | "na
 
 function New() {
   const data = useAppData();
-  const { partyList } = usePartyList();
+  const { partyList } = usePartyList(ProfileNameView);
   const navigate = useNavigate();
   const [initialParticipant] = useState(() => createDraftParticipant(partyList.username));
 

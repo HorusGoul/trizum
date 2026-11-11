@@ -1,3 +1,4 @@
+import { ProfileJoiningView, PartyMembershipView } from "#src/lib/data/views.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -44,8 +45,8 @@ function Who() {
   const params = Route.useParams();
   const search = Route.useSearch();
   const data = useAppData();
-  const { party, setParticipantDetails } = useParty(params.partyId);
-  const { partyList, addPartyToList } = usePartyList();
+  const { party, setParticipantDetails } = useParty(params.partyId, PartyMembershipView);
+  const { partyList, addPartyToList } = usePartyList(ProfileJoiningView);
   const navigate = useNavigate();
   const partyName = party.name;
 

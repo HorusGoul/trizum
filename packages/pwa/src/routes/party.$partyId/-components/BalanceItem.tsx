@@ -1,3 +1,4 @@
+import { PartyCurrencyView } from "#src/lib/data/views.ts";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import type { Balance } from "#src/models/expense.js";
@@ -11,7 +12,7 @@ interface BalanceItemProps {
 }
 
 export function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyCurrencyView);
 
   const balance = stats.balance;
   const isNegative = balance < 0;

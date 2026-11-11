@@ -1,3 +1,27 @@
+import type { Entity, View, Selection } from "@nkzw/fate";
+import type {
+  PartyEntity,
+  ProfileEntity,
+  ExpenseEntity,
+  ExpenseChunkEntity,
+  BalanceEntity,
+  MediaEntity,
+} from "./entities.ts";
+import {
+  entityTypes,
+  projectDocument,
+  projectExpense,
+  chunkFields,
+  expenseFields,
+  type SourceDocument,
+} from "./projection.ts";
+import {
+  PartyIdentityView,
+  ProfileIdentityView,
+  ExpenseChunkView,
+  BalanceView,
+  MediaContentView,
+} from "./views.ts";
 import { createReadScope } from "./readScope.ts";
 import { loadRecord } from "./loadRecord.ts";
 import { createFateState } from "./fateState.ts";
@@ -49,6 +73,8 @@ export function createAppData(repo: Repo) {
   const pending = new Set<string>();
   const retained = new Map<string, { dispose(): void }>();
   const lifetime = new AbortController();
+  const previousExpenses = new Map<string, Set<string>>();
+  const sourceKinds = new Map<string, SourceDocument["type"]>();
 
   const presenceChannels = new Map<
     string,
@@ -70,6 +96,12 @@ export function createAppData(repo: Repo) {
 
   const roots = {
     record: clientRoot<RecordSnapshot, "RecordSnapshot", { id: string }>("RecordSnapshot"),
+    party: clientRoot<PartyEntity, "Party">("Party"),
+    profile: clientRoot<ProfileEntity, "Profile">("Profile"),
+    expense: clientRoot<ExpenseEntity, "Expense">("Expense"),
+    expenseChunk: clientRoot<ExpenseChunkEntity, "ExpenseChunk">("ExpenseChunk"),
+    balance: clientRoot<BalanceEntity, "Balance">("Balance"),
+    media: clientRoot<MediaEntity, "Media">("Media"),
   };
 
   const mutations = { "local.run": valueMutation<LocalCommand, { done: true }>() };
@@ -77,14 +109,21 @@ export function createAppData(repo: Repo) {
   const fate = createClient<[typeof roots, typeof mutations]>({
     roots,
     mutations,
-    types: [{ type: "RecordSnapshot", fields: { value: "scalar" } }, { type: "LoadState" }],
+    types: [
+      { type: "RecordSnapshot", fields: { value: "scalar" } },
+      { type: "LoadState" },
+      ...entityTypes,
+    ],
     transport: {
-      async fetchById(_type, ids, _select, _args, context) {
+      async fetchById(type, ids, _select, _args, context) {
         return Promise.all(
           ids.map(async (value) => {
-            const id = String(value);
+            const entityId = String(value);
+            const id = type === "Expense" ? decodeExpenseId(entityId).chunkId : entityId;
 
             if (!isValidDocumentId(id)) throw new Error("Malformed record ID");
+
+            if (handles.get(id)?.isReady()) return projection(type, entityId, document(id));
 
             pending.add(id);
             fate.write("LoadState", { id, pending: true }, new Set(["pending"]));
@@ -101,22 +140,16 @@ export function createAppData(repo: Repo) {
 
             if (disposed) throw new Error("Data client disposed");
 
-            if (!handle) return { __typename: "RecordSnapshot", id, value: null };
+            if (!handle) return projection(type, entityId, document(id));
 
             handles.set(id, handle);
 
             if (!listeners.has(id)) {
               retained.set(id, fate.retain({ record: { id, view: RecordView } }));
-              const publish = () => fate.write("RecordSnapshot", { ...snapshot(id) }, selection);
+              const publish = () => publishDocument(id);
               handle.on("change", publish);
 
-              const onDelete = () =>
-                fate.write(
-                  "RecordSnapshot",
-                  { __typename: "RecordSnapshot", id, value: null },
-                  selection,
-                );
-
+              const onDelete = () => publishDocument(id, true);
               handle.on("delete", onDelete);
               listeners.set(id, () => {
                 handle.off("change", publish);
@@ -124,7 +157,9 @@ export function createAppData(repo: Repo) {
               });
             }
 
-            return snapshot(id);
+            publishDocument(id);
+
+            return projection(type, entityId, document(id));
           }),
         );
       },
@@ -139,6 +174,95 @@ export function createAppData(repo: Repo) {
       },
     },
   });
+
+  function document(id: string): SourceDocument | undefined {
+    const handle = handles.get(id);
+
+    // SAFETY: These IDs are the application's persisted domain documents. Projection dispatch checks their discriminant.
+    return handle?.isReady() ? (handle.doc() as SourceDocument) : undefined;
+  }
+
+  function projection(type: string, id: string, source: SourceDocument | undefined) {
+    return type === "RecordSnapshot" ? snapshot(id) : projectDocument(type, id, source);
+  }
+
+  function publishDocument(id: string, deleted = false) {
+    const source = deleted ? undefined : document(id);
+
+    if (source) sourceKinds.set(id, source.type);
+    const kind = sourceKinds.get(id);
+
+    const type =
+      kind === "party"
+        ? "Party"
+        : kind === "partyList"
+          ? "Profile"
+          : kind === "expenseChunk"
+            ? "ExpenseChunk"
+            : kind === "expenseChunkBalances"
+              ? "Balance"
+              : kind === "mediaFile"
+                ? "Media"
+                : undefined;
+
+    fate.store.transaction(() => {
+      fate.write(
+        "RecordSnapshot",
+        { __typename: "RecordSnapshot", id, value: source ?? null },
+        selection,
+      );
+
+      if (!type) return;
+      const record = projection(type, id, source);
+      fate.write(
+        type,
+        { ...record },
+        new Set(type === "ExpenseChunk" ? chunkFields : Object.keys(record)),
+      );
+
+      if (type === "ExpenseChunk") {
+        const expenses = source?.type === "expenseChunk" ? source.expenses : [];
+        const current = new Set(expenses.map((expense) => expense.id));
+
+        for (const previousId of previousExpenses.get(id) ?? []) {
+          if (!current.has(previousId))
+            fate.write("Expense", projectExpense(previousId), new Set(expenseFields));
+        }
+
+        previousExpenses.set(id, current);
+      }
+    });
+
+    const key = `${type}:${id}`;
+
+    if (type && !retained.has(key)) {
+      switch (type) {
+        case "Party":
+          retained.set(key, fate.retain({ party: { id, view: PartyIdentityView } }));
+          break;
+        case "Profile":
+          retained.set(key, fate.retain({ profile: { id, view: ProfileIdentityView } }));
+          break;
+        case "ExpenseChunk":
+          retained.set(key, fate.retain({ expenseChunk: { id, view: ExpenseChunkView } }));
+          break;
+        case "Balance":
+          retained.set(key, fate.retain({ balance: { id, view: BalanceView } }));
+          break;
+        case "Media":
+          retained.set(key, fate.retain({ media: { id, view: MediaContentView } }));
+          break;
+      }
+    }
+  }
+
+  function entityRef<Model extends Entity>(
+    type: Model["__typename"],
+    id: string,
+    selected: View<Model, Selection<Model>>,
+  ) {
+    return fate.ref<Model>(type, id, selected);
+  }
 
   function ref(id: string) {
     return fate.ref<RecordSnapshot>("RecordSnapshot", id, RecordView);
@@ -196,7 +320,7 @@ export function createAppData(repo: Repo) {
     ) as Actions<T>;
   }
 
-  function readyPartyActions(id: Party["id"]) {
+  function readyPartyActions(id: string) {
     // SAFETY: React reads the required Party snapshot before requesting its commands.
     const handle = handles.get(id) as DocHandle<Party> | undefined;
 
@@ -205,7 +329,7 @@ export function createAppData(repo: Repo) {
     return actions(getPartyHelpers(repo, handle));
   }
 
-  function profileActions(id: PartyList["id"]) {
+  function profileActions(id: string) {
     // SAFETY: React reads the required profile snapshot before requesting its commands.
     const handle = handles.get(id) as DocHandle<PartyList> | undefined;
 
@@ -216,6 +340,7 @@ export function createAppData(repo: Repo) {
 
   return {
     fate,
+    entityRef,
     ref,
     read,
     peek,
@@ -226,6 +351,27 @@ export function createAppData(repo: Repo) {
       pending.has(id) ? "pending" : handles.has(id) ? "resolved" : "not-found",
     activeProfileId: activeProfile.getSnapshot,
     subscribeToProfile: activeProfile.subscribe,
+    createTestExpenses: async (id: string, count: number) => {
+      const source = await read<Party>(id);
+
+      if (!source) throw new Error("Party unavailable");
+      const participants = Object.keys(source.participants);
+      const helpers = readyPartyActions(id);
+      await Promise.all(
+        Array.from({ length: count }, (_, index) =>
+          helpers.addExpenseToParty({
+            name: `Test Expense ${index + 1}`,
+            paidAt: new Date(),
+            photos: [],
+            paidBy: { [participants[0]]: 100 },
+            shares: {
+              [participants[0]]: { type: "divide", value: 1 },
+              [participants[1]]: { type: "divide", value: 1 },
+            },
+          }),
+        ),
+      );
+    },
     media: {
       createMediaFile: (
         ...args: Parameters<ReturnType<typeof getMediaFileHelpers>["createMediaFile"]>
@@ -319,6 +465,8 @@ export function createAppData(repo: Repo) {
       for (const cleanup of listeners.values()) cleanup();
       listeners.clear();
       handles.clear();
+      sourceKinds.clear();
+      previousExpenses.clear();
       presenceChannels.clear();
     },
   };

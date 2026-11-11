@@ -1,30 +1,24 @@
-import { useEffect, useSyncExternalStore } from "react";
-import { type PartyList } from "#src/models/partyList.ts";
-import { useDataRecord } from "#src/lib/data/hooks.ts";
+import { useSyncExternalStore } from "react";
+import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
-import { getBrowserLocale, setLocale } from "#src/lib/i18n.ts";
-import { setThemeHue, defaultThemeHue } from "@trizum/ui/theme";
+import type { View, Selection } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 
-export function usePartyList() {
+export function usePartyList<const Selected extends Selection<ProfileEntity>>(
+  selected: View<ProfileEntity, Selected>,
+) {
   const data = useAppData();
 
-  const partyListId = useSyncExternalStore(
+  const id = useSyncExternalStore(
     data.subscribeToProfile,
     data.activeProfileId,
     data.activeProfileId,
   );
 
-  const [partyList] = useDataRecord<PartyList>(partyListId, {
-    required: true,
-  });
+  const partyList = useRequiredView(
+    selected,
+    data.entityRef<ProfileEntity>("Profile", id, selected),
+  );
 
-  useEffect(() => {
-    setLocale(partyList.locale ?? getBrowserLocale());
-  }, [partyList.locale]);
-
-  useEffect(() => {
-    setThemeHue(partyList.hue ?? defaultThemeHue);
-  }, [partyList.hue]);
-
-  return { partyList, ...data.profileActions(partyList.id) };
+  return { partyList, ...data.profileActions(id) };
 }

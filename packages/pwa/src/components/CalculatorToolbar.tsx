@@ -1,3 +1,6 @@
+import { useAppData } from "#src/lib/data/useAppData.ts";
+import { MediaContentView } from "#src/lib/data/views.ts";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
 import { msg, t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
@@ -5,7 +8,7 @@ import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
-import { useDataRecords } from "#src/lib/data/hooks.ts";
+import { useRequiredViews } from "#src/lib/data/hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
 import { Button } from "@trizum/ui/Button";
 import { sheetTweenConfig } from "@trizum/ui/sheetMotion";
@@ -1167,9 +1170,12 @@ function CalculatorMobileAttachmentContent({
   const attachmentButtonIdPrefix = useId();
   const pendingAttachmentFocusIndexRef = useRef<number | null>(null);
 
-  const mediaFiles = useDataRecords<MediaFile>(photoIds, {
-    required: true as const,
-  }).map(({ doc }) => doc);
+  const data = useAppData();
+
+  const mediaFiles = useRequiredViews(
+    MediaContentView,
+    photoIds.map((id) => data.entityRef<MediaEntity>("Media", id, MediaContentView)),
+  );
 
   const urls = useMediaFileObjectUrls(mediaFiles);
   const galleryItems: MediaGalleryItem[] = urls.map((url) => ({ src: url }));

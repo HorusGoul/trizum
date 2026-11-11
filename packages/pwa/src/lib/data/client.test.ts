@@ -1,5 +1,8 @@
-import type { PartyExpenseChunk } from "#src/models/party.ts";
 // @vitest-environment jsdom
+
+import { PartyDetailsView } from "./views.ts";
+import type { PartyEntity } from "./entities.ts";
+import type { PartyExpenseChunk } from "#src/models/party.ts";
 import {
   Repo,
   RawString,
@@ -125,6 +128,13 @@ test("Fate mutations acknowledge a durable local save and reopen while offline",
     .updateDetails({ name: "Offline edit", symbol: "🌴", description: "Saved" });
   const reopened = runtime(storage);
   expect(await reopened.data.read<Party>(handle.documentId)).toMatchObject({
+    name: "Offline edit",
+    description: "Saved",
+    symbol: "🌴",
+  });
+  const ref = reopened.data.entityRef<PartyEntity>("Party", handle.documentId, PartyDetailsView);
+  expect((await reopened.data.fate.readView(PartyDetailsView, ref)).data).toMatchObject({
+    available: true,
     name: "Offline edit",
     description: "Saved",
     symbol: "🌴",

@@ -1,3 +1,4 @@
+import { PartyCurrencyView } from "#src/lib/data/views.ts";
 import { Trans } from "@lingui/react/macro";
 import { Link } from "react-aria-components";
 import { CurrencyText } from "#src/components/CurrencyText.js";
@@ -11,7 +12,7 @@ import {
 import { cn } from "@trizum/ui/utils";
 
 export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }) {
-  const { party } = useParty(partyId);
+  const { party } = useParty(partyId, PartyCurrencyView);
   const participant = useCurrentParticipant();
 
   return (

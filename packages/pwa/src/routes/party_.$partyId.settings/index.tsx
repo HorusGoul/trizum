@@ -1,3 +1,4 @@
+import { PartySettingsView } from "#src/lib/data/views.ts";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { useParty } from "#src/hooks/useParty.js";
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/party_/$partyId/settings/")({
 
 function PartySettings() {
   const { partyId } = Route.useParams();
-  const { party } = useParty(partyId);
+  const { party } = useParty(partyId, PartySettingsView);
 
   return (
     <div className="flex min-h-full flex-col">

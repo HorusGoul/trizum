@@ -1,8 +1,11 @@
+import { ExpenseDetailView, PartyIdentityView } from "#src/lib/data/views.ts";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { optionalSearchNumberSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import { decodeExpenseId, findExpenseById, getExpenseTotalAmount } from "#src/models/expense.js";
+import { decodeExpenseId, getExpenseTotalAmount } from "#src/models/expense.js";
 import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
@@ -10,8 +13,7 @@ import { Dialog, MenuTrigger, Modal, ModalOverlay, Popover } from "react-aria-co
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Icon } from "@trizum/ui/Icon";
-import { useDataRecord } from "#src/lib/data/hooks.ts";
-import type { PartyExpenseChunk } from "#src/models/party.js";
+import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
@@ -238,6 +240,7 @@ function ExpenseDeleteConfirmationDialog({
 }
 
 function useExpense() {
+  const data = useAppData();
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
   const currentLocation = useLocation();
@@ -245,15 +248,12 @@ function useExpense() {
 
   if (!isValidRecordId(partyId)) throw new Error(t`Malformed Party ID`);
 
-  const { chunkId } = decodeExpenseId(expenseId);
+  const expense = useRequiredView(
+    ExpenseDetailView,
+    data.entityRef<ExpenseEntity>("Expense", expenseId, ExpenseDetailView),
+  );
 
-  const [chunk] = useDataRecord<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
-
-  const { removeExpense } = useCurrentParty();
-
-  const [expense, _expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const { removeExpense } = useCurrentParty(PartyIdentityView);
 
   async function onDeleteExpense() {
     if (expenseId === undefined) return;

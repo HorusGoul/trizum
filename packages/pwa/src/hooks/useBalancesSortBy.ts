@@ -1,3 +1,4 @@
+import { PartyIdentityView } from "#src/lib/data/views.ts";
 import type { BalancesSortedBy } from "#src/models/party.ts";
 import { useCurrentParty } from "./useParty";
 import { useCurrentParticipant } from "./useCurrentParticipant";
@@ -9,7 +10,7 @@ function isBalanceSortedBy(sortedBy: string): sortedBy is BalancesSortedBy {
 }
 
 export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSortedBy) => void] {
-  const { setParticipantDetails } = useCurrentParty();
+  const { setParticipantDetails } = useCurrentParty(PartyIdentityView);
   const participant = useCurrentParticipant();
 
   const sortedBy =

@@ -1,3 +1,4 @@
+import { PartyParticipantAmountsView } from "#src/lib/data/views.ts";
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
@@ -9,7 +10,7 @@ import { Icon } from "@trizum/ui/Icon";
 export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
   const { i18n } = useLingui();
   const unitAmounts = getExpenseUnitShares(expense);
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyParticipantAmountsView);
   const currentParticipant = useCurrentParticipant();
 
   return (

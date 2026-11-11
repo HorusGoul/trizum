@@ -1,3 +1,5 @@
+import { ExpenseEditorView, PartyIdentityView } from "#src/lib/data/views.ts";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
 import { getFailureMessage } from "#src/lib/failureMessage.ts";
@@ -10,17 +12,11 @@ import {
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { useDataRecord } from "#src/lib/data/hooks.ts";
+import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
-import {
-  decodeExpenseId,
-  findExpenseById,
-  calculateExpenseHash,
-  type Expense,
-} from "#src/models/expense.ts";
-import type { PartyExpenseChunk } from "#src/models/party.ts";
+import { decodeExpenseId, calculateExpenseHash, type Expense } from "#src/models/expense.ts";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
@@ -58,14 +54,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
 const logger = getLogger("routes", "EditExpense");
 
 function EditExpense() {
-  const {
-    expenseId,
-    partyId,
-    expense,
-    onUpdateExpense,
-    onChangeExpense,
-    subscribeToExpenseChanges,
-  } = useExpense();
+  const { expenseId, partyId, expense, onUpdateExpense, onChangeExpense } = useExpense();
 
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -202,15 +191,12 @@ function EditExpense() {
   }
 
   useEffect(() => {
-    return subscribeToExpenseChanges((updatedExpense) => {
-      const raw = clone(updatedExpense);
+    const hash = getExpenseEditHash(expense);
 
-      const currentHash = getExpenseEditHash(raw);
-      currentHashRef.current = currentHash;
-
-      editorRef.current?.setValues(getExpenseEditValues(raw));
-    });
-  }, [subscribeToExpenseChanges]);
+    if (hash === currentHashRef.current) return;
+    currentHashRef.current = hash;
+    editorRef.current?.setValues(getExpenseEditValues(clone(expense)));
+  }, [expense]);
 
   const expenseName = formValues.name;
 
@@ -245,15 +231,12 @@ function EditExpense() {
 function useExpense() {
   const data = useAppData();
   const { partyId, expenseId } = Route.useParams();
-  const { updateExpense } = useCurrentParty();
+  const { updateExpense } = useCurrentParty(PartyIdentityView);
 
-  const { chunkId } = decodeExpenseId(expenseId);
-
-  const [chunk] = useDataRecord<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
-
-  const [expense] = findExpenseById(chunk.expenses, expenseId);
+  const expense = useRequiredView(
+    ExpenseEditorView,
+    data.entityRef<ExpenseEntity>("Expense", expenseId, ExpenseEditorView),
+  );
 
   async function onUpdateExpense(expense: Expense) {
     const result = await updateExpense(expense);
@@ -266,24 +249,6 @@ function useExpense() {
     void data.editExpenseDraft(expenseId, patches);
   }
 
-  function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
-    let prevHash = expense ? getExpenseEditHash(expense) : "";
-
-    return data.subscribe(chunkId, () => {
-      const chunk = data.peek<PartyExpenseChunk>(chunkId);
-
-      if (!chunk) return;
-      const [current] = findExpenseById(chunk.expenses, expenseId);
-
-      if (!current) return;
-      const hash = getExpenseEditHash(current);
-
-      if (hash === prevHash) return;
-      prevHash = hash;
-      callback(current);
-    });
-  }
-
   return {
     partyId,
     expense,
@@ -291,6 +256,5 @@ function useExpense() {
     isLoading: false,
     onChangeExpense,
     onUpdateExpense,
-    subscribeToExpenseChanges,
   };
 }

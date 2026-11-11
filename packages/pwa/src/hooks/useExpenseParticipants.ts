@@ -1,9 +1,10 @@
+import { PartyParticipantsView } from "#src/lib/data/views.ts";
 import type { Expense } from "#src/models/expense.ts";
 import { useCurrentParty } from "./useParty";
 import { usePartyParticipants } from "./usePartyParticipants";
 
 export function useExpenseParticipants(expense: Pick<Expense, "paidBy" | "shares">) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyParticipantsView);
   const { active } = usePartyParticipants();
 
   const participants = new Set<string>();

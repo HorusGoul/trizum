@@ -1,15 +1,13 @@
+import { ExpenseIdentityView, PartyParticipantsView } from "#src/lib/data/views.ts";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
 import type { ExpensePresenceMessage } from "#src/lib/data/presence.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { useDataRecord } from "#src/lib/data/hooks.ts";
-import {
-  decodeExpenseId,
-  type Expense,
-  type ExpenseParticipantPresence,
-} from "#src/models/expense.ts";
+import { useRequiredView } from "#src/lib/data/hooks.ts";
+import { type Expense, type ExpenseParticipantPresence } from "#src/models/expense.ts";
 import type { MediaFile } from "#src/models/media.ts";
-import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
+import type { PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "@trizum/ui/Avatar";
 import { getLogger } from "#src/lib/log.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
@@ -73,13 +71,11 @@ function broadcastPresenceUpdate({
 }
 
 export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEditorPresenceProps) {
-  const { chunkId } = decodeExpenseId(expenseId);
-
-  useDataRecord<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
-
   const data = useAppData();
+  useRequiredView(
+    ExpenseIdentityView,
+    data.entityRef<ExpenseEntity>("Expense", expenseId, ExpenseIdentityView),
+  );
   const handle = data.presence(expenseId);
   const participant = useCurrentParticipant();
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -298,7 +294,7 @@ function Bubble({
   presence: ExpenseParticipantPresence;
   overlayRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyParticipantsView);
   const participant = party.participants[presence.participantId];
 
   const [position, setPosition] = useState<{

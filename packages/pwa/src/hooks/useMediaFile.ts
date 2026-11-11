@@ -1,4 +1,7 @@
-import { useDataRecord } from "#src/lib/data/hooks.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
+import { MediaContentView } from "#src/lib/data/views.ts";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
 import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { useEffect } from "react";
@@ -68,7 +71,7 @@ function releaseMediaFileObjectUrl(key: string) {
   }
 }
 
-export function useMediaFileObjectUrls(mediaFiles: MediaFile[]) {
+export function useMediaFileObjectUrls(mediaFiles: readonly MediaFile[]) {
   const entries = mediaFiles.map(getOrCreateMediaFileObjectUrlEntry);
   const entryKeys = entries.map((entry) => entry.key);
   const entryKeysKey = JSON.stringify(entryKeys);
@@ -96,9 +99,12 @@ export function useMediaFile(mediaFileId: string) {
     throw new Error("Malformed MediaFile ID");
   }
 
-  const [mediaFile] = useDataRecord<MediaFile>(mediaFileId, {
-    required: true,
-  });
+  const data = useAppData();
+
+  const mediaFile = useRequiredView(
+    MediaContentView,
+    data.entityRef<MediaEntity>("Media", mediaFileId, MediaContentView),
+  );
 
   const [url] = useMediaFileObjectUrls([mediaFile]);
 

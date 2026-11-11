@@ -1,3 +1,4 @@
+import { PartyTemplatesView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { msg, t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -72,7 +73,12 @@ function ExpenseTemplateEditor() {
   const { partyId, templateId } = Route.useParams();
   const isNew = templateId === "new";
   const { i18n, t: translate } = useLingui();
-  const { party, deleteExpenseTemplate, saveExpenseTemplate } = useParty(partyId);
+
+  const { party, deleteExpenseTemplate, saveExpenseTemplate } = useParty(
+    partyId,
+    PartyTemplatesView,
+  );
+
   const template = isNew ? undefined : party.expenseTemplates?.[templateId];
 
   if (!isNew && !template) {

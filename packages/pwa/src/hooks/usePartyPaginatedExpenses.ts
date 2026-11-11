@@ -1,4 +1,7 @@
-import { useDataRecord } from "#src/lib/data/hooks.ts";
+import { useParty } from "./useParty.ts";
+import { PartyHistoryView, ExpenseDetailView } from "#src/lib/data/views.ts";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
+import { useRequiredViews } from "#src/lib/data/hooks.ts";
 import {
   getPartyPaginatedExpensesSnapshot,
   getVisiblePartyExpenseChunkIdsToLoad,
@@ -14,9 +17,7 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   const data = useAppData();
 
-  const [party] = useDataRecord<Party>(partyId, {
-    required: true,
-  });
+  const { party } = useParty(partyId, PartyHistoryView);
 
   const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
   const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(data, chunkIds);
@@ -65,8 +66,15 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
     void loadNextPartyExpenseChunks(data, chunkIds);
   }
 
+  const expenses = useRequiredViews(
+    ExpenseDetailView,
+    snapshot.expenses.map(({ id }) =>
+      data.entityRef<ExpenseEntity>("Expense", id, ExpenseDetailView),
+    ),
+  );
+
   return {
-    expenses: snapshot.expenses,
+    expenses,
     loadNext,
     isLoadingNext: snapshot.isLoadingNext,
     hasNext: snapshot.hasNext,
@@ -86,7 +94,7 @@ function areSnapshotsEqual(
   }
 
   for (let index = 0; index < previous.expenses.length; index++) {
-    if (previous.expenses[index] !== next.expenses[index]) {
+    if (previous.expenses[index]?.id !== next.expenses[index]?.id) {
       return false;
     }
   }

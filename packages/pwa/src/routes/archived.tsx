@@ -1,3 +1,4 @@
+import { ProfileHomeView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -7,7 +8,7 @@ import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import type { PartyList } from "#src/models/partyList.js";
+import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { Icon } from "@trizum/ui/Icon";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/archived")({
 });
 
 function ArchivedParties() {
-  const { partyList, setPartyArchived } = usePartyList();
+  const { partyList, setPartyArchived } = usePartyList(ProfileHomeView);
   const archivedPartyIds = useArchivedPartyIds(partyList);
 
   return (
@@ -65,7 +66,7 @@ function ArchivedParties() {
   );
 }
 
-function useArchivedPartyIds(partyList: PartyList) {
+function useArchivedPartyIds(partyList: OrderedProfile) {
   const data = useAppData();
   const { archivedPartyIds } = getOrderedPartySections(partyList);
 

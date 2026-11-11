@@ -1,3 +1,4 @@
+import { ProfileSettingsView } from "#src/lib/data/views.ts";
 // @vitest-environment jsdom
 
 import { Repo } from "@automerge/automerge-repo";
@@ -57,7 +58,7 @@ it("syncs saved methods and removals to existing groups without changing other p
   let settings!: ReturnType<typeof usePartyList>;
 
   function Harness() {
-    settings = usePartyList();
+    settings = usePartyList(ProfileSettingsView);
 
     return null;
   }

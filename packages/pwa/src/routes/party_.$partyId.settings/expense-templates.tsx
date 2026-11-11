@@ -1,3 +1,4 @@
+import { PartyTemplatesView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -48,7 +49,7 @@ function ExpenseTemplatesSettings() {
     setDefaultExpenseTemplate,
     setOnlyUseCustomExpenseTemplates,
     setParticipantDetails,
-  } = useParty(partyId);
+  } = useParty(partyId, PartyTemplatesView);
 
   const participant = useCurrentParticipant();
   const [isOnlyCustomTemplatesSheetOpen, setIsOnlyCustomTemplatesSheetOpen] = useState(false);

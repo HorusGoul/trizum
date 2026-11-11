@@ -1,11 +1,15 @@
+import { useAppData } from "#src/lib/data/useAppData.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { ProfileHomeView } from "#src/lib/data/views.ts";
+import { PartyTransferView } from "#src/lib/data/views.ts";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useDataRecords } from "#src/lib/data/hooks.ts";
+import { useViews } from "react-fate";
 import { useCurrentParty } from "./useParty";
 import { usePartyList } from "./usePartyList";
 
 export interface EligibleDebtTransferParty {
-  party: Party;
+  party: Pick<Party, "id" | "name" | "symbol" | "description" | "currency" | "participants">;
   currentParticipantId: PartyParticipant["id"];
   currentParticipant: PartyParticipant;
   otherParticipants: PartyParticipant[];
@@ -17,7 +21,7 @@ interface EligibleDebtTransferParticipants {
 }
 
 export function getEligibleDebtTransferParticipants(
-  party: Party,
+  party: Pick<Party, "participants">,
   currentParticipantId: PartyParticipant["id"],
 ): EligibleDebtTransferParticipants | null {
   const currentParticipant = party.participants[currentParticipantId];
@@ -41,8 +45,8 @@ export function getEligibleDebtTransferParticipants(
 }
 
 export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
-  const { party: originParty } = useCurrentParty();
-  const { partyList } = usePartyList();
+  const { party: originParty } = useCurrentParty(PartyTransferView);
+  const { partyList } = usePartyList(ProfileHomeView);
   const { activePartyIds } = getOrderedPartySections(partyList);
 
   const joinedActiveParties = activePartyIds.flatMap((partyId) => {
@@ -60,10 +64,17 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
     ];
   });
 
-  const partyEntries = useDataRecords<Party>(joinedActiveParties.map(({ partyId }) => partyId));
+  const data = useAppData();
 
-  return partyEntries.flatMap(({ doc }, index) => {
-    if (!doc || doc.currency !== originParty.currency) {
+  const partyEntries = useViews(
+    PartyTransferView,
+    joinedActiveParties.map(({ partyId }) =>
+      data.entityRef<PartyEntity>("Party", partyId, PartyTransferView),
+    ),
+  );
+
+  return partyEntries.flatMap((doc, index) => {
+    if (!doc.available || doc.currency !== originParty.currency) {
       return [];
     }
 

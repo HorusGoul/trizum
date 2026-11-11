@@ -1,3 +1,6 @@
+import { useAppData } from "#src/lib/data/useAppData.ts";
+import { PartyCardView } from "#src/lib/data/views.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -13,7 +16,7 @@ import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { type ComponentProps, type ReactNode, useState } from "react";
 import { useMediaQuery } from "@trizum/ui/useMediaQuery";
 import type { Party, PartyParticipant } from "#src/models/party.js";
-import { useDataRecord } from "#src/lib/data/hooks.ts";
+import { useView } from "react-fate";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
@@ -62,7 +65,14 @@ export function PartyListCard({
 }: PartyListCardProps) {
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery("(min-width: 768px)");
-  const [party] = useDataRecord<Party>(partyId);
+  const data = useAppData();
+
+  const entity = useView(
+    PartyCardView,
+    data.entityRef<PartyEntity>("Party", partyId, PartyCardView),
+  );
+
+  const party = entity.available ? entity : undefined;
   const [isFocusWithin, setIsFocusWithin] = useState(false);
   const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
@@ -337,7 +347,10 @@ function ParticipantPreviewText({
   );
 }
 
-function getParticipantPreview(party: Party, currentParticipantId: PartyParticipant["id"] | null) {
+function getParticipantPreview(
+  party: Pick<Party, "participants">,
+  currentParticipantId: PartyParticipant["id"] | null,
+) {
   const visibleParticipantNames: string[] = [];
 
   for (const participant of Object.values(party.participants)) {

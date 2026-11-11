@@ -1,10 +1,11 @@
+import { ProfileHomeView } from "#src/lib/data/views.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
-import type { PartyList } from "#src/models/partyList.js";
+import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
 import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrdering.ts";
 import { Icon } from "@trizum/ui/Icon";
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/_home")({
 });
 
 function Home() {
-  const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
+  const { partyList, setPartyArchived, setPartyPinned } = usePartyList(ProfileHomeView);
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, isUpdating, checkForUpdate } = use(UpdateContext);
   const session = useAppSession();
@@ -221,7 +222,7 @@ function Home() {
   );
 }
 
-function usePartySections(partyList: PartyList) {
+function usePartySections(partyList: OrderedProfile) {
   const data = useAppData();
   const sections = getOrderedPartySections(partyList);
 
@@ -258,7 +259,7 @@ function createPartyActions({
 }
 
 async function togglePartyPinned(
-  partyList: PartyList,
+  partyList: OrderedProfile,
   partyId: Party["id"],
   setPartyPinned: ReturnType<typeof usePartyList>["setPartyPinned"],
 ) {

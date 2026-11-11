@@ -1,3 +1,6 @@
+import { useAppData } from "#src/lib/data/useAppData.ts";
+import { ExpenseChunkView, ExpenseDetailView, PartyBalancesView } from "#src/lib/data/views.ts";
+import type { ExpenseChunkEntity, ExpenseEntity } from "#src/lib/data/entities.ts";
 import { endOfWeek, getLocalTimeZone, startOfWeek, today } from "@internationalized/date";
 import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
@@ -8,14 +11,14 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
-import { useDataRecords } from "#src/lib/data/hooks.ts";
+import { useRequiredViews } from "#src/lib/data/hooks.ts";
 import {
   calculatePartyStats,
   getPartyStatsAvailablePastYears,
   type PartyStatsParticipantStat,
   type PartyStatsTimeframe,
 } from "#src/lib/partyStats.ts";
-import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.js";
+import type { PartyParticipant } from "#src/models/party.js";
 import { Avatar } from "@trizum/ui/Avatar";
 import { Button } from "@trizum/ui/Button";
 import {
@@ -157,16 +160,28 @@ export function PartyStatsView({ scrollElementRef }: PartyStatsViewProps) {
 }
 
 function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyBalancesView);
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
 
-  const chunkDocuments = useDataRecords<PartyExpenseChunk>(
-    party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
-    { required: true },
+  const data = useAppData();
+
+  const chunks = useRequiredViews(
+    ExpenseChunkView,
+    party.chunkRefs.map(({ chunkId }) =>
+      data.entityRef<ExpenseChunkEntity>("ExpenseChunk", chunkId, ExpenseChunkView),
+    ),
   );
 
-  const expenses = chunkDocuments.flatMap(({ doc }) => doc.expenses);
+  const expenses = useRequiredViews(
+    ExpenseDetailView,
+    chunks.flatMap((chunk) =>
+      chunk.expenses.map(({ id }) =>
+        data.entityRef<ExpenseEntity>("Expense", id, ExpenseDetailView),
+      ),
+    ),
+  );
+
   const timezone = getLocalTimeZone();
   const pastYears = getPartyStatsAvailablePastYears({ expenses });
   const [timeframeKey, setTimeframeKey] = useState<PartyStatsTimeframeKey>("all-time");

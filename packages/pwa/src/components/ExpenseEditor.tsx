@@ -1,3 +1,4 @@
+import { ProfileCalculatorView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -109,7 +110,7 @@ export function ExpenseEditor({
   onCloseCalculator,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
-  const { partyList, setAutoOpenCalculator } = usePartyList();
+  const { partyList, setAutoOpenCalculator } = usePartyList(ProfileCalculatorView);
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);

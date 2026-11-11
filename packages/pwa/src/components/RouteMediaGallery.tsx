@@ -1,9 +1,11 @@
+import { useAppData } from "#src/lib/data/useAppData.ts";
+import { MediaContentView } from "#src/lib/data/views.ts";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState, useRef } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import MediaGallery, { MediaGalleryImage } from "@trizum/ui/MediaGallery";
-import { useDataRecord } from "#src/lib/data/hooks.ts";
-import type { MediaFile } from "#src/models/media.ts";
+import { useRequiredView } from "#src/lib/data/hooks.ts";
 
 export interface RouteMediaGalleryProps {
   /** List of photo IDs to display in the gallery */
@@ -82,10 +84,12 @@ export function RouteMediaGallery({
 }
 
 function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
-  // SAFETY: photoId comes from an Automerge media document referenced by the expense; it is passed back to the same repository.
-  const [mediaFile] = useDataRecord<MediaFile>(photoId as MediaFile["id"], {
-    required: true,
-  });
+  const data = useAppData();
+
+  const mediaFile = useRequiredView(
+    MediaContentView,
+    data.entityRef<MediaEntity>("Media", photoId, MediaContentView),
+  );
 
   const [url] = useMediaFileObjectUrls([mediaFile]);
 

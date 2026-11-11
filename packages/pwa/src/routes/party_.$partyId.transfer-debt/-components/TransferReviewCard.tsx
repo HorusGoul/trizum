@@ -17,8 +17,8 @@ export function TransferReviewCard({
 }: {
   amount: number;
   currency: CurrencyCode;
-  originParty: Party;
-  destinationParty?: Party;
+  originParty: Pick<Party, "name" | "symbol">;
+  destinationParty?: Pick<Party, "name" | "symbol">;
   from: PartyParticipant;
   to: PartyParticipant;
   destinationDebtor: PartyParticipant | null;

@@ -1,3 +1,4 @@
+import { PartyParticipantsView } from "#src/lib/data/views.ts";
 import { Trans } from "@lingui/react/macro";
 import { useEligibleDebtTransferParties } from "#src/hooks/useEligibleDebtTransferParties.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
@@ -20,7 +21,7 @@ export function Balances({
   sortedBy: BalancesSortedBy;
   onRefresh: () => Promise<void>;
 }) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyParticipantsView);
   const participant = useCurrentParticipant();
   const balances = usePartyBalances(party.id);
 

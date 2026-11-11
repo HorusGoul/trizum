@@ -1,3 +1,4 @@
+import { ProfileCloudView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
@@ -237,7 +238,7 @@ export function CloudSyncSettingsView(props: CloudSyncSettingsViewProps) {
 }
 
 function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSettingsViewProps) {
-  const { partyList } = usePartyList();
+  const { partyList } = usePartyList(ProfileCloudView);
   const router = useRouter();
   const currentLocation = useLocation();
   const navigate = useNavigate();

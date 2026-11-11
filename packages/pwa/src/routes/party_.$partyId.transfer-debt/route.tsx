@@ -1,3 +1,4 @@
+import { PartyTransferView } from "#src/lib/data/views.ts";
 import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
@@ -245,7 +246,7 @@ function RouteComponent() {
 
 function useTransferDebtRouteView() {
   const { fromId, toId, amount } = Route.useSearch();
-  const { party, transferDebtToParty } = useCurrentParty();
+  const { party, transferDebtToParty } = useCurrentParty(PartyTransferView);
   const currentParticipant = useCurrentParticipant();
   const eligibleDestinationParties = useEligibleDebtTransferParties();
   const navigate = useNavigate();

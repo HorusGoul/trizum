@@ -1,3 +1,4 @@
+import { PartyHeaderView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/party_/$partyId/share")({
 });
 
 function RouteComponent() {
-  const { partyId, party } = useCurrentParty();
+  const { partyId, party } = useCurrentParty(PartyHeaderView);
   const { i18n } = useLingui();
   const shareUrl = getPartyShareUrl(partyId, getSupportedLocale(i18n.locale));
   const { canShare } = Route.useLoaderData();

@@ -1,3 +1,4 @@
+import { PartyTemplatesView } from "#src/lib/data/views.ts";
 import {
   expenseEditorSearchSchema,
   optionalNonemptySearchTextSchema,
@@ -48,7 +49,7 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 });
 
 function AddExpense() {
-  const { party, partyId, addExpenseToParty } = useCurrentParty();
+  const { party, partyId, addExpenseToParty } = useCurrentParty(PartyTemplatesView);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();

@@ -1,3 +1,4 @@
+import { PartyTransferView } from "#src/lib/data/views.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -21,7 +22,7 @@ export function BalanceActionItem({
   amount,
   canTransferDebt = false,
 }: BalanceActionItemProps) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyTransferView);
   const me = useCurrentParticipant();
   const from = party.participants[fromId];
   const to = party.participants[toId];

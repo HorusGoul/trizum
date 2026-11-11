@@ -1,3 +1,6 @@
+import { ProfileAppearanceView } from "./lib/data/views.ts";
+import { getBrowserLocale, setLocale } from "./lib/i18n.ts";
+import { setThemeHue, defaultThemeHue } from "@trizum/ui/theme";
 import { optionalNonemptySearchTextSchema } from "./lib/routerSearch.ts";
 import type {} from "./lib/testing/browserHarnessApi.ts";
 import * as ReactDOM from "react-dom/client";
@@ -343,8 +346,15 @@ if (!rootElement.innerHTML) {
 function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
-  const { partyList } = usePartyList();
+  const { partyList } = usePartyList(ProfileAppearanceView);
   const data = useAppData();
+
+  useEffect(() => {
+    setLocale(partyList.locale ?? getBrowserLocale());
+  }, [partyList.locale]);
+  useEffect(() => {
+    setThemeHue(partyList.hue ?? defaultThemeHue);
+  }, [partyList.hue]);
 
   useEffect(() => {
     return data.bindAnalytics(partyList.id, () => router.state.location.pathname);

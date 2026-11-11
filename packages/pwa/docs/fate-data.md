@@ -12,8 +12,9 @@ and synchronization. Existing saved documents and share links keep their format.
   missing profile while another peer or deferred import supplies the document.
   Commands update Automerge locally, update Fate through source change events,
   and await local storage completion. Sync is independent of that completion.
-- [`data/hooks.ts`](../src/lib/data/hooks.ts) reads snapshots with Fate's
-  `useView` and `useViews`. Domain hooks compose those reads with private commands.
+- [`data/hooks.ts`](../src/lib/data/hooks.ts) reads typed entities with Fate's
+  `useView` and `useViews`. Domain hooks require a named field selection and compose
+  those reads with private commands.
   Components and route loaders receive the data client instead of a Repo.
 - [`data/partyCommands.ts`](../src/lib/data/partyCommands.ts),
   [`data/profileCommands.ts`](../src/lib/data/profileCommands.ts), and
@@ -45,12 +46,27 @@ Initial expense history still loads one chunk, and further pages load on demand.
 
 ## Experimental tradeoffs
 
-The first port selects whole immutable domain snapshots as scalar Fate fields.
-It preserves `Date`, `RawString`, object identity, source deletion, and existing
-expense pagination without converting the persisted model. It does not yet provide
-field-level normalized participant/expense subscriptions. Chunk relationships are
-still present in the internal domain hooks. Narrower public views and domain-only
-list cursors remain follow-up work for evaluating normalization.
+React selects named views from [`data/views.ts`](../src/lib/data/views.ts): party
+headers, settings, participants, profile membership, appearance, balances, expense
+rows, drafts, and media each declare their fields. `useParty(id, view)` and
+`usePartyList(view)` require a selection; the generic whole-document React hooks
+are removed. Appearance effects run once at bootstrap.
+
+[`data/projection.ts`](../src/lib/data/projection.ts) maps source documents to
+Party, Profile, ExpenseChunk, Expense, Balance, and Media entities. Expenses have
+independent identities; chunks expose normalized expense references. List views
+select membership, saved rows select saved expense fields, and editors additionally
+select draft fields. A source change publishes its projections atomically. Removed
+optional fields are explicitly cleared, and removed expenses or documents publish
+`available: false`. Required views use the existing unavailable-record error path.
+
+Participant, payment-method, template, balance, and draft maps remain scalar fields.
+They preserve `Date`, `RawString`, and immutable nested object identity; individual
+entries in these maps are not normalized. Route preloads and the pagination
+controller retain imperative source snapshots internally. The controller handles
+chunk loading and sort order; React reads displayed expense fields through Fate
+views. Unchanged expense ID order does not invalidate the pagination snapshot.
+Persisted document shapes and the initial one-chunk loading policy are unchanged.
 
 Local commands use a private Fate mutation that executes a typed source closure.
 Those closures are neither serialized nor replayed after reload. The source write
@@ -69,7 +85,10 @@ prioritizes instant revisits; an eviction policy should be measured separately.
 [`client.test.ts`](../src/lib/data/client.test.ts) covers immediate publication,
 source field removal, repository isolation, incoming merges, media values,
 acknowledged save/offline reopen, draft round trips, retained history, deletion,
-and listener cleanup. [HTTP adapter tests](../src/lib/data/http.test.ts) cover
+and listener cleanup. [`views.test.tsx`](../src/lib/data/views.test.tsx) mounts
+React against real repositories to verify field isolation, shared listeners,
+optional-field removal, normalized expense membership, draft write round trips,
+incoming merges, deletion, and retention. [HTTP adapter tests](../src/lib/data/http.test.ts) cover
 read sharing, refresh, server errors, and in-flight account isolation. Existing domain,
 account, SDK, and API tests exercise the production implementations behind Fate.
 

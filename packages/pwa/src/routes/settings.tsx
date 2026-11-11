@@ -1,3 +1,4 @@
+import { ProfileSettingsView, ProfileAnalyticsView } from "#src/lib/data/views.ts";
 import { PaymentMethodsEditor } from "#src/components/PaymentMethodsEditor.tsx";
 import {
   getPaymentMethods,
@@ -62,7 +63,7 @@ function getLocaleOptions(): LocaleOption[] {
 }
 
 export function Settings() {
-  const { partyList, updateSettings } = usePartyList();
+  const { partyList, updateSettings } = usePartyList(ProfileSettingsView);
   const navigate = useNavigate();
   const localeOptions = getLocaleOptions();
 
@@ -305,7 +306,7 @@ function SettingsFormFields({
 }
 
 function UsageAnalyticsSetting() {
-  const { partyList, setUsageAnalyticsEnabled } = usePartyList();
+  const { partyList, setUsageAnalyticsEnabled } = usePartyList(ProfileAnalyticsView);
 
   return (
     <SwitchField

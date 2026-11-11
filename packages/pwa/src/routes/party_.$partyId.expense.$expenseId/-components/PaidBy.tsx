@@ -1,3 +1,4 @@
+import { PartyParticipantAmountsView } from "#src/lib/data/views.ts";
 import { t } from "@lingui/core/macro";
 import { Fragment } from "react";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
@@ -7,7 +8,7 @@ import type { Expense } from "#src/models/expense.js";
 import { Icon } from "@trizum/ui/Icon";
 
 export function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyParticipantAmountsView);
   const currentParticipant = useCurrentParticipant();
   const hasMultiple = Object.keys(paidBy).length > 1;
 

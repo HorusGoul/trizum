@@ -1,3 +1,4 @@
+import { PartyCurrencyView } from "#src/lib/data/views.ts";
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import {
@@ -221,7 +222,7 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
 }
 
 function ExpenseEditorValidationIssueItem({ issue }: { issue: ExpenseEditorValidationIssue }) {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyCurrencyView);
 
   switch (issue.code) {
     case "shares-total-mismatch":

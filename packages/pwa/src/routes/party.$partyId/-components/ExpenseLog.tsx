@@ -1,3 +1,4 @@
+import { PartyTemplatesView } from "#src/lib/data/views.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -25,7 +26,7 @@ import { cn } from "@trizum/ui/utils";
 import { VirtualizedExpenseList } from "./VirtualizedExpenseList.js";
 
 export function ExpenseLog() {
-  const { party, dev, setParticipantDetails } = useCurrentParty();
+  const { party, dev, setParticipantDetails } = useCurrentParty(PartyTemplatesView);
   const { expenses, hasNext, isLoadingNext, loadNext } = usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
   const navigate = useNavigate();

@@ -1,73 +1,39 @@
-import { useDataRecord } from "#src/lib/data/hooks.ts";
+import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { useParams } from "@tanstack/react-router";
-import type { Party } from "#src/models/party.ts";
+import type { View, Selection } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 
-export function useParty(partyId: string) {
-  const [party] = useDataRecord<Party>(partyId, {
-    required: true,
-  });
-
+export function useParty<const Selected extends Selection<PartyEntity>>(
+  partyId: string,
+  selected: View<PartyEntity, Selected>,
+) {
   const data = useAppData();
-  const helpers = data.readyPartyActions(party.id);
+  const party = useRequiredView(selected, data.entityRef<PartyEntity>("Party", partyId, selected));
 
-  async function __dev_createTestExpenses() {
-    const promptAnswer = window.prompt("How many test expenses to create?");
+  async function createTestExpenses() {
+    const answer = window.prompt("How many test expenses to create?");
 
-    if (!promptAnswer) {
-      return;
-    }
+    if (!answer) return;
 
-    const amount = parseInt(promptAnswer ?? "0");
-
-    const participants = Object.keys(party.participants);
-
-    await Promise.all(
-      Array.from({ length: amount }, (_, index) => {
-        const expenseNumber = index + 1;
-
-        return helpers.addExpenseToParty({
-          name: `Test Expense ${expenseNumber}`,
-          paidAt: new Date(),
-          shares: {
-            [participants.at(0)!]: {
-              type: "divide",
-              value: 1,
-            },
-            [participants.at(1)!]: {
-              type: "divide",
-              value: 1,
-            },
-          },
-          photos: [],
-          paidBy: {
-            [participants.at(0)!]: 100,
-          },
-        });
-      }),
-    );
+    await data.createTestExpenses(partyId, parseInt(answer));
   }
 
   return {
     party,
     partyId,
     isLoading: false,
-    ...helpers,
-    dev: {
-      createTestExpenses: __dev_createTestExpenses,
-    },
+    ...data.readyPartyActions(partyId),
+    dev: { createTestExpenses },
   };
 }
 
-export function useCurrentParty() {
-  const partyId = useParams({
-    strict: false,
-    select: (params) => params.partyId,
-  });
+export function useCurrentParty<const Selected extends Selection<PartyEntity>>(
+  selected: View<PartyEntity, Selected>,
+) {
+  const partyId = useParams({ strict: false, select: (params) => params.partyId });
 
-  if (!partyId) {
-    throw new Error("No Party ID found in URL");
-  }
+  if (!partyId) throw new Error("No Party ID found in URL");
 
-  return useParty(partyId);
+  return useParty(partyId, selected);
 }

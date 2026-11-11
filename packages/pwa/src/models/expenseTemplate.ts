@@ -124,7 +124,13 @@ export function resolveExpenseTemplateValues({
 }: {
   currentParticipantId: ExpenseUser;
   now: Date;
-  party: Party;
+  party: Pick<
+    Party,
+    | "expenseTemplates"
+    | "defaultExpenseTemplateId"
+    | "onlyUseCustomExpenseTemplates"
+    | "participants"
+  >;
   templateId?: string;
 }): ResolvedExpenseTemplateValues {
   const template = templateId ? party.expenseTemplates?.[templateId] : undefined;

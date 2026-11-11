@@ -1,3 +1,4 @@
+import { ProfileBannerView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -15,7 +16,7 @@ import { IconButton } from "@trizum/ui/IconButton";
 import { ProfileSetupCard } from "./ProfileSetupCard.tsx";
 
 export function HomeBanner({ isVisible }: { isVisible: boolean }) {
-  const { partyList, dismissPremiumBanner } = usePartyList();
+  const { partyList, dismissPremiumBanner } = usePartyList(ProfileBannerView);
   const navigate = useNavigate();
   const isHome = useLocation({ select: (location) => location.pathname === "/" });
   const resumePremium = useSearch({ strict: false, select: (search) => search.premium });

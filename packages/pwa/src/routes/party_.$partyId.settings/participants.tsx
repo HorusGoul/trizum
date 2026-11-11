@@ -1,3 +1,4 @@
+import { PartyParticipantsView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/party_/$partyId/settings/participants")({
 
 function PartyParticipantSettings() {
   const { partyId } = Route.useParams();
-  const { party, updateParticipants } = useParty(partyId);
+  const { party, updateParticipants } = useParty(partyId, PartyParticipantsView);
 
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",

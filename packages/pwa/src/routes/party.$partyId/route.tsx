@@ -1,3 +1,4 @@
+import { ProfileIdentityView, PartyHeaderView } from "#src/lib/data/views.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -52,9 +53,10 @@ function PartyById() {
 
   const { party, partyId, isLoading, setParticipantDetails, recalculateBalances } = useParty(
     params.partyId,
+    PartyHeaderView,
   );
 
-  const { removeParty } = usePartyList();
+  const { removeParty } = usePartyList(ProfileIdentityView);
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
@@ -83,7 +85,7 @@ function PartyById() {
       trackEvent(tab === "balances" ? "party_balances_selected" : "party_expenses_selected");
   }
 
-  const { setLastOpenedPartyId } = usePartyList();
+  const { setLastOpenedPartyId } = usePartyList(ProfileIdentityView);
   const lastRecordedPartyIdRef = useRef<string | null>(null);
 
   useEffect(() => {

@@ -1,7 +1,8 @@
+import { PartyParticipantsView } from "#src/lib/data/views.ts";
 import { useCurrentParty } from "./useParty";
 
 export function usePartyParticipants() {
-  const { party } = useCurrentParty();
+  const { party } = useCurrentParty(PartyParticipantsView);
 
   const all = Object.values(party.participants);
   const archived = all.filter((participant) => participant.isArchived);

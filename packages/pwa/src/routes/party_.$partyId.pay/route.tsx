@@ -1,3 +1,4 @@
+import { PartyTransferView } from "#src/lib/data/views.ts";
 import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
@@ -43,7 +44,7 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
 
 function RouteComponent() {
   const { fromId, toId, amount } = Route.useSearch();
-  const { party, addExpenseToParty } = useCurrentParty();
+  const { party, addExpenseToParty } = useCurrentParty(PartyTransferView);
   const me = useCurrentParticipant();
   const from = party.participants[fromId];
   const to = party.participants[toId];
