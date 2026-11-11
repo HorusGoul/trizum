@@ -1,6 +1,7 @@
 import type { LogRecord } from "@logtape/logtape";
 import { getSentrySink } from "@logtape/sentry";
 import { getTrizumLogger, configureTrizumLogging } from "@trizum/logging";
+import { sentryLoggerConfig } from "@trizum/logging/sentry";
 import { AsyncLocalStorage } from "node:async_hooks";
 import packageJson from "#package.json" with { type: "json" };
 
@@ -18,7 +19,7 @@ export function configureServerLogging(): void {
     extraSinks: {
       sentry: getSentrySink(),
     },
-    extraLoggers: [{ category: [], lowestLevel: "error", sinks: ["sentry"] }],
+    extraLoggers: [sentryLoggerConfig],
     contextLocalStorage,
   });
 }
