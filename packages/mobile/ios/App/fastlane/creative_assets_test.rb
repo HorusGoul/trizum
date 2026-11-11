@@ -69,7 +69,7 @@ class CreativeAssetsClientFake
     data = body.fetch(:data)
     item = if %w[v1/appAssetLibraryVideos v1/appAssetLibraryImages].include?(path)
              id = "#{data.fetch(:attributes).fetch(:referenceName)}-#{@videos.length + @images.length}"
-             attributes = data.fetch(:attributes).transform_keys(&:to_s).merge("state" => "AWAITING_UPLOAD", "specId" => (path.end_with?("Images") ? "search-image" : id.include?("search") ? "search-video" : "header-video"), "previewFrameImage" => { "state" => "COMPLETE" }, "uploadOperations" => [{ "method" => "PUT", "url" => "https://upload.example.test/part", "offset" => 0, "length" => data.fetch(:attributes).fetch(:fileSize), "requestHeaders" => [{ "name" => "Content-Type", "value" => "video/mp4" }] }])
+             attributes = data.fetch(:attributes).transform_keys(&:to_s).merge("state" => "AWAITING_UPLOAD", "specId" => (path.end_with?("Images") ? "search-image" : id.include?("search") ? "search-video" : "header-video"), "previewFrameImage" => { "state" => { "state" => "COMPLETE", "errors" => [], "warnings" => [] } }, "uploadOperations" => [{ "method" => "PUT", "url" => "https://upload.example.test/part", "offset" => 0, "length" => data.fetch(:attributes).fetch(:fileSize), "requestHeaders" => [{ "name" => "Content-Type", "value" => "video/mp4" }] }])
              attributes.delete("previewFrameImage") if path.end_with?("Images")
              (path.end_with?("Images") ? @images : @videos)[id] = { "id" => id, "attributes" => attributes }
            elsif path == "v1/appAssetLibraryPlacements"
@@ -103,6 +103,8 @@ class CreativeAssetsTest < Minitest::Test
     @directory = Dir.mktmpdir("trizum-header-test")
     @manifest = JSON.parse(File.read(File.join(__dir__, "creative_assets/manifest.json")))
     @manifest.fetch("assets").each { |asset| asset["path"] = File.expand_path(asset.fetch("path"), File.join(__dir__, "creative_assets")) }
+    @release_manifest = JSON.parse(JSON.generate(@manifest))
+    @manifest["assets"] = @manifest.fetch("assets").select { |asset| asset.fetch("placement_type") == "PRODUCT_PAGE_HEADER_ASSET" }
     @manifest_path = File.join(@directory, "manifest.json")
     File.write(@manifest_path, JSON.generate(@manifest))
     @client = CreativeAssetsClientFake.new(@manifest)
@@ -113,7 +115,7 @@ class CreativeAssetsTest < Minitest::Test
     FileUtils.remove_entry(@directory)
   end
 
-  def run_creatives(preflight: false)
+  def run_creatives(preflight: false, on_wait: nil)
     http = Object.new
     uploads = @uploads
     http.define_singleton_method(:request) do |request|
@@ -122,7 +124,12 @@ class CreativeAssetsTest < Minitest::Test
     end
     transport = Object.new
     transport.define_singleton_method(:start) { |*_arguments, **_options, &block| block.call(http) }
-    CreativeAssets.new(client: @client, manifest: @manifest_path, report: File.join(@directory, "report.json"), log: ->(_message) {}, http: transport).run(version: "1.14.0", preflight: preflight)
+    uploader = CreativeAssets.new(client: @client, manifest: @manifest_path, report: File.join(@directory, "report.json"), log: ->(_message) {}, http: transport)
+    uploader.define_singleton_method(:sleep) do |_seconds|
+      raise "Unexpected wait for a processed creative" unless on_wait
+      on_wait.call
+    end
+    uploader.run(version: "1.14.0", preflight: preflight)
   end
 
   def test_uploads_exact_approved_bytes_without_api_token_and_places_both_locales
@@ -139,10 +146,78 @@ class CreativeAssetsTest < Minitest::Test
     assert @client.mutations.any? { |method, path, body| method == :patch && path.include?("Videos/") && body.dig(:data, :attributes) == { uploaded: true } }
   end
 
+  def test_release_manifest_uploads_selected_headers_and_search_images_in_both_locales
+    File.write(@manifest_path, JSON.generate(@release_manifest))
+
+    result = run_creatives
+
+    assert_equal 4, result.fetch("assets").length
+    assert_equal 8, result.fetch("placements").length
+    @uploads.zip(@release_manifest.fetch("assets")).each do |request, asset|
+      assert_equal File.binread(asset.fetch("path")), request.body
+    end
+    %w[en-US es-ES].each do |locale|
+      assert_equal %w[APP_STORE_SEARCH_RESULTS_ASSET PRODUCT_PAGE_HEADER_ASSET], result.fetch("placements").select { |placement| placement.fetch("locale") == locale }.map { |placement| placement.fetch("placement_type") }.uniq.sort
+    end
+    @client.mutations.clear
+    @uploads.clear
+    run_creatives
+    assert_empty @client.mutations
+    assert_empty @uploads
+  end
+
   def test_freshly_committed_upload_can_briefly_report_awaiting_upload
     @client.transient_upload_state = true
-    result = run_creatives
+    result = run_creatives(on_wait: -> {})
     assert_equal 4, result.fetch("placements").length
+  end
+
+  def test_waits_for_nested_poster_processing_before_placing_any_assets
+    run_creatives
+    @client.mutations.clear
+    @client.videos.each_value do |video|
+      video.fetch("attributes")["previewFrameImage"]["state"] = { "state" => "PROCESSING" }
+    end
+    waits = 0
+
+    result = run_creatives(on_wait: lambda do
+      waits += 1
+      assert_empty @client.mutations
+      @client.videos.each_value do |video|
+        video.fetch("attributes")["previewFrameImage"]["state"] = { "state" => "COMPLETE" }
+      end
+    end)
+
+    assert_equal 1, waits
+    assert_equal 4, result.fetch("placements").length
+    assert result.fetch("assets").all? { |asset| asset.dig("preview_frame_state", "state") == "COMPLETE" }
+  end
+
+  def test_nested_poster_failure_reports_apple_errors_without_replacing_assets
+    run_creatives
+    @client.mutations.clear
+    @client.videos.each_value do |video|
+      video.fetch("attributes")["previewFrameImage"]["state"] = { "state" => "FAILED", "errors" => [{ "code" => "INVALID_TIMECODE" }] }
+    end
+
+    error = assert_raises(RuntimeError) { run_creatives }
+
+    assert_match(/Poster processing failed.*INVALID_TIMECODE/, error.message)
+    assert_empty @client.mutations
+    report = JSON.parse(File.read(File.join(@directory, "report.json")))
+    assert_equal "FAILED", report.fetch("assets").first.dig("preview_frame_state", "state")
+  end
+
+  def test_search_video_uses_the_same_nested_poster_readiness_contract
+    asset = @manifest.fetch("assets").first.merge("placement_type" => "APP_STORE_SEARCH_RESULTS_ASSET", "width" => 1920, "height" => 1280)
+    @manifest.fetch("assets") << asset
+    File.write(@manifest_path, JSON.generate(@manifest))
+
+    result = run_creatives
+
+    assert_equal 3, result.fetch("assets").length
+    assert_equal 6, result.fetch("placements").length
+    assert_equal 2, result.fetch("placements").count { |placement| placement.fetch("placement_type") == "APP_STORE_SEARCH_RESULTS_ASSET" }
   end
 
   def test_rerun_reuses_assets_and_placements

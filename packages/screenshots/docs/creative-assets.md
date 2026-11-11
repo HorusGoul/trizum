@@ -20,8 +20,9 @@ All source lives in [`src/creative-assets`](../src/creative-assets/):
 | `preview-controls.ts`, `preview.html` | Local playback, language and framing controls                    |
 | `manifest.ts`, `schema.ts`            | File inspection and explicit release selection                   |
 
-The original search concepts remain drafts; the approved header is the current
-release selection. Header financial examples use integer cents. When changing
+The release selection includes the approved header and search concept A (Shared
+adventures) in English and Spanish. Search keeps its original concept styling;
+concepts B and C remain drafts. Header financial examples use integer cents. When changing
 expenses or repayments, update the matching story amounts and states together;
 the ledger tests check zero-sum balances and settlement through every frame.
 
@@ -87,10 +88,10 @@ After reviewing a header export:
 vp run creative:prepare --kind header --from creative-assets/header --media video --poster-time-code 00:00:10:48
 ```
 
-After reviewing a search concept, for example B:
+To select the approved search concept A:
 
 ```bash
-vp run creative:prepare --kind search --from creative-assets/search/b --media image
+vp run creative:prepare --kind search --from creative-assets/search/a --media image
 ```
 
 Selection requires both `en-US` and `es-ES` files. It validates every locale

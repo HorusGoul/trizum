@@ -53,10 +53,9 @@ vp run ruby:check:android
 
 For product page header and search artwork automation, read the
 [creative asset guide](./app-store-creative-assets.md). The approved English and
-Spanish headers are uploaded and attached by `deploy_appstore_full` after
-metadata upload and before version review. Merging their files does not upload
-or publish anything. The same manifest supports future selected search artwork;
-search drafts are currently unselected. Editable source and regeneration commands
+Spanish headers and concept A search images are uploaded and attached by
+`deploy_appstore_full` after metadata upload and before version review. Merging
+their files does not upload or publish anything. Editable source and regeneration commands
 are documented in the [creative generation guide](../../screenshots/docs/creative-assets.md).
 
 **Build Lanes:**
@@ -93,6 +92,24 @@ path; completed screenshots are preserved. The entire synchronization has a
 before review submission. Timeout logs identify the affected screenshot IDs,
 filenames, and states.
 
+App Store deployments wait up to ten minutes for the uploaded version/build pair
+and explicitly attach it to that exact iOS version before uploading creatives.
+`deploy_appstore_full` then attaches selected creatives and submits the version
+for review by default. `submit_for_review:false` still attaches the build and
+creatives. `deploy_appstore` attaches only the build.
+
+If a release stops after the binary upload, recover without rebuilding or
+uploading the IPA again:
+
+```bash
+bundle exec fastlane submit_review app_version:1.13.6 build_number:10130600 automatic_release:true
+```
+
+Use the version and build number from the failed release. This lane waits for
+that build, attaches it, reuses/uploads and places the selected creatives, then
+submits the version. Omitting the pair defaults to the local native project's
+version and build number; `build_number:latest` also uses the local build number.
+
 The creative asset lane defaults to the native project's version. Use
 `upload_creative_assets app_version:1.14.0 preflight:true` to validate the selected
 file checksums and inspect Apple's current specifications, target localizations,
@@ -101,6 +118,10 @@ uploads reuse matching assets and placements. They replace only the selected
 locale/type/group slots after all selected assets finish processing. Other
 artwork is preserved. The selected creatives are reviewed and released with the
 app version.
+
+Video readiness checks both the asset status and Apple's nested
+`previewFrameImage.state.state`. Poster processing errors stop placement and
+review; logs and the creative asset report include the poster state and errors.
 
 **Utility Lanes:**
 
