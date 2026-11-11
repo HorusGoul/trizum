@@ -151,13 +151,19 @@ test("blank payment methods are removed on save without restoring legacy Bizum",
   await page.getByRole("button", { name: "Bizum actions", exact: true }).click();
   await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
   const phone = page.getByRole("textbox", { name: "Bizum", exact: true });
+  await expect(phone).toHaveAttribute("placeholder", "e.g. 612 345 678");
+  await expect(page.getByText("Your Bizum phone number.", { exact: true })).toBeVisible();
+  const phoneError = page.getByText("Enter a valid Bizum phone number.", { exact: true });
   await phone.fill("not a phone");
-  await expect(
-    page.getByText("Enter a valid Bizum phone number, including the country code.", {
-      exact: true,
-    }),
-  ).toBeVisible();
+  await expect(phoneError).toHaveCount(0);
+  await expect(phone).not.toHaveAttribute("aria-invalid", "true");
+  await phone.press("Tab");
+  await expect(phoneError).toBeVisible();
   await expect(page.getByRole("button", { name: "Save", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Bizum actions", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
+  await expect(phone).toBeFocused();
+  await expect(phoneError).toHaveCount(0);
   await phone.fill("");
   await page.getByRole("textbox", { name: "Username", exact: true }).click();
   await page.getByRole("button", { name: "Edit Bizum", exact: true }).click();
@@ -252,6 +258,22 @@ test.describe("mobile payment settings", () => {
     await page.getByRole("textbox", { name: "Username", exact: true }).tap();
     await page.getByRole("button", { name: "Edit Venmo", exact: true }).tap();
     await expect(field).toBeFocused();
+
+    const invalidHandle = page.getByText("Enter a valid Venmo username or profile link.", {
+      exact: true,
+    });
+
+    await field.fill("not a handle");
+    await expect(invalidHandle).toHaveCount(0);
+    await page.getByRole("textbox", { name: "Username", exact: true }).tap();
+    await expect(invalidHandle).toBeVisible();
+    await page.getByRole("button", { name: "Venmo actions", exact: true }).tap();
+    await page
+      .getByRole("dialog", { name: "Venmo", exact: true })
+      .getByRole("button", { name: "Edit", exact: true })
+      .tap();
+    await expect(field).toBeFocused();
+    await expect(invalidHandle).toHaveCount(0);
     await field.fill("@alex");
     await expect(field).toHaveAccessibleDescription("Your Venmo username or profile link.");
     await page.getByRole("textbox", { name: "Username", exact: true }).tap();

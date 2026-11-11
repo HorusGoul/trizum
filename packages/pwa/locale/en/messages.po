@@ -88,8 +88,8 @@ msgstr "{issueCount, plural, one {# warning} other {# warnings}}"
 msgid "{message}"
 msgstr "{message}"
 
-#: src/components/PaymentMethodEditorRow.tsx:155
-#: src/components/PaymentMethodEditorRow.tsx:194
+#: src/components/PaymentMethodEditorRow.tsx:152
+#: src/components/PaymentMethodEditorRow.tsx:191
 msgid "{methodName} actions"
 msgstr "{methodName} actions"
 
@@ -1090,8 +1090,8 @@ msgstr "Copy {methodName} details"
 msgid "Copy code"
 msgstr "Copy code"
 
-#: src/components/PaymentMethodEditorRow.tsx:204
-#: src/components/PaymentMethodEditorRow.tsx:239
+#: src/components/PaymentMethodEditorRow.tsx:201
+#: src/components/PaymentMethodEditorRow.tsx:236
 msgid "Copy details"
 msgstr "Copy details"
 
@@ -1414,6 +1414,10 @@ msgstr "e.g. +34 612 345 678"
 msgid "e.g. $yourname"
 msgstr "e.g. $yourname"
 
+#: src/lib/paymentMethods.ts:30
+msgid "e.g. 612 345 678"
+msgstr "e.g. 612 345 678"
+
 #: src/lib/paymentMethods.ts:31
 msgid "e.g. Alex · IBAN or account number"
 msgstr "e.g. Alex · IBAN or account number"
@@ -1430,13 +1434,13 @@ msgstr "e.g. Wise · your payment details"
 msgid "East Caribbean Dollar"
 msgstr "East Caribbean Dollar"
 
-#: src/components/PaymentMethodEditorRow.tsx:196
-#: src/components/PaymentMethodEditorRow.tsx:224
+#: src/components/PaymentMethodEditorRow.tsx:193
+#: src/components/PaymentMethodEditorRow.tsx:221
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:113
 msgid "Edit"
 msgstr "Edit"
 
-#: src/components/PaymentMethodEditorRow.tsx:61
+#: src/components/PaymentMethodEditorRow.tsx:60
 msgid "Edit {methodName}"
 msgstr "Edit {methodName}"
 
@@ -1536,6 +1540,10 @@ msgstr "Enter a valid $Cashtag or Cash App profile link."
 #: src/lib/paymentMethods.ts:129
 msgid "Enter a valid Bizum phone number, including the country code."
 msgstr "Enter a valid Bizum phone number, including the country code."
+
+#: src/lib/paymentMethods.ts:129
+msgid "Enter a valid Bizum phone number."
+msgstr "Enter a valid Bizum phone number."
 
 #: src/lib/paymentMethods.ts:109
 msgid "Enter a valid PayPal.Me username or profile link."
@@ -1916,7 +1924,7 @@ msgstr "Hide password sign in"
 msgid "Hide the blank option when adding an expense."
 msgstr "Hide the blank option when adding an expense."
 
-#: src/components/PaymentMethodEditorRow.tsx:67
+#: src/components/PaymentMethodEditorRow.tsx:66
 msgid "Hold for payment method actions"
 msgstr "Hold for payment method actions"
 
@@ -2388,7 +2396,7 @@ msgstr "Monthly"
 msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 msgstr "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 
-#: src/components/PaymentMethodEditorRow.tsx:189
+#: src/components/PaymentMethodEditorRow.tsx:186
 msgid "More {methodName} actions"
 msgstr "More {methodName} actions"
 
@@ -3195,8 +3203,8 @@ msgstr "Premium status could not be checked. Try again."
 msgid "Premium, made for sharing."
 msgstr "Premium, made for sharing."
 
-#: src/components/PaymentMethodEditorRow.tsx:200
-#: src/components/PaymentMethodEditorRow.tsx:228
+#: src/components/PaymentMethodEditorRow.tsx:197
+#: src/components/PaymentMethodEditorRow.tsx:225
 msgid "Preview payment link"
 msgstr "Preview payment link"
 
@@ -3310,8 +3318,8 @@ msgstr "Remove {methodName}"
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
-#: src/components/PaymentMethodEditorRow.tsx:207
-#: src/components/PaymentMethodEditorRow.tsx:249
+#: src/components/PaymentMethodEditorRow.tsx:204
+#: src/components/PaymentMethodEditorRow.tsx:246
 msgid "Remove payment method"
 msgstr "Remove payment method"
 
@@ -4766,6 +4774,10 @@ msgstr "Your account could not be checked. Connect to the internet and try again
 #: src/lib/paymentMethods.ts:20
 msgid "Your Bizum phone number, including the country code."
 msgstr "Your Bizum phone number, including the country code."
+
+#: src/lib/paymentMethods.ts:20
+msgid "Your Bizum phone number."
+msgstr "Your Bizum phone number."
 
 #: src/routes/support/route.tsx:95
 msgid "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."

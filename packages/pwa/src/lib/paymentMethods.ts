@@ -17,7 +17,7 @@ export const paymentMethodLabels = {
 };
 
 export const paymentMethodDescriptions = {
-  bizum: msg`Your Bizum phone number, including the country code.`,
+  bizum: msg`Your Bizum phone number.`,
   "bank-transfer": msg`Account holder, IBAN or account number, and any other details needed for a transfer.`,
   paypal: msg`Your PayPal.Me username or profile link.`,
   revolut: msg`Your Revtag or Revolut.me profile link. Enable Revtag discoverability in Revolut to receive payments.`,
@@ -27,7 +27,7 @@ export const paymentMethodDescriptions = {
 };
 
 export const paymentMethodPlaceholders = {
-  bizum: msg`e.g. +34 612 345 678`,
+  bizum: msg`e.g. 612 345 678`,
   "bank-transfer": msg`e.g. Alex · IBAN or account number`,
   paypal: msg`e.g. paypal.me/yourname`,
   revolut: msg`e.g. @yourname`,
@@ -126,7 +126,7 @@ export function validatePaymentMethod(type: PaymentMethodType, value: string): s
     const digits = details.replace(/\D/g, "");
 
     if (!/^\+?[\d\s().-]+$/.test(details) || digits.length < 6 || digits.length > 15) {
-      return t`Enter a valid Bizum phone number, including the country code.`;
+      return t`Enter a valid Bizum phone number.`;
     }
 
     return null;

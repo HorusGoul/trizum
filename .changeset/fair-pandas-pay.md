@@ -14,4 +14,4 @@ Use compact payment rows with direct links, hold-to-copy without opening the ser
 
 Keep the empty receiving-method section compact and explain how group members use shared payment details to settle debts.
 
-Let blank receiving methods reopen for editing with one tap and remove them when saving. Show service-specific validation, including Bizum phone guidance, and align payment-row icons with the add button.
+Let blank receiving methods reopen for editing with one tap and remove them when saving. Show service-specific validation, including Bizum phone guidance without asking for a country code, show errors after leaving a field, and align payment-row icons with the add button.

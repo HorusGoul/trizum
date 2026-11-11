@@ -11,7 +11,6 @@ import {
   ModalSheetTitle,
 } from "@trizum/ui/ModalSheet";
 import { Input, TextArea, TextField } from "@trizum/ui/fields/TextField";
-import { FieldError } from "@trizum/ui/fields/Field";
 import { useMediaQuery } from "@trizum/ui/useMediaQuery";
 import { useId, useLayoutEffect, useRef, useState } from "react";
 import { mergeProps, useButton, useLongPress } from "react-aria";
@@ -61,7 +60,7 @@ export function PaymentMethodEditorRow({
   const editLabel = t({ message: `Edit ${methodName}` });
   const href = getPaymentLink(type, details);
   const copyDetails = useCopyPaymentDetails(details);
-  const error = validatePaymentMethod(type, details);
+  const error = isEditing ? null : validatePaymentMethod(type, details);
 
   const { longPressProps } = useLongPress({
     accessibilityDescription: t`Hold for payment method actions`,
@@ -120,7 +119,6 @@ export function PaymentMethodEditorRow({
             value={details}
             onChange={onChange}
             onBlur={() => setIsEditing(false)}
-            isInvalid={details.length > 0 && !!error}
             maxLength={type === "bizum" ? 20 : 1000}
             className="min-w-0 flex-1"
           >
@@ -145,7 +143,6 @@ export function PaymentMethodEditorRow({
             <Text slot="description" className={hintClassName}>
               {t(paymentMethodDescriptions[type])}
             </Text>
-            <FieldError className="block pb-2">{error}</FieldError>
           </TextField>
         </div>
       ) : (
