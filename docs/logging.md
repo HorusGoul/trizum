@@ -166,6 +166,9 @@ nested properties, error causes, aggregate errors, and stacks. It keeps error
 classification and stack locations and does not mutate application errors.
 Circular values are marked, and custom serializers/accessors are not invoked.
 
+Password-reset tokens in `/api/auth/reset-password/<token>` paths are also
+redacted across these sinks and Sentry payload hooks.
+
 This boundary also covers the PWA browser and sync server. The Worker logging
 audit includes share-preview load/shutdown errors, Party Boost membership
 shutdown errors and nested failures, request errors, migration errors, and
