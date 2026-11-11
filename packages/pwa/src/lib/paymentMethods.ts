@@ -105,15 +105,42 @@ export function normalizePaymentMethods(methods: PaymentMethods): PaymentMethods
   return result;
 }
 
+const invalidProfileMessages = {
+  paypal: msg`Enter a valid PayPal.Me username or profile link.`,
+  revolut: msg`Enter a valid Revtag or Revolut.me profile link.`,
+  venmo: msg`Enter a valid Venmo username or profile link.`,
+  "cash-app": msg`Enter a valid $Cashtag or Cash App profile link.`,
+};
+
 export function validatePaymentMethod(type: PaymentMethodType, value: string): string | null {
-  if (!value.trim()) return t`Enter payment details or remove this method.`;
+  const details = value.trim();
 
-  if (value.length > 1000) return t`Payment details must be 1000 characters or fewer.`;
+  // Blank drafts are removed by normalizePaymentMethods when settings are saved.
+  if (!details) return null;
 
-  if (type === "bizum") return validatePhoneNumber(value);
+  if (type === "bizum") {
+    if (validatePhoneNumber(details)) {
+      return t`The Bizum phone number must be 20 characters or fewer.`;
+    }
 
-  if (type in paymentProfiles && !getPaymentLink(type, value)) {
-    return t`Enter a valid username or a profile link for this payment service.`;
+    const digits = details.replace(/\D/g, "");
+
+    if (!/^\+?[\d\s().-]+$/.test(details) || digits.length < 6 || digits.length > 15) {
+      return t`Enter a valid Bizum phone number, including the country code.`;
+    }
+
+    return null;
+  }
+
+  if (value.length > 1000) {
+    const methodName = t(paymentMethodLabels[type]);
+
+    return t`${methodName} details must be 1000 characters or fewer.`;
+  }
+
+  if (type in paymentProfiles && !getPaymentLink(type, details)) {
+    // SAFETY: Profile providers and their validation messages share the same keys.
+    return t(invalidProfileMessages[type as keyof typeof invalidProfileMessages]);
   }
 
   return null;

@@ -81,9 +81,37 @@ it("trims receiving details and preserves multi-line instructions", () => {
   });
 });
 
-it("requires details for an added method and limits instruction length", () => {
-  expect(validatePaymentMethod("other", "  ")).toBeTruthy();
+it("allows empty drafts to be removed on save and limits instruction length", () => {
+  expect(validatePaymentMethod("other", "  ")).toBeNull();
   expect(validatePaymentMethod("other", "x".repeat(1001))).toBeTruthy();
   expect(validatePaymentMethod("bizum", "1".repeat(21))).toBeTruthy();
   expect(validatePaymentMethod("other", "Send using Wise: alice@example.com")).toBeNull();
+});
+
+it.each<PaymentMethodType>([
+  "bizum",
+  "bank-transfer",
+  "paypal",
+  "revolut",
+  "venmo",
+  "cash-app",
+  "other",
+])("allows a blank %s draft to be removed on save", (type) =>
+  expect(validatePaymentMethod(type, " ")).toBeNull(),
+);
+
+it.each([
+  ["bizum", "not a phone", "Bizum phone number"],
+  ["bizum", "123", "Bizum phone number"],
+  ["paypal", "not a handle", "PayPal.Me"],
+  ["revolut", "not a handle", "Revtag"],
+  ["venmo", "not a handle", "Venmo"],
+  ["cash-app", "not a handle", "$Cashtag"],
+] as const)("explains invalid %s receiving details", (type, details, message) => {
+  expect(validatePaymentMethod(type, details)).toContain(message);
+});
+
+it("accepts formatted and legacy Bizum numbers", () => {
+  expect(validatePaymentMethod("bizum", "+34 612 345 678")).toBeNull();
+  expect(validatePaymentMethod("bizum", "612345678")).toBeNull();
 });

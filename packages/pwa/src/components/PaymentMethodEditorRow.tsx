@@ -51,8 +51,14 @@ export function PaymentMethodEditorRow({
   const detailsId = useId();
   const hintId = useId();
   const errorId = useId();
-  const { buttonProps } = useButton({ onPress: () => setIsOpen(true) }, actionRef);
+
+  const { buttonProps } = useButton(
+    { onPress: () => (details.trim() ? setIsOpen(true) : setIsEditing(true)) },
+    actionRef,
+  );
+
   const methodName = t(paymentMethodLabels[type]);
+  const editLabel = t({ message: `Edit ${methodName}` });
   const href = getPaymentLink(type, details);
   const copyDetails = useCopyPaymentDetails(details);
   const error = validatePaymentMethod(type, details);
@@ -69,7 +75,7 @@ export function PaymentMethodEditorRow({
     "text-accent-600 dark:text-accent-400 sr-only text-xs md:not-sr-only md:block md:pb-3";
 
   const serviceLabel = (
-    <span className="text-accent-700 dark:text-accent-200 flex min-h-12 w-11 shrink-0 items-center justify-center self-start md:w-28 md:justify-start md:gap-2">
+    <span className="text-accent-700 dark:text-accent-200 flex min-h-12 w-5 shrink-0 items-center justify-center self-start md:w-28 md:justify-start md:gap-2">
       <PaymentMethodIcon type={type} size={20} />
       <span className="hidden text-sm font-medium md:block">{methodName}</span>
     </span>
@@ -105,7 +111,7 @@ export function PaymentMethodEditorRow({
   return (
     <div className="group dark:bg-accent-900 focus-within:ring-accent-400 relative bg-white first:rounded-t-xl last:rounded-b-xl focus-within:z-10 focus-within:ring-2 focus-within:ring-inset">
       {isEditing ? (
-        <div className="flex items-start gap-3 px-3 md:pr-17">
+        <div className="flex items-start gap-3 px-4 md:pr-17">
           {serviceLabel}
           <TextField
             ref={fieldRef}
@@ -114,7 +120,6 @@ export function PaymentMethodEditorRow({
             value={details}
             onChange={onChange}
             onBlur={() => setIsEditing(false)}
-            isRequired
             isInvalid={details.length > 0 && !!error}
             maxLength={type === "bizum" ? 20 : 1000}
             className="min-w-0 flex-1"
@@ -147,7 +152,7 @@ export function PaymentMethodEditorRow({
         <button
           {...mergeProps(buttonProps, longPressProps)}
           ref={actionRef}
-          aria-label={t({ message: `${methodName} actions` })}
+          aria-label={details.trim() ? t({ message: `${methodName} actions` }) : editLabel}
           aria-describedby={[
             detailsId,
             hintId,
@@ -156,7 +161,7 @@ export function PaymentMethodEditorRow({
           ]
             .filter(Boolean)
             .join(" ")}
-          className="flex w-full cursor-pointer touch-pan-y items-start gap-3 px-3 text-left outline-hidden select-none [-webkit-touch-callout:none] md:pr-17"
+          className="flex w-full cursor-pointer touch-pan-y items-start gap-3 px-4 text-left outline-hidden select-none [-webkit-touch-callout:none] md:pr-17"
         >
           {serviceLabel}
           <span className="min-w-0 flex-1">

@@ -136,6 +136,47 @@ test("desktop settings retain edits through preview, copy, removal, and repeated
   await expect(field).toHaveCount(0);
 });
 
+test("blank payment methods are removed on save without restoring legacy Bizum", async ({
+  page,
+  harness,
+}) => {
+  await harness.seedPartyList({ username: "Alex", phone: "+34612345678" });
+  await harness.navigate("/settings");
+  await page.getByRole("button", { name: "Add payment method", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Venmo", exact: true }).click();
+  await page.getByRole("textbox", { name: "Venmo", exact: true }).fill("@alex");
+  await page.getByRole("button", { name: "Add payment method", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Other", exact: true }).click();
+  await page.getByRole("textbox", { name: "Other", exact: true }).fill(" ");
+  await page.getByRole("button", { name: "Bizum actions", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
+  const phone = page.getByRole("textbox", { name: "Bizum", exact: true });
+  await phone.fill("not a phone");
+  await expect(
+    page.getByText("Enter a valid Bizum phone number, including the country code.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save", exact: true })).toHaveCount(0);
+  await phone.fill("");
+  await page.getByRole("textbox", { name: "Username", exact: true }).click();
+  await page.getByRole("button", { name: "Edit Bizum", exact: true }).click();
+  await expect(phone).toBeFocused();
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page).toHaveURL(/\/(?:\?.*)?$/);
+  await harness.goto("/settings");
+  await expect(page.getByRole("button", { name: "Venmo actions", exact: true })).toContainText(
+    "https://venmo.com/u/alex",
+  );
+  await expect(page.getByRole("textbox", { name: "Bizum", exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /^(?:Edit Bizum|Bizum actions|Edit Other|Other actions)$/ }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Add payment method", exact: true }).click();
+  await expect(page.getByRole("menuitem", { name: "Bizum", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Other", exact: true })).toBeVisible();
+});
+
 test.describe("mobile payment settings", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
@@ -206,6 +247,10 @@ test.describe("mobile payment settings", () => {
     await picker.getByRole("button", { name: "Venmo", exact: true }).tap();
     await expect(picker).not.toBeVisible();
     const field = page.getByRole("textbox", { name: "Venmo", exact: true });
+    await expect(field).toBeFocused();
+    await field.fill(" ");
+    await page.getByRole("textbox", { name: "Username", exact: true }).tap();
+    await page.getByRole("button", { name: "Edit Venmo", exact: true }).tap();
     await expect(field).toBeFocused();
     await field.fill("@alex");
     await expect(field).toHaveAccessibleDescription("Your Venmo username or profile link.");

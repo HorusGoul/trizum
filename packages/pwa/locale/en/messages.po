@@ -88,10 +88,14 @@ msgstr "{issueCount, plural, one {# warning} other {# warnings}}"
 msgid "{message}"
 msgstr "{message}"
 
-#: src/components/PaymentMethodEditorRow.tsx:150
-#: src/components/PaymentMethodEditorRow.tsx:189
+#: src/components/PaymentMethodEditorRow.tsx:155
+#: src/components/PaymentMethodEditorRow.tsx:194
 msgid "{methodName} actions"
 msgstr "{methodName} actions"
+
+#: src/lib/paymentMethods.ts:138
+msgid "{methodName} details must be 1000 characters or fewer."
+msgstr "{methodName} details must be 1000 characters or fewer."
 
 #: src/routes/migrate_.tricount.tsx:321
 msgid "{name}"
@@ -1086,8 +1090,8 @@ msgstr "Copy {methodName} details"
 msgid "Copy code"
 msgstr "Copy code"
 
-#: src/components/PaymentMethodEditorRow.tsx:199
-#: src/components/PaymentMethodEditorRow.tsx:234
+#: src/components/PaymentMethodEditorRow.tsx:204
+#: src/components/PaymentMethodEditorRow.tsx:239
 msgid "Copy details"
 msgstr "Copy details"
 
@@ -1426,11 +1430,15 @@ msgstr "e.g. Wise · your payment details"
 msgid "East Caribbean Dollar"
 msgstr "East Caribbean Dollar"
 
-#: src/components/PaymentMethodEditorRow.tsx:191
-#: src/components/PaymentMethodEditorRow.tsx:219
+#: src/components/PaymentMethodEditorRow.tsx:196
+#: src/components/PaymentMethodEditorRow.tsx:224
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:113
 msgid "Edit"
 msgstr "Edit"
+
+#: src/components/PaymentMethodEditorRow.tsx:61
+msgid "Edit {methodName}"
+msgstr "Edit {methodName}"
 
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:22
 msgid "Edit template"
@@ -1521,9 +1529,29 @@ msgstr "Enjoy trizum ad-free"
 msgid "Enter a party link or code to join"
 msgstr "Enter a party link or code to join"
 
+#: src/lib/paymentMethods.ts:112
+msgid "Enter a valid $Cashtag or Cash App profile link."
+msgstr "Enter a valid $Cashtag or Cash App profile link."
+
+#: src/lib/paymentMethods.ts:129
+msgid "Enter a valid Bizum phone number, including the country code."
+msgstr "Enter a valid Bizum phone number, including the country code."
+
+#: src/lib/paymentMethods.ts:109
+msgid "Enter a valid PayPal.Me username or profile link."
+msgstr "Enter a valid PayPal.Me username or profile link."
+
+#: src/lib/paymentMethods.ts:110
+msgid "Enter a valid Revtag or Revolut.me profile link."
+msgstr "Enter a valid Revtag or Revolut.me profile link."
+
 #: src/lib/paymentMethods.ts:116
 msgid "Enter a valid username or a profile link for this payment service."
 msgstr "Enter a valid username or a profile link for this payment service."
+
+#: src/lib/paymentMethods.ts:111
+msgid "Enter a valid Venmo username or profile link."
+msgstr "Enter a valid Venmo username or profile link."
 
 #: src/lib/paymentMethods.ts:109
 msgid "Enter payment details or remove this method."
@@ -1888,7 +1916,7 @@ msgstr "Hide password sign in"
 msgid "Hide the blank option when adding an expense."
 msgstr "Hide the blank option when adding an expense."
 
-#: src/components/PaymentMethodEditorRow.tsx:61
+#: src/components/PaymentMethodEditorRow.tsx:67
 msgid "Hold for payment method actions"
 msgstr "Hold for payment method actions"
 
@@ -2360,7 +2388,7 @@ msgstr "Monthly"
 msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 msgstr "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 
-#: src/components/PaymentMethodEditorRow.tsx:184
+#: src/components/PaymentMethodEditorRow.tsx:189
 msgid "More {methodName} actions"
 msgstr "More {methodName} actions"
 
@@ -3167,8 +3195,8 @@ msgstr "Premium status could not be checked. Try again."
 msgid "Premium, made for sharing."
 msgstr "Premium, made for sharing."
 
-#: src/components/PaymentMethodEditorRow.tsx:195
-#: src/components/PaymentMethodEditorRow.tsx:223
+#: src/components/PaymentMethodEditorRow.tsx:200
+#: src/components/PaymentMethodEditorRow.tsx:228
 msgid "Preview payment link"
 msgstr "Preview payment link"
 
@@ -3282,8 +3310,8 @@ msgstr "Remove {methodName}"
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
-#: src/components/PaymentMethodEditorRow.tsx:202
-#: src/components/PaymentMethodEditorRow.tsx:244
+#: src/components/PaymentMethodEditorRow.tsx:207
+#: src/components/PaymentMethodEditorRow.tsx:249
 msgid "Remove payment method"
 msgstr "Remove payment method"
 
@@ -3963,6 +3991,10 @@ msgstr "Thank you for using trizum. Your feedback helps us improve!"
 #: src/components/PartyPendingComponent.tsx:16
 msgid "The app works offline too!"
 msgstr "The app works offline too!"
+
+#: src/lib/paymentMethods.ts:123
+msgid "The Bizum phone number must be 20 characters or fewer."
+msgstr "The Bizum phone number must be 20 characters or fewer."
 
 #: src/routes/terms/-components/ServiceTerms.tsx:11
 msgid "The free installed Android and iOS apps may display advertising. Premium may remove advertising for the Premium owner as described on the purchase screen. Advertising and related privacy choices are explained in our Privacy Policy."

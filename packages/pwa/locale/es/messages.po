@@ -88,10 +88,14 @@ msgstr "{issueCount, plural, one {# advertencia} other {# advertencias}}"
 msgid "{message}"
 msgstr "{message}"
 
-#: src/components/PaymentMethodEditorRow.tsx:150
-#: src/components/PaymentMethodEditorRow.tsx:189
+#: src/components/PaymentMethodEditorRow.tsx:155
+#: src/components/PaymentMethodEditorRow.tsx:194
 msgid "{methodName} actions"
 msgstr "Acciones de {methodName}"
+
+#: src/lib/paymentMethods.ts:138
+msgid "{methodName} details must be 1000 characters or fewer."
+msgstr "Los datos de {methodName} deben tener 1000 caracteres como máximo."
 
 #: src/routes/migrate_.tricount.tsx:321
 msgid "{name}"
@@ -1062,8 +1066,8 @@ msgstr "Copiar datos de {methodName}"
 msgid "Copy code"
 msgstr "Copiar código"
 
-#: src/components/PaymentMethodEditorRow.tsx:199
-#: src/components/PaymentMethodEditorRow.tsx:234
+#: src/components/PaymentMethodEditorRow.tsx:204
+#: src/components/PaymentMethodEditorRow.tsx:239
 msgid "Copy details"
 msgstr "Copiar datos"
 
@@ -1398,11 +1402,15 @@ msgstr "p. ej. Wise · tus datos de pago"
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
-#: src/components/PaymentMethodEditorRow.tsx:191
-#: src/components/PaymentMethodEditorRow.tsx:219
+#: src/components/PaymentMethodEditorRow.tsx:196
+#: src/components/PaymentMethodEditorRow.tsx:224
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:113
 msgid "Edit"
 msgstr "Editar"
+
+#: src/components/PaymentMethodEditorRow.tsx:61
+msgid "Edit {methodName}"
+msgstr "Editar {methodName}"
 
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:22
 msgid "Edit template"
@@ -1493,9 +1501,29 @@ msgstr "Disfruta de trizum sin anuncios"
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
+#: src/lib/paymentMethods.ts:112
+msgid "Enter a valid $Cashtag or Cash App profile link."
+msgstr "Introduce un $Cashtag válido o un enlace de perfil de Cash App."
+
+#: src/lib/paymentMethods.ts:129
+msgid "Enter a valid Bizum phone number, including the country code."
+msgstr "Introduce un número de teléfono válido para Bizum, incluido el prefijo del país."
+
+#: src/lib/paymentMethods.ts:109
+msgid "Enter a valid PayPal.Me username or profile link."
+msgstr "Introduce un nombre de usuario válido de PayPal.Me o un enlace de perfil."
+
+#: src/lib/paymentMethods.ts:110
+msgid "Enter a valid Revtag or Revolut.me profile link."
+msgstr "Introduce un Revtag válido o un enlace de perfil de Revolut.me."
+
 #: src/lib/paymentMethods.ts:116
 msgid "Enter a valid username or a profile link for this payment service."
 msgstr "Introduce un nombre de usuario válido o un enlace de perfil de este servicio de pago."
+
+#: src/lib/paymentMethods.ts:111
+msgid "Enter a valid Venmo username or profile link."
+msgstr "Introduce un nombre de usuario válido de Venmo o un enlace de perfil."
 
 #: src/lib/paymentMethods.ts:109
 msgid "Enter payment details or remove this method."
@@ -1840,7 +1868,7 @@ msgstr "Ocultar inicio de sesión con contraseña"
 msgid "Hide the blank option when adding an expense."
 msgstr "Oculta la opción en blanco al añadir un gasto."
 
-#: src/components/PaymentMethodEditorRow.tsx:61
+#: src/components/PaymentMethodEditorRow.tsx:67
 msgid "Hold for payment method actions"
 msgstr "Mantén pulsado para ver las opciones del método de pago"
 
@@ -2308,7 +2336,7 @@ msgstr "Mensual"
 msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 msgstr "Las suscripciones mensuales y anuales se renuevan automáticamente por otro periodo de facturación salvo que las canceles a través de la tienda correspondiente antes de la renovación. El importe se carga en tu cuenta de la tienda al confirmar la compra y en cada renovación, según el precio mostrado por la tienda y sujeto a cualquier aviso previo o consentimiento que exijan la tienda o la legislación aplicable."
 
-#: src/components/PaymentMethodEditorRow.tsx:184
+#: src/components/PaymentMethodEditorRow.tsx:189
 msgid "More {methodName} actions"
 msgstr "Más opciones de {methodName}"
 
@@ -3099,8 +3127,8 @@ msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
 msgid "Premium, made for sharing."
 msgstr "Premium, pensado para compartir."
 
-#: src/components/PaymentMethodEditorRow.tsx:195
-#: src/components/PaymentMethodEditorRow.tsx:223
+#: src/components/PaymentMethodEditorRow.tsx:200
+#: src/components/PaymentMethodEditorRow.tsx:228
 msgid "Preview payment link"
 msgstr "Ver enlace de pago"
 
@@ -3210,8 +3238,8 @@ msgstr "Eliminar {methodName}"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/PaymentMethodEditorRow.tsx:202
-#: src/components/PaymentMethodEditorRow.tsx:244
+#: src/components/PaymentMethodEditorRow.tsx:207
+#: src/components/PaymentMethodEditorRow.tsx:249
 msgid "Remove payment method"
 msgstr "Eliminar método de pago"
 
@@ -3887,6 +3915,10 @@ msgstr "Gracias por usar trizum. ¡Tus comentarios nos ayudan a mejorar!"
 #: src/components/PartyPendingComponent.tsx:16
 msgid "The app works offline too!"
 msgstr "¡La app también funciona sin conexión!"
+
+#: src/lib/paymentMethods.ts:123
+msgid "The Bizum phone number must be 20 characters or fewer."
+msgstr "El número de teléfono de Bizum debe tener 20 caracteres como máximo."
 
 #: src/routes/terms/-components/ServiceTerms.tsx:11
 msgid "The free installed Android and iOS apps may display advertising. Premium may remove advertising for the Premium owner as described on the purchase screen. Advertising and related privacy choices are explained in our Privacy Policy."
