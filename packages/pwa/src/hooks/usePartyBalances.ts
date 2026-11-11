@@ -1,8 +1,5 @@
 import type { Party, PartyExpenseChunkBalances } from "#src/models/party.ts";
-import {
-  useMultipleSuspenseDocument,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.ts";
+import { useDataRecords, useDataRecord } from "#src/lib/data/hooks.ts";
 import {
   calculateBalancesByParticipant,
   mergeBalancesByParticipant,
@@ -10,11 +7,11 @@ import {
 } from "#src/models/expense.ts";
 
 export function usePartyBalances(partyId: Party["id"]): BalancesByParticipant {
-  const [party] = useSuspenseDocument<Party>(partyId, {
+  const [party] = useDataRecord<Party>(partyId, {
     required: true,
   });
 
-  const results = useMultipleSuspenseDocument<PartyExpenseChunkBalances>(
+  const results = useDataRecords<PartyExpenseChunkBalances>(
     party.chunkRefs.map((chunkRef) => chunkRef.balancesId),
     {
       required: true,

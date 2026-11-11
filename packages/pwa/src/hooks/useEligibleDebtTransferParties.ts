@@ -1,6 +1,6 @@
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { useDataRecords } from "#src/lib/data/hooks.ts";
 import { useCurrentParty } from "./useParty";
 import { usePartyList } from "./usePartyList";
 
@@ -60,9 +60,7 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
     ];
   });
 
-  const partyEntries = useMultipleSuspenseDocument<Party>(
-    joinedActiveParties.map(({ partyId }) => partyId),
-  );
+  const partyEntries = useDataRecords<Party>(joinedActiveParties.map(({ partyId }) => partyId));
 
   return partyEntries.flatMap(({ doc }, index) => {
     if (!doc || doc.currency !== originParty.currency) {

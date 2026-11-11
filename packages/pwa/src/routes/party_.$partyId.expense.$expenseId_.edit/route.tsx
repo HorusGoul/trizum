@@ -1,3 +1,4 @@
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
 import { getFailureMessage } from "#src/lib/failureMessage.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -9,11 +10,10 @@ import {
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { useDataRecord } from "#src/lib/data/hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
   decodeExpenseId,
   findExpenseById,
@@ -21,7 +21,6 @@ import {
   type Expense,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
-import { type DocHandleChangePayload } from "@automerge/automerge-repo";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
@@ -31,11 +30,7 @@ import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import {
-  getExpenseEditHash,
-  getExpenseEditValues,
-  getOrCreateExpenseEditCopy,
-} from "./-expenseEditValues.ts";
+import { getExpenseEditHash, getExpenseEditValues } from "#src/lib/data/expenseDraft.ts";
 import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 
@@ -56,7 +51,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
     await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await context.data.read(chunkId);
   },
 });
 
@@ -248,12 +243,13 @@ function EditExpense() {
 }
 
 function useExpense() {
+  const data = useAppData();
   const { partyId, expenseId } = Route.useParams();
   const { updateExpense } = useCurrentParty();
 
   const { chunkId } = decodeExpenseId(expenseId);
 
-  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
+  const [chunk] = useDataRecord<PartyExpenseChunk>(chunkId, {
     required: true,
   });
 
@@ -267,53 +263,32 @@ function useExpense() {
   }
 
   function onChangeExpense(patches: DiffResult[]) {
-    handle.change((chunk) => {
-      const entry = chunk.expenses.find((e) => e.id === expenseId);
-
-      if (!entry) {
-        return;
-      }
-
-      const editCopy = getOrCreateExpenseEditCopy(entry);
-      patchMutate(editCopy, patches);
-      editCopy.__hash = calculateExpenseHash(editCopy);
-      entry.__editCopyLastUpdatedAt = new Date();
-    });
+    void data.editExpenseDraft(expenseId, patches);
   }
 
   function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
     let prevHash = expense ? getExpenseEditHash(expense) : "";
 
-    const handler = (payload: DocHandleChangePayload<PartyExpenseChunk>) => {
-      const [expense] = findExpenseById(payload.doc.expenses, expenseId);
+    return data.subscribe(chunkId, () => {
+      const chunk = data.peek<PartyExpenseChunk>(chunkId);
 
-      if (!expense) {
-        return;
-      }
+      if (!chunk) return;
+      const [current] = findExpenseById(chunk.expenses, expenseId);
 
-      const currentHash = getExpenseEditHash(expense);
+      if (!current) return;
+      const hash = getExpenseEditHash(current);
 
-      if (currentHash === prevHash) {
-        return;
-      }
-
-      prevHash = currentHash;
-
-      callback(expense);
-    };
-
-    handle.on("change", handler);
-
-    return () => {
-      handle.off("change", handler);
-    };
+      if (hash === prevHash) return;
+      prevHash = hash;
+      callback(current);
+    });
   }
 
   return {
     partyId,
     expense,
     expenseId,
-    isLoading: handle.inState(["loading"]),
+    isLoading: false,
     onChangeExpense,
     onUpdateExpense,
     subscribeToExpenseChanges,

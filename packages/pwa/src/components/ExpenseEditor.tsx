@@ -278,8 +278,8 @@ export function ExpenseEditor({
         autoOpenCalculator={autoOpenCalculator}
         formId={formId}
         goBackFallbackOptions={goBackFallbackOptions}
-        onToggleAutoOpenCalculator={() => {
-          setAutoOpenCalculator(!autoOpenCalculator);
+        onToggleAutoOpenCalculator={async () => {
+          await setAutoOpenCalculator(!autoOpenCalculator);
           trackEvent(
             autoOpenCalculator ? "calculator_auto_open_disabled" : "calculator_auto_open_enabled",
           );

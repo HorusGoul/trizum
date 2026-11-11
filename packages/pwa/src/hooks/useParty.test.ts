@@ -12,7 +12,7 @@ const appWorkerMock = vi.hoisted(() => ({
   recalculateBalances: vi.fn<(partyId: Party["id"]) => Promise<boolean>>(),
 }));
 
-import { createPartyHelperFactory } from "./useParty.ts";
+import { createPartyHelperFactory } from "#src/lib/data/partyCommands.ts";
 
 let getPartyHelpers = createPartyHelperFactory(appWorkerMock);
 

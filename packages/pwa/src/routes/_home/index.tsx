@@ -1,6 +1,5 @@
 import type { PartyList } from "#src/models/partyList.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 let hasRedirectedThisSession = false;
@@ -21,14 +20,12 @@ export const Route = createFileRoute("/_home/")({
 
     const partyListId = localStorage.getItem("partyListId");
 
-    if (!partyListId || !isValidDocumentId(partyListId)) {
+    if (!partyListId || !isValidRecordId(partyListId)) {
       return;
     }
 
     // SAFETY: getPartyListId selects the local PartyList document; the shared cache erases its document type.
-    const partyList = (await documentCache.readAsync(context.repo, partyListId)) as
-      | PartyList
-      | undefined;
+    const partyList = (await context.data.read(partyListId)) as PartyList | undefined;
 
     if (!partyList) {
       return;
@@ -39,7 +36,7 @@ export const Route = createFileRoute("/_home/")({
     if (
       openLastPartyOnLaunch &&
       lastOpenedPartyId &&
-      isValidDocumentId(lastOpenedPartyId) &&
+      isValidRecordId(lastOpenedPartyId) &&
       parties[lastOpenedPartyId] &&
       partyList.archivedParties?.[lastOpenedPartyId] !== true
     ) {

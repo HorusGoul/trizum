@@ -1,4 +1,4 @@
-import type { Repo } from "@automerge/automerge-repo/slim";
+import type { AppData } from "#src/lib/data/client.ts";
 import { createRootRouteWithContext, Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import { RouterProvider } from "react-aria-components";
 import { shouldReplaceNavigation } from "#src/lib/navigationHistory.ts";
@@ -7,7 +7,7 @@ import { AppRecoveryDialog } from "#src/components/AppRecoveryDialog.tsx";
 import { isProtectedAdRoute } from "#src/lib/advertising/advertisingPolicy.ts";
 
 interface RouterContext {
-  repo: Repo;
+  data: AppData;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

@@ -2,7 +2,7 @@ import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState, useRef } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import MediaGallery, { MediaGalleryImage } from "@trizum/ui/MediaGallery";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { useDataRecord } from "#src/lib/data/hooks.ts";
 import type { MediaFile } from "#src/models/media.ts";
 
 export interface RouteMediaGalleryProps {
@@ -83,7 +83,7 @@ export function RouteMediaGallery({
 
 function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
   // SAFETY: photoId comes from an Automerge media document referenced by the expense; it is passed back to the same repository.
-  const [mediaFile] = useSuspenseDocument<MediaFile>(photoId as MediaFile["id"], {
+  const [mediaFile] = useDataRecord<MediaFile>(photoId as MediaFile["id"], {
     required: true,
   });
 

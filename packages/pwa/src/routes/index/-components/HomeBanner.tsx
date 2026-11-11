@@ -82,8 +82,8 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
               <IconButton
                 icon="lucide.x"
                 aria-label={t`Dismiss Premium banner`}
-                onPress={() => {
-                  dismissPremiumBanner();
+                onPress={async () => {
+                  await dismissPremiumBanner();
                   trackEvent("premium_banner_dismissed");
                 }}
                 isDisabled={dialogs.dialog.kind !== "closed"}

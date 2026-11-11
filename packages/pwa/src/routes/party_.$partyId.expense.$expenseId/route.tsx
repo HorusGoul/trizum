@@ -3,14 +3,14 @@ import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { decodeExpenseId, findExpenseById, getExpenseTotalAmount } from "#src/models/expense.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { Dialog, MenuTrigger, Modal, ModalOverlay, Popover } from "react-aria-components";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Icon } from "@trizum/ui/Icon";
-import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { useDataRecord } from "#src/lib/data/hooks.ts";
 import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
     await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await context.data.read(chunkId);
   },
 });
 
@@ -243,11 +243,11 @@ function useExpense() {
   const currentLocation = useLocation();
   const navigate = useNavigate();
 
-  if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
+  if (!isValidRecordId(partyId)) throw new Error(t`Malformed Party ID`);
 
   const { chunkId } = decodeExpenseId(expenseId);
 
-  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
+  const [chunk] = useDataRecord<PartyExpenseChunk>(chunkId, {
     required: true,
   });
 
@@ -282,6 +282,6 @@ function useExpense() {
     onDeleteExpense,
     expense,
     expenseId,
-    isLoading: handle.inState(["loading"]),
+    isLoading: false,
   };
 }

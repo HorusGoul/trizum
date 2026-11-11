@@ -8,9 +8,8 @@ import { BackButton } from "#src/components/BackButton.js";
 import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { PartyList } from "#src/models/partyList.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { Icon } from "@trizum/ui/Icon";
 import { cn } from "@trizum/ui/utils";
 
@@ -40,8 +39,8 @@ function ArchivedParties() {
                 key: "restore",
                 icon: "lucide.archive-restore",
                 label: <Trans>Restore to home</Trans>,
-                onAction: () => {
-                  setPartyArchived(partyId, false);
+                onAction: async () => {
+                  await setPartyArchived(partyId, false);
                   trackEvent("party_restored");
                   toast.success(t`Party restored to home`);
                 },
@@ -67,11 +66,11 @@ function ArchivedParties() {
 }
 
 function useArchivedPartyIds(partyList: PartyList) {
-  const repo = useRepo();
+  const data = useAppData();
   const { archivedPartyIds } = getOrderedPartySections(partyList);
 
   for (const partyId of archivedPartyIds) {
-    documentCache.prefetch(repo, partyId);
+    void data.read(partyId);
   }
 
   return archivedPartyIds;

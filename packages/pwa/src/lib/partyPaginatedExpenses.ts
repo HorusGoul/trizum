@@ -1,8 +1,9 @@
-import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
+import type { AppData } from "#src/lib/data/client.ts";
 import type { Expense } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
-import { STATUS_PENDING } from "@trizum/react-suspense-cache";
+import type { DocumentId } from "@automerge/automerge-repo/slim";
+
+const STATUS_PENDING = "pending";
 
 const DEFAULT_PAGE_SIZE = 1;
 
@@ -13,36 +14,39 @@ export interface PartyPaginatedExpensesSnapshot {
 }
 
 function getCachedPartyExpenseChunk(
-  repo: Repo,
+  data: AppData,
   chunkId: DocumentId,
 ): PartyExpenseChunk | undefined {
   // SAFETY: chunkId comes from a PartyExpenseChunkRef; this cache slot therefore contains its expense chunk document.
-  return documentCache.getValueIfCached(repo, chunkId) as PartyExpenseChunk | undefined;
+  return data.peek(chunkId) as PartyExpenseChunk | undefined;
 }
 
 interface PartyExpenseCache {
-  getCachedChunk(repo: Repo, chunkId: DocumentId): Pick<PartyExpenseChunk, "expenses"> | undefined;
-  readChunk(repo: Repo, chunkId: DocumentId): PromiseLike<void>;
-  getStatus(repo: Repo, chunkId: DocumentId): string;
-  subscribe: typeof documentCache.subscribe;
+  getCachedChunk(
+    data: AppData,
+    chunkId: DocumentId,
+  ): Pick<PartyExpenseChunk, "expenses"> | undefined;
+  readChunk(data: AppData, chunkId: DocumentId): PromiseLike<void>;
+  getStatus(data: AppData, chunkId: DocumentId): string;
+  subscribe: (listener: () => void, data: AppData, id: DocumentId) => () => void;
 }
 
 const defaultPartyExpenseCache: PartyExpenseCache = {
   getCachedChunk: getCachedPartyExpenseChunk,
-  readChunk: (repo, chunkId) => documentCache.readAsync(repo, chunkId).then(() => undefined),
-  getStatus: (...args) => documentCache.getStatus(...args),
-  subscribe: (...args) => documentCache.subscribe(...args),
+  readChunk: (data, chunkId) => data.read(chunkId).then(() => undefined),
+  getStatus: (data, id) => data.status(id),
+  subscribe: (listener, data, id) => data.subscribe(id, listener),
 };
 
 export function createPartyExpensePagination(cache: PartyExpenseCache = defaultPartyExpenseCache) {
   function getLoadedPartyExpenseChunkIds(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): DocumentId[] {
     const loadedChunkIds: DocumentId[] = [];
 
     for (const chunkId of chunkIds) {
-      if (!cache.getCachedChunk(repo, chunkId)) {
+      if (!cache.getCachedChunk(data, chunkId)) {
         break;
       }
 
@@ -53,7 +57,7 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
   }
 
   function getVisiblePartyExpenseChunkIdsToLoad(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): DocumentId[] {
     if (chunkIds.length === 0) {
@@ -61,7 +65,7 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
     }
 
     const firstLoadedChunkIndex = chunkIds.findIndex((chunkId) =>
-      Boolean(cache.getCachedChunk(repo, chunkId)),
+      Boolean(cache.getCachedChunk(data, chunkId)),
     );
 
     if (firstLoadedChunkIndex === -1) {
@@ -72,17 +76,17 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
   }
 
   function getNextPartyExpenseChunkIds(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
     pageSize = DEFAULT_PAGE_SIZE,
   ): DocumentId[] {
-    const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(repo, chunkIds);
+    const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(data, chunkIds);
 
     if (firstLoadedChunkIndex === -1) {
       return chunkIds.slice(0, pageSize);
     }
 
-    const visibleLoadedChunkCount = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds).length;
+    const visibleLoadedChunkCount = getVisibleLoadedPartyExpenseChunkIds(data, chunkIds).length;
 
     return chunkIds.slice(
       firstLoadedChunkIndex + visibleLoadedChunkCount,
@@ -91,37 +95,37 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
   }
 
   async function loadVisiblePartyExpenseChunks(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): Promise<void> {
-    await loadPartyExpenseChunks(repo, getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds));
+    await loadPartyExpenseChunks(data, getVisiblePartyExpenseChunkIdsToLoad(data, chunkIds));
   }
 
   async function loadNextPartyExpenseChunks(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): Promise<void> {
-    await loadPartyExpenseChunks(repo, getNextPartyExpenseChunkIds(repo, chunkIds));
+    await loadPartyExpenseChunks(data, getNextPartyExpenseChunkIds(data, chunkIds));
   }
 
   async function loadAllPartyExpenseChunks(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): Promise<void> {
-    const missingChunkIds = chunkIds.filter((chunkId) => !cache.getCachedChunk(repo, chunkId));
+    const missingChunkIds = chunkIds.filter((chunkId) => !cache.getCachedChunk(data, chunkId));
 
-    await loadPartyExpenseChunks(repo, missingChunkIds);
+    await loadPartyExpenseChunks(data, missingChunkIds);
   }
 
   function getPartyPaginatedExpensesSnapshot(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): PartyPaginatedExpensesSnapshot {
-    const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds);
-    const nextChunkId = getNextPartyExpenseChunkIds(repo, chunkIds).at(0);
+    const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(data, chunkIds);
+    const nextChunkId = getNextPartyExpenseChunkIds(data, chunkIds).at(0);
 
     const expenses = loadedChunkIds.flatMap((chunkId) => {
-      const chunk = cache.getCachedChunk(repo, chunkId);
+      const chunk = cache.getCachedChunk(data, chunkId);
 
       return chunk?.expenses ?? [];
     });
@@ -133,18 +137,18 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
     return {
       expenses,
       hasNext: Boolean(nextChunkId),
-      isLoadingNext: nextChunkId != null && cache.getStatus(repo, nextChunkId) === STATUS_PENDING,
+      isLoadingNext: nextChunkId != null && cache.getStatus(data, nextChunkId) === STATUS_PENDING,
     };
   }
 
   function subscribeToPartyPaginatedExpenses(
     onStoreChange: () => void,
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): () => void {
-    const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds);
-    const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds);
-    const nextChunkId = getNextPartyExpenseChunkIds(repo, chunkIds).at(0);
+    const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(data, chunkIds);
+    const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(data, chunkIds);
+    const nextChunkId = getNextPartyExpenseChunkIds(data, chunkIds).at(0);
 
     const chunkIdsToSubscribe = nextChunkId
       ? [...loadedChunkIds, ...visibleChunkIdsToLoad, nextChunkId]
@@ -153,7 +157,7 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
     const uniqueChunkIds = new Set(chunkIdsToSubscribe);
 
     const unsubscribeCallbacks = Array.from(uniqueChunkIds, (chunkId) =>
-      cache.subscribe(onStoreChange, repo, chunkId),
+      cache.subscribe(onStoreChange, data, chunkId),
     );
 
     return () => {
@@ -164,17 +168,17 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
   }
 
   function getFirstLoadedPartyExpenseChunkIndex(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): number {
-    return chunkIds.findIndex((chunkId) => Boolean(cache.getCachedChunk(repo, chunkId)));
+    return chunkIds.findIndex((chunkId) => Boolean(cache.getCachedChunk(data, chunkId)));
   }
 
   function getVisibleLoadedPartyExpenseChunkIds(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): DocumentId[] {
-    const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(repo, chunkIds);
+    const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(data, chunkIds);
 
     if (firstLoadedChunkIndex === -1) {
       return [];
@@ -183,7 +187,7 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
     const visibleLoadedChunkIds: DocumentId[] = [];
 
     for (const chunkId of chunkIds.slice(firstLoadedChunkIndex)) {
-      if (!cache.getCachedChunk(repo, chunkId)) {
+      if (!cache.getCachedChunk(data, chunkId)) {
         break;
       }
 
@@ -194,14 +198,14 @@ export function createPartyExpensePagination(cache: PartyExpenseCache = defaultP
   }
 
   async function loadPartyExpenseChunks(
-    repo: Repo,
+    data: AppData,
     chunkIds: readonly DocumentId[],
   ): Promise<void> {
     if (chunkIds.length === 0) {
       return;
     }
 
-    await Promise.all(chunkIds.map((chunkId) => cache.readChunk(repo, chunkId)));
+    await Promise.all(chunkIds.map((chunkId) => cache.readChunk(data, chunkId)));
   }
 
   function getExpensePaidAtTimestamp(expense: Expense): number {

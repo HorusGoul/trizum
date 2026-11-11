@@ -1,3 +1,4 @@
+import { createFateState } from "./data/fateState.ts";
 import type { AppleSignInPlugin } from "@capawesome/capacitor-apple-sign-in";
 import { getFailureMessage } from "./failureMessage.ts";
 import { Capacitor } from "@capacitor/core";
@@ -62,15 +63,9 @@ type AuthSession = ReturnType<typeof authClient.useSession>;
 
 export type AuthSessionUser = NonNullable<NonNullable<AuthSession["data"]>["user"]>;
 
-/** Keeps the last confirmed account available while network authentication is unavailable. */
-export function useAppSession() {
-  const session = authClient.useSession();
-
-  const remembered = useSyncExternalStore(
-    rememberedSession.subscribe,
-    rememberedSession.getSnapshot,
-  );
-
+function readAppSession() {
+  const session = authClient.$store.atoms.session.get();
+  const remembered = rememberedSession.getSnapshot();
   const offline = remembered.isOffline;
 
   return {
@@ -80,6 +75,45 @@ export function useAppSession() {
     isPending: !remembered.user && !remembered.isResolved && !offline && session.isPending,
     isOffline: offline,
   };
+}
+
+let sessionState: ReturnType<typeof createFateState<ReturnType<typeof readAppSession>>> | undefined;
+let sessionReaders = 0;
+let stopSession: (() => void) | undefined;
+
+function sessionSnapshot() {
+  sessionState ??= createFateState(readAppSession());
+
+  return sessionState.getSnapshot();
+}
+
+function subscribeSession(listener: () => void) {
+  sessionSnapshot();
+  const state = sessionState!;
+  const unsubscribe = state.subscribe(listener);
+
+  if (sessionReaders++ === 0) {
+    const publish = () => state.set(readAppSession());
+    const stopAuth = authClient.$store.atoms.session.subscribe(publish);
+    const stopRemembered = rememberedSession.subscribe(publish);
+    stopSession = () => {
+      stopAuth();
+      stopRemembered();
+    };
+
+    publish();
+  }
+
+  return () => {
+    unsubscribe();
+
+    if (--sessionReaders === 0) stopSession?.();
+  };
+}
+
+/** Reads the Fate projection of SDK authentication and remembered offline identity. */
+export function useAppSession() {
+  return useSyncExternalStore(subscribeSession, sessionSnapshot, sessionSnapshot);
 }
 
 if (typeof window !== "undefined") {

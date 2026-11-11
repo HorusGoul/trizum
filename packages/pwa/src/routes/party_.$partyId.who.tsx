@@ -1,3 +1,4 @@
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
@@ -42,8 +43,9 @@ interface WhoFormValues {
 function Who() {
   const params = Route.useParams();
   const search = Route.useSearch();
+  const data = useAppData();
   const { party, setParticipantDetails } = useParty(params.partyId);
-  const { partyList, partyListHandle, addPartyToList } = usePartyList();
+  const { partyList, addPartyToList } = usePartyList();
   const navigate = useNavigate();
   const partyName = party.name;
 
@@ -53,20 +55,20 @@ function Who() {
       partyList.participantInParties?.[party.id] === undefined,
   );
 
-  function onSaveSettings(values: WhoFormValues) {
+  async function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
     const participantName = participant.name;
-    const currentPartyList = partyListHandle.doc();
+    const currentPartyList = data.peek<typeof partyList>(partyList.id)!;
     const previousParticipantId = currentPartyList.participantInParties?.[party.id];
 
     const isJoining =
       currentPartyList.parties[party.id] !== true || previousParticipantId === undefined;
 
-    addPartyToList(party.id, participant.id);
+    await addPartyToList(party.id, participant.id);
 
     if (isJoining) {
       trackEvent("party_joined");
-      setParticipantDetails(participant.id, {
+      await setParticipantDetails(participant.id, {
         phone: partyList.phone,
         paymentMethods: partyList.paymentMethods ? { ...partyList.paymentMethods } : undefined,
         avatarId: partyList.avatarId,
@@ -92,7 +94,7 @@ function Who() {
       participantId: partyList.participantInParties?.[party.id] ?? "",
     },
     onSubmit: ({ value }) => {
-      onSaveSettings(value);
+      return onSaveSettings(value);
     },
   });
 

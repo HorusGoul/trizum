@@ -1,5 +1,6 @@
+import type { AppData } from "#src/lib/data/client.ts";
 import { t } from "@lingui/core/macro";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { useEffect, useReducer, useRef, type RefObject } from "react";
 import { toast } from "sonner";
 import { fetchLinkedAuthAccounts, type LinkedAuthAccount } from "#src/lib/auth-client.ts";
@@ -15,8 +16,7 @@ import {
   readCachedCloudAccountState,
   writeCachedCloudAccountState,
 } from "#src/lib/cloudSyncRouteState.ts";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { setPartyListId, type PartyList } from "#src/models/partyList.js";
 import { setAnalyticsEnabled, trackCloudSyncActivated } from "#src/lib/analytics.ts";
 
@@ -113,12 +113,9 @@ function cloudSyncAccountStateReducer(
   }
 }
 
-async function readCloudPartyList(
-  repo: Parameters<typeof documentCache.readAsync>[0],
-  id: PartyList["id"],
-) {
+async function readCloudPartyList(data: AppData, id: PartyList["id"]) {
   // SAFETY: This gateway reads only IDs supplied by the cloud party-list settings contract.
-  return (await documentCache.readAsync(repo, id)) as PartyList | undefined;
+  return (await data.read<PartyList>(id)) as PartyList | undefined;
 }
 
 const cloudAccountServices = {
@@ -168,7 +165,7 @@ export function createUseCloudSyncAccountState(
     partyList: PartyList;
     userId: string | undefined;
   }) {
-    const repo = useRepo();
+    const data = useAppData();
 
     const [state, dispatch] = useReducer(
       cloudSyncAccountStateReducer,
@@ -241,11 +238,11 @@ export function createUseCloudSyncAccountState(
 
           if (
             activeSettings &&
-            isValidDocumentId(activeSettings.partyListDocumentId) &&
+            isValidRecordId(activeSettings.partyListDocumentId) &&
             activeSettings.partyListDocumentId !== currentPartyList.id
           ) {
             // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
-            const cloudPartyList = await readPartyList(repo, activeSettings.partyListDocumentId);
+            const cloudPartyList = await readPartyList(data, activeSettings.partyListDocumentId);
 
             if (isCancelled) {
               return;
@@ -270,7 +267,7 @@ export function createUseCloudSyncAccountState(
             return;
           }
 
-          if (!isValidDocumentId(activeSettings.partyListDocumentId)) {
+          if (!isValidRecordId(activeSettings.partyListDocumentId)) {
             toast.error(t`trizum cloud data is invalid`);
 
             return;
@@ -332,7 +329,7 @@ export function createUseCloudSyncAccountState(
         isCancelled = true;
         window.clearInterval(intervalId);
       };
-    }, [isOffline, isSignInSuccessVisibleRef, repo, userId]);
+    }, [isOffline, isSignInSuccessVisibleRef, data, userId]);
 
     function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
       dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });
@@ -356,7 +353,7 @@ export function createUseCloudSyncAccountState(
         return;
       }
 
-      if (!isValidDocumentId(settings.partyListDocumentId)) {
+      if (!isValidRecordId(settings.partyListDocumentId)) {
         toast.error(t`trizum cloud data is invalid`);
 
         return;
@@ -369,7 +366,7 @@ export function createUseCloudSyncAccountState(
       }
 
       // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
-      const cloudPartyList = await readPartyList(repo, settings.partyListDocumentId);
+      const cloudPartyList = await readPartyList(data, settings.partyListDocumentId);
 
       if (!cloudPartyList) {
         toast.error(t`Could not load trizum cloud state`);

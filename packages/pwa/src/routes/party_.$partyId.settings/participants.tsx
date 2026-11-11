@@ -38,10 +38,10 @@ function PartyParticipantSettings() {
 
   const form = useForm({
     defaultValues,
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const participants = toPartyParticipantRecord(value.participants);
 
-      updateParticipants(participants);
+      await updateParticipants(participants);
       trackEvent("party_participants_updated");
       form.reset({ participants: Object.values(participants) });
       toast.success(t`Participants saved!`);

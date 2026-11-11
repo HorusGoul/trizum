@@ -15,7 +15,7 @@ import {
   type RegisteredRouter,
 } from "@tanstack/react-router";
 import { parseAppSearch, stringifyAppSearch, type AppSearch } from "./lib/routerSearch.ts";
-import { initializeAnalytics, bindAnalytics, trackPage } from "./lib/analytics.ts";
+import { initializeAnalytics, trackPage } from "./lib/analytics.ts";
 import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
 import "./index.css";
 import { I18nProvider } from "@lingui/react";
@@ -27,7 +27,9 @@ import { routeTree } from "./routeTree.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "@trizum/ui/MediaGalleryController";
 import { usePartyList } from "./hooks/usePartyList.ts";
-import { RepoContext } from "./lib/automerge/RepoContext.ts";
+import { DataProvider } from "./lib/data/context.tsx";
+import { useAppData } from "./lib/data/useAppData.ts";
+import { getAppData } from "./lib/data/client.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
@@ -230,6 +232,8 @@ window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
   return appWorker.recalculateBalances(partyId);
 };
 
+const data = getAppData(repo);
+
 // Create a new router instance
 const history = preventDuplicateHistoryEntries(createBrowserHistory());
 
@@ -238,7 +242,7 @@ const router = createRouter({
   stringifySearch: stringifyAppSearch,
   routeTree,
   history,
-  context: { repo },
+  context: { data },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
@@ -322,14 +326,14 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <PwaUIProvider>
         <UpdateControllerComponent>
-          <RepoContext value={repo}>
+          <DataProvider data={data}>
             <MediaGalleryController>
               <PremiumProvider>
                 <RouterProvider router={router} InnerWrap={InnerWrap} />
               </PremiumProvider>
               <Toaster />
             </MediaGalleryController>
-          </RepoContext>
+          </DataProvider>
         </UpdateControllerComponent>
       </PwaUIProvider>
     </I18nProvider>,
@@ -339,11 +343,12 @@ if (!rootElement.innerHTML) {
 function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
-  const { partyListHandle } = usePartyList();
+  const { partyList } = usePartyList();
+  const data = useAppData();
 
   useEffect(() => {
-    return bindAnalytics(partyListHandle, () => router.state.location.pathname);
-  }, [partyListHandle]);
+    return data.bindAnalytics(partyList.id, () => router.state.location.pathname);
+  }, [data, partyList.id]);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {

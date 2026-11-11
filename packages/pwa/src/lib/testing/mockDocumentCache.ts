@@ -1,22 +1,26 @@
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
-import { STATUS_RESOLVED, type ReactUsePromise } from "@trizum/react-suspense-cache";
+
+const STATUS_RESOLVED = "resolved";
+
+type ReactUsePromise<Value> = Promise<Value> & { status: "fulfilled"; value: Value };
+
 import { vi } from "vite-plus/test";
 
-type DocumentCacheMock<TDocument> = {
-  getStatus: (repo: Repo, documentId: DocumentId) => string;
-  getValueIfCached: (repo: Repo, documentId: DocumentId) => TDocument | undefined;
-  readAsync: (repo: Repo, documentId: DocumentId) => ReactUsePromise<TDocument | undefined>;
-  subscribe: (callback: () => void, repo: Repo, documentId: DocumentId) => () => void;
+type DocumentCacheMock<TDocument, Context> = {
+  getStatus: (repo: Context, documentId: DocumentId) => string;
+  getValueIfCached: (repo: Context, documentId: DocumentId) => TDocument | undefined;
+  readAsync: (repo: Context, documentId: DocumentId) => ReactUsePromise<TDocument | undefined>;
+  subscribe: (callback: () => void, repo: Context, documentId: DocumentId) => () => void;
 };
 
-export interface MockDocumentCacheCollection<TDocument> {
+export interface MockDocumentCacheCollection<TDocument, Context = Repo> {
   availableDocuments: Map<DocumentId, TDocument>;
   cachedDocuments: Map<DocumentId, TDocument>;
   documentStatuses: Map<DocumentId, string>;
   subscribers: Map<DocumentId, Set<() => void>>;
   documentCache: {
-    [TKey in keyof DocumentCacheMock<TDocument>]: ReturnType<
-      typeof vi.fn<DocumentCacheMock<TDocument>[TKey]>
+    [TKey in keyof DocumentCacheMock<TDocument, Context>]: ReturnType<
+      typeof vi.fn<DocumentCacheMock<TDocument, Context>[TKey]>
     >;
   };
   cacheDocument: (documentId: DocumentId) => void;
@@ -26,7 +30,8 @@ export interface MockDocumentCacheCollection<TDocument> {
 
 export function createMockDocumentCacheCollection<
   TDocument,
->(): MockDocumentCacheCollection<TDocument> {
+  Context = Repo,
+>(): MockDocumentCacheCollection<TDocument, Context> {
   const availableDocuments = new Map<DocumentId, TDocument>();
   const cachedDocuments = new Map<DocumentId, TDocument>();
   const documentStatuses = new Map<DocumentId, string>();
@@ -48,46 +53,52 @@ export function createMockDocumentCacheCollection<
   }
 
   const documentCache = {
-    getStatus: vi.fn<DocumentCacheMock<TDocument>["getStatus"]>((_: Repo, documentId) => {
-      return documentStatuses.get(documentId) ?? "not-found";
-    }),
-    getValueIfCached: vi.fn<DocumentCacheMock<TDocument>["getValueIfCached"]>(
-      (_: Repo, documentId) => {
+    getStatus: vi.fn<DocumentCacheMock<TDocument, Context>["getStatus"]>(
+      (_: Context, documentId) => {
+        return documentStatuses.get(documentId) ?? "not-found";
+      },
+    ),
+    getValueIfCached: vi.fn<DocumentCacheMock<TDocument, Context>["getValueIfCached"]>(
+      (_: Context, documentId) => {
         return cachedDocuments.get(documentId);
       },
     ),
-    readAsync: vi.fn<DocumentCacheMock<TDocument>["readAsync"]>((_: Repo, documentId) => {
-      const cachedDocument = cachedDocuments.get(documentId);
+    readAsync: vi.fn<DocumentCacheMock<TDocument, Context>["readAsync"]>(
+      (_: Context, documentId) => {
+        const cachedDocument = cachedDocuments.get(documentId);
 
-      if (cachedDocument) {
-        return createFulfilledReadPromise(cachedDocument);
-      }
-
-      const availableDocument = availableDocuments.get(documentId);
-
-      if (!availableDocument) {
-        return createFulfilledReadPromise(undefined);
-      }
-
-      cacheDocument(documentId);
-      notifySubscribers(documentId);
-
-      return createFulfilledReadPromise(availableDocument);
-    }),
-    subscribe: vi.fn<DocumentCacheMock<TDocument>["subscribe"]>((callback, _: Repo, documentId) => {
-      const callbacks = subscribers.get(documentId) ?? new Set<() => void>();
-
-      callbacks.add(callback);
-      subscribers.set(documentId, callbacks);
-
-      return () => {
-        callbacks.delete(callback);
-
-        if (callbacks.size === 0) {
-          subscribers.delete(documentId);
+        if (cachedDocument) {
+          return createFulfilledReadPromise(cachedDocument);
         }
-      };
-    }),
+
+        const availableDocument = availableDocuments.get(documentId);
+
+        if (!availableDocument) {
+          return createFulfilledReadPromise(undefined);
+        }
+
+        cacheDocument(documentId);
+        notifySubscribers(documentId);
+
+        return createFulfilledReadPromise(availableDocument);
+      },
+    ),
+    subscribe: vi.fn<DocumentCacheMock<TDocument, Context>["subscribe"]>(
+      (callback, _: Context, documentId) => {
+        const callbacks = subscribers.get(documentId) ?? new Set<() => void>();
+
+        callbacks.add(callback);
+        subscribers.set(documentId, callbacks);
+
+        return () => {
+          callbacks.delete(callback);
+
+          if (callbacks.size === 0) {
+            subscribers.delete(documentId);
+          }
+        };
+      },
+    ),
   };
 
   return {

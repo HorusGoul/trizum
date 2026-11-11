@@ -1,3 +1,4 @@
+import { useFateState } from "#src/lib/data/fateState.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { useEffect, useRef, useState, type ComponentType, type ComponentProps } from "react";
 import { useAppSession } from "#src/lib/auth-client.ts";
@@ -62,7 +63,9 @@ export function PremiumProviderState({
   platform: ReturnType<typeof getRevenueCatPlatform>;
   Paywall?: ComponentType<ComponentProps<typeof PremiumPaywall>>;
 }) {
-  const [resolvedState, setResolvedState] = useState<ResolvedPremiumState | null>(null);
+  const [resolvedState, setResolvedState, updateResolvedState] =
+    useFateState<ResolvedPremiumState | null>(null);
+
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [paywallSessionId, setPaywallSessionId] = useState(0);
   const paywallRequestRef = useRef<PaywallRequest | null>(null);
@@ -107,7 +110,7 @@ export function PremiumProviderState({
       },
       onRefreshError(error) {
         logger.error("Failed to resolve Premium status", { error });
-        setResolvedState((previous) =>
+        updateResolvedState((previous) =>
           getPremiumStateAfterRefreshError(previous, identifiedUserId),
         );
       },
@@ -119,7 +122,7 @@ export function PremiumProviderState({
     return () => {
       connection.disconnect();
     };
-  }, [hasSessionError, platform, isSessionPending, userId]);
+  }, [hasSessionError, platform, isSessionPending, userId, setResolvedState, updateResolvedState]);
 
   const isPremium = state.status === "premium";
   const adEntitlement = state.status === "free" ? "adSupported" : isPremium ? "adFree" : "unknown";

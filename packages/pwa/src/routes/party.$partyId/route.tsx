@@ -33,7 +33,7 @@ export const Route = createFileRoute("/party/$partyId")({
     const { party } = await guardParticipatingInParty(partyId, context, location);
 
     await loadVisiblePartyExpenseChunks(
-      context.repo,
+      context.data,
       party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
     );
 
@@ -60,7 +60,7 @@ function PartyById() {
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
   const [balancesSortedBy, setBalancesSortedBy] = useBalancesSortedBy();
 
-  function changeBalancesSort(value: typeof balancesSortedBy) {
+  async function changeBalancesSort(value: typeof balancesSortedBy) {
     if (value === balancesSortedBy) return;
     setBalancesSortedBy(value);
     trackEvent("balances_sort_changed");
@@ -92,13 +92,13 @@ function PartyById() {
     }
 
     lastRecordedPartyIdRef.current = partyId;
-    setLastOpenedPartyId(partyId);
-  }, [partyId, setLastOpenedPartyId]);
+    void setLastOpenedPartyId(party.id);
+  }, [party.id, partyId, setLastOpenedPartyId]);
 
   async function onLeaveParty() {
     if (!partyId) return;
     await navigate({ to: "/", replace: true });
-    removeParty(partyId);
+    await removeParty(party.id);
     trackEvent("party_left");
     toast.success(t`You left the party!`);
   }
@@ -117,8 +117,8 @@ function PartyById() {
 
   const participantName = participant.name;
 
-  function onTogglePersonalMode() {
-    setParticipantDetails(participant.id, {
+  async function onTogglePersonalMode() {
+    await setParticipantDetails(participant.id, {
       personalMode: !participant.personalMode,
     });
     trackEvent(participant.personalMode ? "personal_mode_disabled" : "personal_mode_enabled");

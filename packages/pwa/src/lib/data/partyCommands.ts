@@ -1,0 +1,495 @@
+import {
+  createExpenseId,
+  calculateExpenseHash,
+  type Expense,
+  decodeExpenseId,
+  applyExpenseDiff,
+} from "#src/models/expense.js";
+import type {
+  Party,
+  PartyExpenseChunk,
+  PartyExpenseChunkBalances,
+  PartyExpenseChunkRef,
+  PartyParticipant,
+} from "#src/models/party.js";
+import type { DocHandle, Repo, DocumentId } from "@automerge/automerge-repo/slim";
+import { deleteAt, insertAt } from "@automerge/automerge-repo/slim";
+import { getLogger } from "#src/lib/log.ts";
+import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
+import { appWorker } from "#src/lib/appWorker/client.ts";
+import { createKeyedCoalescedQueue } from "#src/lib/coalescedQueue.ts";
+import {
+  copyExpenseTemplate,
+  ExpenseTemplateLimitError,
+  getFirstExpenseTemplateId,
+  MAX_EXPENSE_TEMPLATES,
+  type ExpenseTemplate,
+} from "#src/models/expenseTemplate.ts";
+
+const logger = getLogger("data", "partyCommands");
+
+export function createPartyHelperFactory(
+  worker: Pick<typeof appWorker, "recalculateBalances"> = appWorker,
+) {
+  const recalculatePartyBalances = createKeyedCoalescedQueue<Party["id"], boolean>({
+    run: (partyId) => worker.recalculateBalances(partyId),
+    recover: () => false,
+  });
+
+  function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
+    async function recalculateBalances() {
+      return recalculatePartyBalances(handle.documentId);
+    }
+
+    function scheduleRecalculateBalances() {
+      void recalculateBalances();
+    }
+
+    async function updateDetails(values: Pick<Party, "name" | "symbol" | "description">) {
+      handle.change((doc) => {
+        doc.name = values.name;
+        doc.symbol = values.symbol;
+        doc.description = values.description;
+      });
+      await repo.flush([handle.documentId]);
+    }
+
+    function updateParticipants(participants: Party["participants"]) {
+      handle.change((doc) => {
+        doc.participants = participants;
+      });
+    }
+
+    function setParticipantDetails(
+      participantId: PartyParticipant["id"],
+      details: Partial<
+        Pick<
+          PartyParticipant,
+          | "phone"
+          | "paymentMethods"
+          | "personalMode"
+          | "avatarId"
+          | "balancesSortedBy"
+          | "alwaysUseDefaultExpenseTemplate"
+        >
+      >,
+    ) {
+      handle.change((doc) => {
+        const participant = doc.participants[participantId];
+
+        if (!participant) {
+          return;
+        }
+
+        for (const key in details) {
+          // SAFETY: The enumerated keys come from the typed details update object; for-in erases its property union.
+          const value = details[key as keyof typeof details];
+
+          if (value === undefined) {
+            // SAFETY: Only optional participant detail fields from the details object are deleted here.
+            delete participant[key as keyof typeof participant];
+          } else {
+            // @ts-expect-error -- idk tbh
+            participant[key] = value;
+          }
+        }
+      });
+    }
+
+    function saveExpenseTemplate(template: ExpenseTemplate) {
+      handle.change((doc) => {
+        if (!doc.expenseTemplates) {
+          doc.expenseTemplates = {};
+        }
+
+        const isNewTemplate = !doc.expenseTemplates[template.id];
+
+        if (isNewTemplate && Object.keys(doc.expenseTemplates).length >= MAX_EXPENSE_TEMPLATES) {
+          throw new ExpenseTemplateLimitError();
+        }
+
+        doc.expenseTemplates[template.id] = copyExpenseTemplate(template);
+
+        if (doc.onlyUseCustomExpenseTemplates && !doc.defaultExpenseTemplateId) {
+          doc.defaultExpenseTemplateId = template.id;
+        }
+      });
+    }
+
+    function deleteExpenseTemplate(templateId: ExpenseTemplate["id"]) {
+      handle.change((doc) => {
+        if (!doc.expenseTemplates?.[templateId]) {
+          return;
+        }
+
+        delete doc.expenseTemplates[templateId];
+        const firstRemainingTemplateId = getFirstExpenseTemplateId(doc.expenseTemplates);
+
+        if (!firstRemainingTemplateId) {
+          delete doc.defaultExpenseTemplateId;
+          delete doc.onlyUseCustomExpenseTemplates;
+
+          return;
+        }
+
+        if (doc.defaultExpenseTemplateId === templateId) {
+          if (doc.onlyUseCustomExpenseTemplates) {
+            doc.defaultExpenseTemplateId = firstRemainingTemplateId;
+          } else {
+            delete doc.defaultExpenseTemplateId;
+          }
+        }
+      });
+    }
+
+    function setOnlyUseCustomExpenseTemplates(
+      onlyUseCustomTemplates: boolean,
+      fallbackTemplateId?: ExpenseTemplate["id"],
+    ) {
+      handle.change((doc) => {
+        if (!onlyUseCustomTemplates) {
+          delete doc.onlyUseCustomExpenseTemplates;
+
+          return;
+        }
+
+        const hasFallbackTemplate = Boolean(
+          fallbackTemplateId && doc.expenseTemplates?.[fallbackTemplateId],
+        );
+
+        const nextDefaultTemplateId =
+          doc.defaultExpenseTemplateId && doc.expenseTemplates?.[doc.defaultExpenseTemplateId]
+            ? doc.defaultExpenseTemplateId
+            : hasFallbackTemplate
+              ? fallbackTemplateId
+              : getFirstExpenseTemplateId(doc.expenseTemplates);
+
+        if (!nextDefaultTemplateId) {
+          delete doc.onlyUseCustomExpenseTemplates;
+          delete doc.defaultExpenseTemplateId;
+
+          return;
+        }
+
+        doc.onlyUseCustomExpenseTemplates = true;
+        doc.defaultExpenseTemplateId = nextDefaultTemplateId;
+      });
+    }
+
+    function setDefaultExpenseTemplate(templateId?: ExpenseTemplate["id"]) {
+      handle.change((doc) => {
+        if (!templateId) {
+          const firstTemplateId = doc.onlyUseCustomExpenseTemplates
+            ? getFirstExpenseTemplateId(doc.expenseTemplates)
+            : undefined;
+
+          if (firstTemplateId) {
+            doc.defaultExpenseTemplateId = firstTemplateId;
+          } else {
+            delete doc.defaultExpenseTemplateId;
+          }
+
+          return;
+        }
+
+        if (!doc.expenseTemplates?.[templateId]) {
+          return;
+        }
+
+        doc.defaultExpenseTemplateId = templateId;
+      });
+    }
+
+    function createChunk() {
+      const party = handle.doc();
+
+      // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
+      const chunkHandle = repo.create<PartyExpenseChunk>({
+        id: "" as DocumentId,
+        type: "expenseChunk",
+        createdAt: new Date(),
+        expenses: [],
+        maxSize: 500,
+        partyId: party.id,
+      });
+
+      chunkHandle.change((doc) => (doc.id = chunkHandle.documentId));
+
+      // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
+      const balancesHandle = repo.create<PartyExpenseChunkBalances>({
+        id: "" as DocumentId,
+        type: "expenseChunkBalances",
+        balances: {},
+        partyId: party.id,
+      });
+
+      balancesHandle.change((doc) => (doc.id = balancesHandle.documentId));
+
+      const chunkRef: PartyExpenseChunkRef = {
+        chunkId: chunkHandle.documentId,
+        createdAt: new Date(),
+        balancesId: balancesHandle.documentId,
+      };
+
+      return [chunkRef, chunkHandle] as const;
+    }
+
+    async function addExpenseToParty(expense: Omit<Expense, "id" | "__hash">): Promise<Expense> {
+      const party = handle.doc();
+
+      if (!party) {
+        throw new Error("Party not found, this should not happen");
+      }
+
+      // Last chunk is the most recent one, so should be indexed at 0
+      let lastChunkRef = party.chunkRefs.at(0);
+
+      if (!lastChunkRef) {
+        // Create a new chunk if there is none
+        const [chunkRef] = createChunk();
+        lastChunkRef = chunkRef;
+      }
+
+      let lastChunkHandle = await repo.find<PartyExpenseChunk>(lastChunkRef.chunkId);
+      let lastChunk = lastChunkHandle.doc();
+
+      if (!lastChunk) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+
+      if (lastChunk.expenses.length >= lastChunk.maxSize) {
+        // Create a new chunk if the last one is full
+        const [chunkRef, handle] = createChunk();
+        lastChunkRef = chunkRef;
+        lastChunkHandle = handle;
+        lastChunk = lastChunkHandle.doc();
+
+        if (!lastChunk) {
+          throw new Error("Chunk not found, this should not happen");
+        }
+      }
+
+      const expenseWithId = {
+        ...expense,
+        id: createExpenseId(lastChunkRef.chunkId),
+      };
+
+      const expenseWithHash = {
+        ...expenseWithId,
+        __hash: calculateExpenseHash({
+          ...expenseWithId,
+          __hash: "",
+        }),
+      };
+
+      lastChunkHandle.change((doc) => {
+        insertAt(doc.expenses, 0, expenseWithHash);
+      });
+
+      handle.change((party) => {
+        let existingLastChunkRef = party.chunkRefs.find(
+          (chunkRef) => chunkRef.chunkId === lastChunk.id,
+        );
+
+        if (!existingLastChunkRef) {
+          existingLastChunkRef = lastChunkRef;
+          insertAt(party.chunkRefs, 0, existingLastChunkRef);
+        }
+      });
+
+      scheduleRecalculateBalances();
+
+      return expenseWithHash;
+    }
+
+    async function updateExpense(expense: Expense) {
+      const party = handle.doc();
+
+      if (!party) {
+        throw new Error("Party not found, this should not happen");
+      }
+
+      const { chunkId } = decodeExpenseId(expense.id);
+
+      const chunkRef = party.chunkRefs.find((chunk) => chunk.chunkId === chunkId);
+
+      if (!chunkRef) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+
+      const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+      const chunk = chunkHandle.doc();
+
+      if (!chunk) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+
+      chunkHandle.change((doc) => {
+        const expenseEntry = doc.expenses.find((e) => e.id === expense.id);
+
+        if (!expenseEntry) {
+          throw new Error("Expense not found, this should not happen");
+        }
+
+        applyExpenseDiff(expenseEntry, expense);
+
+        delete expenseEntry.__editCopy;
+        delete expenseEntry.__editCopyLastUpdatedAt;
+      });
+
+      scheduleRecalculateBalances();
+    }
+
+    async function removeExpense(expenseId: Expense["id"]) {
+      const party = handle.doc();
+
+      if (!party) {
+        throw new Error("Party not found, this should not happen");
+      }
+
+      const { chunkId } = decodeExpenseId(expenseId);
+
+      const chunkRef = party.chunkRefs.find((chunk) => chunk.chunkId === chunkId);
+
+      if (!chunkRef) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+
+      const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+      const chunk = chunkHandle.doc();
+
+      if (!chunk) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+
+      chunkHandle.change((doc) => {
+        const expenseIndex = doc.expenses.findIndex((e) => e.id === expenseId);
+
+        if (expenseIndex === -1) {
+          throw new Error("Expense not found, this should not happen");
+        }
+
+        deleteAt(doc.expenses, expenseIndex);
+      });
+
+      scheduleRecalculateBalances();
+
+      return true;
+    }
+
+    async function transferDebtToParty({
+      destinationPartyId,
+      originDebtorId,
+      originCreditorId,
+      destinationDebtorId,
+      destinationCreditorId,
+      amount,
+      paidAt,
+      originExpenseName,
+      destinationExpenseName,
+    }: {
+      destinationPartyId: Party["id"];
+      originDebtorId: PartyParticipant["id"];
+      originCreditorId: PartyParticipant["id"];
+      destinationDebtorId: PartyParticipant["id"];
+      destinationCreditorId: PartyParticipant["id"];
+      amount: number;
+      paidAt: Date;
+      originExpenseName: string;
+      destinationExpenseName: string;
+    }) {
+      const originParty = handle.doc();
+
+      if (!originParty) {
+        throw new Error("Party not found, this should not happen");
+      }
+
+      if (destinationPartyId === originParty.id) {
+        throw new Error("Cannot transfer debt to the same party");
+      }
+
+      if (!originParty.participants[originDebtorId]) {
+        throw new Error("Origin debtor not found");
+      }
+
+      if (!originParty.participants[originCreditorId]) {
+        throw new Error("Origin creditor not found");
+      }
+
+      const destinationHandle = await repo.find<Party>(destinationPartyId);
+      const destinationParty = destinationHandle.doc();
+
+      if (!destinationParty) {
+        throw new Error("Destination party not found");
+      }
+
+      if (destinationParty.currency !== originParty.currency) {
+        throw new Error("Cannot transfer debt between parties with different currencies");
+      }
+
+      if (!destinationParty.participants[destinationDebtorId]) {
+        throw new Error("Destination debtor not found");
+      }
+
+      if (!destinationParty.participants[destinationCreditorId]) {
+        throw new Error("Destination creditor not found");
+      }
+
+      const destinationHelpers = getPartyHelpers(repo, destinationHandle);
+
+      const { originExpense, destinationExpense } = createDebtTransferExpenses({
+        amount,
+        originDebtorId,
+        originCreditorId,
+        destinationDebtorId,
+        destinationCreditorId,
+        paidAt,
+        originExpenseName,
+        destinationExpenseName,
+      });
+
+      const createdDestinationExpense =
+        await destinationHelpers.addExpenseToParty(destinationExpense);
+
+      try {
+        const createdOriginExpense = await addExpenseToParty(originExpense);
+
+        return {
+          originExpense: createdOriginExpense,
+          destinationExpense: createdDestinationExpense,
+        };
+      } catch (error) {
+        try {
+          await destinationHelpers.removeExpense(createdDestinationExpense.id);
+        } catch (rollbackError) {
+          logger.error("Failed to rollback destination debt transfer expense", {
+            rollbackError,
+            destinationExpenseId: createdDestinationExpense.id,
+            destinationPartyId,
+          });
+        }
+
+        throw error;
+      }
+    }
+
+    return {
+      updateDetails,
+      updateParticipants,
+      setParticipantDetails,
+      saveExpenseTemplate,
+      deleteExpenseTemplate,
+      setOnlyUseCustomExpenseTemplates,
+      setDefaultExpenseTemplate,
+      addExpenseToParty,
+      transferDebtToParty,
+      updateExpense,
+      removeExpense,
+      recalculateBalances,
+    };
+  }
+
+  return getPartyHelpers;
+}
+
+export const getPartyHelpers = createPartyHelperFactory();

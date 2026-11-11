@@ -8,7 +8,7 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { useDataRecords } from "#src/lib/data/hooks.ts";
 import {
   calculatePartyStats,
   getPartyStatsAvailablePastYears,
@@ -161,7 +161,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
 
-  const chunkDocuments = useMultipleSuspenseDocument<PartyExpenseChunk>(
+  const chunkDocuments = useDataRecords<PartyExpenseChunk>(
     party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
     { required: true },
   );

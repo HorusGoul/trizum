@@ -3,8 +3,7 @@ import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "@trizum/ui/IconButton";
-import type { DocumentId } from "@automerge/automerge-repo/slim";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
@@ -30,20 +29,17 @@ function createDraftParticipant(name: string): Pick<PartyParticipant, "id" | "na
 }
 
 function New() {
-  const repo = useRepo();
+  const data = useAppData();
   const { partyList } = usePartyList();
   const navigate = useNavigate();
   const [initialParticipant] = useState(() => createDraftParticipant(partyList.username));
 
   const currencyOptions = getCurrencyOptions();
 
-  function onCreateParty(values: NewPartyFormValues) {
+  async function onCreateParty(values: NewPartyFormValues) {
     const participants = values.participants.map(({ id, name }) => ({ id, name }));
 
-    // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
-    const handle = repo.create<Party>({
-      id: "" as DocumentId,
-      type: "party",
+    const partyId = await data.createParty({
       name: values.name,
       symbol: values.symbol,
       description: values.description,
@@ -56,14 +52,12 @@ function New() {
 
         return result;
       }, {}),
-      chunkRefs: [],
     });
 
-    handle.change((doc) => (doc.id = handle.documentId));
     trackEvent("party_created");
     void navigate({
       to: "/party/$partyId",
-      params: { partyId: handle.documentId },
+      params: { partyId: partyId },
       search: {
         tab: "expenses",
       },
@@ -72,7 +66,7 @@ function New() {
 
     toast.success(t`Party created`);
 
-    return handle.documentId;
+    return partyId;
   }
 
   const defaultValues: NewPartyFormValues = {
@@ -86,7 +80,7 @@ function New() {
   const form = useForm({
     defaultValues,
     onSubmit: ({ value }) => {
-      onCreateParty(value);
+      return onCreateParty(value);
     },
   });
 

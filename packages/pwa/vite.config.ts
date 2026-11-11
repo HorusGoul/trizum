@@ -110,7 +110,6 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/analytics#build",
             "@trizum/logging#build",
-            "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
             "@trizum/ui#build",
             "codegen",
@@ -136,7 +135,6 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/analytics#build",
             "@trizum/logging#build",
-            "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
             "@trizum/ui#build",
             "codegen",
@@ -159,7 +157,6 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/analytics#build",
             "@trizum/logging#build",
-            "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
             "@trizum/ui#build",
             "codegen",
@@ -182,7 +179,6 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/analytics#build",
             "@trizum/logging#build",
-            "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
             "@trizum/ui#build",
             "codegen",
@@ -194,7 +190,6 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/analytics#build",
             "@trizum/logging#build",
-            "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
             "@trizum/ui#build",
             "codegen",
@@ -207,7 +202,6 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/analytics#build",
             "@trizum/logging#build",
-            "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
             "@trizum/ui#build",
             "codegen",
@@ -223,7 +217,6 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/analytics#build",
             "@trizum/logging#build",
-            "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
             "@trizum/ui#build",
             "codegen",

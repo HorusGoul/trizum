@@ -5,16 +5,14 @@ import {
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
-import { documentCache } from "./automerge/suspense-hooks";
-import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId } from "@automerge/automerge-repo";
+import { type PartyList } from "#src/models/partyList.js";
 
 export async function guardPartyExists(
   partyId: string,
-  { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+  { data }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
 ) {
   // SAFETY: The router owns this document ID and its Party/PartyList contract; the shared cache erases those document types.
-  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as Party | undefined;
+  const party = (await data.read<Party>(partyId)) as Party | undefined;
 
   if (!party) {
     throw redirect({ to: "/" });
@@ -24,11 +22,11 @@ export async function guardPartyExists(
 }
 
 export async function guardPartyListExists({
-  repo,
+  data,
 }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
-  const partyListId = getPartyListId(repo);
+  const partyListId = data.activeProfileId();
   // SAFETY: The router owns this document ID and its Party/PartyList contract; the shared cache erases those document types.
-  const partyList = (await documentCache.readAsync(repo, partyListId)) as PartyList | undefined;
+  const partyList = (await data.read<PartyList>(partyListId)) as PartyList | undefined;
 
   if (!partyList) {
     throw redirect({ to: "/" });

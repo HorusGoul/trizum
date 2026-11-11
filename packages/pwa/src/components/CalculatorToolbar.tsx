@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { useDataRecords } from "#src/lib/data/hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
 import { Button } from "@trizum/ui/Button";
 import { sheetTweenConfig } from "@trizum/ui/sheetMotion";
@@ -1167,7 +1167,7 @@ function CalculatorMobileAttachmentContent({
   const attachmentButtonIdPrefix = useId();
   const pendingAttachmentFocusIndexRef = useRef<number | null>(null);
 
-  const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
+  const mediaFiles = useDataRecords<MediaFile>(photoIds, {
     required: true as const,
   }).map(({ doc }) => doc);
 

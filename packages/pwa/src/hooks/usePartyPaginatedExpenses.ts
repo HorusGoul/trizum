@@ -1,4 +1,4 @@
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { useDataRecord } from "#src/lib/data/hooks.ts";
 import {
   getPartyPaginatedExpensesSnapshot,
   getVisiblePartyExpenseChunkIdsToLoad,
@@ -8,18 +8,18 @@ import {
   subscribeToPartyPaginatedExpenses,
 } from "#src/lib/partyPaginatedExpenses.ts";
 import type { Party } from "#src/models/party.js";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 
 export function usePartyPaginatedExpenses(partyId: Party["id"]) {
-  const repo = useRepo();
+  const data = useAppData();
 
-  const [party] = useSuspenseDocument<Party>(partyId, {
+  const [party] = useDataRecord<Party>(partyId, {
     required: true,
   });
 
   const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
-  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds);
+  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(data, chunkIds);
   const snapshotRef = useRef<PartyPaginatedExpensesSnapshot | undefined>(undefined);
   const snapshotKeyRef = useRef<string>("");
   const snapshotKey = `${String(partyId)}:${chunkIds.join(",")}`;
@@ -38,18 +38,18 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
     }
 
     requestedVisibleChunkIdsKeyRef.current = visibleChunkIdsToLoadKey;
-    void loadVisiblePartyExpenseChunks(repo, chunkIds);
-  }, [chunkIds, repo, visibleChunkIdsToLoad, visibleChunkIdsToLoadKey]);
+    void loadVisiblePartyExpenseChunks(data, chunkIds);
+  }, [chunkIds, data, visibleChunkIdsToLoad, visibleChunkIdsToLoadKey]);
 
   const snapshot = useSyncExternalStore(
-    (onStoreChange) => subscribeToPartyPaginatedExpenses(onStoreChange, repo, chunkIds),
+    (onStoreChange) => subscribeToPartyPaginatedExpenses(onStoreChange, data, chunkIds),
     () => {
       if (snapshotKeyRef.current !== snapshotKey) {
         snapshotKeyRef.current = snapshotKey;
         snapshotRef.current = undefined;
       }
 
-      const nextSnapshot = getPartyPaginatedExpensesSnapshot(repo, chunkIds);
+      const nextSnapshot = getPartyPaginatedExpensesSnapshot(data, chunkIds);
 
       if (snapshotRef.current && areSnapshotsEqual(snapshotRef.current, nextSnapshot)) {
         return snapshotRef.current;
@@ -62,7 +62,7 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   );
 
   function loadNext() {
-    void loadNextPartyExpenseChunks(repo, chunkIds);
+    void loadNextPartyExpenseChunks(data, chunkIds);
   }
 
   return {

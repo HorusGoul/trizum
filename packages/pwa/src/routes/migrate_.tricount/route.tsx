@@ -2,8 +2,7 @@ import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { createPartyFromMigrationData } from "#src/models/migration.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { MigrationApiError, trizumApiClient } from "#src/lib/trizumApiClient.ts";
 import type { Party } from "#src/models/party.ts";
 import { ErrorState, SuccessState } from "./-components/FinishedStates.js";
@@ -50,7 +49,7 @@ type MigrationState =
 
 function useMigrateTricount() {
   const [state, setState] = useState<MigrationState>({ type: "idle" });
-  const repo = useRepo();
+  const appData = useAppData();
 
   async function migrate({ key, importAttachments }: MigrateParams) {
     trackEvent("tricount_import_started");
@@ -63,8 +62,7 @@ function useMigrateTricount() {
     try {
       const data = await trizumApiClient.migration.importTricount(key);
 
-      const partyId = await createPartyFromMigrationData({
-        repo,
+      const partyId = await appData.importParty({
         data,
         importAttachments,
         onProgress: (progress) => {

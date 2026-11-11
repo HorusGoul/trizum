@@ -1,3 +1,4 @@
+import { createFateApiClient } from "./data/http.ts";
 import { hc } from "hono/client";
 import type { PremiumRoute } from "../../api/routes/premium";
 import type { CloudSyncRoute } from "../../api/routes/cloud-sync";
@@ -157,14 +158,16 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
   };
 }
 
-export const trizumApiClient = createTrizumApiClient({
-  baseUrl: getAuthBaseURL,
-  migrationBaseUrl: () => getAppLink("/"),
-  fetch: fetchWithNativeAuth,
-  // Migration is public and uses wildcard CORS; keep its requests credential-free
-  // across origins, including Capacitor's native origin.
-  publicFetch: (input, init) => fetch(input, init),
-});
+export const trizumApiClient = createFateApiClient(
+  createTrizumApiClient({
+    baseUrl: getAuthBaseURL,
+    migrationBaseUrl: () => getAppLink("/"),
+    fetch: fetchWithNativeAuth,
+    // Migration is public and uses wildcard CORS; keep its requests credential-free
+    // across origins, including Capacitor's native origin.
+    publicFetch: (input, init) => fetch(input, init),
+  }),
+);
 
 export function isPartyBoostStatus(value: unknown): value is PartyBoostStatus {
   return partyBoostStatusSchema.safeParse(value).success;

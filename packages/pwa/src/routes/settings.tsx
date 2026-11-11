@@ -66,8 +66,8 @@ export function Settings() {
   const navigate = useNavigate();
   const localeOptions = getLocaleOptions();
 
-  function onSaveSettings(values: SettingsFormValues) {
-    updateSettings({
+  async function onSaveSettings(values: SettingsFormValues) {
+    await updateSettings({
       username: values.username,
       phone: values.paymentMethods.bizum?.trim() ?? "",
       paymentMethods: normalizePaymentMethods(values.paymentMethods),
@@ -94,7 +94,7 @@ export function Settings() {
       hue: partyList.hue ?? defaultThemeHue,
     },
     onSubmit: ({ value }) => {
-      onSaveSettings(value);
+      return onSaveSettings(value);
     },
   });
 
@@ -312,9 +312,9 @@ function UsageAnalyticsSetting() {
       label={<Trans>Share usage analytics</Trans>}
       description={<Trans>Help us understand how trizum is used.</Trans>}
       isSelected={partyList.usageAnalyticsEnabled !== false}
-      onChange={(enabled) => {
+      onChange={async (enabled) => {
         if (!enabled) setAnalyticsEnabled(false);
-        setUsageAnalyticsEnabled(enabled);
+        await setUsageAnalyticsEnabled(enabled);
       }}
     />
   );

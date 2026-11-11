@@ -89,9 +89,9 @@ function ExpenseTemplatesSettings() {
 
   const canAddTemplate = templateCount < MAX_EXPENSE_TEMPLATES;
 
-  function changeOnlyUseCustomTemplates(isSelected: boolean) {
+  async function changeOnlyUseCustomTemplates(isSelected: boolean) {
     if (!isSelected) {
-      setOnlyUseCustomExpenseTemplates(false);
+      await setOnlyUseCustomExpenseTemplates(false);
       trackEvent("custom_templates_only_disabled");
 
       return;
@@ -104,7 +104,7 @@ function ExpenseTemplatesSettings() {
     }
 
     if (configuredDefaultTemplate) {
-      setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      await setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
       trackEvent("custom_templates_only_enabled");
 
       return;
@@ -113,11 +113,11 @@ function ExpenseTemplatesSettings() {
     setIsOnlyCustomTemplatesSheetOpen(true);
   }
 
-  function confirmOnlyUseCustomTemplates() {
+  async function confirmOnlyUseCustomTemplates() {
     const firstTemplate = templates[0];
 
     if (firstTemplate) {
-      setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      await setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
       trackEvent("custom_templates_only_enabled");
     }
 
@@ -157,8 +157,8 @@ function ExpenseTemplatesSettings() {
               aria-label={t`Always use default template`}
               aria-describedby={ALWAYS_USE_DEFAULT_TEMPLATE_DESCRIPTION_ID}
               isSelected={participant.alwaysUseDefaultExpenseTemplate ?? false}
-              onChange={(isSelected) => {
-                setParticipantDetails(participant.id, {
+              onChange={async (isSelected) => {
+                await setParticipantDetails(participant.id, {
                   alwaysUseDefaultExpenseTemplate: isSelected,
                 });
                 trackEvent(
@@ -179,9 +179,9 @@ function ExpenseTemplatesSettings() {
                 label={t`Default template`}
                 items={defaultOptions}
                 selectedKey={selectedDefaultId}
-                onSelectionChange={(key) => {
+                onSelectionChange={async (key) => {
                   const templateId = String(key);
-                  setDefaultExpenseTemplate(
+                  await setDefaultExpenseTemplate(
                     templateId === BLANK_TEMPLATE_ID ? undefined : templateId,
                   );
 

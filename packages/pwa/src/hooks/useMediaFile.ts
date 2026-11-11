@@ -1,6 +1,6 @@
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { useDataRecord } from "#src/lib/data/hooks.ts";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { useEffect } from "react";
 
 interface MediaFileObjectUrlEntry {
@@ -92,11 +92,11 @@ export function useMediaFileObjectUrls(mediaFiles: MediaFile[]) {
 }
 
 export function useMediaFile(mediaFileId: string) {
-  if (!isValidDocumentId(mediaFileId)) {
+  if (!isValidRecordId(mediaFileId)) {
     throw new Error("Malformed MediaFile ID");
   }
 
-  const [mediaFile] = useSuspenseDocument<MediaFile>(mediaFileId, {
+  const [mediaFile] = useDataRecord<MediaFile>(mediaFileId, {
     required: true,
   });
 

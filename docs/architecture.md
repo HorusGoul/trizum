@@ -10,3 +10,7 @@ trizum is built as a **monorepo** with a local-first architecture. The core prin
 4. **Conflict Resolution**. Automerge CRDTs automatically merge changes from multiple devices
 
 [Project overview](../README.md). For implementation, start with the [PWA](../packages/pwa/README.md) or [sync server](../packages/server/README.md).
+
+For the exploration of Fate v2 as the application's data access interface over
+private Automerge storage and sync, read
+[Fate v2 architecture exploration](../refactors/pending/fate-v2-automerge.md).

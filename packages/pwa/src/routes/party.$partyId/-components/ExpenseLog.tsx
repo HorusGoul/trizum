@@ -74,8 +74,8 @@ export function ExpenseLog() {
     openExpenseEditor(hasDefaultTemplate ? defaultTemplateId : fallbackTemplateId);
   }
 
-  function toggleAlwaysUseDefaultTemplate() {
-    setParticipantDetails(participant.id, {
+  async function toggleAlwaysUseDefaultTemplate() {
+    await setParticipantDetails(participant.id, {
       alwaysUseDefaultExpenseTemplate: !participant.alwaysUseDefaultExpenseTemplate,
     });
     trackEvent(

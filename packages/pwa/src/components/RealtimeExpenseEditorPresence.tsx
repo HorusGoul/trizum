@@ -1,7 +1,8 @@
+import type { ExpensePresenceMessage } from "#src/lib/data/presence.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { useDataRecord } from "#src/lib/data/hooks.ts";
 import {
   decodeExpenseId,
   type Expense,
@@ -11,7 +12,8 @@ import type { MediaFile } from "#src/models/media.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "@trizum/ui/Avatar";
 import { getLogger } from "#src/lib/log.ts";
-import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
+import { useAppData } from "#src/lib/data/useAppData.ts";
+import type { AppData } from "#src/lib/data/client.ts";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   arePresenceBubblePositionsEqual,
@@ -26,21 +28,6 @@ interface RealtimeExpenseEditorPresenceProps {
   expenseId: Expense["id"];
 }
 
-type ExpensePresenceUpdatePayload = {
-  type: "expense-presence-update";
-  data: ExpenseParticipantPresence & {
-    expenseId: Expense["id"];
-  };
-};
-
-type ExpensePresenceDeletePayload = {
-  type: "expense-presence-delete";
-  data: {
-    participantId: PartyParticipant["id"];
-    expenseId: Expense["id"];
-  };
-};
-
 function broadcastPresenceUpdate({
   expenseId,
   handle,
@@ -49,7 +36,7 @@ function broadcastPresenceUpdate({
   value,
 }: {
   expenseId: Expense["id"];
-  handle: DocHandle<PartyExpenseChunk>;
+  handle: ReturnType<AppData["presence"]>;
   lastSentElementIdRef: React.RefObject<string | null>;
   participantId: PartyParticipant["id"];
   value: Pick<ExpenseParticipantPresence, "elementId"> | null;
@@ -57,7 +44,7 @@ function broadcastPresenceUpdate({
   if (!value) {
     lastSentElementIdRef.current = null;
 
-    const payload: ExpensePresenceDeletePayload = {
+    const payload: ExpensePresenceMessage = {
       type: "expense-presence-delete",
       data: {
         participantId,
@@ -72,7 +59,7 @@ function broadcastPresenceUpdate({
 
   lastSentElementIdRef.current = value.elementId;
 
-  const payload: ExpensePresenceUpdatePayload = {
+  const payload: ExpensePresenceMessage = {
     type: "expense-presence-update",
     data: {
       elementId: value.elementId,
@@ -88,10 +75,12 @@ function broadcastPresenceUpdate({
 export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEditorPresenceProps) {
   const { chunkId } = decodeExpenseId(expenseId);
 
-  const [, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
+  useDataRecord<PartyExpenseChunk>(chunkId, {
     required: true,
   });
 
+  const data = useAppData();
+  const handle = data.presence(expenseId);
   const participant = useCurrentParticipant();
   const overlayRef = useRef<HTMLDivElement>(null);
   const presenceElementIdRef = useRef<string | null>(null);
@@ -127,9 +116,9 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
   }, [expenseId, handle, participant.id]);
 
   useEffect(() => {
-    const listener = ({ message }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
+    const listener = ({ message }: { message: unknown }) => {
       // SAFETY: The ephemeral channel is owned by the expense-presence sender; the following try block checks fields and ignores malformed messages.
-      const payload = message as ExpensePresenceDeletePayload | ExpensePresenceUpdatePayload;
+      const payload = message as ExpensePresenceMessage;
 
       try {
         if (payload.data.expenseId !== expenseId) {
@@ -166,11 +155,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       }
     };
 
-    handle.on("ephemeral-message", listener);
-
-    return () => {
-      handle.off("ephemeral-message", listener);
-    };
+    return handle.subscribe(listener);
   }, [handle, expenseId, participant.id]);
 
   useEffect(() => {

@@ -147,7 +147,7 @@ function ExpenseTemplateEditor() {
       activeParticipants.map((participant) => participant.id),
       defaultTemplateName,
     ),
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (isNew && Object.keys(party.expenseTemplates ?? {}).length >= MAX_EXPENSE_TEMPLATES) {
         announceTemplateLimit();
 
@@ -175,7 +175,7 @@ function ExpenseTemplateEditor() {
       if (value.amount > 0) savedTemplate.amount = convertToUnits(value.amount);
 
       try {
-        saveExpenseTemplate(savedTemplate);
+        await saveExpenseTemplate(savedTemplate);
       } catch (error) {
         if (error instanceof ExpenseTemplateLimitError) {
           announceTemplateLimit();
@@ -227,12 +227,12 @@ function ExpenseTemplateEditor() {
     setShares(nextShares, "all");
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (!template) {
       return;
     }
 
-    deleteExpenseTemplate(template.id);
+    await deleteExpenseTemplate(template.id);
     trackEvent("expense_template_deleted");
     setIsDeleteSheetOpen(false);
     toast.success(t`Expense template deleted`);

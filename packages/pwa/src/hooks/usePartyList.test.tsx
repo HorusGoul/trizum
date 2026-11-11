@@ -4,8 +4,8 @@ import { Repo } from "@automerge/automerge-repo";
 import { act, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
-import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
+import { DataHarness } from "#src/lib/testing/DataHarness.tsx";
+import { documentCache } from "#src/lib/testing/dataCache.ts";
 import { hasLocalPartyListData } from "#src/lib/cloudSyncRouteState.ts";
 import { initializeI18n } from "#src/lib/i18n.ts";
 import { getPartyListHandle } from "#src/models/partyList.ts";
@@ -67,11 +67,11 @@ it("syncs saved methods and removals to existing groups without changing other p
   try {
     await act(async () =>
       root.render(
-        <RepoContext value={repo}>
+        <DataHarness value={repo}>
           <Suspense>
             <Harness />
           </Suspense>
-        </RepoContext>,
+        </DataHarness>,
       ),
     );
 

@@ -10,10 +10,9 @@ import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrderi
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { use } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
@@ -155,10 +154,10 @@ function Home() {
                   const actions = createPartyActions({
                     isPinned: pinned,
                     onTogglePinned: () => {
-                      togglePartyPinned(partyList, partyId, setPartyPinned);
+                      return togglePartyPinned(partyList, partyId, setPartyPinned);
                     },
                     onArchive: () => {
-                      archiveParty(partyId, setPartyArchived);
+                      return archiveParty(partyId, setPartyArchived);
                     },
                   });
 
@@ -223,11 +222,11 @@ function Home() {
 }
 
 function usePartySections(partyList: PartyList) {
-  const repo = useRepo();
+  const data = useAppData();
   const sections = getOrderedPartySections(partyList);
 
   for (const partyId of [...sections.activePartyIds, ...sections.archivedPartyIds]) {
-    documentCache.prefetch(repo, partyId);
+    void data.read(partyId);
   }
 
   return sections;
@@ -258,22 +257,22 @@ function createPartyActions({
   ];
 }
 
-function togglePartyPinned(
+async function togglePartyPinned(
   partyList: PartyList,
   partyId: Party["id"],
   setPartyPinned: ReturnType<typeof usePartyList>["setPartyPinned"],
 ) {
   const currentlyPinned = isPartyPinned(partyList, partyId);
-  setPartyPinned(partyId, !currentlyPinned);
+  await setPartyPinned(partyId, !currentlyPinned);
   trackEvent(currentlyPinned ? "party_unpinned" : "party_pinned");
   toast.success(currentlyPinned ? t`Party unpinned` : t`Party pinned`);
 }
 
-function archiveParty(
+async function archiveParty(
   partyId: Party["id"],
   setPartyArchived: ReturnType<typeof usePartyList>["setPartyArchived"],
 ) {
-  setPartyArchived(partyId, true);
+  await setPartyArchived(partyId, true);
   trackEvent("party_archived");
   toast.success(t`Party archived`);
 }
