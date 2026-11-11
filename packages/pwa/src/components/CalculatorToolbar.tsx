@@ -1,6 +1,6 @@
-import { useAppData } from "#src/lib/data/useAppData.ts";
-import { MediaContentView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { msg, t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
@@ -19,6 +19,14 @@ import { cn } from "@trizum/ui/utils";
 import { suppressCalculatorAutoOpen } from "./calculatorAutoOpenSuppression.ts";
 import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
 import type { MediaFile } from "#src/models/media.ts";
+
+const MediaContentView = view<MediaEntity>()({
+  id: true,
+  available: true,
+  type: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)

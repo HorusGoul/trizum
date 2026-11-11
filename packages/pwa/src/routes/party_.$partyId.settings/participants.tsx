@@ -1,4 +1,5 @@
-import { PartyParticipantsView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -17,6 +18,12 @@ import type {
   AddPartyParticipantFormValues,
   PartyParticipantsFormValues,
 } from "./-components/types.js";
+
+const PartyParticipantsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+});
 
 export const Route = createFileRoute("/party_/$partyId/settings/participants")({
   component: PartyParticipantSettings,

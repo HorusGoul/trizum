@@ -1,5 +1,5 @@
-import { ExpenseEditorView, PartyIdentityView } from "#src/lib/data/views.ts";
-import type { ExpenseEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
+import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
 import { getFailureMessage } from "#src/lib/failureMessage.ts";
@@ -29,6 +29,25 @@ import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { getExpenseEditHash, getExpenseEditValues } from "#src/lib/data/expenseDraft.ts";
 import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
+
+const ExpenseEditorView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+  __editCopy: true,
+  __editCopyLastUpdatedAt: true,
+});
+
+const PartyIdentityView = view<PartyEntity>()({
+  id: true,
+  available: true,
+});
 
 interface EditExpenseSearchParams {
   calculator?: string;

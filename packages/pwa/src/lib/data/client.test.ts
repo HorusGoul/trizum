@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
-import { PartyDetailsView } from "./views.ts";
+import { view } from "@nkzw/fate";
 import type { PartyEntity } from "./entities.ts";
+
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import {
   Repo,
@@ -13,6 +14,14 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 import type { Party } from "#src/models/party.ts";
 import type { MediaFile } from "#src/models/media.ts";
 import { createAppData, type AppData } from "./client.ts";
+
+const PartyDetailsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+  description: true,
+});
 
 const repos: Repo[] = [];
 const clients: AppData[] = [];

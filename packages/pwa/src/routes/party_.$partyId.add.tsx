@@ -1,4 +1,5 @@
-import { PartyTemplatesView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import {
   expenseEditorSearchSchema,
   optionalNonemptySearchTextSchema,
@@ -24,6 +25,16 @@ import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { useState } from "react";
 import { resolveExpenseTemplateValues } from "#src/models/expenseTemplate.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
+
+const PartyTemplatesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  expenseTemplates: true,
+  defaultExpenseTemplateId: true,
+  onlyUseCustomExpenseTemplates: true,
+});
 
 interface AddExpenseSearchParams {
   calculator?: string;

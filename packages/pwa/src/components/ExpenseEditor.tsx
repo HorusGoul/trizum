@@ -1,4 +1,5 @@
-import { ProfileCalculatorView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -51,6 +52,12 @@ import {
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
 import { cn } from "@trizum/ui/utils";
+
+const ProfileCalculatorView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  autoOpenCalculator: true,
+});
 
 export interface ExpenseEditorFormValues {
   name: string;

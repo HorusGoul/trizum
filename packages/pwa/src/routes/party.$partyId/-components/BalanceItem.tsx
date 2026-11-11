@@ -1,9 +1,16 @@
-import { PartyCurrencyView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import type { Balance } from "#src/models/expense.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { cn } from "@trizum/ui/utils";
+
+const PartyCurrencyView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+});
 
 interface BalanceItemProps {
   participant: PartyParticipant;

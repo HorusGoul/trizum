@@ -1,4 +1,5 @@
-import { ProfileSettingsView, ProfileAnalyticsView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { PaymentMethodsEditor } from "#src/components/PaymentMethodsEditor.tsx";
 import {
   getPaymentMethods,
@@ -34,6 +35,25 @@ import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus, type AuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
+
+const ProfileSettingsView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+  locale: true,
+  openLastPartyOnLaunch: true,
+  autoOpenCalculator: true,
+  hue: true,
+});
+
+const ProfileAnalyticsView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  usageAnalyticsEnabled: true,
+});
 
 export const Route = createFileRoute("/settings")({
   component: Settings,

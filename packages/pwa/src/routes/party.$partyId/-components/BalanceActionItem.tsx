@@ -1,4 +1,5 @@
-import { PartyTransferView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -8,6 +9,16 @@ import { useCurrentParty } from "#src/hooks/useParty.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
+
+const PartyTransferView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  symbol: true,
+  description: true,
+  name: true,
+  currency: true,
+  participants: true,
+});
 
 interface BalanceActionItemProps {
   fromId: PartyParticipant["id"];

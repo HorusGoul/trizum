@@ -1,6 +1,6 @@
+import { view } from "@nkzw/fate";
+import type { ExpenseChunkEntity, ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
-import { ExpenseChunkView, ExpenseDetailView, PartyBalancesView } from "#src/lib/data/views.ts";
-import type { ExpenseChunkEntity, ExpenseEntity } from "#src/lib/data/entities.ts";
 import { endOfWeek, getLocalTimeZone, startOfWeek, today } from "@internationalized/date";
 import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
@@ -42,6 +42,32 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+
+const ExpenseChunkView = view<ExpenseChunkEntity>()({
+  id: true,
+  available: true,
+  expenses: { id: true },
+});
+
+const ExpenseDetailView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+});
+
+const PartyBalancesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  chunkRefs: true,
+});
 
 interface PartyStatsViewProps {
   scrollElementRef: RefObject<HTMLDivElement | null>;

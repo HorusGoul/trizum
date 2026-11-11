@@ -1,4 +1,5 @@
-import { PartyParticipantsView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { Trans } from "@lingui/react/macro";
 import { useEligibleDebtTransferParties } from "#src/hooks/useEligibleDebtTransferParties.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
@@ -11,6 +12,12 @@ import { Icon } from "@trizum/ui/Icon";
 import { BalanceActionItem } from "./BalanceActionItem.js";
 import { BalanceItem } from "./BalanceItem.js";
 import { PullToRefresh } from "@trizum/ui/PullToRefresh";
+
+const PartyParticipantsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+});
 
 export function Balances({
   panelRef,

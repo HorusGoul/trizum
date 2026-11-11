@@ -1,4 +1,5 @@
-import { ProfileAppearanceView } from "./lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { getBrowserLocale, setLocale } from "./lib/i18n.ts";
 import { setThemeHue, defaultThemeHue } from "@trizum/ui/theme";
 import { optionalNonemptySearchTextSchema } from "./lib/routerSearch.ts";
@@ -61,6 +62,13 @@ import {
   seedPartyListState,
   type InternalPartyListSeed,
 } from "./lib/testing/browserHarness.ts";
+
+const ProfileAppearanceView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  locale: true,
+  hue: true,
+});
 
 const initialUrl = new URL(window.location.href);
 const isProduction = import.meta.env.MODE === "production";

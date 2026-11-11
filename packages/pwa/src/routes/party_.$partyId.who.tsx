@@ -1,4 +1,5 @@
-import { ProfileJoiningView, PartyMembershipView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -18,6 +19,23 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
+
+const ProfileJoiningView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  participantInParties: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+});
+
+const PartyMembershipView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  participants: true,
+});
 
 interface WhoSearchParams {
   redirectTo?: string;

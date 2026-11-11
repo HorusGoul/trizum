@@ -1,5 +1,8 @@
 // @vitest-environment jsdom
 
+import { view } from "@nkzw/fate";
+import type { ExpenseEntity, ExpenseChunkEntity, PartyEntity, ProfileEntity } from "./entities.ts";
+
 import { Repo } from "@automerge/automerge-repo";
 import { act, Suspense } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -12,16 +15,71 @@ import { useParty } from "#src/hooks/useParty.ts";
 import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { createAppData, type AppData } from "./client.ts";
 import { DataProvider } from "./context.tsx";
-import type { ExpenseEntity, ExpenseChunkEntity, PartyEntity } from "./entities.ts";
-import {
-  PartyHeaderView,
-  PartyDetailsView,
-  ProfileHomeView,
-  ProfileAppearanceView,
-  ExpenseChunkView,
-  ExpenseDetailView,
-  ExpenseEditorView,
-} from "./views.ts";
+
+const PartyHeaderView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+});
+
+const PartyDetailsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+  description: true,
+});
+
+const ProfileHomeView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+});
+
+const ProfileAppearanceView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  locale: true,
+  hue: true,
+});
+
+const ExpenseChunkView = view<ExpenseChunkEntity>()({
+  id: true,
+  available: true,
+  expenses: { id: true },
+});
+
+const ExpenseDetailView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+});
+
+const ExpenseEditorView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+  __editCopy: true,
+  __editCopyLastUpdatedAt: true,
+});
 
 let repo: Repo;
 let data: AppData;

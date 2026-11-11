@@ -1,4 +1,5 @@
-import { PartySettingsView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { useParty } from "#src/hooks/useParty.js";
@@ -8,6 +9,14 @@ import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";
 import { PartySettingsLink } from "./-components/PartySettingsLink.js";
 import { PartySettingsSection } from "./-components/PartySettingsSection.js";
 import { PartyBoostCard } from "./-components/PartyBoostCard.js";
+
+const PartySettingsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+  boost: true,
+});
 
 export const Route = createFileRoute("/party_/$partyId/settings/")({
   component: PartySettings,

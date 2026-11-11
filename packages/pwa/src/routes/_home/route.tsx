@@ -1,4 +1,5 @@
-import { ProfileHomeView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
@@ -23,6 +24,17 @@ import { NoActivePartiesCard } from "#src/routes/index/-components/NoActiveParti
 import { HomeBanner } from "#src/routes/index/-components/HomeBanner.tsx";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
+
+const ProfileHomeView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+});
 
 interface HomeSearch {
   premium?: boolean;

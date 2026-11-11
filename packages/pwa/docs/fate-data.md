@@ -46,11 +46,19 @@ Initial expense history still loads one chunk, and further pages load on demand.
 
 ## Experimental tradeoffs
 
-React selects named views from [`data/views.ts`](../src/lib/data/views.ts): party
-headers, settings, participants, profile membership, appearance, balances, expense
-rows, drafts, and media each declare their fields. `useParty(id, view)` and
-`usePartyList(view)` require a selection; the generic whole-document React hooks
-are removed. Appearance effects run once at bootstrap.
+Each React component or reusable hook declares its Fate views as module-level
+constants beside the code that consumes them. For example,
+[`PartyListCard`](../src/components/PartyListCard.tsx) owns its card selection,
+[`usePartyPaginatedExpenses`](../src/hooks/usePartyPaginatedExpenses.ts) owns its
+history and saved-expense selections, and the
+[expense edit route](../src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx)
+owns its draft selection. There is no central UI view catalog. Components can
+change their data requirements independently, even when selections currently match.
+
+`useParty(id, view)` and `usePartyList(view)` require a selection; the generic
+whole-document React hooks are removed. Appearance effects run once at bootstrap.
+The adapter owns private identity and relationship views for cache retention,
+independent of component selections.
 
 [`data/projection.ts`](../src/lib/data/projection.ts) maps source documents to
 Party, Profile, ExpenseChunk, Expense, Balance, and Media entities. Expenses have

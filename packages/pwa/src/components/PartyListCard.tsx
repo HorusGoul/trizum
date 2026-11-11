@@ -1,6 +1,6 @@
-import { useAppData } from "#src/lib/data/useAppData.ts";
-import { PartyCardView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -31,6 +31,15 @@ import {
   ModalSheetTitle,
 } from "@trizum/ui/ModalSheet";
 import { cn } from "@trizum/ui/utils";
+
+const PartyCardView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+  description: true,
+  participants: true,
+});
 
 export interface PartyListCardAction {
   key: string;

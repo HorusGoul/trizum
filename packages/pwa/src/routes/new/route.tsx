@@ -1,4 +1,5 @@
-import { ProfileNameView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
@@ -17,6 +18,12 @@ import type {
   CurrencyOption,
   NewPartyFormValues,
 } from "./-components/types.js";
+
+const ProfileNameView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+});
 
 export const Route = createFileRoute("/new")({
   component: New,

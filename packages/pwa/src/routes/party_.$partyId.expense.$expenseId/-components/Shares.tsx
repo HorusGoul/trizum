@@ -1,4 +1,5 @@
-import { PartyParticipantAmountsView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
@@ -6,6 +7,13 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { getExpenseUnitShares, type Expense } from "#src/models/expense.js";
 import { Icon } from "@trizum/ui/Icon";
+
+const PartyParticipantAmountsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+  currency: true,
+});
 
 export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
   const { i18n } = useLingui();

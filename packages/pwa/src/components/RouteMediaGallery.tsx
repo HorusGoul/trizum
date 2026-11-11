@@ -1,11 +1,19 @@
-import { useAppData } from "#src/lib/data/useAppData.ts";
-import { MediaContentView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState, useRef } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import MediaGallery, { MediaGalleryImage } from "@trizum/ui/MediaGallery";
 import { useRequiredView } from "#src/lib/data/hooks.ts";
+
+const MediaContentView = view<MediaEntity>()({
+  id: true,
+  available: true,
+  type: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 export interface RouteMediaGalleryProps {
   /** List of photo IDs to display in the gallery */

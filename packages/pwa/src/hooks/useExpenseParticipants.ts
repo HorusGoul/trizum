@@ -1,7 +1,14 @@
-import { PartyParticipantsView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import type { Expense } from "#src/models/expense.ts";
 import { useCurrentParty } from "./useParty";
 import { usePartyParticipants } from "./usePartyParticipants";
+
+const PartyParticipantsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+});
 
 export function useExpenseParticipants(expense: Pick<Expense, "paidBy" | "shares">) {
   const { party } = useCurrentParty(PartyParticipantsView);

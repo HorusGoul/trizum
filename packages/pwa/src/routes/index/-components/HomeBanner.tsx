@@ -1,4 +1,5 @@
-import { ProfileBannerView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -14,6 +15,13 @@ import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { ProfileSetupCard } from "./ProfileSetupCard.tsx";
+
+const ProfileBannerView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  premiumBannerDismissed: true,
+});
 
 export function HomeBanner({ isVisible }: { isVisible: boolean }) {
   const { partyList, dismissPremiumBanner } = usePartyList(ProfileBannerView);

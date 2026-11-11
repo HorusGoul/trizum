@@ -1,12 +1,32 @@
+import { view } from "@nkzw/fate";
+import type { PartyEntity, ProfileEntity } from "#src/lib/data/entities.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
-import type { PartyEntity } from "#src/lib/data/entities.ts";
-import { ProfileHomeView } from "#src/lib/data/views.ts";
-import { PartyTransferView } from "#src/lib/data/views.ts";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
 import { useViews } from "react-fate";
 import { useCurrentParty } from "./useParty";
 import { usePartyList } from "./usePartyList";
+
+const ProfileHomeView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+});
+
+const PartyTransferView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  symbol: true,
+  description: true,
+  name: true,
+  currency: true,
+  participants: true,
+});
 
 export interface EligibleDebtTransferParty {
   party: Pick<Party, "id" | "name" | "symbol" | "description" | "currency" | "participants">;

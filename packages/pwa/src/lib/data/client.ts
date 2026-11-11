@@ -1,4 +1,3 @@
-import type { Entity, View, Selection } from "@nkzw/fate";
 import type {
   PartyEntity,
   ProfileEntity,
@@ -7,6 +6,7 @@ import type {
   BalanceEntity,
   MediaEntity,
 } from "./entities.ts";
+import type { Entity, View, Selection } from "@nkzw/fate";
 import {
   entityTypes,
   projectDocument,
@@ -15,13 +15,6 @@ import {
   expenseFields,
   type SourceDocument,
 } from "./projection.ts";
-import {
-  PartyIdentityView,
-  ProfileIdentityView,
-  ExpenseChunkView,
-  BalanceView,
-  MediaContentView,
-} from "./views.ts";
 import { createReadScope } from "./readScope.ts";
 import { loadRecord } from "./loadRecord.ts";
 import { createFateState } from "./fateState.ts";
@@ -41,6 +34,16 @@ import { getPartyListId, subscribeToPartyListId, type PartyList } from "#src/mod
 import type { Party } from "#src/models/party.ts";
 import { createPartyFromMigrationData } from "#src/models/migration.ts";
 import { bindAnalytics } from "../analytics.ts";
+
+const RetainedPartyView = view<PartyEntity>()({ id: true });
+
+const RetainedProfileView = view<ProfileEntity>()({ id: true });
+
+const RetainedExpenseChunkView = view<ExpenseChunkEntity>()({ id: true, expenses: { id: true } });
+
+const RetainedBalanceView = view<BalanceEntity>()({ id: true });
+
+const RetainedMediaView = view<MediaEntity>()({ id: true });
 
 interface RecordSnapshot {
   __typename: "RecordSnapshot";
@@ -238,19 +241,19 @@ export function createAppData(repo: Repo) {
     if (type && !retained.has(key)) {
       switch (type) {
         case "Party":
-          retained.set(key, fate.retain({ party: { id, view: PartyIdentityView } }));
+          retained.set(key, fate.retain({ party: { id, view: RetainedPartyView } }));
           break;
         case "Profile":
-          retained.set(key, fate.retain({ profile: { id, view: ProfileIdentityView } }));
+          retained.set(key, fate.retain({ profile: { id, view: RetainedProfileView } }));
           break;
         case "ExpenseChunk":
-          retained.set(key, fate.retain({ expenseChunk: { id, view: ExpenseChunkView } }));
+          retained.set(key, fate.retain({ expenseChunk: { id, view: RetainedExpenseChunkView } }));
           break;
         case "Balance":
-          retained.set(key, fate.retain({ balance: { id, view: BalanceView } }));
+          retained.set(key, fate.retain({ balance: { id, view: RetainedBalanceView } }));
           break;
         case "Media":
-          retained.set(key, fate.retain({ media: { id, view: MediaContentView } }));
+          retained.set(key, fate.retain({ media: { id, view: RetainedMediaView } }));
           break;
       }
     }

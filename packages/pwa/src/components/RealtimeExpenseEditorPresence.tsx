@@ -1,5 +1,5 @@
-import { ExpenseIdentityView, PartyParticipantsView } from "#src/lib/data/views.ts";
-import type { ExpenseEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
+import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import type { ExpensePresenceMessage } from "#src/lib/data/presence.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
@@ -19,6 +19,17 @@ import {
   getPresenceElementIdFromTarget,
   type PresenceBubblePosition,
 } from "./presencePosition.ts";
+
+const ExpenseIdentityView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+});
+
+const PartyParticipantsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+});
 
 const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 

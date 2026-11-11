@@ -1,5 +1,5 @@
-import { ExpenseDetailView, PartyIdentityView } from "#src/lib/data/views.ts";
-import type { ExpenseEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
+import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { optionalSearchNumberSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -32,6 +32,23 @@ import { PaidAt } from "./-components/PaidAt.js";
 import { PaidBy } from "./-components/PaidBy.js";
 import { Photos } from "./-components/Photos.js";
 import { Shares } from "./-components/Shares.js";
+
+const ExpenseDetailView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+});
+
+const PartyIdentityView = view<PartyEntity>()({
+  id: true,
+  available: true,
+});
 
 interface ExpenseSearchParams {
   media?: number;

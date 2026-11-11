@@ -1,6 +1,6 @@
+import { view } from "@nkzw/fate";
+import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { useParty } from "./useParty.ts";
-import { PartyHistoryView, ExpenseDetailView } from "#src/lib/data/views.ts";
-import type { ExpenseEntity } from "#src/lib/data/entities.ts";
 import { useRequiredViews } from "#src/lib/data/hooks.ts";
 import {
   getPartyPaginatedExpensesSnapshot,
@@ -13,6 +13,24 @@ import {
 import type { Party } from "#src/models/party.js";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { useEffect, useRef, useSyncExternalStore } from "react";
+
+const PartyHistoryView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  chunkRefs: true,
+});
+
+const ExpenseDetailView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+});
 
 export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   const data = useAppData();

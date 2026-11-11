@@ -1,4 +1,5 @@
-import { PartyTransferView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
@@ -17,6 +18,16 @@ import { PaymentMethodItem } from "./-components/PaymentMethodItem.tsx";
 import { getPaymentMethods } from "#src/lib/paymentMethods.ts";
 import { paymentMethodTypes } from "#src/models/paymentMethod.ts";
 import { CashItem } from "./-components/CashItem.js";
+
+const PartyTransferView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  symbol: true,
+  description: true,
+  name: true,
+  currency: true,
+  participants: true,
+});
 
 interface PaySearchParams {
   fromId: string;

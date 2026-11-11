@@ -1,4 +1,5 @@
-import { ProfileHomeView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -13,6 +14,17 @@ import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
 import { Icon } from "@trizum/ui/Icon";
 import { cn } from "@trizum/ui/utils";
+
+const ProfileHomeView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+});
 
 export const Route = createFileRoute("/archived")({
   component: ArchivedParties,

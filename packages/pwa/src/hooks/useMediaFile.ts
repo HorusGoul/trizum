@@ -1,10 +1,18 @@
-import { useAppData } from "#src/lib/data/useAppData.ts";
-import { MediaContentView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { useAppData } from "#src/lib/data/useAppData.ts";
 import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
 import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { useEffect } from "react";
+
+const MediaContentView = view<MediaEntity>()({
+  id: true,
+  available: true,
+  type: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 interface MediaFileObjectUrlEntry {
   key: string;

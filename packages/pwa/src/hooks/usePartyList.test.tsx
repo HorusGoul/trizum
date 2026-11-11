@@ -1,5 +1,7 @@
-import { ProfileSettingsView } from "#src/lib/data/views.ts";
 // @vitest-environment jsdom
+
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 
 import { Repo } from "@automerge/automerge-repo";
 import { act, Suspense } from "react";
@@ -12,6 +14,19 @@ import { initializeI18n } from "#src/lib/i18n.ts";
 import { getPartyListHandle } from "#src/models/partyList.ts";
 import type { Party } from "#src/models/party.ts";
 import { usePartyList } from "./usePartyList.ts";
+
+const ProfileSettingsView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+  locale: true,
+  openLastPartyOnLaunch: true,
+  autoOpenCalculator: true,
+  hue: true,
+});
 
 let repo: Repo;
 

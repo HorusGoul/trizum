@@ -1,6 +1,6 @@
+import { view } from "@nkzw/fate";
+import type { BalanceEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { useAppData } from "#src/lib/data/useAppData.ts";
-import { PartyBalancesView, BalanceView } from "#src/lib/data/views.ts";
-import type { BalanceEntity } from "#src/lib/data/entities.ts";
 import { useParty } from "./useParty.ts";
 import type { Party } from "#src/models/party.ts";
 import { useRequiredViews } from "#src/lib/data/hooks.ts";
@@ -9,6 +9,20 @@ import {
   mergeBalancesByParticipant,
   type BalancesByParticipant,
 } from "#src/models/expense.ts";
+
+const PartyBalancesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  chunkRefs: true,
+});
+
+const BalanceView = view<BalanceEntity>()({
+  id: true,
+  available: true,
+  balances: true,
+});
 
 export function usePartyBalances(partyId: Party["id"]): BalancesByParticipant {
   const data = useAppData();

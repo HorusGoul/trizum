@@ -1,7 +1,13 @@
-import { PartyIdentityView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import type { BalancesSortedBy } from "#src/models/party.ts";
 import { useCurrentParty } from "./useParty";
 import { useCurrentParticipant } from "./useCurrentParticipant";
+
+const PartyIdentityView = view<PartyEntity>()({
+  id: true,
+  available: true,
+});
 
 const defaultBalancesSortedBy: BalancesSortedBy = "name";
 

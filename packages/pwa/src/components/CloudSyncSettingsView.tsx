@@ -1,4 +1,5 @@
-import { ProfileCloudView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
@@ -49,6 +50,27 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { Button } from "@trizum/ui/Button";
+
+const ProfileCloudView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+  locale: true,
+  openLastPartyOnLaunch: true,
+  autoOpenCalculator: true,
+  hue: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+  type: true,
+  usageAnalyticsEnabled: true,
+});
 
 const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
 const SIGN_IN_SUCCESS_EXIT_ANIMATION_MS = 180;

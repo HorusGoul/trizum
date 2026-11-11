@@ -1,4 +1,5 @@
-import { PartyTemplatesView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -264,3 +265,13 @@ function ExpenseTemplateSheetAction({
 }
 
 import { trackEvent } from "#src/lib/analytics.ts";
+
+const PartyTemplatesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  expenseTemplates: true,
+  defaultExpenseTemplateId: true,
+  onlyUseCustomExpenseTemplates: true,
+});

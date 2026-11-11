@@ -1,4 +1,5 @@
-import { PartyTemplatesView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -19,6 +20,16 @@ import { cn } from "@trizum/ui/utils";
 import { OnlyUseCustomTemplatesSheet } from "./-components/OnlyUseCustomTemplatesSheet.tsx";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.tsx";
 import { PartySettingsSection } from "./-components/PartySettingsSection.tsx";
+
+const PartyTemplatesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  expenseTemplates: true,
+  defaultExpenseTemplateId: true,
+  onlyUseCustomExpenseTemplates: true,
+});
 
 export const Route = createFileRoute("/party_/$partyId/settings/expense-templates")({
   component: ExpenseTemplatesSettings,

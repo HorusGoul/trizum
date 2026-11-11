@@ -1,4 +1,5 @@
-import { PartyHeaderView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
@@ -14,6 +15,13 @@ import { toast } from "sonner";
 import { Share } from "@capacitor/share";
 import { getAppLink } from "#src/lib/link.ts";
 import { getSupportedLocale, type SupportedLocale } from "#src/lib/locales.js";
+
+const PartyHeaderView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+});
 
 export const Route = createFileRoute("/party_/$partyId/share")({
   component: RouteComponent,

@@ -1,4 +1,5 @@
-import { PartyTransferView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
@@ -27,6 +28,16 @@ import { TransferDebtLayout } from "./-components/TransferDebtLayout.js";
 import { TransferReviewCard } from "./-components/TransferReviewCard.js";
 import { TransferSuccessState } from "./-components/TransferSuccessState.js";
 import type { DestinationPartyOption } from "./-components/types.js";
+
+const PartyTransferView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  symbol: true,
+  description: true,
+  name: true,
+  currency: true,
+  participants: true,
+});
 
 interface TransferDebtSearchParams {
   fromId: string;

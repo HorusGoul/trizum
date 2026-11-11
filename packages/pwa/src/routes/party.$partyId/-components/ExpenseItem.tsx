@@ -1,4 +1,5 @@
-import { PartyCurrencyView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { Trans } from "@lingui/react/macro";
 import { Link } from "react-aria-components";
 import { CurrencyText } from "#src/components/CurrencyText.js";
@@ -10,6 +11,12 @@ import {
   type Expense,
 } from "#src/models/expense.js";
 import { cn } from "@trizum/ui/utils";
+
+const PartyCurrencyView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+});
 
 export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }) {
   const { party } = useParty(partyId, PartyCurrencyView);

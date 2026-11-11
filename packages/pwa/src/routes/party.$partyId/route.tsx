@@ -1,4 +1,5 @@
-import { ProfileIdentityView, PartyHeaderView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -22,6 +23,18 @@ import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
 import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.ts";
 import { Balances } from "./-components/Balances.js";
 import { ExpenseLog } from "./-components/ExpenseLog.js";
+
+const ProfileIdentityView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+});
+
+const PartyHeaderView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+});
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";

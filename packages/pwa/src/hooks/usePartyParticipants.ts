@@ -1,5 +1,12 @@
-import { PartyParticipantsView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { useCurrentParty } from "./useParty";
+
+const PartyParticipantsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+});
 
 export function usePartyParticipants() {
   const { party } = useCurrentParty(PartyParticipantsView);

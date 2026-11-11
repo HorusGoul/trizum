@@ -1,4 +1,5 @@
-import { PartyCurrencyView } from "#src/lib/data/views.ts";
+import { view } from "@nkzw/fate";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import {
@@ -19,6 +20,12 @@ import type {
 import { Button } from "@trizum/ui/Button";
 import { Icon, type IconProps } from "@trizum/ui/Icon";
 import { cn } from "@trizum/ui/utils";
+
+const PartyCurrencyView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+});
 
 interface ExpenseEditorValidationStatusProps {
   isOpen: boolean;
