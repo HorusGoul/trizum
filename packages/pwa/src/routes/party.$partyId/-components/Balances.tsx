@@ -1,10 +1,12 @@
+import { useViews, useFateClient, useView } from "react-fate";
+import { requireAvailableList, requireAvailable } from "#src/lib/data/availability.ts";
+import type { BalanceEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import { calculateBalancesByParticipant, mergeBalancesByParticipant } from "#src/models/expense.ts";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import { view } from "@nkzw/fate";
-import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { Trans } from "@lingui/react/macro";
 import { useEligibleDebtTransferParties } from "#src/hooks/useEligibleDebtTransferParties.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
-import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
-import { useCurrentParty } from "#src/hooks/useParty.js";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { simplifyBalanceTransactions } from "#src/models/expense.js";
 import type { BalancesSortedBy } from "#src/models/party.js";
@@ -13,10 +15,13 @@ import { BalanceActionItem } from "./BalanceActionItem.js";
 import { BalanceItem } from "./BalanceItem.js";
 import { PullToRefresh } from "@trizum/ui/PullToRefresh";
 
+const BalanceView = view<BalanceEntity>()({ available: true, balances: true });
+
 const PartyParticipantsView = view<PartyEntity>()({
   id: true,
   available: true,
   participants: true,
+  chunkRefs: true,
 });
 
 export function Balances({
@@ -28,9 +33,34 @@ export function Balances({
   sortedBy: BalancesSortedBy;
   onRefresh: () => Promise<void>;
 }) {
-  const { party } = useCurrentParty(PartyParticipantsView);
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(
+      PartyParticipantsView,
+      client.ref<PartyEntity>("Party", partyId, PartyParticipantsView),
+    ),
+  );
+
   const participant = useCurrentParticipant();
-  const balances = usePartyBalances(party.id);
+
+  const chunks = requireAvailableList(
+    useViews(
+      BalanceView,
+      party.chunkRefs.map(({ balancesId }) =>
+        client.ref<BalanceEntity>("Balance", balancesId, BalanceView),
+      ),
+    ),
+  );
+
+  // Old balance documents may not contain participants added since their last calculation.
+  const baseBalance = calculateBalancesByParticipant([], party.participants);
+
+  const balances = mergeBalancesByParticipant(
+    baseBalance,
+    ...chunks.map(({ balances }) => balances),
+  );
 
   useScrollRestoration({
     cacheKey: `party-${party.id}-balances`,

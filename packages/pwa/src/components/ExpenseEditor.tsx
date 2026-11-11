@@ -1,12 +1,17 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import type { PartyEntity, MediaEntity, ProfileEntity } from "#src/lib/data/entities.ts";
+import { useFateClient, useView } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
 import { view } from "@nkzw/fate";
-import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
+import { convertToUnits } from "#src/lib/expenses.js";
 import type { ExpenseUser } from "#src/lib/expenses.js";
-import { useForm, useStore, type Updater } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
+import type { Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
 import { Suspense, use, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 import { IconButton } from "@trizum/ui/IconButton";
@@ -14,22 +19,21 @@ import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
 import { AppNumberField, AppTextField } from "@trizum/ui/fields/TextField";
 import { CurrencyField } from "./CurrencyField";
-import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
-import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
+import { getExpenseParticipants } from "#src/lib/expenseParticipants.ts";
 import { Checkbox } from "@trizum/ui/Checkbox";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { Tooltip, TooltipTrigger } from "@trizum/ui/Tooltip";
 import { AppDatePicker } from "@trizum/ui/DatePicker";
-import { fromDate, getLocalTimeZone, type ZonedDateTime } from "@internationalized/date";
+import { fromDate, getLocalTimeZone } from "@internationalized/date";
+import type { ZonedDateTime } from "@internationalized/date";
 import { Icon } from "@trizum/ui/Icon";
 import { Button } from "@trizum/ui/Button";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Switch } from "@trizum/ui/Switch";
-import { usePartyList } from "#src/hooks/usePartyList.ts";
-import { useMediaFile } from "#src/hooks/useMediaFile.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import { Skeleton } from "@trizum/ui/Skeleton";
 import type { MediaFile } from "#src/models/media.ts";
 import { getImageUploadErrorMessage } from "#src/lib/data/mediaCommands.ts";
@@ -48,12 +52,20 @@ import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "@trizum/ui/MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
-  type ExpenseEditorMode,
   getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
 } from "#src/lib/expenseEditor.ts";
+import type { ExpenseEditorMode } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
 import { cn } from "@trizum/ui/utils";
+
+const EditorParticipantsView = view<PartyEntity>()({ available: true, participants: true });
+
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 const ProfileCalculatorView = view<ProfileEntity>()({
   id: true,
@@ -118,14 +130,32 @@ export function ExpenseEditor({
   onOpenCalculator,
   onCloseCalculator,
 }: ExpenseEditorProps) {
+  const profileId = useProfileId();
+
   const { i18n } = useLingui();
   const client = useFateClient();
-  const { partyList } = usePartyList(ProfileCalculatorView);
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileCalculatorView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileCalculatorView),
+    ),
+  );
+
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
 
-  const unsortedParticipants = useExpenseParticipants({
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(
+      EditorParticipantsView,
+      client.ref<PartyEntity>("Party", partyId, EditorParticipantsView),
+    ),
+  );
+
+  const unsortedParticipants = getExpenseParticipants(party.participants, {
     paidBy: {
       [defaultValues.paidBy]: 1,
     },
@@ -1117,7 +1147,13 @@ interface CurrentPhotoProps {
 }
 
 function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
-  const { url } = useMediaFile(photoId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", photoId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
   const { open } = use(MediaGalleryContext);
 
   function handleViewPhoto() {

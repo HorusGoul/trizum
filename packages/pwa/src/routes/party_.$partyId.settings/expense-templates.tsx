@@ -1,14 +1,14 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
-import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useParty } from "#src/hooks/useParty.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import {
   BLANK_EXPENSE_TEMPLATE_SYMBOL,
@@ -58,7 +58,10 @@ function ExpenseTemplatesSettings() {
   const { t: translate, i18n } = useLingui();
 
   const client = useFateClient();
-  const { party } = useParty(partyId, PartyTemplatesView);
+
+  const party = requireAvailable(
+    useView(PartyTemplatesView, client.ref<PartyEntity>("Party", partyId, PartyTemplatesView)),
+  );
 
   const participant = useCurrentParticipant();
   const [isOnlyCustomTemplatesSheetOpen, setIsOnlyCustomTemplatesSheetOpen] = useState(false);

@@ -1,23 +1,27 @@
 // @vitest-environment jsdom
 
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView, FateClient } from "react-fate";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
-
 import { view, toEntityId } from "@nkzw/fate";
-import type { ExpenseEntity, ExpenseChunkEntity, PartyEntity, ProfileEntity } from "./entities.ts";
-
+import type {
+  ExpenseEntity,
+  ExpenseChunkEntity,
+  PartyEntity,
+  ProfileEntity,
+} from "#src/lib/data/entities.ts";
 import { Repo } from "@automerge/automerge-repo";
 import { act, Suspense } from "react";
-import { createRoot, type Root } from "react-dom/client";
+import { createRoot } from "react-dom/client";
+import type { Root } from "react-dom/client";
 import { flushSync } from "react-dom";
-import { useView } from "react-fate";
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import type { Party, PartyExpenseChunk } from "#src/models/party.ts";
 import { createExpenseId, calculateExpenseHash } from "#src/models/expense.ts";
 import { getPartyListHandle } from "#src/models/partyList.ts";
-import { useParty } from "#src/hooks/useParty.ts";
-import { usePartyList } from "#src/hooks/usePartyList.ts";
-import { createAppData, type AppData } from "./client.ts";
-import { FateClient } from "react-fate";
+import { createAppData } from "./client.ts";
+import type { AppData } from "./client.ts";
 
 const PartyHeaderView = view<PartyEntity>()({
   id: true,
@@ -150,7 +154,14 @@ test("cold and evicted Fate caches render a ready local party without entering S
   }
 
   function Header() {
-    const { party } = useParty(handle.documentId, PartyHeaderView);
+    const client = useFateClient();
+
+    const party = requireAvailable(
+      useView(
+        PartyHeaderView,
+        client.ref<PartyEntity>("Party", handle.documentId, PartyHeaderView),
+      ),
+    );
 
     return <span>{party.name}</span>;
   }
@@ -194,7 +205,15 @@ test("React party views isolate fields, share a source listener, and clear remov
   const detailsRender = vi.fn<() => void>();
 
   function Header() {
-    const { party } = useParty(handle.documentId, PartyHeaderView);
+    const client = useFateClient();
+
+    const party = requireAvailable(
+      useView(
+        PartyHeaderView,
+        client.ref<PartyEntity>("Party", handle.documentId, PartyHeaderView),
+      ),
+    );
+
     headerRender();
 
     return (
@@ -206,7 +225,15 @@ test("React party views isolate fields, share a source listener, and clear remov
   }
 
   function Details() {
-    const { party } = useParty(handle.documentId, PartyDetailsView);
+    const client = useFateClient();
+
+    const party = requireAvailable(
+      useView(
+        PartyDetailsView,
+        client.ref<PartyEntity>("Party", handle.documentId, PartyDetailsView),
+      ),
+    );
+
     detailsRender();
 
     return <span>{party.description}</span>;
@@ -250,14 +277,28 @@ test("profile appearance changes do not rerender the home membership view", asyn
   const homeRender = vi.fn<() => void>();
 
   function Home() {
-    const { partyList } = usePartyList(ProfileHomeView);
+    const client = useFateClient();
+    const profileId = useProfileId();
+
+    const partyList = requireAvailable(
+      useView(ProfileHomeView, client.ref<ProfileEntity>("Profile", profileId, ProfileHomeView)),
+    );
+
     homeRender();
 
     return <span>{Object.keys(partyList.parties).length}</span>;
   }
 
   function Appearance() {
-    const { partyList } = usePartyList(ProfileAppearanceView);
+    const client = useFateClient();
+    const profileId = useProfileId();
+
+    const partyList = requireAvailable(
+      useView(
+        ProfileAppearanceView,
+        client.ref<ProfileEntity>("Profile", profileId, ProfileAppearanceView),
+      ),
+    );
 
     return <span>{partyList.hue}</span>;
   }

@@ -1,24 +1,25 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
 import { PartyCardView } from "#src/components/PartyListCard.view.ts";
 import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
-import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
-import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
-import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
-import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrdering.ts";
+import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
+import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import type { PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
-import { useFateClient } from "react-fate";
 import { MenuTrigger, Popover } from "react-aria-components";
-import { usePartyList } from "#src/hooks/usePartyList.js";
 import { use } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
@@ -54,8 +55,14 @@ export const Route = createFileRoute("/_home")({
 });
 
 function Home() {
+  const profileId = useProfileId();
+
   const client = useFateClient();
-  const { partyList } = usePartyList(ProfileHomeView);
+
+  const partyList = requireAvailable(
+    useView(ProfileHomeView, client.ref<ProfileEntity>("Profile", profileId, ProfileHomeView)),
+  );
+
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, isUpdating, checkForUpdate } = use(UpdateContext);
   const session = useAppSession();

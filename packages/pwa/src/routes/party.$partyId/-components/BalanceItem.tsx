@@ -1,7 +1,9 @@
-import { view } from "@nkzw/fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
 import { CurrencyText } from "#src/components/CurrencyText.js";
-import { useCurrentParty } from "#src/hooks/useParty.js";
 import type { Balance } from "#src/models/expense.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { cn } from "@trizum/ui/utils";
@@ -19,7 +21,12 @@ interface BalanceItemProps {
 }
 
 export function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
-  const { party } = useCurrentParty(PartyCurrencyView);
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(PartyCurrencyView, client.ref<PartyEntity>("Party", partyId, PartyCurrencyView)),
+  );
 
   const balance = stats.balance;
   const isNegative = balance < 0;

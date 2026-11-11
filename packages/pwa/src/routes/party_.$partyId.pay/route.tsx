@@ -1,7 +1,9 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
-import { view } from "@nkzw/fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
@@ -9,7 +11,6 @@ import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
 import { Alert, AlertDescription } from "@trizum/ui/Alert";
@@ -56,9 +57,15 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
 });
 
 function RouteComponent() {
+  const partyId = useCurrentPartyId();
+
   const { fromId, toId, amount } = Route.useSearch();
   const client = useFateClient();
-  const { party } = useCurrentParty(PartyTransferView);
+
+  const party = requireAvailable(
+    useView(PartyTransferView, client.ref<PartyEntity>("Party", partyId, PartyTransferView)),
+  );
+
   const me = useCurrentParticipant();
   const from = party.participants[fromId];
   const to = party.participants[toId];
@@ -70,7 +77,10 @@ function RouteComponent() {
   const methods = getPaymentMethods(to);
   const hasPaymentDetails = paymentMethodTypes.some((type) => methods[type]?.trim());
 
-  function onMarkAsPaid() {
+  async function markAsPaidAction() {
+    // oxlint-disable-next-line react/purity -- Timestamp is created only when Button runs this press action.
+    const paidAt = new Date();
+
     const expensePromise = mutationResult(
       client.mutations.party.addExpenseToParty({
         input: {
@@ -78,7 +88,7 @@ function RouteComponent() {
           parameters: [
             {
               name: t({ message: `Paid debt to ${toName}` }),
-              paidAt: new Date(),
+              paidAt,
               paidBy: { [fromId]: amount },
               isTransfer: true,
               shares: { [toId]: { type: "divide", value: 1 } },
@@ -95,7 +105,7 @@ function RouteComponent() {
       error: t`Failed to mark expense as paid`,
     });
 
-    void expensePromise.then((expense) => {
+    await expensePromise.then((expense) => {
       trackEvent("settlement_recorded");
 
       return navigate({
@@ -137,7 +147,7 @@ function RouteComponent() {
           </div>
         </div>
 
-        <Button color="accent" className="min-h-12 font-semibold" onPress={onMarkAsPaid}>
+        <Button color="accent" className="min-h-12 font-semibold" pressAction={markAsPaidAction}>
           <Icon icon="lucide.circle-check" width={20} height={20} className="mr-2" />
           <Trans>Mark as paid</Trans>
         </Button>

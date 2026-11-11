@@ -1,23 +1,22 @@
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
 import type { ExpenseEntity } from "#src/lib/data/entities.ts";
-import { useFateClient } from "react-fate";
 import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
 import { getFailureMessage } from "#src/lib/failureMessage.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
-import {
-  ExpenseEditor,
-  type ExpenseEditorFormValues,
-  type ExpenseEditorRef,
-} from "#src/components/ExpenseEditor.tsx";
+import { ExpenseEditor } from "#src/components/ExpenseEditor.tsx";
+import type { ExpenseEditorFormValues, ExpenseEditorRef } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
-import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { calculateExpenseHash, type Expense } from "#src/models/expense.ts";
-import { diff, type DiffResult } from "@opentf/obj-diff";
+import { calculateExpenseHash } from "#src/models/expense.ts";
+import type { Expense } from "#src/models/expense.ts";
+import { diff } from "@opentf/obj-diff";
+import type { DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
@@ -248,9 +247,8 @@ function useExpense() {
   const client = useFateClient();
   const { partyId, expenseId } = Route.useParams();
 
-  const expense = useRequiredView(
-    ExpenseEditorView,
-    client.ref<ExpenseEntity>("Expense", expenseId, ExpenseEditorView),
+  const expense = requireAvailable(
+    useView(ExpenseEditorView, client.ref<ExpenseEntity>("Expense", expenseId, ExpenseEditorView)),
   );
 
   async function onUpdateExpense(expense: Expense) {

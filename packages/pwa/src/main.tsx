@@ -1,37 +1,36 @@
-import { view } from "@nkzw/fate";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView, FateClient } from "react-fate";
+import { view } from "@nkzw/fate";
 import { getBrowserLocale, setLocale } from "./lib/i18n.ts";
 import { setThemeHue, defaultThemeHue } from "@trizum/ui/theme";
-import { optionalNonemptySearchTextSchema } from "./lib/routerSearch.ts";
-
-import * as ReactDOM from "react-dom/client";
+import {
+  optionalNonemptySearchTextSchema,
+  parseAppSearch,
+  stringifyAppSearch,
+} from "./lib/routerSearch.ts";
+import type { AppSearch } from "./lib/routerSearch.ts";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { createRecoveringStorage } from "./lib/recoveringStorage.ts";
-import {
-  RouterProvider,
-  createBrowserHistory,
-  createRouter,
-  type NavigateOptions,
-  type ParsedLocation,
-  type ToOptions,
-  type RegisteredRouter,
+import { RouterProvider, createBrowserHistory, createRouter } from "@tanstack/react-router";
+import type {
+  NavigateOptions,
+  ParsedLocation,
+  ToOptions,
+  RegisteredRouter,
 } from "@tanstack/react-router";
-import { parseAppSearch, stringifyAppSearch, type AppSearch } from "./lib/routerSearch.ts";
 import { initializeAnalytics, trackPage } from "./lib/analytics.ts";
 import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
-import "./index.css";
 import { I18nProvider } from "@lingui/react";
 import { PwaUIProvider } from "./components/PwaUIProvider.js";
 import { Toaster } from "@trizum/ui/Toaster";
 import { initializeI18n } from "./lib/i18n.js";
-// Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "@trizum/ui/MediaGalleryController";
-import { usePartyList } from "./hooks/usePartyList.ts";
-import { FateClient } from "react-fate";
 import { getAppData } from "./lib/data/client.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
@@ -40,7 +39,6 @@ import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx"
 import { PremiumProvider } from "./components/PremiumProvider.tsx";
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
-import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { sentryDocumentIdRedaction, sentryLoggerConfig } from "@trizum/logging/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
@@ -53,14 +51,21 @@ import {
   pushHistoryWithoutDuplicateEntry,
   shouldNavigateToPartyListOnNativeBack,
 } from "./lib/navigationHistory.ts";
-import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
+import { createPartyFromMigrationData } from "./models/migration.ts";
+import type { MigrationData } from "./models/migration.ts";
 import type { Party } from "./models/party.ts";
 import {
   createInactivePartyListState,
   readPartyListState,
   seedPartyListState,
-  type InternalPartyListSeed,
 } from "./lib/testing/browserHarness.ts";
+import type { InternalPartyListSeed } from "./lib/testing/browserHarness.ts";
+
+import * as ReactDOM from "react-dom/client";
+
+import "./index.css";
+
+import * as Sentry from "@sentry/react";
 
 const ProfileAppearanceView = view<ProfileEntity>()({
   id: true,
@@ -353,9 +358,17 @@ if (!rootElement.innerHTML) {
 }
 
 function InnerWrap({ children }: { children: React.ReactNode }) {
+  const client = useFateClient();
+  const profileId = useProfileId();
+
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
-  const { partyList } = usePartyList(ProfileAppearanceView);
+  const partyList = requireAvailable(
+    useView(
+      ProfileAppearanceView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileAppearanceView),
+    ),
+  );
 
   useEffect(() => {
     setLocale(partyList.locale ?? getBrowserLocale());

@@ -1,5 +1,8 @@
-import { view } from "@nkzw/fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import {
@@ -11,14 +14,14 @@ import {
 } from "motion/react";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "react-aria-components";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import type {
   ExpenseEditorValidationIssue,
   ExpenseEditorValidationResult,
   ExpenseEditorValidationStatus,
 } from "#src/lib/expenseEditor.ts";
 import { Button } from "@trizum/ui/Button";
-import { Icon, type IconProps } from "@trizum/ui/Icon";
+import { Icon } from "@trizum/ui/Icon";
+import type { IconProps } from "@trizum/ui/Icon";
 import { cn } from "@trizum/ui/utils";
 
 const PartyCurrencyView = view<PartyEntity>()({
@@ -229,7 +232,12 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
 }
 
 function ExpenseEditorValidationIssueItem({ issue }: { issue: ExpenseEditorValidationIssue }) {
-  const { party } = useCurrentParty(PartyCurrencyView);
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(PartyCurrencyView, client.ref<PartyEntity>("Party", partyId, PartyCurrencyView)),
+  );
 
   switch (issue.code) {
     case "shares-total-mismatch":

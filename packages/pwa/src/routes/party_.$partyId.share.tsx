@@ -1,11 +1,13 @@
-import { view } from "@nkzw/fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.tsx";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
 import { QRCode } from "@trizum/ui/QRCode";
@@ -14,7 +16,8 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { toast } from "sonner";
 import { Share } from "@capacitor/share";
 import { getAppLink } from "#src/lib/link.ts";
-import { getSupportedLocale, type SupportedLocale } from "#src/lib/locales.js";
+import { getSupportedLocale } from "#src/lib/locales.js";
+import type { SupportedLocale } from "#src/lib/locales.js";
 
 const PartyHeaderView = view<PartyEntity>()({
   id: true,
@@ -34,7 +37,14 @@ export const Route = createFileRoute("/party_/$partyId/share")({
 });
 
 function RouteComponent() {
-  const { partyId, party } = useCurrentParty(PartyHeaderView);
+  const client = useFateClient();
+
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(PartyHeaderView, client.ref<PartyEntity>("Party", partyId, PartyHeaderView)),
+  );
+
   const { i18n } = useLingui();
   const shareUrl = getPartyShareUrl(partyId, getSupportedLocale(i18n.locale));
   const { canShare } = Route.useLoaderData();

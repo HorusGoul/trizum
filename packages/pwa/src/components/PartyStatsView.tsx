@@ -1,6 +1,13 @@
+import { useFateClient, useView, useViews } from "react-fate";
+import { requireAvailable, requireAvailableList } from "#src/lib/data/availability.ts";
+import type {
+  MediaEntity,
+  PartyEntity,
+  ExpenseChunkEntity,
+  ExpenseEntity,
+} from "#src/lib/data/entities.ts";
 import { view } from "@nkzw/fate";
-import type { ExpenseChunkEntity, ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useFateClient } from "react-fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import { endOfWeek, getLocalTimeZone, startOfWeek, today } from "@internationalized/date";
 import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
@@ -8,16 +15,10 @@ import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
-import { useMediaFile } from "#src/hooks/useMediaFile.ts";
-import { useCurrentParty } from "#src/hooks/useParty.js";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
-import { useRequiredViews } from "#src/lib/data/hooks.ts";
-import {
-  calculatePartyStats,
-  getPartyStatsAvailablePastYears,
-  type PartyStatsParticipantStat,
-  type PartyStatsTimeframe,
-} from "#src/lib/partyStats.ts";
+import { calculatePartyStats, getPartyStatsAvailablePastYears } from "#src/lib/partyStats.ts";
+import type { PartyStatsParticipantStat, PartyStatsTimeframe } from "#src/lib/partyStats.ts";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Avatar } from "@trizum/ui/Avatar";
 import { Button } from "@trizum/ui/Button";
@@ -34,14 +35,14 @@ import { Icon } from "@trizum/ui/Icon";
 import { Popover, PopoverDialog, PopoverTrigger } from "@trizum/ui/Popover";
 import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { cn } from "@trizum/ui/utils";
-import {
-  Suspense,
-  startTransition,
-  useState,
-  type ComponentProps,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import { Suspense, startTransition, useState } from "react";
+import type { ComponentProps, ReactNode, RefObject } from "react";
+
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 const ExpenseChunkView = view<ExpenseChunkEntity>()({
   id: true,
@@ -186,23 +187,31 @@ export function PartyStatsView({ scrollElementRef }: PartyStatsViewProps) {
 }
 
 function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
-  const { party } = useCurrentParty(PartyBalancesView);
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(PartyBalancesView, client.ref<PartyEntity>("Party", partyId, PartyBalancesView)),
+  );
+
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
 
-  const client = useFateClient();
-
-  const chunks = useRequiredViews(
-    ExpenseChunkView,
-    party.chunkRefs.map(({ chunkId }) =>
-      client.ref<ExpenseChunkEntity>("ExpenseChunk", chunkId, ExpenseChunkView),
+  const chunks = requireAvailableList(
+    useViews(
+      ExpenseChunkView,
+      party.chunkRefs.map(({ chunkId }) =>
+        client.ref<ExpenseChunkEntity>("ExpenseChunk", chunkId, ExpenseChunkView),
+      ),
     ),
   );
 
-  const expenses = useRequiredViews(
-    ExpenseDetailView,
-    chunks.flatMap((chunk) =>
-      chunk.expenses.map(({ id }) => client.ref<ExpenseEntity>("Expense", id, ExpenseDetailView)),
+  const expenses = requireAvailableList(
+    useViews(
+      ExpenseDetailView,
+      chunks.flatMap((chunk) =>
+        chunk.expenses.map(({ id }) => client.ref<ExpenseEntity>("Expense", id, ExpenseDetailView)),
+      ),
     ),
   );
 
@@ -813,7 +822,13 @@ function StatsParticipantAvatarImage({
   name: string;
   className?: string;
 }) {
-  const { url } = useMediaFile(avatarId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", avatarId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return <Avatar className={className} name={name} url={url} />;
 }

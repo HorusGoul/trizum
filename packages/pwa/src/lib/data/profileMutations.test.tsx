@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
 
-import { useFateClient } from "react-fate";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
 import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
-
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
-
 import { Repo } from "@automerge/automerge-repo";
 import { act, Suspense } from "react";
 import { createRoot } from "react-dom/client";
@@ -17,7 +17,6 @@ import { hasLocalPartyListData } from "#src/lib/cloudSyncRouteState.ts";
 import { initializeI18n } from "#src/lib/i18n.ts";
 import { getPartyListHandle } from "#src/models/partyList.ts";
 import type { Party } from "#src/models/party.ts";
-import { usePartyList } from "./usePartyList.ts";
 
 const ProfileSettingsView = view<ProfileEntity>()({
   id: true,
@@ -77,8 +76,14 @@ it("syncs saved methods and removals to existing groups without changing other p
   let client!: AppClient;
 
   function Harness() {
-    usePartyList(ProfileSettingsView);
     client = useFateClient();
+    const profileId = useProfileId();
+    requireAvailable(
+      useView(
+        ProfileSettingsView,
+        client.ref<ProfileEntity>("Profile", profileId, ProfileSettingsView),
+      ),
+    );
 
     return null;
   }

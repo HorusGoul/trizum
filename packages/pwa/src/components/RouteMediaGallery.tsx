@@ -1,11 +1,12 @@
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
 import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
-import { useFateClient } from "react-fate";
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState, useRef } from "react";
-import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
+
 import MediaGallery, { MediaGalleryImage } from "@trizum/ui/MediaGallery";
-import { useRequiredView } from "#src/lib/data/hooks.ts";
 
 const MediaContentView = view<MediaEntity>()({
   id: true,
@@ -94,9 +95,8 @@ export function RouteMediaGallery({
 function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
   const client = useFateClient();
 
-  const mediaFile = useRequiredView(
-    MediaContentView,
-    client.ref<MediaEntity>("Media", photoId, MediaContentView),
+  const mediaFile = requireAvailable(
+    useView(MediaContentView, client.ref<MediaEntity>("Media", photoId, MediaContentView)),
   );
 
   const [url] = useMediaFileObjectUrls([mediaFile]);

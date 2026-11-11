@@ -1,7 +1,8 @@
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
 import type { ExpenseEntity } from "#src/lib/data/entities.ts";
-import { useFateClient } from "react-fate";
 import { optionalSearchNumberSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
@@ -14,7 +15,6 @@ import { Dialog, MenuTrigger, Modal, ModalOverlay, Popover } from "react-aria-co
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Icon } from "@trizum/ui/Icon";
-import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
@@ -258,9 +258,8 @@ function useExpense() {
 
   if (!isValidRecordId(partyId)) throw new Error(t`Malformed Party ID`);
 
-  const expense = useRequiredView(
-    ExpenseDetailView,
-    client.ref<ExpenseEntity>("Expense", expenseId, ExpenseDetailView),
+  const expense = requireAvailable(
+    useView(ExpenseDetailView, client.ref<ExpenseEntity>("Expense", expenseId, ExpenseDetailView)),
   );
 
   async function onDeleteExpense() {

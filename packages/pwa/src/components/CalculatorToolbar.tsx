@@ -1,15 +1,14 @@
+import { useViews, useFateClient } from "react-fate";
+import { requireAvailableList } from "#src/lib/data/availability.ts";
 import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
-import { useFateClient } from "react-fate";
 import { msg, t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
-import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
-import { useRequiredViews } from "#src/lib/data/hooks.ts";
-import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import { Button } from "@trizum/ui/Button";
 import { sheetTweenConfig } from "@trizum/ui/sheetMotion";
 import { SheetSurface } from "@trizum/ui/SheetSurface";
@@ -19,6 +18,8 @@ import { cn } from "@trizum/ui/utils";
 import { suppressCalculatorAutoOpen } from "./calculatorAutoOpenSuppression.ts";
 import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
 import type { MediaFile } from "#src/models/media.ts";
+
+import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
 
 const MediaContentView = view<MediaEntity>()({
   id: true,
@@ -1180,9 +1181,11 @@ function CalculatorMobileAttachmentContent({
 
   const client = useFateClient();
 
-  const mediaFiles = useRequiredViews(
-    MediaContentView,
-    photoIds.map((id) => client.ref<MediaEntity>("Media", id, MediaContentView)),
+  const mediaFiles = requireAvailableList(
+    useViews(
+      MediaContentView,
+      photoIds.map((id) => client.ref<MediaEntity>("Media", id, MediaContentView)),
+    ),
   );
 
   const urls = useMediaFileObjectUrls(mediaFiles);

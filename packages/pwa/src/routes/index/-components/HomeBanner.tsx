@@ -1,14 +1,15 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
-import { view } from "@nkzw/fate";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useEffect, useEffectEvent } from "react";
 import { useLocation, useNavigate, useSearch } from "@tanstack/react-router";
 import { Button } from "react-aria-components";
-import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { usePremiumDialogs } from "#src/hooks/usePremiumDialogs.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { useAdProtectedFlow } from "#src/lib/advertising/AdvertisingContext.ts";
@@ -26,8 +27,14 @@ const ProfileBannerView = view<ProfileEntity>()({
 });
 
 export function HomeBanner({ isVisible }: { isVisible: boolean }) {
+  const profileId = useProfileId();
+
   const client = useFateClient();
-  const { partyList } = usePartyList(ProfileBannerView);
+
+  const partyList = requireAvailable(
+    useView(ProfileBannerView, client.ref<ProfileEntity>("Profile", profileId, ProfileBannerView)),
+  );
+
   const navigate = useNavigate();
   const isHome = useLocation({ select: (location) => location.pathname === "/" });
   const resumePremium = useSearch({ strict: false, select: (search) => search.premium });

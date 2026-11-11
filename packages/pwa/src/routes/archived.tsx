@@ -1,8 +1,10 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
 import { PartyCardView } from "#src/components/PartyListCard.view.ts";
-import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
-import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -10,11 +12,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "react-aria-components";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
-import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
+import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import type { PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useFateClient } from "react-fate";
+import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
 import { Icon } from "@trizum/ui/Icon";
 import { cn } from "@trizum/ui/utils";
 
@@ -36,8 +37,14 @@ export const Route = createFileRoute("/archived")({
 });
 
 function ArchivedParties() {
+  const profileId = useProfileId();
+
   const client = useFateClient();
-  const { partyList } = usePartyList(ProfileHomeView);
+
+  const partyList = requireAvailable(
+    useView(ProfileHomeView, client.ref<ProfileEntity>("Profile", profileId, ProfileHomeView)),
+  );
+
   const archivedPartyIds = useArchivedPartyIds(partyList);
 
   return (

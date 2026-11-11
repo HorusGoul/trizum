@@ -1,15 +1,15 @@
+import { useFateClient, useView } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import type { MediaEntity, PartyEntity, ExpensePresenceEntity } from "#src/lib/data/entities.ts";
 import { view } from "@nkzw/fate";
-import type { ExpensePresenceEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import type { ExpensePresenceMessage } from "#src/lib/data/presence.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
-import { useMediaFile } from "#src/hooks/useMediaFile.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
-
-import { type Expense, type ExpenseParticipantPresence } from "#src/models/expense.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
+import type { Expense, ExpenseParticipantPresence } from "#src/models/expense.ts";
 import type { MediaFile } from "#src/models/media.ts";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "@trizum/ui/Avatar";
-import { useFateClient, useView } from "react-fate";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -17,8 +17,14 @@ import {
   arePresenceBubblePositionsEqual,
   getPresenceBubblePosition,
   getPresenceElementIdFromTarget,
-  type PresenceBubblePosition,
 } from "./presencePosition.ts";
+import type { PresenceBubblePosition } from "./presencePosition.ts";
+
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 const PresenceView = view<ExpensePresenceEntity>()({ participants: true });
 
@@ -252,7 +258,16 @@ function Bubble({
   presence: ExpenseParticipantPresence;
   overlayRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const { party } = useCurrentParty(PartyParticipantsView);
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(
+      PartyParticipantsView,
+      client.ref<PartyEntity>("Party", partyId, PartyParticipantsView),
+    ),
+  );
+
   const participant = party.participants[presence.participantId];
 
   const [position, setPosition] = useState<{
@@ -335,7 +350,13 @@ function AvatarWithAvatarId({
   top: number;
   left: number;
 }) {
-  const { url } = useMediaFile(avatarId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", avatarId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return <AvatarWrapper url={url} name={name} top={top} left={left} />;
 }

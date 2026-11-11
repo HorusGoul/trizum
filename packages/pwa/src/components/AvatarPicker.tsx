@@ -1,5 +1,8 @@
+import { useFateClient, useView } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -8,7 +11,7 @@ import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
 import { Skeleton } from "@trizum/ui/Skeleton";
 import { getImageUploadErrorMessage } from "#src/lib/data/mediaCommands.ts";
-import { useMediaFile } from "#src/hooks/useMediaFile.js";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import {
   compressionPresets,
   ImageProcessingError,
@@ -26,6 +29,12 @@ import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
 import { TrizumSpinner } from "@trizum/ui/TrizumSpinner";
+
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 const logger = getLogger("components", "AvatarPicker");
 
@@ -215,7 +224,13 @@ interface AvatarWithImageProps {
 }
 
 function AvatarWithImage({ avatarId, name }: AvatarWithImageProps) {
-  const { url } = useMediaFile(avatarId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", avatarId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return <Avatar url={url} name={name} className="h-32 w-32 text-lg" />;
 }

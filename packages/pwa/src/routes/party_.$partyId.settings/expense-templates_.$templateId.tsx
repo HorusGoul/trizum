@@ -1,7 +1,8 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
-import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { msg, t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -13,15 +14,13 @@ import { CurrencyField } from "#src/components/CurrencyField.tsx";
 import { EmojiPicker } from "#src/components/EmojiPicker.tsx";
 import { ExpenseParticipantsSection } from "#src/components/ExpenseEditor.tsx";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.ts";
-import { useParty } from "#src/hooks/useParty.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import {
   ExpenseTemplateLimitError,
   getExpenseTemplateEditorValues,
   MAX_EXPENSE_TEMPLATES,
-  type ExpenseTemplate,
-  type ExpenseTemplateEditorValues,
 } from "#src/models/expenseTemplate.ts";
+import type { ExpenseTemplate, ExpenseTemplateEditorValues } from "#src/models/expenseTemplate.ts";
 import { Button } from "@trizum/ui/Button";
 import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { Switch } from "@trizum/ui/Switch";
@@ -88,7 +87,10 @@ function ExpenseTemplateEditor() {
   const { i18n, t: translate } = useLingui();
 
   const client = useFateClient();
-  const { party } = useParty(partyId, PartyTemplatesView);
+
+  const party = requireAvailable(
+    useView(PartyTemplatesView, client.ref<PartyEntity>("Party", partyId, PartyTemplatesView)),
+  );
 
   const template = isNew ? undefined : party.expenseTemplates?.[templateId];
 

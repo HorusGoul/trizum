@@ -1,11 +1,11 @@
-import { view } from "@nkzw/fate";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import type { PartyEntity, ProfileEntity } from "#src/lib/data/entities.ts";
-import { useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView, useViews } from "react-fate";
+import { view } from "@nkzw/fate";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useViews } from "react-fate";
-import { useCurrentParty } from "./useParty";
-import { usePartyList } from "./usePartyList";
 
 const ProfileHomeView = view<ProfileEntity>()({
   id: true,
@@ -65,8 +65,18 @@ export function getEligibleDebtTransferParticipants(
 }
 
 export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
-  const { party: originParty } = useCurrentParty(PartyTransferView);
-  const { partyList } = usePartyList(ProfileHomeView);
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+  const profileId = useProfileId();
+
+  const originParty = requireAvailable(
+    useView(PartyTransferView, client.ref<PartyEntity>("Party", partyId, PartyTransferView)),
+  );
+
+  const partyList = requireAvailable(
+    useView(ProfileHomeView, client.ref<ProfileEntity>("Profile", profileId, ProfileHomeView)),
+  );
+
   const { activePartyIds } = getOrderedPartySections(partyList);
 
   const joinedActiveParties = activePartyIds.flatMap((partyId) => {
@@ -83,8 +93,6 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
       },
     ];
   });
-
-  const client = useFateClient();
 
   const partyEntries = useViews(
     PartyTransferView,

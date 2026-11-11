@@ -1,12 +1,14 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
-import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
+import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.js";
+import type { Party, PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "@trizum/ui/IconButton";
-import { useFateClient } from "react-fate";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
@@ -38,8 +40,14 @@ function createDraftParticipant(name: string): Pick<PartyParticipant, "id" | "na
 }
 
 function New() {
+  const profileId = useProfileId();
+
   const client = useFateClient();
-  const { partyList } = usePartyList(ProfileNameView);
+
+  const partyList = requireAvailable(
+    useView(ProfileNameView, client.ref<ProfileEntity>("Profile", profileId, ProfileNameView)),
+  );
+
   const navigate = useNavigate();
   const [initialParticipant] = useState(() => createDraftParticipant(partyList.username));
 

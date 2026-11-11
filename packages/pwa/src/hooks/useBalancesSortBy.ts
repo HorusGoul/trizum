@@ -1,7 +1,7 @@
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { useFateClient } from "react-fate";
 import type { BalancesSortedBy } from "#src/models/party.ts";
-import { useCurrentPartyId } from "./useParty";
+import { useCurrentPartyId } from "./useCurrentPartyId.ts";
 import { useCurrentParticipant } from "./useCurrentParticipant";
 
 const defaultBalancesSortedBy: BalancesSortedBy = "name";

@@ -1,7 +1,8 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
-import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -10,7 +11,6 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Suspense, useEffect, useId, useRef } from "react";
 import { toast } from "sonner";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.js";
-import { useParty } from "#src/hooks/useParty.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.js";
 import { IconButton } from "@trizum/ui/IconButton";
 import { PartySettingsDetailsFields } from "./-components/PartySettingsDetailsFields.js";
@@ -33,7 +33,10 @@ function PartyDetailsSettings() {
   const { partyId } = Route.useParams();
   const router = useRouter();
   const client = useFateClient();
-  const { party } = useParty(partyId, PartyDetailsView);
+
+  const party = requireAvailable(
+    useView(PartyDetailsView, client.ref<PartyEntity>("Party", partyId, PartyDetailsView)),
+  );
 
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",

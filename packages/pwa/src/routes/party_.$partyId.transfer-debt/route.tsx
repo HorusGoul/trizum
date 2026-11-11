@@ -1,7 +1,9 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
-import { view } from "@nkzw/fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
@@ -12,11 +14,8 @@ import { useReducer } from "react";
 import { toast } from "sonner";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
-import {
-  type EligibleDebtTransferParty,
-  useEligibleDebtTransferParties,
-} from "#src/hooks/useEligibleDebtTransferParties.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { useEligibleDebtTransferParties } from "#src/hooks/useEligibleDebtTransferParties.ts";
+import type { EligibleDebtTransferParty } from "#src/hooks/useEligibleDebtTransferParties.ts";
 import { getDebtTransferParticipantMatch } from "#src/lib/debtTransfer.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import type { PartyParticipant } from "#src/models/party.ts";
@@ -258,9 +257,15 @@ function RouteComponent() {
 }
 
 function useTransferDebtRouteView() {
+  const partyId = useCurrentPartyId();
+
   const { fromId, toId, amount } = Route.useSearch();
   const client = useFateClient();
-  const { party } = useCurrentParty(PartyTransferView);
+
+  const party = requireAvailable(
+    useView(PartyTransferView, client.ref<PartyEntity>("Party", partyId, PartyTransferView)),
+  );
+
   const currentParticipant = useCurrentParticipant();
   const eligibleDestinationParties = useEligibleDebtTransferParties();
   const navigate = useNavigate();

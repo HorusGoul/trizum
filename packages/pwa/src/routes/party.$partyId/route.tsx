@@ -1,8 +1,9 @@
-import type { ExpenseHistoryEntity } from "#src/lib/data/entities.ts";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { PartyEntity, ProfileEntity, ExpenseHistoryEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
-import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -12,15 +13,13 @@ import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Icon } from "@trizum/ui/Icon";
-import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
-
 import { toast } from "sonner";
-import { useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "@trizum/ui/AnimatedTabs";
-import { Suspense, useEffect, useRef, type Key } from "react";
+import { Suspense, useEffect, useRef } from "react";
+import type { Key } from "react";
 import { Switch } from "@trizum/ui/Switch";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
 import { Balances } from "./-components/Balances.js";
@@ -65,13 +64,25 @@ export const Route = createFileRoute("/party/$partyId")({
 });
 
 function PartyById() {
+  const profileId = useProfileId();
+
   const params = Route.useParams();
   const { tab: selectedTab } = Route.useSearch();
 
   const client = useFateClient();
-  const { party, partyId } = useParty(params.partyId, PartyHeaderView);
+  const partyId = params.partyId;
 
-  const { partyList } = usePartyList(ProfileIdentityView);
+  const party = requireAvailable(
+    useView(PartyHeaderView, client.ref<PartyEntity>("Party", partyId, PartyHeaderView)),
+  );
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileIdentityView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileIdentityView),
+    ),
+  );
+
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);

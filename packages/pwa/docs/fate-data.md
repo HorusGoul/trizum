@@ -15,9 +15,10 @@ and synchronization. Existing saved documents and share links keep their format.
   missing profile while another peer or deferred import supplies the document.
   Commands update Automerge locally, update Fate through source change events,
   and await local storage completion. Sync is independent of that completion.
-- [`data/hooks.ts`](../src/lib/data/hooks.ts) reads typed entities with Fate's
-  `useView` and `useViews`. Domain hooks are read-only conveniences around a view
-  and route/profile identity. Reusable party cards receive refs from their parent
+- React consumers read typed entities with Fate's
+  `useView` and `useViews` directly; availability is checked by pure validation
+  functions. Hooks retain only behavior such as route/profile/participant identity
+  and browser resource lifetimes. Reusable party cards receive refs from their parent
   and read their own colocated view. React uses Fate's provider and `useFateClient`;
   router context carries the same configured Fate client. There is no additional
   application data context or service-locator hook.
@@ -63,19 +64,25 @@ Initial expense history still loads one chunk, and further pages load on demand.
 
 ## Experimental tradeoffs
 
-Each React component or reusable hook declares its Fate views beside its
-implementation. The [card view](../src/components/PartyListCard.view.ts) lives
-beside [`PartyListCard`](../src/components/PartyListCard.tsx), which receives refs
-from its parents. Exported shared views use adjacent files to preserve Fast
-Refresh. [`usePartyPaginatedExpenses`](../src/hooks/usePartyPaginatedExpenses.ts)
-owns its history and saved-expense selections, and the
-[expense edit route](../src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx)
-owns its draft selection. There is no central UI view catalog.
+Each React consumer declares its Fate views beside its implementation. The
+[card view](../src/components/PartyListCard.view.ts) lives beside
+[`PartyListCard`](../src/components/PartyListCard.tsx), which receives refs from
+its parents. Exported shared views use adjacent files to preserve Fast Refresh.
+[`ExpenseLog`](../src/routes/party.$partyId/-components/ExpenseLog.tsx) owns its
+history and saved-expense selections;
+[`Balances`](../src/routes/party.$partyId/-components/Balances.tsx) owns balance
+reads and derives displayed totals through the existing pure calculations.
+The [expense editor route](../src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx)
+owns its draft selection. There is no central UI view catalog or per-model query
+hook layer.
 
-`useParty(id, view)` and `usePartyList(view)` require a selection; the generic
-whole-document React hooks are removed. Appearance effects run once at bootstrap.
-The adapter owns private identity and relationship views for cache retention,
-independent of component selections.
+`useProfileId`, `useCurrentPartyId`, and `useCurrentParticipant` own identity
+selection. Participant filtering lives in
+[`expenseParticipants.ts`](../src/lib/expenseParticipants.ts) as pure functions.
+[`useMediaFileObjectUrls`](../src/hooks/useMediaFileObjectUrls.ts) owns reference
+counting and browser URL cleanup; each image consumer selects its media through
+Fate directly. Appearance effects run once at bootstrap. The adapter owns private
+identity and relationship views for cache retention, independent of UI selections.
 
 [`data/projection.ts`](../src/lib/data/projection.ts) maps source documents to
 Party, Profile, ExpenseChunk, Expense, Balance, and Media entities. Expenses have

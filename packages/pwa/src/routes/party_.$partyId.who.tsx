@@ -1,15 +1,15 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { PartyEntity, ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
 import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
-import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useFateClient } from "react-fate";
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
-import { useParty } from "#src/hooks/useParty.js";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import { usePartyParticipants } from "#src/hooks/usePartyParticipants.js";
+import { getPartyParticipants } from "#src/lib/expenseParticipants.ts";
 import { guardPartyExists } from "#src/lib/guards.js";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
@@ -61,11 +61,26 @@ interface WhoFormValues {
 }
 
 function Who() {
+  const profileId = useProfileId();
+
   const params = Route.useParams();
   const search = Route.useSearch();
   const client = useFateClient();
-  const { party } = useParty(params.partyId, PartyMembershipView);
-  const { partyList } = usePartyList(ProfileJoiningView);
+
+  const party = requireAvailable(
+    useView(
+      PartyMembershipView,
+      client.ref<PartyEntity>("Party", params.partyId, PartyMembershipView),
+    ),
+  );
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileJoiningView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileJoiningView),
+    ),
+  );
+
   const navigate = useNavigate();
   const partyName = party.name;
 
@@ -141,7 +156,7 @@ function Who() {
 
   const formId = useId();
 
-  const { active: participants } = usePartyParticipants();
+  const { active: participants } = getPartyParticipants(party.participants);
 
   return (
     <div className="flex min-h-full flex-col">

@@ -1,14 +1,17 @@
-import { mutationResult } from "#src/lib/data/mutationResult.ts";
-import { useFateClient } from "react-fate";
-import { view } from "@nkzw/fate";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { PaymentMethodsEditor } from "#src/components/PaymentMethodsEditor.tsx";
 import {
   getPaymentMethods,
   normalizePaymentMethods,
   validatePaymentMethod,
 } from "#src/lib/paymentMethods.ts";
-import { paymentMethodTypes, type PaymentMethods } from "#src/models/paymentMethod.ts";
+import { paymentMethodTypes } from "#src/models/paymentMethod.ts";
+import type { PaymentMethods } from "#src/models/paymentMethod.ts";
 import { setAnalyticsEnabled, trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
@@ -21,7 +24,8 @@ import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import { AvatarPicker } from "#src/components/AvatarPicker.js";
 import { SwitchField } from "@trizum/ui/SwitchField";
-import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/locales.js";
+import { DEFAULT_LOCALE } from "#src/lib/locales.js";
+import type { SupportedLocale } from "#src/lib/locales.js";
 import { validatePartyParticipantName } from "#src/lib/validation.js";
 import type { MediaFile } from "#src/models/media.ts";
 import { ColorSlider, ColorThumb, SliderTrack } from "@trizum/ui/Color";
@@ -31,11 +35,11 @@ import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { Label } from "@trizum/ui/fields/Field";
 import { AppTextField } from "@trizum/ui/fields/TextField";
 import { defaultThemeHue, setThemeHue } from "@trizum/ui/theme";
-import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
-import { getAuthSessionStatus, type AuthSessionStatus } from "#src/lib/authSessionStatus.ts";
+import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
+import type { AuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 
 const ProfileSettingsView = view<ProfileEntity>()({
@@ -85,8 +89,17 @@ function getLocaleOptions(): LocaleOption[] {
 }
 
 export function Settings() {
+  const profileId = useProfileId();
+
   const client = useFateClient();
-  const { partyList } = usePartyList(ProfileSettingsView);
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileSettingsView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileSettingsView),
+    ),
+  );
+
   const navigate = useNavigate();
   const localeOptions = getLocaleOptions();
 
@@ -338,8 +351,16 @@ function SettingsFormFields({
 }
 
 function UsageAnalyticsSetting() {
+  const profileId = useProfileId();
+
   const client = useFateClient();
-  const { partyList } = usePartyList(ProfileAnalyticsView);
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileAnalyticsView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileAnalyticsView),
+    ),
+  );
 
   return (
     <SwitchField
