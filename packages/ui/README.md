@@ -78,6 +78,16 @@ Only used icon symbols are emitted. Keep icon names as string literals so the
 scanner can discover them; a dynamically constructed name needs explicit literal
 usage elsewhere in the target.
 
+Payment brand symbols in `icons/brand/` use `currentColor` for light and dark
+surfaces. PayPal, Revolut, and Cash App come from
+[Simple Icons](https://github.com/simple-icons/simple-icons/tree/1bb2f6e6ea50f920de8d2f3d273ae48564a5eaee/icons)
+under its [CC0 license](https://github.com/simple-icons/simple-icons/blob/1bb2f6e6ea50f920de8d2f3d273ae48564a5eaee/LICENSE.md).
+Bizum and Venmo use the symbols from Adyen's
+[Bizum](https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/bizum.svg)
+and [Venmo](https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/venmo.svg)
+payment logos, with wordmarks and backgrounds removed and view boxes fitted to
+the symbols.
+
 Pass the generated SVG URL to `UIProvider`:
 
 ```tsx

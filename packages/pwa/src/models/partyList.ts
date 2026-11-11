@@ -1,3 +1,4 @@
+import type { PaymentMethods } from "./paymentMethod.ts";
 import {
   isValidDocumentId,
   type Repo,
@@ -16,6 +17,7 @@ export interface PartyList {
   type: "partyList";
   username: string;
   phone: string;
+  paymentMethods?: PaymentMethods;
   avatarId?: DocumentId | null;
   locale?: SupportedLocale;
   openLastPartyOnLaunch?: boolean;
