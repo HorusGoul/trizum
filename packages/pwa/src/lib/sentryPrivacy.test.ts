@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { configureTrizumLogging, getTrizumLogger } from "@trizum/logging";
-import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
+import { sentryDocumentIdRedaction, sentryLoggerConfig } from "@trizum/logging/sentry";
 import { afterEach, expect, test, vi } from "vite-plus/test";
 import { setTelemetryIdentity, sentryTelemetryIntegration } from "./telemetry.ts";
 
@@ -44,6 +44,37 @@ test("captures the AdMob console message and diagnostic as its own Sentry event"
     logentry: { message: "AdMob operation failed" },
     extra: { platform: "ios", stage: "consent", code: "unknown" },
   });
+});
+
+test("routes warning and higher records to Sentry with redaction and original severity", async () => {
+  const envelopes = initializeRecordingClient();
+  configureTrizumLogging({
+    surface: "pwa",
+    lowestLevel: "debug",
+    reset: true,
+    extraSinks: { sentry: getSentrySink() },
+    extraLoggers: [sentryLoggerConfig],
+  });
+  const logger = getTrizumLogger("pwa", "test");
+  logger.debug("Debug stays local");
+  logger.info("Info stays local");
+  logger.warning("Image fallback {documentId}", { documentId });
+  logger.error("Upload failed");
+  logger.fatal("Storage unavailable");
+  expect(await Sentry.flush(2000)).toBe(true);
+  const items = envelopes.flatMap(([, envelopeItems]) => envelopeItems);
+  expect(JSON.stringify(envelopes)).not.toContain(documentId);
+  expect(JSON.stringify(envelopes)).not.toContain("stays local");
+  expect(items.find(([header]) => header.type === "log")?.[1]).toMatchObject({
+    items: [
+      { level: "warn", body: expect.stringContaining("[REDACTED_DOCUMENT_ID]") },
+      { level: "error", body: "Upload failed" },
+      { level: "fatal", body: "Storage unavailable" },
+    ],
+  });
+  expect(
+    items.flatMap(([header, payload]) => (header.type === "event" ? [payload] : [])),
+  ).toMatchObject([{ level: "error" }, { level: "fatal" }]);
 });
 
 function initializeRecordingClient() {
