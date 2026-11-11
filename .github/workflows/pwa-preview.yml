@@ -37,6 +37,7 @@ jobs:
         run: vp run --filter @trizum/pwa build
         env:
           VITE_APP_AUTH_URL: ""
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Deploy PWA preview to Cloudflare
         id: deploy
@@ -49,6 +50,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: >-
             versions upload
+            --var SENTRY_ENVIRONMENT:preview
             --preview-alias pr-${{ github.event.pull_request.number }}
             --tag pr-${{ github.event.pull_request.number }}
             --message "Preview for PR #${{ github.event.pull_request.number }}"

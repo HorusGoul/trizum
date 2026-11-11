@@ -142,7 +142,7 @@ In general:
 - Keep `debug` and `info` records out of the Sentry sink. Console thresholds remain
   runtime-specific.
 
-The PWA (including native wrappers) and sync server use `sentryLoggerConfig`
+The PWA (including native wrappers), Cloudflare Worker, and sync server use `sentryLoggerConfig`
 from `@trizum/logging/sentry` for this routing policy. Runtime entry points still
 own SDK initialization and environment gates; console-only runtimes do not
 initialize Sentry.
@@ -173,7 +173,7 @@ cloud-sync settings logs. Avoid recording identifiers at the call site even
 with this protection; the cloud-sync success log deliberately omits its
 party-list document ID. Redaction is separate from JSON console formatting.
 
-The browser and sync server also spread `sentryDocumentIdRedaction` from
+The browser, Cloudflare Worker, and sync server also spread `sentryDocumentIdRedaction` from
 `@trizum/logging/sentry` into `Sentry.init()`. Its `beforeSend`, `beforeBreadcrumb`,
 `beforeSendSpan`, and `beforeSendTransaction` hooks apply the same sanitizer to
 direct and automatically captured SDK payloads. Its integration sanitizes log
