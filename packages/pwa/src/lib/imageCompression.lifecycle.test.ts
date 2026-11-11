@@ -24,7 +24,7 @@ it("does not allocate a blob URL when canvas is unavailable", async () => {
   expect(createObjectURL).not.toHaveBeenCalled();
 });
 
-it("reports decode diagnostics once at the upload boundary without file contents or names", async () => {
+it("warns during processing and reports failed uploads without file contents or names", async () => {
   const records: LogRecord[] = [];
   configurePwaLogging({
     reset: true,
@@ -56,8 +56,21 @@ it("reports decode diagnostics once at the upload boundary without file contents
   }
 
   expect(error).toBeInstanceOf(ImageProcessingError);
-  // Processing alone must not emit an error: the caller decides whether fallback is possible.
+  // Every processing failure warns; only a failed upload emits an error.
   expect(records.filter((record) => record.level === "error")).toHaveLength(0);
+
+  const warnings = records.filter(
+    (record) => record.level === "warning" && record.message[0] === "Image processing failed",
+  );
+
+  expect(warnings).toHaveLength(1);
+  expect(warnings[0].properties).toMatchObject({
+    processingStage: "decode_and_orient",
+    imageMimeType: "image/jpeg",
+    imageSizeBytes: file.size,
+    isHeic: false,
+    error: { name: "ImageProcessingError", cause: { message: "Failed to load image" } },
+  });
   getLogger("components", "ExpenseEditor").error("Failed to upload expense attachment", {
     error,
     ...(error instanceof ImageProcessingError ? error.diagnostics : undefined),

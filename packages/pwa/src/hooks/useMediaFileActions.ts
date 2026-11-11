@@ -86,7 +86,7 @@ export function getMediaFileHelpers(
               );
         }
 
-        logger.warning("Image compression failed, using original", {
+        logger.info("Using original image after processing failure", {
           error,
           ...(error instanceof ImageProcessingError ? error.diagnostics : undefined),
         });

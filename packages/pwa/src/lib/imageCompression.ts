@@ -446,7 +446,7 @@ export async function processImage(
   } catch (error) {
     // Keep a stable, own-property error title even when a dependency throws an
     // accessor-backed exception. The original cause remains available for debugging.
-    throw new ImageProcessingError(
+    const failure = new ImageProcessingError(
       error instanceof ImageProcessingError ? error.code : "image_processing_failed",
       error,
       {
@@ -456,6 +456,9 @@ export async function processImage(
         isHeic: isHeicImageFile(file),
       },
     );
+
+    logger.warning("Image processing failed", { error: failure, ...failure.diagnostics });
+    throw failure;
   }
 }
 
