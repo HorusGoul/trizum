@@ -1057,7 +1057,7 @@ msgstr "Continuar con Premium"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:149
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:165
 msgid "Copy {methodName} details"
 msgstr "Copiar datos de {methodName}"
 
@@ -1726,7 +1726,7 @@ msgstr "Terminando el inicio de sesión"
 msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 msgstr "Sigue las instrucciones de la tienda e introduce tu código si te lo pide. Revisa la oferta antes de confirmar."
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:48
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:64
 msgid "Follow these instructions to arrange payment."
 msgstr "Sigue estas instrucciones para acordar el pago."
 
@@ -1883,7 +1883,7 @@ msgstr "Oculta la opción en blanco al añadir un gasto."
 msgid "Hold for payment method actions"
 msgstr "Mantén pulsado para ver las opciones del método de pago"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:32
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:48
 msgid "Hold to copy payment details"
 msgstr "Mantén pulsado para copiar los datos de pago"
 
@@ -2602,7 +2602,7 @@ msgstr "Los grupos antiguos quedan apartados, no desaparecen"
 msgid "Omani Rial"
 msgstr "Rial Omaní"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:89
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:106
 msgid "On a keyboard, press Ctrl+C or Command+C to copy."
 msgstr "En un teclado, pulsa Ctrl+C o Comando+C para copiar."
 
@@ -2652,7 +2652,7 @@ msgstr "¿Usar solo plantillas personalizadas?"
 msgid "Only your own debt can be transferred"
 msgstr "Solo puedes transferir tus propias deudas"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:125
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:142
 msgid "Open {methodName}"
 msgstr "Abrir {methodName}"
 
@@ -3884,11 +3884,11 @@ msgstr "Chelín Tanzano"
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:45
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:61
 msgid "Tap to copy the phone number and pay through Bizum using your bank app."
 msgstr "Toca para copiar el número de teléfono y pagar por Bizum desde la aplicación de tu banco."
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:43
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:59
 msgid "Tap to open {methodName} and pay."
 msgstr "Toca para abrir {methodName} y pagar."
 
@@ -4391,7 +4391,7 @@ msgstr "Usa el modo personal para filtrar solo tus gastos."
 msgid "Use the Service to store or distribute unlawful or infringing content"
 msgstr "Utilizar el Servicio para almacenar o distribuir contenido ilícito o que vulnere derechos"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:47
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:63
 msgid "Use these bank details to make a transfer."
 msgstr "Utiliza estos datos bancarios para hacer una transferencia."
 

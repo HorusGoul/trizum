@@ -1081,7 +1081,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:149
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:165
 msgid "Copy {methodName} details"
 msgstr "Copy {methodName} details"
 
@@ -1770,7 +1770,7 @@ msgstr "Finishing sign in"
 msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 msgstr "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:48
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:64
 msgid "Follow these instructions to arrange payment."
 msgstr "Follow these instructions to arrange payment."
 
@@ -1931,7 +1931,7 @@ msgstr "Hide the blank option when adding an expense."
 msgid "Hold for payment method actions"
 msgstr "Hold for payment method actions"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:32
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:48
 msgid "Hold to copy payment details"
 msgstr "Hold to copy payment details"
 
@@ -2658,7 +2658,7 @@ msgstr "Older parties stay tucked away, not gone"
 msgid "Omani Rial"
 msgstr "Omani Rial"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:89
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:106
 msgid "On a keyboard, press Ctrl+C or Command+C to copy."
 msgstr "On a keyboard, press Ctrl+C or Command+C to copy."
 
@@ -2708,7 +2708,7 @@ msgstr "Only use custom templates?"
 msgid "Only your own debt can be transferred"
 msgstr "Only your own debt can be transferred"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:125
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:142
 msgid "Open {methodName}"
 msgstr "Open {methodName}"
 
@@ -3960,11 +3960,11 @@ msgstr "Tanzanian Shilling"
 msgid "Tap to change"
 msgstr "Tap to change"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:45
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:61
 msgid "Tap to copy the phone number and pay through Bizum using your bank app."
 msgstr "Tap to copy the phone number and pay through Bizum using your bank app."
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:43
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:59
 msgid "Tap to open {methodName} and pay."
 msgstr "Tap to open {methodName} and pay."
 
@@ -4488,7 +4488,7 @@ msgstr "Use personal mode to filter only your expenses."
 msgid "Use the Service to store or distribute unlawful or infringing content"
 msgstr "Use the Service to store or distribute unlawful or infringing content"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:47
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:63
 msgid "Use these bank details to make a transfer."
 msgstr "Use these bank details to make a transfer."
 

@@ -15,3 +15,5 @@ Keep the familiar Pay layout and present payment methods in compact cards with t
 Keep the empty receiving-method section compact and explain how group members use shared payment details to settle debts.
 
 Let blank receiving methods reopen for editing with one tap and remove them when saving. Show service-specific validation, including Bizum phone guidance without asking for a country code, show errors after leaving a field, and align payment-row icons with the add button.
+
+Support Enter and Space to copy non-link methods once, and preserve native copying of selected text within payment details.

@@ -119,6 +119,108 @@ test("payment cards open links, copy handles, and cancel opening after a hold", 
   ).toHaveCount(0);
 });
 
+test("keyboard activation copies each non-link method once", async ({ page, harness }) => {
+  const seeded = await harness.seedJoinedParty({
+    fixture: createPaymentPartyFixture(),
+    memberParticipantId: defaultParticipants.blair.id,
+  });
+
+  await harness.navigate(
+    `/party/${seeded.partyId}/pay?fromId=${defaultParticipants.blair.id}&toId=${defaultParticipants.alex.id}&amount=3000`,
+  );
+
+  for (const { method, details } of [
+    { method: "Bizum", details: "+34612345678" },
+    { method: "Bank transfer", details: "Alex\nIBAN: ES00 1234" },
+    { method: "Other", details: "Ask me for Wise" },
+  ]) {
+    const button = page.getByRole("button", { name: `Copy ${method} details`, exact: true });
+
+    for (const key of ["Enter", "Space"]) {
+      await button.focus();
+
+      const count = await page.evaluate(() =>
+        Number(localStorage.getItem("e2e-payment-copy-count") ?? 0),
+      );
+
+      await button.press(key);
+      await expect
+        .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
+        .toBe(details);
+      await expect
+        .poll(() => page.evaluate(() => Number(localStorage.getItem("e2e-payment-copy-count"))))
+        .toBe(count + 1);
+    }
+  }
+});
+
+test("copies a selected account number through native browser copying", async ({
+  page,
+  harness,
+  browserName,
+}) => {
+  const seeded = await harness.seedJoinedParty({
+    fixture: createPaymentPartyFixture(),
+    memberParticipantId: defaultParticipants.blair.id,
+  });
+
+  await harness.navigate(
+    `/party/${seeded.partyId}/pay?fromId=${defaultParticipants.blair.id}&toId=${defaultParticipants.alex.id}&amount=3000`,
+  );
+  await page.evaluate(() => {
+    document.addEventListener("copy", (event) => {
+      localStorage.setItem(
+        "e2e-native-copy",
+        JSON.stringify({
+          selected: window.getSelection()?.toString(),
+          prevented: event.defaultPrevented,
+        }),
+      );
+    });
+  });
+  const button = page.getByRole("button", { name: "Copy Bank transfer details", exact: true });
+  await button.focus();
+  const text = page.getByText("Alex\nIBAN: ES00 1234", { exact: true });
+
+  const bounds = await text.evaluate((element, setSelection) => {
+    const node = element.firstChild;
+
+    if (!node) throw new Error("Missing bank details text");
+    const start = (node.textContent ?? "").indexOf("ES00 1234");
+    const range = document.createRange();
+    range.setStart(node, start);
+    range.setEnd(node, start + "ES00 1234".length);
+
+    if (setSelection) {
+      // WebKit does not mouse-select native button text; seed the same selection precondition.
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+
+    const rect = range.getBoundingClientRect();
+
+    return { left: rect.left + 0.5, right: rect.right - 0.5, y: rect.y + rect.height / 2 };
+  }, browserName === "webkit");
+
+  if (browserName !== "webkit") {
+    await page.mouse.move(bounds.left, bounds.y);
+    await page.mouse.down();
+    await page.mouse.move(bounds.right, bounds.y, { steps: 8 });
+    await page.mouse.up();
+  }
+
+  await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).toBe("ES00 1234");
+  await expect(button).toBeFocused();
+  await page.keyboard.press("ControlOrMeta+c");
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("e2e-native-copy")))
+    .toBe(JSON.stringify({ selected: "ES00 1234", prevented: false }));
+  expect(
+    await page.evaluate(() => Number(localStorage.getItem("e2e-payment-copy-count") ?? 0)),
+  ).toBe(0);
+});
+
 test("desktop settings retain edits through preview, copy, removal, and repeated saves", async ({
   page,
   harness,

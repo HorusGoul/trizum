@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { mergeProps, useLink, useLongPress } from "react-aria";
+import { mergeProps, useButton, useLink, useLongPress } from "react-aria";
 import { useId, useRef, type KeyboardEvent } from "react";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { getPaymentHandle, getPaymentLink, paymentMethodLabels } from "#src/lib/paymentMethods.ts";
@@ -16,6 +16,7 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
   const descriptionId = useId();
   const showInstructions = !href && type !== "bizum";
   const linkRef = useRef<HTMLAnchorElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const heldRef = useRef(false);
   const suppressHeldClickRef = useRef(false);
 
@@ -26,6 +27,21 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
       onPress: () => trackEvent("payment_link_requested"),
     },
     linkRef,
+  );
+
+  const { buttonProps } = useButton(
+    {
+      onPress: (event) => {
+        if (
+          type === "bizum" ||
+          event.pointerType === "keyboard" ||
+          event.pointerType === "virtual"
+        ) {
+          void copyDetails();
+        }
+      },
+    },
+    buttonRef,
   );
 
   const { longPressProps } = useLongPress({
@@ -61,6 +77,7 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
 
   function copyWithKeyboard(event: KeyboardEvent<HTMLElement>) {
     if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === "c") {
+      if (event.currentTarget.ownerDocument.getSelection()?.isCollapsed === false) return;
       event.preventDefault();
       void copyDetails();
     }
@@ -129,17 +146,16 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
         </a>
       ) : (
         <button
-          {...mergeProps(longPressProps, {
+          {...mergeProps(buttonProps, longPressProps, {
             "aria-describedby": describedBy,
             onKeyDown: copyWithKeyboard,
           })}
           type="button"
-          onClick={(event) => {
-            longPressProps.onClick?.(event);
-
-            // Bizum taps copy once; late clicks following a hold must not copy again.
-            if (event.detail === 0 || (type === "bizum" && !suppressHeldClickRef.current)) {
-              void copyDetails();
+          ref={buttonRef}
+          onClickCapture={(event) => {
+            if (suppressHeldClickRef.current && event.detail > 0) {
+              event.preventDefault();
+              event.stopPropagation();
             }
           }}
           onPointerDownCapture={() => {
