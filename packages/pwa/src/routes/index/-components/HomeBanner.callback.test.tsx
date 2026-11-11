@@ -22,7 +22,7 @@ import { PremiumContextProvider } from "#src/lib/premium/PremiumContext.ts";
 import { CloudSyncSettingsView } from "#src/components/CloudSyncSettingsView.tsx";
 import { HomeBanner } from "./HomeBanner.tsx";
 
-import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
+import { DataHarness } from "#src/lib/testing/DataHarness.tsx";
 import { createProfileRuntime } from "#src/lib/testing/profileRuntime.ts";
 
 let runtime: Awaited<ReturnType<typeof createProfileRuntime>>;
@@ -86,9 +86,9 @@ async function render(router: TestRouter) {
               presentCustomerCenter: async () => undefined,
             }}
           >
-            <RepoContext value={runtime.repo}>
+            <DataHarness value={runtime.repo}>
               <RouterProvider router={router} />
-            </RepoContext>
+            </DataHarness>
           </PremiumContextProvider>
         </PwaUIProvider>
       </I18nProvider>,

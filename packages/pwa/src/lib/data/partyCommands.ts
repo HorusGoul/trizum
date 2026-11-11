@@ -1,4 +1,3 @@
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import {
   createExpenseId,
   calculateExpenseHash,
@@ -13,10 +12,8 @@ import type {
   PartyExpenseChunkRef,
   PartyParticipant,
 } from "#src/models/party.js";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import type { DocHandle, Repo, DocumentId } from "@automerge/automerge-repo/slim";
-import { deleteAt, insertAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { useParams } from "@tanstack/react-router";
+import { deleteAt, insertAt } from "@automerge/automerge-repo/slim";
 import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import { appWorker } from "#src/lib/appWorker/client.ts";
@@ -29,84 +26,7 @@ import {
   type ExpenseTemplate,
 } from "#src/models/expenseTemplate.ts";
 
-const logger = getLogger("hooks", "useParty");
-
-export function useParty(partyId: string) {
-  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
-
-  const [party, handle] = useSuspenseDocument<Party>(partyId, {
-    required: true,
-  });
-
-  const repo = useRepo();
-
-  const helpers = getPartyHelpers(repo, handle);
-
-  async function __dev_createTestExpenses() {
-    const promptAnswer = window.prompt("How many test expenses to create?");
-
-    if (!promptAnswer) {
-      logger.debug("No prompt answer");
-
-      return;
-    }
-
-    const amount = parseInt(promptAnswer ?? "0");
-
-    logger.debug("Creating test expenses", { amount });
-
-    const participants = Object.keys(party.participants);
-
-    await Promise.all(
-      Array.from({ length: amount }, (_, index) => {
-        const expenseNumber = index + 1;
-        logger.debug("Creating test expense {index}", { index: expenseNumber });
-
-        return helpers.addExpenseToParty({
-          name: `Test Expense ${expenseNumber}`,
-          paidAt: new Date(),
-          shares: {
-            [participants.at(0)!]: {
-              type: "divide",
-              value: 1,
-            },
-            [participants.at(1)!]: {
-              type: "divide",
-              value: 1,
-            },
-          },
-          photos: [],
-          paidBy: {
-            [participants.at(0)!]: 100,
-          },
-        });
-      }),
-    );
-  }
-
-  return {
-    party,
-    partyId,
-    isLoading: handle.inState(["loading"]),
-    ...helpers,
-    dev: {
-      createTestExpenses: __dev_createTestExpenses,
-    },
-  };
-}
-
-export function useCurrentParty() {
-  const partyId = useParams({
-    strict: false,
-    select: (params) => params.partyId,
-  });
-
-  if (!partyId) {
-    throw new Error("No Party ID found in URL");
-  }
-
-  return useParty(partyId);
-}
+const logger = getLogger("data", "partyCommands");
 
 export function createPartyHelperFactory(
   worker: Pick<typeof appWorker, "recalculateBalances"> = appWorker,

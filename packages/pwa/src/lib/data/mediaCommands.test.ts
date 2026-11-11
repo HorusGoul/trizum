@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/tes
 import { Repo, type DocHandle } from "@automerge/automerge-repo";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
 
-import { getImageUploadErrorMessage, getMediaFileHelpers } from "./useMediaFileActions";
+import { getImageUploadErrorMessage, getMediaFileHelpers } from "#src/lib/data/mediaCommands.ts";
 import type { processImage } from "#src/lib/imageCompression.ts";
 import { ImageProcessingError, type ProcessedImage } from "#src/lib/imageCompression.ts";
 

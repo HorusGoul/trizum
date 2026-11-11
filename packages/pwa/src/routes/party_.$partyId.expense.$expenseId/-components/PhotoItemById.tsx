@@ -1,9 +1,25 @@
+import { useFateClient, useView } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
 import { t } from "@lingui/core/macro";
-import { useMediaFile } from "#src/hooks/useMediaFile.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import { Button } from "@trizum/ui/Button";
 
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
+
 export function PhotoItemById({ photoId, onPress }: { photoId: string; onPress: () => void }) {
-  const { url } = useMediaFile(photoId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", photoId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return (
     <Button

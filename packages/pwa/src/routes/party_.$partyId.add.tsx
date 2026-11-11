@@ -1,3 +1,9 @@
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import {
   expenseEditorSearchSchema,
   optionalNonemptySearchTextSchema,
@@ -7,22 +13,30 @@ import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
-
-import { type Expense } from "#src/models/expense.js";
+import type { Expense } from "#src/models/expense.js";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { getLogger } from "#src/lib/log.ts";
-
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
-import { useCurrentParty } from "#src/hooks/useParty.js";
-import { ExpenseEditor, type ExpenseEditorFormValues } from "#src/components/ExpenseEditor.js";
+import { ExpenseEditor } from "#src/components/ExpenseEditor.js";
+import type { ExpenseEditorFormValues } from "#src/components/ExpenseEditor.js";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { useState } from "react";
 import { resolveExpenseTemplateValues } from "#src/models/expenseTemplate.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
+
+const PartyTemplatesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  expenseTemplates: true,
+  defaultExpenseTemplateId: true,
+  onlyUseCustomExpenseTemplates: true,
+});
 
 interface AddExpenseSearchParams {
   calculator?: string;
@@ -48,7 +62,14 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 });
 
 function AddExpense() {
-  const { party, partyId, addExpenseToParty } = useCurrentParty();
+  const client = useFateClient();
+
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(PartyTemplatesView, client.ref<PartyEntity>("Party", partyId, PartyTemplatesView)),
+  );
+
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
@@ -114,13 +135,22 @@ function AddExpense() {
         id: "add-expense",
       });
 
-      const expense = await addExpenseToParty({
-        name: values.name,
-        paidAt: values.paidAt,
-        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-        shares,
-        photos: values.photos,
-      });
+      const expense = await mutationResult(
+        client.mutations.party.addExpenseToParty({
+          input: {
+            partyId: party.id,
+            parameters: [
+              {
+                name: values.name,
+                paidAt: values.paidAt,
+                paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+                shares,
+                photos: values.photos,
+              },
+            ],
+          },
+        }),
+      );
 
       trackEvent("expense_created");
 

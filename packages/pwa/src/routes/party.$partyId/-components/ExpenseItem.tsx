@@ -1,17 +1,28 @@
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
 import { Trans } from "@lingui/react/macro";
 import { Link } from "react-aria-components";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
-import { useParty } from "#src/hooks/useParty.js";
-import {
-  getExpenseTotalAmount,
-  getImpactOnBalanceForUser,
-  type Expense,
-} from "#src/models/expense.js";
+import { getExpenseTotalAmount, getImpactOnBalanceForUser } from "#src/models/expense.js";
+import type { Expense } from "#src/models/expense.js";
 import { cn } from "@trizum/ui/utils";
 
+const PartyCurrencyView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+});
+
 export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }) {
-  const { party } = useParty(partyId);
+  const client = useFateClient();
+
+  const party = requireAvailable(
+    useView(PartyCurrencyView, client.ref<PartyEntity>("Party", partyId, PartyCurrencyView)),
+  );
+
   const participant = useCurrentParticipant();
 
   return (

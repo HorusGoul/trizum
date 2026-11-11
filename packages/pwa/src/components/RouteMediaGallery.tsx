@@ -1,9 +1,20 @@
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { view } from "@nkzw/fate";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState, useRef } from "react";
-import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
+
 import MediaGallery, { MediaGalleryImage } from "@trizum/ui/MediaGallery";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
-import type { MediaFile } from "#src/models/media.ts";
+
+const MediaContentView = view<MediaEntity>()({
+  id: true,
+  available: true,
+  type: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 export interface RouteMediaGalleryProps {
   /** List of photo IDs to display in the gallery */
@@ -82,10 +93,11 @@ export function RouteMediaGallery({
 }
 
 function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
-  // SAFETY: photoId comes from an Automerge media document referenced by the expense; it is passed back to the same repository.
-  const [mediaFile] = useSuspenseDocument<MediaFile>(photoId as MediaFile["id"], {
-    required: true,
-  });
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaContentView, client.ref<MediaEntity>("Media", photoId, MediaContentView)),
+  );
 
   const [url] = useMediaFileObjectUrls([mediaFile]);
 

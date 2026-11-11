@@ -1,3 +1,8 @@
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { msg, t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -9,15 +14,13 @@ import { CurrencyField } from "#src/components/CurrencyField.tsx";
 import { EmojiPicker } from "#src/components/EmojiPicker.tsx";
 import { ExpenseParticipantsSection } from "#src/components/ExpenseEditor.tsx";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.ts";
-import { useParty } from "#src/hooks/useParty.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import {
   ExpenseTemplateLimitError,
   getExpenseTemplateEditorValues,
   MAX_EXPENSE_TEMPLATES,
-  type ExpenseTemplate,
-  type ExpenseTemplateEditorValues,
 } from "#src/models/expenseTemplate.ts";
+import type { ExpenseTemplate, ExpenseTemplateEditorValues } from "#src/models/expenseTemplate.ts";
 import { Button } from "@trizum/ui/Button";
 import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { Switch } from "@trizum/ui/Switch";
@@ -26,6 +29,16 @@ import { ArchivedParticipantsAlert } from "./-components/ArchivedParticipantsAle
 import { DeleteExpenseTemplateSheet } from "./-components/DeleteExpenseTemplateSheet.tsx";
 import { ExpenseTemplateEditorHeader } from "./-components/ExpenseTemplateEditorHeader.tsx";
 import { PartySettingsSection } from "./-components/PartySettingsSection.tsx";
+
+const PartyTemplatesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  expenseTemplates: true,
+  defaultExpenseTemplateId: true,
+  onlyUseCustomExpenseTemplates: true,
+});
 
 export const Route = createFileRoute("/party_/$partyId/settings/expense-templates_/$templateId")({
   component: ExpenseTemplateEditor,
@@ -72,7 +85,13 @@ function ExpenseTemplateEditor() {
   const { partyId, templateId } = Route.useParams();
   const isNew = templateId === "new";
   const { i18n, t: translate } = useLingui();
-  const { party, deleteExpenseTemplate, saveExpenseTemplate } = useParty(partyId);
+
+  const client = useFateClient();
+
+  const party = requireAvailable(
+    useView(PartyTemplatesView, client.ref<PartyEntity>("Party", partyId, PartyTemplatesView)),
+  );
+
   const template = isNew ? undefined : party.expenseTemplates?.[templateId];
 
   if (!isNew && !template) {
@@ -147,7 +166,7 @@ function ExpenseTemplateEditor() {
       activeParticipants.map((participant) => participant.id),
       defaultTemplateName,
     ),
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (isNew && Object.keys(party.expenseTemplates ?? {}).length >= MAX_EXPENSE_TEMPLATES) {
         announceTemplateLimit();
 
@@ -175,7 +194,11 @@ function ExpenseTemplateEditor() {
       if (value.amount > 0) savedTemplate.amount = convertToUnits(value.amount);
 
       try {
-        saveExpenseTemplate(savedTemplate);
+        await mutationResult(
+          client.mutations.party.saveExpenseTemplate({
+            input: { partyId: party.id, parameters: [savedTemplate] },
+          }),
+        );
       } catch (error) {
         if (error instanceof ExpenseTemplateLimitError) {
           announceTemplateLimit();
@@ -227,12 +250,16 @@ function ExpenseTemplateEditor() {
     setShares(nextShares, "all");
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (!template) {
       return;
     }
 
-    deleteExpenseTemplate(template.id);
+    await mutationResult(
+      client.mutations.party.deleteExpenseTemplate({
+        input: { partyId: party.id, parameters: [template.id] },
+      }),
+    );
     trackEvent("expense_template_deleted");
     setIsDeleteSheetOpen(false);
     toast.success(t`Expense template deleted`);

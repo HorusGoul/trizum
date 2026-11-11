@@ -1,15 +1,6 @@
-import { useEffect, useState } from "react";
-import { getPartyListId, subscribeToPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocHandle, DocumentId } from "@automerge/automerge-repo/slim";
-import type { Party, PartyParticipant } from "#src/models/party.js";
-import {
-  documentCache,
-  handleCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
-import { defaultThemeHue, setThemeHue } from "@trizum/ui/theme";
+import type { Repo, DocHandle, DocumentId } from "@automerge/automerge-repo/slim";
+import type { PartyList } from "#src/models/partyList.ts";
+import type { Party, PartyParticipant } from "#src/models/party.ts";
 
 function ensurePinnedParties(list: PartyList) {
   if (!list.pinnedParties) {
@@ -35,26 +26,7 @@ function ensureLastUsedAt(list: PartyList) {
   return list.lastUsedAt;
 }
 
-export function usePartyList() {
-  const repo = useRepo();
-  const [partyListId, setPartyListId] = useState<DocumentId>(() => getPartyListId(repo));
-
-  const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(partyListId, {
-    required: true,
-  });
-
-  useEffect(() => {
-    return subscribeToPartyListId(setPartyListId);
-  }, []);
-
-  useEffect(() => {
-    setLocale(partyList.locale ?? getBrowserLocale());
-  }, [partyList.locale]);
-
-  useEffect(() => {
-    setThemeHue(partyList.hue ?? defaultThemeHue);
-  }, [partyList.hue]);
-
+export function getProfileHelpers(repo: Repo, partyListHandle: DocHandle<PartyList>) {
   function addPartyToList(partyId: Party["id"], participantId: PartyParticipant["id"]) {
     partyListHandle.change((list) => {
       list.parties[partyId] = true;
@@ -184,21 +156,12 @@ export function usePartyList() {
 
       await Promise.all(
         Object.keys(partyList.participantInParties).map(async (partyId) => {
-          // SAFETY: These keys come from the party-list map keyed by DocumentId; Object.keys erases that branded key type.
-          const party = await documentCache.readAsync(repo, partyId as DocumentId);
+          // SAFETY: Membership-map keys are the document IDs assigned by Repo.
+          const partyHandle = await repo
+            .find<Party>(partyId as DocumentId, { signal: AbortSignal.timeout(3_000) })
+            .catch(() => undefined);
 
-          if (!party) {
-            return;
-          }
-
-          // SAFETY: This ID comes from the party-list membership map and identifies a Party; the shared cache erases document types.
-          const partyHandle = (await handleCache.readAsync(repo, partyId as DocumentId)) as
-            | DocHandle<Party>
-            | undefined;
-
-          if (!partyHandle) {
-            return;
-          }
+          if (!partyHandle) return;
 
           partyHandle.change((doc) => {
             // SAFETY: partyId is a key enumerated from this same DocumentId-keyed membership map.
@@ -248,8 +211,6 @@ export function usePartyList() {
   }
 
   return {
-    partyList,
-    partyListHandle,
     addPartyToList,
     removeParty,
     updateSettings,

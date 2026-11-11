@@ -1,16 +1,35 @@
 // @vitest-environment jsdom
 
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { Repo } from "@automerge/automerge-repo";
 import { act, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
-import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
+import { DataHarness } from "#src/lib/testing/DataHarness.tsx";
+import { documentCache } from "#src/lib/testing/dataCache.ts";
 import { hasLocalPartyListData } from "#src/lib/cloudSyncRouteState.ts";
 import { initializeI18n } from "#src/lib/i18n.ts";
 import { getPartyListHandle } from "#src/models/partyList.ts";
 import type { Party } from "#src/models/party.ts";
-import { usePartyList } from "./usePartyList.ts";
+
+const ProfileSettingsView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+  locale: true,
+  openLastPartyOnLaunch: true,
+  autoOpenCalculator: true,
+  hue: true,
+});
 
 let repo: Repo;
 
@@ -54,10 +73,17 @@ it("syncs saved methods and removals to existing groups without changing other p
   await documentCache.readAsync(repo, profile.documentId);
   await documentCache.readAsync(repo, party.documentId);
 
-  let settings!: ReturnType<typeof usePartyList>;
+  let client!: AppClient;
 
   function Harness() {
-    settings = usePartyList();
+    client = useFateClient();
+    const profileId = useProfileId();
+    requireAvailable(
+      useView(
+        ProfileSettingsView,
+        client.ref<ProfileEntity>("Profile", profileId, ProfileSettingsView),
+      ),
+    );
 
     return null;
   }
@@ -67,11 +93,11 @@ it("syncs saved methods and removals to existing groups without changing other p
   try {
     await act(async () =>
       root.render(
-        <RepoContext value={repo}>
+        <DataHarness value={repo}>
           <Suspense>
             <Harness />
           </Suspense>
-        </RepoContext>,
+        </DataHarness>,
       ),
     );
 
@@ -91,12 +117,30 @@ it("syncs saved methods and removals to existing groups without changing other p
       "cash-app": "https://cash.app/$Alice123",
     };
 
-    await act(async () => settings.updateSettings({ ...values, paymentMethods: methods }));
+    await act(async () =>
+      mutationResult(
+        client.mutations.profile.updateSettings({
+          input: {
+            profileId: profile.documentId,
+            parameters: [{ ...values, paymentMethods: methods }],
+          },
+        }),
+      ),
+    );
     expect(profile.doc().paymentMethods).toEqual(methods);
     await vi.waitFor(() => expect(party.doc().participants.alice?.paymentMethods).toEqual(methods));
     expect(party.doc().participants.bob?.paymentMethods).toEqual({ venmo: "bob" });
 
-    await act(async () => settings.updateSettings({ ...values, phone: "", paymentMethods: {} }));
+    await act(async () =>
+      mutationResult(
+        client.mutations.profile.updateSettings({
+          input: {
+            profileId: profile.documentId,
+            parameters: [{ ...values, phone: "", paymentMethods: {} }],
+          },
+        }),
+      ),
+    );
     await vi.waitFor(() => expect(party.doc().participants.alice?.paymentMethods).toEqual({}));
     expect(party.doc().participants.alice?.phone).toBe("");
     expect(profile.doc().paymentMethods).toEqual({});

@@ -1,19 +1,25 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { PartyCardView } from "#src/components/PartyListCard.view.ts";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
-import type { PartyList } from "#src/models/partyList.js";
-import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrdering.ts";
+import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
+import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import type { PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { MenuTrigger, Popover } from "react-aria-components";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { use } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
@@ -23,6 +29,19 @@ import { NoActivePartiesCard } from "#src/routes/index/-components/NoActiveParti
 import { HomeBanner } from "#src/routes/index/-components/HomeBanner.tsx";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
+
+const PartyPrefetchView = view<PartyEntity>()({ id: true, available: true });
+
+const ProfileHomeView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+});
 
 interface HomeSearch {
   premium?: boolean;
@@ -36,7 +55,14 @@ export const Route = createFileRoute("/_home")({
 });
 
 function Home() {
-  const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
+  const profileId = useProfileId();
+
+  const client = useFateClient();
+
+  const partyList = requireAvailable(
+    useView(ProfileHomeView, client.ref<ProfileEntity>("Profile", profileId, ProfileHomeView)),
+  );
+
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, isUpdating, checkForUpdate } = use(UpdateContext);
   const session = useAppSession();
@@ -155,10 +181,10 @@ function Home() {
                   const actions = createPartyActions({
                     isPinned: pinned,
                     onTogglePinned: () => {
-                      togglePartyPinned(partyList, partyId, setPartyPinned);
+                      return togglePartyPinned(partyList, partyId, client);
                     },
                     onArchive: () => {
-                      archiveParty(partyId, setPartyArchived);
+                      return archiveParty(partyId, partyList.id, client);
                     },
                   });
 
@@ -166,7 +192,7 @@ function Home() {
                     <PartyListCard
                       key={partyId}
                       actions={actions}
-                      partyId={partyId}
+                      partyRef={client.ref<PartyEntity>("Party", partyId, PartyCardView)}
                       isPinned={pinned}
                       currentParticipantId={partyList.participantInParties[partyId] ?? null}
                     />
@@ -222,12 +248,15 @@ function Home() {
   );
 }
 
-function usePartySections(partyList: PartyList) {
-  const repo = useRepo();
+function usePartySections(partyList: OrderedProfile) {
+  const client = useFateClient();
   const sections = getOrderedPartySections(partyList);
 
   for (const partyId of [...sections.activePartyIds, ...sections.archivedPartyIds]) {
-    documentCache.prefetch(repo, partyId);
+    void client.readView(
+      PartyPrefetchView,
+      client.ref<PartyEntity>("Party", partyId, PartyPrefetchView),
+    );
   }
 
   return sections;
@@ -258,22 +287,31 @@ function createPartyActions({
   ];
 }
 
-function togglePartyPinned(
-  partyList: PartyList,
+async function togglePartyPinned(
+  partyList: OrderedProfile & Pick<ProfileEntity, "id">,
   partyId: Party["id"],
-  setPartyPinned: ReturnType<typeof usePartyList>["setPartyPinned"],
+  client: AppClient,
 ) {
   const currentlyPinned = isPartyPinned(partyList, partyId);
-  setPartyPinned(partyId, !currentlyPinned);
+  await mutationResult(
+    client.mutations.profile.setPartyPinned({
+      input: { profileId: partyList.id, parameters: [partyId, !currentlyPinned] },
+    }),
+  );
   trackEvent(currentlyPinned ? "party_unpinned" : "party_pinned");
   toast.success(currentlyPinned ? t`Party unpinned` : t`Party pinned`);
 }
 
-function archiveParty(
+async function archiveParty(
   partyId: Party["id"],
-  setPartyArchived: ReturnType<typeof usePartyList>["setPartyArchived"],
+  profileId: ProfileEntity["id"],
+  client: AppClient,
 ) {
-  setPartyArchived(partyId, true);
+  await mutationResult(
+    client.mutations.profile.setPartyArchived({
+      input: { profileId, parameters: [partyId, true] },
+    }),
+  );
   trackEvent("party_archived");
   toast.success(t`Party archived`);
 }

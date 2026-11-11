@@ -1,45 +1,60 @@
-import type { Party } from "#src/models/party.js";
+import { view } from "@nkzw/fate";
 import {
   redirect,
   type ParsedLocation,
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
-import { documentCache } from "./automerge/suspense-hooks";
-import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId } from "@automerge/automerge-repo";
+import type { PartyEntity, ProfileEntity, SessionEntity } from "./data/entities.ts";
 
-export async function guardPartyExists(
-  partyId: string,
-  { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
-) {
-  // SAFETY: The router owns this document ID and its Party/PartyList contract; the shared cache erases those document types.
-  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as Party | undefined;
+const PartyAccessView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+  chunkRefs: true,
+});
 
-  if (!party) {
-    throw redirect({ to: "/" });
-  }
+const ProfileAccessView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  participantInParties: true,
+});
+
+const SessionView = view<SessionEntity>()({ profileId: true });
+
+type RouteContext = RouterContextOptions<RegisteredRouter["routeTree"]>["context"];
+
+export async function guardPartyExists(partyId: string, { client }: RouteContext) {
+  const { data: party } = await client.readView(
+    PartyAccessView,
+    client.ref<PartyEntity>("Party", partyId, PartyAccessView),
+  );
+
+  if (!party.available) throw redirect({ to: "/" });
 
   return party;
 }
 
-export async function guardPartyListExists({
-  repo,
-}: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
-  const partyListId = getPartyListId(repo);
-  // SAFETY: The router owns this document ID and its Party/PartyList contract; the shared cache erases those document types.
-  const partyList = (await documentCache.readAsync(repo, partyListId)) as PartyList | undefined;
+export async function guardPartyListExists({ client }: RouteContext) {
+  const { data: session } = await client.readView(
+    SessionView,
+    client.ref<SessionEntity>("Session", "current", SessionView),
+  );
 
-  if (!partyList) {
-    throw redirect({ to: "/" });
-  }
+  const { data: partyList } = await client.readView(
+    ProfileAccessView,
+    client.ref<ProfileEntity>("Profile", session.profileId, ProfileAccessView),
+  );
+
+  if (!partyList.available) throw redirect({ to: "/" });
 
   return partyList;
 }
 
 export async function guardParticipatingInParty(
   partyId: string,
-  context: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+  context: RouteContext,
   location: ParsedLocation,
 ) {
   const [party, partyList] = await Promise.all([
@@ -47,17 +62,14 @@ export async function guardParticipatingInParty(
     guardPartyListExists(context),
   ]);
 
-  const needsToJoin =
+  if (
     partyList.parties[party.id] !== true ||
-    partyList.participantInParties?.[party.id] === undefined;
-
-  if (needsToJoin) {
+    partyList.participantInParties[party.id] === undefined
+  ) {
     throw redirect({
       to: "/party/$partyId/who",
       params: { partyId },
-      search: {
-        redirectTo: location.href,
-      },
+      search: { redirectTo: location.href },
     });
   }
 

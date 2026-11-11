@@ -9,16 +9,9 @@ import {
   isSupportedImageFile,
 } from "#src/lib/imageCompression.ts";
 import { type Repo, RawString, type DocumentId } from "@automerge/automerge-repo";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getLogger } from "#src/lib/log.ts";
 
-const logger = getLogger("hooks", "useMediaFileActions");
-
-export function useMediaFileActions() {
-  const repo = useRepo();
-
-  return getMediaFileHelpers(repo);
-}
+const logger = getLogger("data", "mediaCommands");
 
 export function getImageUploadErrorMessage(cause: unknown): string | null {
   if (!(cause instanceof ImageProcessingError)) {

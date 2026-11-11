@@ -1,7 +1,7 @@
 import { Repo } from "@automerge/automerge-repo";
 import { Capacitor } from "@capacitor/core";
 import { vi } from "vite-plus/test";
-import { documentCache } from "../automerge/suspense-hooks.ts";
+import { documentCache } from "./dataCache.ts";
 import { rememberedSession } from "../authSession.ts";
 import { setNativeAuthToken } from "../nativeAuthSession.ts";
 import { setPartyListId, type PartyList } from "#src/models/partyList.ts";

@@ -1,20 +1,22 @@
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
 import { optionalSearchNumberSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import { decodeExpenseId, findExpenseById, getExpenseTotalAmount } from "#src/models/expense.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { getExpenseTotalAmount } from "#src/models/expense.js";
+import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { Dialog, MenuTrigger, Modal, ModalOverlay, Popover } from "react-aria-components";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Icon } from "@trizum/ui/Icon";
-import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
@@ -30,6 +32,18 @@ import { PaidAt } from "./-components/PaidAt.js";
 import { PaidBy } from "./-components/PaidBy.js";
 import { Photos } from "./-components/Photos.js";
 import { Shares } from "./-components/Shares.js";
+
+const ExpenseDetailView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+});
 
 interface ExpenseSearchParams {
   media?: number;
@@ -52,13 +66,15 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
 
-    const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await context.client.readView(
+      ExpenseDetailView,
+      context.client.ref<ExpenseEntity>("Expense", expenseId, ExpenseDetailView),
+    );
   },
 });
 
 function ExpenseById() {
-  const { expenseId, partyId, expense, onDeleteExpense, isLoading } = useExpense();
+  const { expenseId, partyId, expense, onDeleteExpense } = useExpense();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -77,10 +93,6 @@ function ExpenseById() {
 
   if (expenseId === undefined) {
     return <span>Invalid Expense ID</span>;
-  }
-
-  if (isLoading) {
-    return null;
   }
 
   if (!expense) {
@@ -238,28 +250,27 @@ function ExpenseDeleteConfirmationDialog({
 }
 
 function useExpense() {
+  const client = useFateClient();
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
   const currentLocation = useLocation();
   const navigate = useNavigate();
 
-  if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
+  if (!isValidRecordId(partyId)) throw new Error(t`Malformed Party ID`);
 
-  const { chunkId } = decodeExpenseId(expenseId);
-
-  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
-
-  const { removeExpense } = useCurrentParty();
-
-  const [expense, _expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const expense = requireAvailable(
+    useView(ExpenseDetailView, client.ref<ExpenseEntity>("Expense", expenseId, ExpenseDetailView)),
+  );
 
   async function onDeleteExpense() {
     if (expenseId === undefined) return;
 
     try {
-      await removeExpense(expenseId);
+      await mutationResult(
+        client.mutations.party.removeExpense({
+          input: { partyId, parameters: [expenseId] },
+        }),
+      );
     } catch (error) {
       logger.error("Failed to delete expense", { error });
       toast.error(t`Failed to delete expense. Please try again.`);
@@ -282,6 +293,5 @@ function useExpense() {
     onDeleteExpense,
     expense,
     expenseId,
-    isLoading: handle.inState(["loading"]),
   };
 }

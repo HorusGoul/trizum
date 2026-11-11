@@ -1,15 +1,21 @@
+import type { ExpenseHistorySource } from "./partyPaginatedExpenses.ts";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { createMockDocumentCacheCollection } from "#src/lib/testing/mockDocumentCache.ts";
 import type { Expense } from "#src/models/expense.ts";
-import { STATUS_PENDING } from "@trizum/react-suspense-cache";
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
+
+const STATUS_PENDING = "pending";
+
+import type { DocumentId } from "@automerge/automerge-repo/slim";
 
 type MockChunk = {
   id: DocumentId;
   expenses: Expense[];
 };
 
-const mockDocumentCacheCollection = createMockDocumentCacheCollection<MockChunk>();
+const mockDocumentCacheCollection = createMockDocumentCacheCollection<
+  MockChunk,
+  ExpenseHistorySource
+>();
 
 const {
   availableDocuments: availableChunks,
@@ -35,13 +41,13 @@ const {
   subscribeToPartyPaginatedExpenses,
 } = createPartyExpensePagination({
   getCachedChunk: documentCache.getValueIfCached,
-  readChunk: (repo, id) => documentCache.readAsync(repo, id).then(() => undefined),
+  readChunk: (data, id) => documentCache.readAsync(data, id).then(() => undefined),
   getStatus: documentCache.getStatus,
   subscribe: documentCache.subscribe,
 });
 
 // SAFETY: All cache operations are mocked in this test; the repo is only an identity key and no Repo method is called.
-const repo = {} as Repo;
+const repo = {} as ExpenseHistorySource;
 const chunk1 = toChunkId("chunk-1");
 const chunk2 = toChunkId("chunk-2");
 const chunk3 = toChunkId("chunk-3");

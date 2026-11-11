@@ -1,12 +1,14 @@
+import { useViews, useFateClient } from "react-fate";
+import { requireAvailableList } from "#src/lib/data/availability.ts";
+import { view } from "@nkzw/fate";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
 import { msg, t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
-import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
-import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import { Button } from "@trizum/ui/Button";
 import { sheetTweenConfig } from "@trizum/ui/sheetMotion";
 import { SheetSurface } from "@trizum/ui/SheetSurface";
@@ -16,6 +18,16 @@ import { cn } from "@trizum/ui/utils";
 import { suppressCalculatorAutoOpen } from "./calculatorAutoOpenSuppression.ts";
 import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
 import type { MediaFile } from "#src/models/media.ts";
+
+import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
+
+const MediaContentView = view<MediaEntity>()({
+  id: true,
+  available: true,
+  type: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
@@ -1167,9 +1179,14 @@ function CalculatorMobileAttachmentContent({
   const attachmentButtonIdPrefix = useId();
   const pendingAttachmentFocusIndexRef = useRef<number | null>(null);
 
-  const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
-    required: true as const,
-  }).map(({ doc }) => doc);
+  const client = useFateClient();
+
+  const mediaFiles = requireAvailableList(
+    useViews(
+      MediaContentView,
+      photoIds.map((id) => client.ref<MediaEntity>("Media", id, MediaContentView)),
+    ),
+  );
 
   const urls = useMediaFileObjectUrls(mediaFiles);
   const galleryItems: MediaGalleryItem[] = urls.map((url) => ({ src: url }));

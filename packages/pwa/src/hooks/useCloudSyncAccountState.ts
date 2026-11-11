@@ -1,5 +1,8 @@
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { t } from "@lingui/core/macro";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { useEffect, useReducer, useRef, type RefObject } from "react";
 import { toast } from "sonner";
 import { fetchLinkedAuthAccounts, type LinkedAuthAccount } from "#src/lib/auth-client.ts";
@@ -15,8 +18,7 @@ import {
   readCachedCloudAccountState,
   writeCachedCloudAccountState,
 } from "#src/lib/cloudSyncRouteState.ts";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useFateClient } from "react-fate";
 import { setPartyListId, type PartyList } from "#src/models/partyList.js";
 import { setAnalyticsEnabled, trackCloudSyncActivated } from "#src/lib/analytics.ts";
 
@@ -113,12 +115,27 @@ function cloudSyncAccountStateReducer(
   }
 }
 
+const CloudProfileView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  type: true,
+  username: true,
+  phone: true,
+  parties: true,
+  participantInParties: true,
+  usageAnalyticsEnabled: true,
+});
+
 async function readCloudPartyList(
-  repo: Parameters<typeof documentCache.readAsync>[0],
+  client: AppClient,
   id: PartyList["id"],
-) {
-  // SAFETY: This gateway reads only IDs supplied by the cloud party-list settings contract.
-  return (await documentCache.readAsync(repo, id)) as PartyList | undefined;
+): Promise<PartyList | undefined> {
+  const result = await client.readView(
+    CloudProfileView,
+    client.ref<ProfileEntity>("Profile", id, CloudProfileView),
+  );
+
+  return result.data.available ? result.data : undefined;
 }
 
 const cloudAccountServices = {
@@ -168,7 +185,7 @@ export function createUseCloudSyncAccountState(
     partyList: PartyList;
     userId: string | undefined;
   }) {
-    const repo = useRepo();
+    const client = useFateClient();
 
     const [state, dispatch] = useReducer(
       cloudSyncAccountStateReducer,
@@ -241,11 +258,11 @@ export function createUseCloudSyncAccountState(
 
           if (
             activeSettings &&
-            isValidDocumentId(activeSettings.partyListDocumentId) &&
+            isValidRecordId(activeSettings.partyListDocumentId) &&
             activeSettings.partyListDocumentId !== currentPartyList.id
           ) {
             // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
-            const cloudPartyList = await readPartyList(repo, activeSettings.partyListDocumentId);
+            const cloudPartyList = await readPartyList(client, activeSettings.partyListDocumentId);
 
             if (isCancelled) {
               return;
@@ -270,7 +287,7 @@ export function createUseCloudSyncAccountState(
             return;
           }
 
-          if (!isValidDocumentId(activeSettings.partyListDocumentId)) {
+          if (!isValidRecordId(activeSettings.partyListDocumentId)) {
             toast.error(t`trizum cloud data is invalid`);
 
             return;
@@ -332,7 +349,7 @@ export function createUseCloudSyncAccountState(
         isCancelled = true;
         window.clearInterval(intervalId);
       };
-    }, [isOffline, isSignInSuccessVisibleRef, repo, userId]);
+    }, [client, isOffline, isSignInSuccessVisibleRef, userId]);
 
     function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
       dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });
@@ -356,7 +373,7 @@ export function createUseCloudSyncAccountState(
         return;
       }
 
-      if (!isValidDocumentId(settings.partyListDocumentId)) {
+      if (!isValidRecordId(settings.partyListDocumentId)) {
         toast.error(t`trizum cloud data is invalid`);
 
         return;
@@ -369,7 +386,7 @@ export function createUseCloudSyncAccountState(
       }
 
       // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
-      const cloudPartyList = await readPartyList(repo, settings.partyListDocumentId);
+      const cloudPartyList = await readPartyList(client, settings.partyListDocumentId);
 
       if (!cloudPartyList) {
         toast.error(t`Could not load trizum cloud state`);

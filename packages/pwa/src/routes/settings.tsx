@@ -1,10 +1,17 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { PaymentMethodsEditor } from "#src/components/PaymentMethodsEditor.tsx";
 import {
   getPaymentMethods,
   normalizePaymentMethods,
   validatePaymentMethod,
 } from "#src/lib/paymentMethods.ts";
-import { paymentMethodTypes, type PaymentMethods } from "#src/models/paymentMethod.ts";
+import { paymentMethodTypes } from "#src/models/paymentMethod.ts";
+import type { PaymentMethods } from "#src/models/paymentMethod.ts";
 import { setAnalyticsEnabled, trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
@@ -17,7 +24,8 @@ import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import { AvatarPicker } from "#src/components/AvatarPicker.js";
 import { SwitchField } from "@trizum/ui/SwitchField";
-import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/locales.js";
+import { DEFAULT_LOCALE } from "#src/lib/locales.js";
+import type { SupportedLocale } from "#src/lib/locales.js";
 import { validatePartyParticipantName } from "#src/lib/validation.js";
 import type { MediaFile } from "#src/models/media.ts";
 import { ColorSlider, ColorThumb, SliderTrack } from "@trizum/ui/Color";
@@ -27,12 +35,31 @@ import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { Label } from "@trizum/ui/fields/Field";
 import { AppTextField } from "@trizum/ui/fields/TextField";
 import { defaultThemeHue, setThemeHue } from "@trizum/ui/theme";
-import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
-import { getAuthSessionStatus, type AuthSessionStatus } from "#src/lib/authSessionStatus.ts";
+import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
+import type { AuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
+
+const ProfileSettingsView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+  locale: true,
+  openLastPartyOnLaunch: true,
+  autoOpenCalculator: true,
+  hue: true,
+});
+
+const ProfileAnalyticsView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  usageAnalyticsEnabled: true,
+});
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -62,21 +89,40 @@ function getLocaleOptions(): LocaleOption[] {
 }
 
 export function Settings() {
-  const { partyList, updateSettings } = usePartyList();
+  const profileId = useProfileId();
+
+  const client = useFateClient();
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileSettingsView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileSettingsView),
+    ),
+  );
+
   const navigate = useNavigate();
   const localeOptions = getLocaleOptions();
 
-  function onSaveSettings(values: SettingsFormValues) {
-    updateSettings({
-      username: values.username,
-      phone: values.paymentMethods.bizum?.trim() ?? "",
-      paymentMethods: normalizePaymentMethods(values.paymentMethods),
-      avatarId: values.avatarId,
-      locale: values.locale === "system" ? undefined : values.locale,
-      openLastPartyOnLaunch: values.openLastPartyOnLaunch,
-      autoOpenCalculator: values.autoOpenCalculator,
-      hue: values.hue,
-    });
+  async function onSaveSettings(values: SettingsFormValues) {
+    await mutationResult(
+      client.mutations.profile.updateSettings({
+        input: {
+          profileId: partyList.id,
+          parameters: [
+            {
+              username: values.username,
+              phone: values.paymentMethods.bizum?.trim() ?? "",
+              paymentMethods: normalizePaymentMethods(values.paymentMethods),
+              avatarId: values.avatarId,
+              locale: values.locale === "system" ? undefined : values.locale,
+              openLastPartyOnLaunch: values.openLastPartyOnLaunch,
+              autoOpenCalculator: values.autoOpenCalculator,
+              hue: values.hue,
+            },
+          ],
+        },
+      }),
+    );
     trackEvent("settings_saved");
     form.reset(values);
     toast.success(t`Settings saved`);
@@ -94,7 +140,7 @@ export function Settings() {
       hue: partyList.hue ?? defaultThemeHue,
     },
     onSubmit: ({ value }) => {
-      onSaveSettings(value);
+      return onSaveSettings(value);
     },
   });
 
@@ -305,16 +351,29 @@ function SettingsFormFields({
 }
 
 function UsageAnalyticsSetting() {
-  const { partyList, setUsageAnalyticsEnabled } = usePartyList();
+  const profileId = useProfileId();
+
+  const client = useFateClient();
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileAnalyticsView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileAnalyticsView),
+    ),
+  );
 
   return (
     <SwitchField
       label={<Trans>Share usage analytics</Trans>}
       description={<Trans>Help us understand how trizum is used.</Trans>}
       isSelected={partyList.usageAnalyticsEnabled !== false}
-      onChange={(enabled) => {
+      onChange={async (enabled) => {
         if (!enabled) setAnalyticsEnabled(false);
-        setUsageAnalyticsEnabled(enabled);
+        await mutationResult(
+          client.mutations.profile.setUsageAnalyticsEnabled({
+            input: { profileId: partyList.id, parameters: [enabled] },
+          }),
+        );
       }}
     />
   );

@@ -1,3 +1,4 @@
+import { getAppData } from "#src/lib/data/client.ts";
 import { PwaUIProvider } from "#src/components/PwaUIProvider.js";
 // @vitest-environment jsdom
 
@@ -14,8 +15,8 @@ import {
 } from "@tanstack/react-router";
 import { Repo } from "@automerge/automerge-repo";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
-import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
+import { DataHarness } from "#src/lib/testing/DataHarness.tsx";
+import { documentCache } from "#src/lib/testing/dataCache.ts";
 import { initializeI18n } from "#src/lib/i18n.ts";
 import { bindAnalytics, initializeAnalytics } from "#src/lib/analytics.ts";
 import { getPartyListHandle } from "#src/models/partyList.ts";
@@ -89,7 +90,9 @@ async function setup(joined = false, loader?: () => Promise<void>) {
   initializeAnalytics(["/party/$partyId/who", "/party/$partyId"]);
   unbind = bindAnalytics(profile, () => `/party/${party.documentId}/who`);
 
-  const rootRoute = createRootRouteWithContext<{ repo: Repo }>()({});
+  const rootRoute = createRootRouteWithContext<{ client: ReturnType<typeof getAppData>["fate"] }>()(
+    {},
+  );
 
   const whoRouteOptions = {
     getParentRoute: () => rootRoute,
@@ -108,7 +111,7 @@ async function setup(joined = false, loader?: () => Promise<void>) {
   });
 
   const router = createRouter({
-    context: { repo },
+    context: { client: getAppData(repo).fate },
     routeTree: rootRoute.addChildren([whoRoute, partyRoute]),
     history: createMemoryHistory({
       initialEntries: [
@@ -122,11 +125,11 @@ async function setup(joined = false, loader?: () => Promise<void>) {
     root.render(
       <I18nProvider i18n={initializeI18n("en")}>
         <PwaUIProvider>
-          <RepoContext value={repo}>
+          <DataHarness value={repo}>
             <Suspense fallback="Loading">
               <RouterProvider router={router} />
             </Suspense>
-          </RepoContext>
+          </DataHarness>
         </PwaUIProvider>
       </I18nProvider>,
     ),

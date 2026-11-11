@@ -1,15 +1,37 @@
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { getExpenseUnitShares, type Expense } from "#src/models/expense.js";
+import { getExpenseUnitShares } from "#src/models/expense.js";
+import type { Expense } from "#src/models/expense.js";
 import { Icon } from "@trizum/ui/Icon";
 
+const PartyParticipantAmountsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+  currency: true,
+});
+
 export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
   const { i18n } = useLingui();
   const unitAmounts = getExpenseUnitShares(expense);
-  const { party } = useCurrentParty();
+
+  const party = requireAvailable(
+    useView(
+      PartyParticipantAmountsView,
+      client.ref<PartyEntity>("Party", partyId, PartyParticipantAmountsView),
+    ),
+  );
+
   const currentParticipant = useCurrentParticipant();
 
   return (

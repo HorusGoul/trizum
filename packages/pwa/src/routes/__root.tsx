@@ -1,4 +1,4 @@
-import type { Repo } from "@automerge/automerge-repo/slim";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
 import { createRootRouteWithContext, Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import { RouterProvider } from "react-aria-components";
 import { shouldReplaceNavigation } from "#src/lib/navigationHistory.ts";
@@ -7,7 +7,7 @@ import { AppRecoveryDialog } from "#src/components/AppRecoveryDialog.tsx";
 import { isProtectedAdRoute } from "#src/lib/advertising/advertisingPolicy.ts";
 
 interface RouterContext {
-  repo: Repo;
+  client: AppClient;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

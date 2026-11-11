@@ -1,3 +1,5 @@
+import { getAppData } from "#src/lib/data/client.ts";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
 // @vitest-environment jsdom
 
 import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-repo/slim";
@@ -17,10 +19,13 @@ import { createUseCloudSyncAccountState } from "./useCloudSyncAccountState.ts";
 import type { fetchCloudUserSettings as fetchCloudUserSettingsType } from "#src/lib/cloudSyncSettings.ts";
 
 import { Repo } from "@automerge/automerge-repo";
-import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
+import { DataHarness } from "#src/lib/testing/DataHarness.tsx";
 
 let repo: Repo;
-const readDocument = vi.fn<(repo: Repo, id: PartyList["id"]) => Promise<PartyList | undefined>>();
+
+const readDocument =
+  vi.fn<(client: AppClient, id: PartyList["id"]) => Promise<PartyList | undefined>>();
+
 const setAnalyticsEnabled = vi.fn<typeof setAnalyticsEnabledType>();
 const trackCloudSyncActivated = vi.fn<typeof trackCloudSyncActivatedType>();
 const setPartyListId = vi.fn<typeof setPartyListIdType>();
@@ -66,9 +71,9 @@ function renderAccount(source: PartyList) {
 
   // Effects are irrelevant to the explicit activation action under test.
   renderToStaticMarkup(
-    <RepoContext value={repo}>
+    <DataHarness value={repo}>
       <Harness />
-    </RepoContext>,
+    </DataHarness>,
   );
 
   return { ...account, onCloudDataActivated };
@@ -125,12 +130,12 @@ it.each(["missing", "rejected"])(
     try {
       await act(async () =>
         root.render(
-          <RepoContext value={repo}>
+          <DataHarness value={repo}>
             <Harness />
-          </RepoContext>,
+          </DataHarness>,
         ),
       );
-      expect(readDocument).toHaveBeenCalledWith(repo, destination.id);
+      expect(readDocument).toHaveBeenCalledWith(getAppData(repo).fate, destination.id);
       expect(account.isAccountStateResolved).toBe(true);
       expect(account.isCloudSyncSwitchOpen).toBe(false);
       expect(setPartyListId).not.toHaveBeenCalled();

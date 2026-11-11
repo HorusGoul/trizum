@@ -43,14 +43,14 @@ export interface PartyStatsResult {
 }
 
 interface CalculatePartyStatsOptions {
-  expenses: Expense[];
+  expenses: readonly Expense[];
   participants: Record<PartyParticipant["id"], PartyParticipant>;
   timeframe: PartyStatsTimeframe;
   now?: Date;
 }
 
 interface PartyStatsExpenseDatesOptions {
-  expenses: Pick<Expense, "isTransfer" | "paidAt">[];
+  expenses: readonly Pick<Expense, "isTransfer" | "paidAt">[];
   now?: Date;
 }
 
@@ -138,7 +138,7 @@ export function getPartyStatsAvailablePastYears({
 }
 
 export function getPartyStatsDateBounds(
-  expenses: Pick<Expense, "isTransfer" | "paidAt">[],
+  expenses: readonly Pick<Expense, "isTransfer" | "paidAt">[],
 ): PartyStatsDateBounds | null {
   let earliestExpense: Date | null = null;
   let latestExpense: Date | null = null;

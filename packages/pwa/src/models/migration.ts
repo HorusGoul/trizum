@@ -1,7 +1,7 @@
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 import type { Party } from "./party";
-import { getPartyHelpers } from "#src/hooks/useParty.ts";
-import { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
+import { getPartyHelpers } from "#src/lib/data/partyCommands.ts";
+import { getMediaFileHelpers } from "#src/lib/data/mediaCommands.ts";
 import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";

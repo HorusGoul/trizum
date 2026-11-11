@@ -1,28 +1,22 @@
+import { useView, useFateClient } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
 import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
 import { getFailureMessage } from "#src/lib/failureMessage.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
-import {
-  ExpenseEditor,
-  type ExpenseEditorFormValues,
-  type ExpenseEditorRef,
-} from "#src/components/ExpenseEditor.tsx";
+import { ExpenseEditor } from "#src/components/ExpenseEditor.tsx";
+import type { ExpenseEditorFormValues, ExpenseEditorRef } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { patchMutate } from "#src/lib/patchMutate.ts";
-import {
-  decodeExpenseId,
-  findExpenseById,
-  calculateExpenseHash,
-  type Expense,
-} from "#src/models/expense.ts";
-import type { PartyExpenseChunk } from "#src/models/party.ts";
-import { type DocHandleChangePayload } from "@automerge/automerge-repo";
-import { diff, type DiffResult } from "@opentf/obj-diff";
+import { calculateExpenseHash } from "#src/models/expense.ts";
+import type { Expense } from "#src/models/expense.ts";
+import { diff } from "@opentf/obj-diff";
+import type { DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
@@ -31,13 +25,23 @@ import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import {
-  getExpenseEditHash,
-  getExpenseEditValues,
-  getOrCreateExpenseEditCopy,
-} from "./-expenseEditValues.ts";
+import { getExpenseEditHash, getExpenseEditValues } from "#src/lib/data/expenseDraft.ts";
 import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
+
+const ExpenseEditorView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+  __editCopy: true,
+  __editCopyLastUpdatedAt: true,
+});
 
 interface EditExpenseSearchParams {
   calculator?: string;
@@ -55,22 +59,17 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
   async loader({ location, context, params: { expenseId, partyId } }) {
     await guardParticipatingInParty(partyId, context, location);
 
-    const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await context.client.readView(
+      ExpenseEditorView,
+      context.client.ref<ExpenseEntity>("Expense", expenseId, ExpenseEditorView),
+    );
   },
 });
 
 const logger = getLogger("routes", "EditExpense");
 
 function EditExpense() {
-  const {
-    expenseId,
-    partyId,
-    expense,
-    onUpdateExpense,
-    onChangeExpense,
-    subscribeToExpenseChanges,
-  } = useExpense();
+  const { expenseId, partyId, expense, onUpdateExpense, onChangeExpense } = useExpense();
 
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -207,15 +206,12 @@ function EditExpense() {
   }
 
   useEffect(() => {
-    return subscribeToExpenseChanges((updatedExpense) => {
-      const raw = clone(updatedExpense);
+    const hash = getExpenseEditHash(expense);
 
-      const currentHash = getExpenseEditHash(raw);
-      currentHashRef.current = currentHash;
-
-      editorRef.current?.setValues(getExpenseEditValues(raw));
-    });
-  }, [subscribeToExpenseChanges]);
+    if (hash === currentHashRef.current) return;
+    currentHashRef.current = hash;
+    editorRef.current?.setValues(getExpenseEditValues(clone(expense)));
+  }, [expense]);
 
   const expenseName = formValues.name;
 
@@ -248,74 +244,34 @@ function EditExpense() {
 }
 
 function useExpense() {
+  const client = useFateClient();
   const { partyId, expenseId } = Route.useParams();
-  const { updateExpense } = useCurrentParty();
 
-  const { chunkId } = decodeExpenseId(expenseId);
-
-  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
-
-  const [expense] = findExpenseById(chunk.expenses, expenseId);
+  const expense = requireAvailable(
+    useView(ExpenseEditorView, client.ref<ExpenseEntity>("Expense", expenseId, ExpenseEditorView)),
+  );
 
   async function onUpdateExpense(expense: Expense) {
-    const result = await updateExpense(expense);
+    const result = await mutationResult(
+      client.mutations.party.updateExpense({
+        input: { partyId, parameters: [expense] },
+      }),
+    );
+
     trackEvent("expense_updated");
 
     return result;
   }
 
   function onChangeExpense(patches: DiffResult[]) {
-    handle.change((chunk) => {
-      const entry = chunk.expenses.find((e) => e.id === expenseId);
-
-      if (!entry) {
-        return;
-      }
-
-      const editCopy = getOrCreateExpenseEditCopy(entry);
-      patchMutate(editCopy, patches);
-      editCopy.__hash = calculateExpenseHash(editCopy);
-      entry.__editCopyLastUpdatedAt = new Date();
-    });
-  }
-
-  function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
-    let prevHash = expense ? getExpenseEditHash(expense) : "";
-
-    const handler = (payload: DocHandleChangePayload<PartyExpenseChunk>) => {
-      const [expense] = findExpenseById(payload.doc.expenses, expenseId);
-
-      if (!expense) {
-        return;
-      }
-
-      const currentHash = getExpenseEditHash(expense);
-
-      if (currentHash === prevHash) {
-        return;
-      }
-
-      prevHash = currentHash;
-
-      callback(expense);
-    };
-
-    handle.on("change", handler);
-
-    return () => {
-      handle.off("change", handler);
-    };
+    void mutationResult(client.mutations.expense.editDraft({ input: { expenseId, patches } }));
   }
 
   return {
     partyId,
     expense,
     expenseId,
-    isLoading: handle.inState(["loading"]),
     onChangeExpense,
     onUpdateExpense,
-    subscribeToExpenseChanges,
   };
 }

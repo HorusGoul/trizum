@@ -1,11 +1,15 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { PartyEntity, ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
-import { useParty } from "#src/hooks/useParty.js";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import { usePartyParticipants } from "#src/hooks/usePartyParticipants.js";
+import { getPartyParticipants } from "#src/lib/expenseParticipants.ts";
 import { guardPartyExists } from "#src/lib/guards.js";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
@@ -16,6 +20,23 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
+
+const ProfileJoiningView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  participantInParties: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+});
+
+const PartyMembershipView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  participants: true,
+});
 
 interface WhoSearchParams {
   redirectTo?: string;
@@ -40,10 +61,26 @@ interface WhoFormValues {
 }
 
 function Who() {
+  const profileId = useProfileId();
+
   const params = Route.useParams();
   const search = Route.useSearch();
-  const { party, setParticipantDetails } = useParty(params.partyId);
-  const { partyList, partyListHandle, addPartyToList } = usePartyList();
+  const client = useFateClient();
+
+  const party = requireAvailable(
+    useView(
+      PartyMembershipView,
+      client.ref<PartyEntity>("Party", params.partyId, PartyMembershipView),
+    ),
+  );
+
+  const partyList = requireAvailable(
+    useView(
+      ProfileJoiningView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileJoiningView),
+    ),
+  );
+
   const navigate = useNavigate();
   const partyName = party.name;
 
@@ -53,24 +90,45 @@ function Who() {
       partyList.participantInParties?.[party.id] === undefined,
   );
 
-  function onSaveSettings(values: WhoFormValues) {
+  async function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
     const participantName = participant.name;
-    const currentPartyList = partyListHandle.doc();
+
+    const currentPartyList = client.peekView(
+      ProfileJoiningView,
+      client.ref<ProfileEntity>("Profile", partyList.id, ProfileJoiningView),
+    )!.data;
+
     const previousParticipantId = currentPartyList.participantInParties?.[party.id];
 
     const isJoining =
       currentPartyList.parties[party.id] !== true || previousParticipantId === undefined;
 
-    addPartyToList(party.id, participant.id);
+    await mutationResult(
+      client.mutations.profile.addPartyToList({
+        input: { profileId: partyList.id, parameters: [party.id, participant.id] },
+      }),
+    );
 
     if (isJoining) {
       trackEvent("party_joined");
-      setParticipantDetails(participant.id, {
-        phone: partyList.phone,
-        paymentMethods: partyList.paymentMethods ? { ...partyList.paymentMethods } : undefined,
-        avatarId: partyList.avatarId,
-      });
+      await mutationResult(
+        client.mutations.party.setParticipantDetails({
+          input: {
+            partyId: party.id,
+            parameters: [
+              participant.id,
+              {
+                phone: partyList.phone,
+                paymentMethods: partyList.paymentMethods
+                  ? { ...partyList.paymentMethods }
+                  : undefined,
+                avatarId: partyList.avatarId,
+              },
+            ],
+          },
+        }),
+      );
 
       toast.success(t({ message: `Welcome to the party, ${participantName}!` }));
     } else {
@@ -92,13 +150,13 @@ function Who() {
       participantId: partyList.participantInParties?.[party.id] ?? "",
     },
     onSubmit: ({ value }) => {
-      onSaveSettings(value);
+      return onSaveSettings(value);
     },
   });
 
   const formId = useId();
 
-  const { active: participants } = usePartyParticipants();
+  const { active: participants } = getPartyParticipants(party.participants);
 
   return (
     <div className="flex min-h-full flex-col">

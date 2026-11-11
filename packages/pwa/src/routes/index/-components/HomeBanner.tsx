@@ -1,10 +1,15 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useEffect, useEffectEvent } from "react";
 import { useLocation, useNavigate, useSearch } from "@tanstack/react-router";
 import { Button } from "react-aria-components";
-import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { usePremiumDialogs } from "#src/hooks/usePremiumDialogs.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { useAdProtectedFlow } from "#src/lib/advertising/AdvertisingContext.ts";
@@ -14,8 +19,22 @@ import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { ProfileSetupCard } from "./ProfileSetupCard.tsx";
 
+const ProfileBannerView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  premiumBannerDismissed: true,
+});
+
 export function HomeBanner({ isVisible }: { isVisible: boolean }) {
-  const { partyList, dismissPremiumBanner } = usePartyList();
+  const profileId = useProfileId();
+
+  const client = useFateClient();
+
+  const partyList = requireAvailable(
+    useView(ProfileBannerView, client.ref<ProfileEntity>("Profile", profileId, ProfileBannerView)),
+  );
+
   const navigate = useNavigate();
   const isHome = useLocation({ select: (location) => location.pathname === "/" });
   const resumePremium = useSearch({ strict: false, select: (search) => search.premium });
@@ -82,8 +101,12 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
               <IconButton
                 icon="lucide.x"
                 aria-label={t`Dismiss Premium banner`}
-                onPress={() => {
-                  dismissPremiumBanner();
+                onPress={async () => {
+                  await mutationResult(
+                    client.mutations.profile.dismissPremiumBanner({
+                      input: { profileId: partyList.id, parameters: [] },
+                    }),
+                  );
                   trackEvent("premium_banner_dismissed");
                 }}
                 isDisabled={dialogs.dialog.kind !== "closed"}

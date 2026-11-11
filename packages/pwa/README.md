@@ -6,6 +6,7 @@ The main React application, with offline-first Automerge state and a Cloudflare 
 
 - [Routes](./src/routes), [design system](../ui/README.md), and [app components](./src/components).
 - [Business logic](./src/lib) and [domain models](./src/models).
+- **Change the experimental data layer:** [Fate data access](./docs/fate-data.md).
 - [Package tasks](./vite.config.ts) and [scripts](./package.json).
 - **Change UI or client state:** [PWA conventions](../../docs/agents/pwa.md).
 - **Change HTTP routes or clients:** [First-party API](./docs/api.md).

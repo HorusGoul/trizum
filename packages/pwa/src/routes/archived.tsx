@@ -1,3 +1,10 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { PartyCardView } from "#src/components/PartyListCard.view.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -5,21 +12,39 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "react-aria-components";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
-import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import type { PartyList } from "#src/models/partyList.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
+import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import type { PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
 import { Icon } from "@trizum/ui/Icon";
 import { cn } from "@trizum/ui/utils";
+
+const PartyPrefetchView = view<PartyEntity>()({ id: true, available: true });
+
+const ProfileHomeView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+});
 
 export const Route = createFileRoute("/archived")({
   component: ArchivedParties,
 });
 
 function ArchivedParties() {
-  const { partyList, setPartyArchived } = usePartyList();
+  const profileId = useProfileId();
+
+  const client = useFateClient();
+
+  const partyList = requireAvailable(
+    useView(ProfileHomeView, client.ref<ProfileEntity>("Profile", profileId, ProfileHomeView)),
+  );
+
   const archivedPartyIds = useArchivedPartyIds(partyList);
 
   return (
@@ -40,8 +65,12 @@ function ArchivedParties() {
                 key: "restore",
                 icon: "lucide.archive-restore",
                 label: <Trans>Restore to home</Trans>,
-                onAction: () => {
-                  setPartyArchived(partyId, false);
+                onAction: async () => {
+                  await mutationResult(
+                    client.mutations.profile.setPartyArchived({
+                      input: { profileId: partyList.id, parameters: [partyId, false] },
+                    }),
+                  );
                   trackEvent("party_restored");
                   toast.success(t`Party restored to home`);
                 },
@@ -52,7 +81,7 @@ function ArchivedParties() {
               <PartyListCard
                 actions={actions}
                 key={partyId}
-                partyId={partyId}
+                partyRef={client.ref<PartyEntity>("Party", partyId, PartyCardView)}
                 isArchived={true}
                 currentParticipantId={partyList.participantInParties[partyId] ?? null}
               />
@@ -66,12 +95,15 @@ function ArchivedParties() {
   );
 }
 
-function useArchivedPartyIds(partyList: PartyList) {
-  const repo = useRepo();
+function useArchivedPartyIds(partyList: OrderedProfile) {
+  const client = useFateClient();
   const { archivedPartyIds } = getOrderedPartySections(partyList);
 
   for (const partyId of archivedPartyIds) {
-    documentCache.prefetch(repo, partyId);
+    void client.readView(
+      PartyPrefetchView,
+      client.ref<PartyEntity>("Party", partyId, PartyPrefetchView),
+    );
   }
 
   return archivedPartyIds;

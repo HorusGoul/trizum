@@ -1,3 +1,9 @@
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
@@ -8,11 +14,8 @@ import { useReducer } from "react";
 import { toast } from "sonner";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
-import {
-  type EligibleDebtTransferParty,
-  useEligibleDebtTransferParties,
-} from "#src/hooks/useEligibleDebtTransferParties.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { useEligibleDebtTransferParties } from "#src/hooks/useEligibleDebtTransferParties.ts";
+import type { EligibleDebtTransferParty } from "#src/hooks/useEligibleDebtTransferParties.ts";
 import { getDebtTransferParticipantMatch } from "#src/lib/debtTransfer.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import type { PartyParticipant } from "#src/models/party.ts";
@@ -26,6 +29,16 @@ import { TransferDebtLayout } from "./-components/TransferDebtLayout.js";
 import { TransferReviewCard } from "./-components/TransferReviewCard.js";
 import { TransferSuccessState } from "./-components/TransferSuccessState.js";
 import type { DestinationPartyOption } from "./-components/types.js";
+
+const PartyTransferView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  symbol: true,
+  description: true,
+  name: true,
+  currency: true,
+  participants: true,
+});
 
 interface TransferDebtSearchParams {
   fromId: string;
@@ -244,8 +257,15 @@ function RouteComponent() {
 }
 
 function useTransferDebtRouteView() {
+  const partyId = useCurrentPartyId();
+
   const { fromId, toId, amount } = Route.useSearch();
-  const { party, transferDebtToParty } = useCurrentParty();
+  const client = useFateClient();
+
+  const party = requireAvailable(
+    useView(PartyTransferView, client.ref<PartyEntity>("Party", partyId, PartyTransferView)),
+  );
+
   const currentParticipant = useCurrentParticipant();
   const eligibleDestinationParties = useEligibleDebtTransferParties();
   const navigate = useNavigate();
@@ -376,17 +396,26 @@ function useTransferDebtRouteView() {
     try {
       dispatch({ type: "submitStarted" });
 
-      const { originExpense } = await transferDebtToParty({
-        destinationPartyId: selectedDestinationParty.entry.party.id,
-        originDebtorId: fromId,
-        originCreditorId: toId,
-        destinationDebtorId: selectedDestinationParty.currentParticipant.id,
-        destinationCreditorId: selectedDestinationCounterparty.id,
-        amount,
-        paidAt: new Date(),
-        originExpenseName: t`Debt transfer to another party`,
-        destinationExpenseName: t`Debt transfer from another party`,
-      });
+      const { originExpense } = await mutationResult(
+        client.mutations.party.transferDebtToParty({
+          input: {
+            partyId: party.id,
+            parameters: [
+              {
+                destinationPartyId: selectedDestinationParty.entry.party.id,
+                originDebtorId: fromId,
+                originCreditorId: toId,
+                destinationDebtorId: selectedDestinationParty.currentParticipant.id,
+                destinationCreditorId: selectedDestinationCounterparty.id,
+                amount,
+                paidAt: new Date(),
+                originExpenseName: t`Debt transfer to another party`,
+                destinationExpenseName: t`Debt transfer from another party`,
+              },
+            ],
+          },
+        }),
+      );
 
       trackEvent("debt_transferred");
       dispatch({ type: "submitSucceeded" });

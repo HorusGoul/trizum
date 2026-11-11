@@ -1,7 +1,17 @@
+import { useFateClient, useView } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
 import { Suspense } from "react";
-import { useMediaFile } from "#src/hooks/useMediaFile.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "@trizum/ui/Avatar";
+
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
 
 export function TransferParticipantAvatar({
   participant,
@@ -34,7 +44,13 @@ function TransferParticipantAvatarImage({
   name: string;
   className?: string;
 }) {
-  const { url } = useMediaFile(avatarId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", avatarId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return <Avatar className={className} name={name} url={url} />;
 }

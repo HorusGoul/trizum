@@ -4,6 +4,11 @@ import type { PartyList } from "#src/models/partyList.js";
 
 type PartyId = Party["id"];
 
+export type OrderedProfile = Pick<
+  PartyList,
+  "parties" | "pinnedParties" | "archivedParties" | "lastUsedAt" | "lastOpenedPartyId"
+>;
+
 interface OrderedPartySections {
   activePartyIds: PartyId[];
   archivedPartyIds: PartyId[];
@@ -12,7 +17,7 @@ interface OrderedPartySections {
   pinnedActiveCount: number;
 }
 
-export function getOrderedPartySections(partyList: PartyList): OrderedPartySections {
+export function getOrderedPartySections(partyList: OrderedProfile): OrderedPartySections {
   const partyIds = Object.keys(partyList.parties).filter(isValidDocumentId);
   const insertionOrder = new Map(partyIds.map((partyId, index) => [partyId, index]));
 
@@ -67,15 +72,15 @@ export function getOrderedPartySections(partyList: PartyList): OrderedPartySecti
   };
 }
 
-export function isPartyPinned(partyList: PartyList, partyId: PartyId) {
+export function isPartyPinned(partyList: OrderedProfile, partyId: PartyId) {
   return partyList.pinnedParties?.[partyId] === true;
 }
 
-export function isPartyArchived(partyList: PartyList, partyId: PartyId) {
+export function isPartyArchived(partyList: OrderedProfile, partyId: PartyId) {
   return partyList.archivedParties?.[partyId] === true;
 }
 
-export function getPartyLastUsedAt(partyList: PartyList, partyId: PartyId) {
+export function getPartyLastUsedAt(partyList: OrderedProfile, partyId: PartyId) {
   if (partyList.lastUsedAt?.[partyId] !== undefined) {
     return partyList.lastUsedAt[partyId] ?? 0;
   }

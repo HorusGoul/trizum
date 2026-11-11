@@ -1,33 +1,37 @@
-import { optionalNonemptySearchTextSchema } from "./lib/routerSearch.ts";
-import type {} from "./lib/testing/browserHarnessApi.ts";
-import * as ReactDOM from "react-dom/client";
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView, FateClient } from "react-fate";
+import { view } from "@nkzw/fate";
+import { getBrowserLocale, setLocale } from "./lib/i18n.ts";
+import { setThemeHue, defaultThemeHue } from "@trizum/ui/theme";
+import {
+  optionalNonemptySearchTextSchema,
+  parseAppSearch,
+  stringifyAppSearch,
+} from "./lib/routerSearch.ts";
+import type { AppSearch } from "./lib/routerSearch.ts";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { createRecoveringStorage } from "./lib/recoveringStorage.ts";
-import {
-  RouterProvider,
-  createBrowserHistory,
-  createRouter,
-  type NavigateOptions,
-  type ParsedLocation,
-  type ToOptions,
-  type RegisteredRouter,
+import { RouterProvider, createBrowserHistory, createRouter } from "@tanstack/react-router";
+import type {
+  NavigateOptions,
+  ParsedLocation,
+  ToOptions,
+  RegisteredRouter,
 } from "@tanstack/react-router";
-import { parseAppSearch, stringifyAppSearch, type AppSearch } from "./lib/routerSearch.ts";
-import { initializeAnalytics, bindAnalytics, trackPage } from "./lib/analytics.ts";
+import { initializeAnalytics, trackPage } from "./lib/analytics.ts";
 import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
-import "./index.css";
 import { I18nProvider } from "@lingui/react";
 import { PwaUIProvider } from "./components/PwaUIProvider.js";
 import { Toaster } from "@trizum/ui/Toaster";
 import { initializeI18n } from "./lib/i18n.js";
-// Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "@trizum/ui/MediaGalleryController";
-import { usePartyList } from "./hooks/usePartyList.ts";
-import { RepoContext } from "./lib/automerge/RepoContext.ts";
+import { getAppData } from "./lib/data/client.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
@@ -35,7 +39,6 @@ import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx"
 import { PremiumProvider } from "./components/PremiumProvider.tsx";
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
-import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { sentryDocumentIdRedaction, sentryLoggerConfig } from "@trizum/logging/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
@@ -48,14 +51,28 @@ import {
   pushHistoryWithoutDuplicateEntry,
   shouldNavigateToPartyListOnNativeBack,
 } from "./lib/navigationHistory.ts";
-import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
+import { createPartyFromMigrationData } from "./models/migration.ts";
+import type { MigrationData } from "./models/migration.ts";
 import type { Party } from "./models/party.ts";
 import {
   createInactivePartyListState,
   readPartyListState,
   seedPartyListState,
-  type InternalPartyListSeed,
 } from "./lib/testing/browserHarness.ts";
+import type { InternalPartyListSeed } from "./lib/testing/browserHarness.ts";
+
+import * as ReactDOM from "react-dom/client";
+
+import "./index.css";
+
+import * as Sentry from "@sentry/react";
+
+const ProfileAppearanceView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  locale: true,
+  hue: true,
+});
 
 const initialUrl = new URL(window.location.href);
 const isProduction = import.meta.env.MODE === "production";
@@ -230,6 +247,8 @@ window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
   return appWorker.recalculateBalances(partyId);
 };
 
+const data = getAppData(repo);
+
 // Create a new router instance
 const history = preventDuplicateHistoryEntries(createBrowserHistory());
 
@@ -238,12 +257,14 @@ const router = createRouter({
   stringifySearch: stringifyAppSearch,
   routeTree,
   history,
-  context: { repo },
+  context: { client: data.fate },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
 
 initializeAnalytics(Object.values(router.routesById).map((route) => route.fullPath));
+
+data.bindAnalytics(() => router.state.location.pathname);
 
 router.subscribe("onResolved", () => trackPage(router.state.location.pathname));
 
@@ -322,14 +343,14 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <PwaUIProvider>
         <UpdateControllerComponent>
-          <RepoContext value={repo}>
+          <FateClient client={data.fate}>
             <MediaGalleryController>
               <PremiumProvider>
                 <RouterProvider router={router} InnerWrap={InnerWrap} />
               </PremiumProvider>
               <Toaster />
             </MediaGalleryController>
-          </RepoContext>
+          </FateClient>
         </UpdateControllerComponent>
       </PwaUIProvider>
     </I18nProvider>,
@@ -337,13 +358,24 @@ if (!rootElement.innerHTML) {
 }
 
 function InnerWrap({ children }: { children: React.ReactNode }) {
+  const client = useFateClient();
+  const profileId = useProfileId();
+
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
-  const { partyListHandle } = usePartyList();
+  const partyList = requireAvailable(
+    useView(
+      ProfileAppearanceView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileAppearanceView),
+    ),
+  );
 
   useEffect(() => {
-    return bindAnalytics(partyListHandle, () => router.state.location.pathname);
-  }, [partyListHandle]);
+    setLocale(partyList.locale ?? getBrowserLocale());
+  }, [partyList.locale]);
+  useEffect(() => {
+    setThemeHue(partyList.hue ?? defaultThemeHue);
+  }, [partyList.hue]);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {

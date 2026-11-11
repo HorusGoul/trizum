@@ -1,5 +1,7 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import type { BalancesSortedBy } from "#src/models/party.ts";
-import { useCurrentParty } from "./useParty";
+import { useCurrentPartyId } from "./useCurrentPartyId.ts";
 import { useCurrentParticipant } from "./useCurrentParticipant";
 
 const defaultBalancesSortedBy: BalancesSortedBy = "name";
@@ -9,7 +11,8 @@ function isBalanceSortedBy(sortedBy: string): sortedBy is BalancesSortedBy {
 }
 
 export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSortedBy) => void] {
-  const { setParticipantDetails } = useCurrentParty();
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
   const participant = useCurrentParticipant();
 
   const sortedBy =
@@ -17,10 +20,20 @@ export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSorte
       ? participant.balancesSortedBy
       : defaultBalancesSortedBy;
 
-  function setter(sortedBy: BalancesSortedBy) {
-    setParticipantDetails(participant.id, {
-      balancesSortedBy: sortedBy,
-    });
+  async function setter(sortedBy: BalancesSortedBy) {
+    await mutationResult(
+      client.mutations.party.setParticipantDetails({
+        input: {
+          partyId,
+          parameters: [
+            participant.id,
+            {
+              balancesSortedBy: sortedBy,
+            },
+          ],
+        },
+      }),
+    );
   }
 
   return [sortedBy, setter];

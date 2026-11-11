@@ -1,11 +1,15 @@
+import { useViews, useFateClient, useView } from "react-fate";
+import { requireAvailableList, requireAvailable } from "#src/lib/data/availability.ts";
+import type { ExpenseHistoryEntity, ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { Button as AriaButton, MenuTrigger, Popover } from "react-aria-components";
 import { useState } from "react";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
-import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
-import { useCurrentParty } from "#src/hooks/useParty.js";
 import {
   BLANK_EXPENSE_TEMPLATE_SYMBOL,
   shouldOpenExpenseTemplatePicker,
@@ -23,10 +27,53 @@ import {
 } from "@trizum/ui/ModalSheet";
 import { cn } from "@trizum/ui/utils";
 import { VirtualizedExpenseList } from "./VirtualizedExpenseList.js";
+import { trackEvent } from "#src/lib/analytics.ts";
+
+const HistoryView = view<ExpenseHistoryEntity>()({
+  expenseIds: true,
+  hasNext: true,
+  isLoadingNext: true,
+});
+
+const ExpenseDetailView = view<ExpenseEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  paidAt: true,
+  paidBy: true,
+  shares: true,
+  photos: true,
+  isTransfer: true,
+  __hash: true,
+});
 
 export function ExpenseLog() {
-  const { party, dev, setParticipantDetails } = useCurrentParty();
-  const { expenses, hasNext, isLoadingNext, loadNext } = usePartyPaginatedExpenses(party.id);
+  const partyId = useCurrentPartyId();
+
+  const client = useFateClient();
+
+  const party = requireAvailable(
+    useView(PartyTemplatesView, client.ref<PartyEntity>("Party", partyId, PartyTemplatesView)),
+  );
+
+  const page = useView(
+    HistoryView,
+    client.ref<ExpenseHistoryEntity>("ExpenseHistory", party.id, HistoryView),
+  );
+
+  const { hasNext, isLoadingNext } = page;
+
+  const expenses = requireAvailableList(
+    useViews(
+      ExpenseDetailView,
+      page.expenseIds.map((id) => client.ref<ExpenseEntity>("Expense", id, ExpenseDetailView)),
+    ),
+  );
+
+  function loadNext() {
+    void mutationResult(client.mutations.expenseHistory.loadNext({ input: { partyId: party.id } }));
+  }
+
   const participant = useCurrentParticipant();
   const navigate = useNavigate();
   const [isAddExpenseSheetOpen, setIsAddExpenseSheetOpen] = useState(false);
@@ -74,10 +121,20 @@ export function ExpenseLog() {
     openExpenseEditor(hasDefaultTemplate ? defaultTemplateId : fallbackTemplateId);
   }
 
-  function toggleAlwaysUseDefaultTemplate() {
-    setParticipantDetails(participant.id, {
-      alwaysUseDefaultExpenseTemplate: !participant.alwaysUseDefaultExpenseTemplate,
-    });
+  async function toggleAlwaysUseDefaultTemplate() {
+    await mutationResult(
+      client.mutations.party.setParticipantDetails({
+        input: {
+          partyId: party.id,
+          parameters: [
+            participant.id,
+            {
+              alwaysUseDefaultExpenseTemplate: !participant.alwaysUseDefaultExpenseTemplate,
+            },
+          ],
+        },
+      }),
+    );
     trackEvent(
       participant.alwaysUseDefaultExpenseTemplate
         ? "expense_template_shortcut_disabled"
@@ -180,7 +237,18 @@ export function ExpenseLog() {
                   </MenuItem>
 
                   {import.meta.env.DEV ? (
-                    <MenuItem menuAction={dev.createTestExpenses}>
+                    <MenuItem
+                      menuAction={async () => {
+                        const answer = window.prompt("How many test expenses to create?");
+
+                        if (answer)
+                          await mutationResult(
+                            client.mutations.party.createTestExpenses({
+                              input: { partyId: party.id, count: parseInt(answer) },
+                            }),
+                          );
+                      }}
+                    >
                       <Icon
                         icon="lucide.test-tube-diagonal"
                         width={20}
@@ -262,4 +330,12 @@ function ExpenseTemplateSheetAction({
   );
 }
 
-import { trackEvent } from "#src/lib/analytics.ts";
+const PartyTemplatesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  expenseTemplates: true,
+  defaultExpenseTemplateId: true,
+  onlyUseCustomExpenseTemplates: true,
+});

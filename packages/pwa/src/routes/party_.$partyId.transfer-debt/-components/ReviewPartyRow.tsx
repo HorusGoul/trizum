@@ -8,7 +8,7 @@ export function ReviewPartyRow({
   children,
 }: {
   caption: string;
-  party: Party;
+  party: Pick<Party, "name" | "symbol">;
   children: React.ReactNode;
 }) {
   return (

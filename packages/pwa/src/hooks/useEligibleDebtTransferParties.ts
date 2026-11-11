@@ -1,11 +1,35 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import type { PartyEntity, ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView, useViews } from "react-fate";
+import { view } from "@nkzw/fate";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
-import { useCurrentParty } from "./useParty";
-import { usePartyList } from "./usePartyList";
+
+const ProfileHomeView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+});
+
+const PartyTransferView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  symbol: true,
+  description: true,
+  name: true,
+  currency: true,
+  participants: true,
+});
 
 export interface EligibleDebtTransferParty {
-  party: Party;
+  party: Pick<Party, "id" | "name" | "symbol" | "description" | "currency" | "participants">;
   currentParticipantId: PartyParticipant["id"];
   currentParticipant: PartyParticipant;
   otherParticipants: PartyParticipant[];
@@ -17,7 +41,7 @@ interface EligibleDebtTransferParticipants {
 }
 
 export function getEligibleDebtTransferParticipants(
-  party: Party,
+  party: Pick<Party, "participants">,
   currentParticipantId: PartyParticipant["id"],
 ): EligibleDebtTransferParticipants | null {
   const currentParticipant = party.participants[currentParticipantId];
@@ -41,8 +65,18 @@ export function getEligibleDebtTransferParticipants(
 }
 
 export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
-  const { party: originParty } = useCurrentParty();
-  const { partyList } = usePartyList();
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+  const profileId = useProfileId();
+
+  const originParty = requireAvailable(
+    useView(PartyTransferView, client.ref<PartyEntity>("Party", partyId, PartyTransferView)),
+  );
+
+  const partyList = requireAvailable(
+    useView(ProfileHomeView, client.ref<ProfileEntity>("Profile", profileId, ProfileHomeView)),
+  );
+
   const { activePartyIds } = getOrderedPartySections(partyList);
 
   const joinedActiveParties = activePartyIds.flatMap((partyId) => {
@@ -60,12 +94,15 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
     ];
   });
 
-  const partyEntries = useMultipleSuspenseDocument<Party>(
-    joinedActiveParties.map(({ partyId }) => partyId),
+  const partyEntries = useViews(
+    PartyTransferView,
+    joinedActiveParties.map(({ partyId }) =>
+      client.ref<PartyEntity>("Party", partyId, PartyTransferView),
+    ),
   );
 
-  return partyEntries.flatMap(({ doc }, index) => {
-    if (!doc || doc.currency !== originParty.currency) {
+  return partyEntries.flatMap((doc, index) => {
+    if (!doc.available || doc.currency !== originParty.currency) {
       return [];
     }
 

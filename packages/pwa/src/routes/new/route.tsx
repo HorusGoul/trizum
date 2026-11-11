@@ -1,10 +1,14 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
+import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.js";
+import type { Party, PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "@trizum/ui/IconButton";
-import type { DocumentId } from "@automerge/automerge-repo/slim";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
@@ -18,6 +22,12 @@ import type {
   NewPartyFormValues,
 } from "./-components/types.js";
 
+const ProfileNameView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+});
+
 export const Route = createFileRoute("/new")({
   component: New,
 });
@@ -30,40 +40,45 @@ function createDraftParticipant(name: string): Pick<PartyParticipant, "id" | "na
 }
 
 function New() {
-  const repo = useRepo();
-  const { partyList } = usePartyList();
+  const profileId = useProfileId();
+
+  const client = useFateClient();
+
+  const partyList = requireAvailable(
+    useView(ProfileNameView, client.ref<ProfileEntity>("Profile", profileId, ProfileNameView)),
+  );
+
   const navigate = useNavigate();
   const [initialParticipant] = useState(() => createDraftParticipant(partyList.username));
 
   const currencyOptions = getCurrencyOptions();
 
-  function onCreateParty(values: NewPartyFormValues) {
+  async function onCreateParty(values: NewPartyFormValues) {
     const participants = values.participants.map(({ id, name }) => ({ id, name }));
 
-    // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
-    const handle = repo.create<Party>({
-      id: "" as DocumentId,
-      type: "party",
-      name: values.name,
-      symbol: values.symbol,
-      description: values.description,
-      currency: values.currency,
-      participants: participants.reduce<Party["participants"]>((result, next) => {
-        result[next.id] = {
-          id: next.id,
-          name: next.name,
-        };
+    const partyId = await mutationResult(
+      client.mutations.party.create({
+        input: {
+          name: values.name,
+          symbol: values.symbol,
+          description: values.description,
+          currency: values.currency,
+          participants: participants.reduce<Party["participants"]>((result, next) => {
+            result[next.id] = {
+              id: next.id,
+              name: next.name,
+            };
 
-        return result;
-      }, {}),
-      chunkRefs: [],
-    });
+            return result;
+          }, {}),
+        },
+      }),
+    );
 
-    handle.change((doc) => (doc.id = handle.documentId));
     trackEvent("party_created");
     void navigate({
       to: "/party/$partyId",
-      params: { partyId: handle.documentId },
+      params: { partyId: partyId },
       search: {
         tab: "expenses",
       },
@@ -72,7 +87,7 @@ function New() {
 
     toast.success(t`Party created`);
 
-    return handle.documentId;
+    return partyId;
   }
 
   const defaultValues: NewPartyFormValues = {
@@ -86,7 +101,7 @@ function New() {
   const form = useForm({
     defaultValues,
     onSubmit: ({ value }) => {
-      onCreateParty(value);
+      return onCreateParty(value);
     },
   });
 

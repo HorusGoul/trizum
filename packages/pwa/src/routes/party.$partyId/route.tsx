@@ -1,3 +1,9 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { PartyEntity, ProfileEntity, ExpenseHistoryEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -7,20 +13,31 @@ import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Icon } from "@trizum/ui/Icon";
-import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
-import { cn } from "@trizum/ui/utils";
 import { toast } from "sonner";
-import { useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "@trizum/ui/AnimatedTabs";
-import { Suspense, useEffect, useRef, type Key } from "react";
+import { Suspense, useEffect, useRef } from "react";
+import type { Key } from "react";
 import { Switch } from "@trizum/ui/Switch";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
-import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.ts";
 import { Balances } from "./-components/Balances.js";
 import { ExpenseLog } from "./-components/ExpenseLog.js";
+
+const ProfileIdentityView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+});
+
+const PartyHeaderView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+});
+
+const HistoryPreloadView = view<ExpenseHistoryEntity>()({ expenseIds: true });
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";
@@ -32,9 +49,9 @@ export const Route = createFileRoute("/party/$partyId")({
   loader: async ({ context, params: { partyId }, location }) => {
     const { party } = await guardParticipatingInParty(partyId, context, location);
 
-    await loadVisiblePartyExpenseChunks(
-      context.repo,
-      party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
+    await context.client.readView(
+      HistoryPreloadView,
+      context.client.ref<ExpenseHistoryEntity>("ExpenseHistory", party.id, HistoryPreloadView),
     );
 
     return;
@@ -47,27 +64,45 @@ export const Route = createFileRoute("/party/$partyId")({
 });
 
 function PartyById() {
+  const profileId = useProfileId();
+
   const params = Route.useParams();
   const { tab: selectedTab } = Route.useSearch();
 
-  const { party, partyId, isLoading, setParticipantDetails, recalculateBalances } = useParty(
-    params.partyId,
+  const client = useFateClient();
+  const partyId = params.partyId;
+
+  const party = requireAvailable(
+    useView(PartyHeaderView, client.ref<PartyEntity>("Party", partyId, PartyHeaderView)),
   );
 
-  const { removeParty } = usePartyList();
+  const partyList = requireAvailable(
+    useView(
+      ProfileIdentityView,
+      client.ref<ProfileEntity>("Profile", profileId, ProfileIdentityView),
+    ),
+  );
+
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
   const [balancesSortedBy, setBalancesSortedBy] = useBalancesSortedBy();
 
-  function changeBalancesSort(value: typeof balancesSortedBy) {
+  async function changeBalancesSort(value: typeof balancesSortedBy) {
     if (value === balancesSortedBy) return;
     setBalancesSortedBy(value);
     trackEvent("balances_sort_changed");
   }
 
   async function refreshBalances() {
-    if (await recalculateBalances()) trackEvent("balances_recalculated");
+    if (
+      await mutationResult(
+        client.mutations.party.recalculateBalances({
+          input: { partyId: party.id, parameters: [] },
+        }),
+      )
+    )
+      trackEvent("balances_recalculated");
   }
 
   async function selectedTabChangeAction(tab: Key) {
@@ -83,7 +118,6 @@ function PartyById() {
       trackEvent(tab === "balances" ? "party_balances_selected" : "party_expenses_selected");
   }
 
-  const { setLastOpenedPartyId } = usePartyList();
   const lastRecordedPartyIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -92,13 +126,21 @@ function PartyById() {
     }
 
     lastRecordedPartyIdRef.current = partyId;
-    setLastOpenedPartyId(partyId);
-  }, [partyId, setLastOpenedPartyId]);
+    void mutationResult(
+      client.mutations.profile.setLastOpenedPartyId({
+        input: { profileId: partyList.id, parameters: [party.id] },
+      }),
+    );
+  }, [client, party.id, partyId, partyList.id]);
 
   async function onLeaveParty() {
     if (!partyId) return;
     await navigate({ to: "/", replace: true });
-    removeParty(partyId);
+    await mutationResult(
+      client.mutations.profile.removeParty({
+        input: { profileId: partyList.id, parameters: [party.id] },
+      }),
+    );
     trackEvent("party_left");
     toast.success(t`You left the party!`);
   }
@@ -107,20 +149,26 @@ function PartyById() {
     return <span>Invalid Party ID</span>;
   }
 
-  if (isLoading) {
-    return null;
-  }
-
   if (party === undefined) {
     return <span>404 bruv</span>;
   }
 
   const participantName = participant.name;
 
-  function onTogglePersonalMode() {
-    setParticipantDetails(participant.id, {
-      personalMode: !participant.personalMode,
-    });
+  async function onTogglePersonalMode() {
+    await mutationResult(
+      client.mutations.party.setParticipantDetails({
+        input: {
+          partyId: party.id,
+          parameters: [
+            participant.id,
+            {
+              personalMode: !participant.personalMode,
+            },
+          ],
+        },
+      }),
+    );
     trackEvent(participant.personalMode ? "personal_mode_disabled" : "personal_mode_enabled");
   }
 

@@ -1,10 +1,14 @@
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useParty } from "#src/hooks/useParty.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import {
   BLANK_EXPENSE_TEMPLATE_SYMBOL,
@@ -18,6 +22,16 @@ import { cn } from "@trizum/ui/utils";
 import { OnlyUseCustomTemplatesSheet } from "./-components/OnlyUseCustomTemplatesSheet.tsx";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.tsx";
 import { PartySettingsSection } from "./-components/PartySettingsSection.tsx";
+
+const PartyTemplatesView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  currency: true,
+  participants: true,
+  expenseTemplates: true,
+  defaultExpenseTemplateId: true,
+  onlyUseCustomExpenseTemplates: true,
+});
 
 export const Route = createFileRoute("/party_/$partyId/settings/expense-templates")({
   component: ExpenseTemplatesSettings,
@@ -43,12 +57,11 @@ function ExpenseTemplatesSettings() {
   const { partyId } = Route.useParams();
   const { t: translate, i18n } = useLingui();
 
-  const {
-    party,
-    setDefaultExpenseTemplate,
-    setOnlyUseCustomExpenseTemplates,
-    setParticipantDetails,
-  } = useParty(partyId);
+  const client = useFateClient();
+
+  const party = requireAvailable(
+    useView(PartyTemplatesView, client.ref<PartyEntity>("Party", partyId, PartyTemplatesView)),
+  );
 
   const participant = useCurrentParticipant();
   const [isOnlyCustomTemplatesSheetOpen, setIsOnlyCustomTemplatesSheetOpen] = useState(false);
@@ -89,9 +102,13 @@ function ExpenseTemplatesSettings() {
 
   const canAddTemplate = templateCount < MAX_EXPENSE_TEMPLATES;
 
-  function changeOnlyUseCustomTemplates(isSelected: boolean) {
+  async function changeOnlyUseCustomTemplates(isSelected: boolean) {
     if (!isSelected) {
-      setOnlyUseCustomExpenseTemplates(false);
+      await mutationResult(
+        client.mutations.party.setOnlyUseCustomExpenseTemplates({
+          input: { partyId: party.id, parameters: [false] },
+        }),
+      );
       trackEvent("custom_templates_only_disabled");
 
       return;
@@ -104,7 +121,11 @@ function ExpenseTemplatesSettings() {
     }
 
     if (configuredDefaultTemplate) {
-      setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      await mutationResult(
+        client.mutations.party.setOnlyUseCustomExpenseTemplates({
+          input: { partyId: party.id, parameters: [true, firstTemplate.id] },
+        }),
+      );
       trackEvent("custom_templates_only_enabled");
 
       return;
@@ -113,11 +134,15 @@ function ExpenseTemplatesSettings() {
     setIsOnlyCustomTemplatesSheetOpen(true);
   }
 
-  function confirmOnlyUseCustomTemplates() {
+  async function confirmOnlyUseCustomTemplates() {
     const firstTemplate = templates[0];
 
     if (firstTemplate) {
-      setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      await mutationResult(
+        client.mutations.party.setOnlyUseCustomExpenseTemplates({
+          input: { partyId: party.id, parameters: [true, firstTemplate.id] },
+        }),
+      );
       trackEvent("custom_templates_only_enabled");
     }
 
@@ -157,10 +182,20 @@ function ExpenseTemplatesSettings() {
               aria-label={t`Always use default template`}
               aria-describedby={ALWAYS_USE_DEFAULT_TEMPLATE_DESCRIPTION_ID}
               isSelected={participant.alwaysUseDefaultExpenseTemplate ?? false}
-              onChange={(isSelected) => {
-                setParticipantDetails(participant.id, {
-                  alwaysUseDefaultExpenseTemplate: isSelected,
-                });
+              onChange={async (isSelected) => {
+                await mutationResult(
+                  client.mutations.party.setParticipantDetails({
+                    input: {
+                      partyId: party.id,
+                      parameters: [
+                        participant.id,
+                        {
+                          alwaysUseDefaultExpenseTemplate: isSelected,
+                        },
+                      ],
+                    },
+                  }),
+                );
                 trackEvent(
                   isSelected
                     ? "expense_template_shortcut_enabled"
@@ -179,10 +214,15 @@ function ExpenseTemplatesSettings() {
                 label={t`Default template`}
                 items={defaultOptions}
                 selectedKey={selectedDefaultId}
-                onSelectionChange={(key) => {
+                onSelectionChange={async (key) => {
                   const templateId = String(key);
-                  setDefaultExpenseTemplate(
-                    templateId === BLANK_TEMPLATE_ID ? undefined : templateId,
+                  await mutationResult(
+                    client.mutations.party.setDefaultExpenseTemplate({
+                      input: {
+                        partyId: party.id,
+                        parameters: [templateId === BLANK_TEMPLATE_ID ? undefined : templateId],
+                      },
+                    }),
                   );
 
                   if (templateId !== selectedDefaultId)

@@ -1,3 +1,8 @@
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -6,12 +11,19 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Suspense, useEffect, useId, useRef } from "react";
 import { toast } from "sonner";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.js";
-import { useParty } from "#src/hooks/useParty.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.js";
 import { IconButton } from "@trizum/ui/IconButton";
 import { PartySettingsDetailsFields } from "./-components/PartySettingsDetailsFields.js";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";
 import type { PartyDetailsFormValues } from "./-components/types.js";
+
+const PartyDetailsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  name: true,
+  symbol: true,
+  description: true,
+});
 
 export const Route = createFileRoute("/party_/$partyId/settings/details")({
   component: PartyDetailsSettings,
@@ -20,7 +32,11 @@ export const Route = createFileRoute("/party_/$partyId/settings/details")({
 function PartyDetailsSettings() {
   const { partyId } = Route.useParams();
   const router = useRouter();
-  const { party, updateDetails } = useParty(partyId);
+  const client = useFateClient();
+
+  const party = requireAvailable(
+    useView(PartyDetailsView, client.ref<PartyEntity>("Party", partyId, PartyDetailsView)),
+  );
 
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",
@@ -54,7 +70,11 @@ function PartyDetailsSettings() {
       let didSave = false;
 
       try {
-        await updateDetails(value);
+        await mutationResult(
+          client.mutations.party.updateDetails({
+            input: { partyId: party.id, parameters: [value] },
+          }),
+        );
         didSave = true;
       } catch {
         if (canCompleteHere) toast.error(t`Could not save party details. Please try again.`);

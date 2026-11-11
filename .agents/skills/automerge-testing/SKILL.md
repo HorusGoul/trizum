@@ -62,9 +62,9 @@ Extend nearby tests rather than introducing a parallel test harness:
 
 - [Participant form round trip](../../../packages/pwa/src/routes/party_.$partyId.settings/-components/toPartyParticipantRecord.test.ts):
   real FormApi and document writes for absent, empty, and populated nested maps.
-- [Settings propagation](../../../packages/pwa/src/hooks/usePartyList.test.tsx):
+- [Settings propagation](../../../packages/pwa/src/lib/data/profileMutations.test.tsx):
   real source/destination documents and assertions on the destination state.
-- [Party mutation tests](../../../packages/pwa/src/hooks/useParty.test.ts):
+- [Party mutation tests](../../../packages/pwa/src/lib/data/partyCommands.test.ts):
   production mutation helpers and storage reopening for acknowledged saves.
 
 Run the focused regression, then follow

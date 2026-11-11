@@ -1,12 +1,26 @@
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
-import { useCurrentParty } from "#src/hooks/useParty.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
+
+const PartyTransferView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  symbol: true,
+  description: true,
+  name: true,
+  currency: true,
+  participants: true,
+});
 
 interface BalanceActionItemProps {
   fromId: PartyParticipant["id"];
@@ -21,7 +35,13 @@ export function BalanceActionItem({
   amount,
   canTransferDebt = false,
 }: BalanceActionItemProps) {
-  const { party } = useCurrentParty();
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(PartyTransferView, client.ref<PartyEntity>("Party", partyId, PartyTransferView)),
+  );
+
   const me = useCurrentParticipant();
   const from = party.participants[fromId];
   const to = party.participants[toId];

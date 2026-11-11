@@ -1,55 +1,52 @@
+import { useFateClient, useView } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import type { MediaEntity, PartyEntity, ExpensePresenceEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
+import { useCurrentPartyId } from "#src/hooks/useCurrentPartyId.ts";
+import type { ExpensePresenceMessage } from "#src/lib/data/presence.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
-import { useMediaFile } from "#src/hooks/useMediaFile.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
-import {
-  decodeExpenseId,
-  type Expense,
-  type ExpenseParticipantPresence,
-} from "#src/models/expense.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
+import type { Expense, ExpenseParticipantPresence } from "#src/models/expense.ts";
 import type { MediaFile } from "#src/models/media.ts";
-import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
+import type { PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "@trizum/ui/Avatar";
-import { getLogger } from "#src/lib/log.ts";
-import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   arePresenceBubblePositionsEqual,
   getPresenceBubblePosition,
   getPresenceElementIdFromTarget,
-  type PresenceBubblePosition,
 } from "./presencePosition.ts";
+import type { PresenceBubblePosition } from "./presencePosition.ts";
 
-const logger = getLogger("components", "RealtimeExpenseEditorPresence");
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
+
+const PresenceView = view<ExpensePresenceEntity>()({ participants: true });
+
+const PartyParticipantsView = view<PartyEntity>()({
+  id: true,
+  available: true,
+  participants: true,
+});
 
 interface RealtimeExpenseEditorPresenceProps {
   expenseId: Expense["id"];
 }
 
-type ExpensePresenceUpdatePayload = {
-  type: "expense-presence-update";
-  data: ExpenseParticipantPresence & {
-    expenseId: Expense["id"];
-  };
-};
-
-type ExpensePresenceDeletePayload = {
-  type: "expense-presence-delete";
-  data: {
-    participantId: PartyParticipant["id"];
-    expenseId: Expense["id"];
-  };
-};
-
 function broadcastPresenceUpdate({
   expenseId,
-  handle,
+  client,
   lastSentElementIdRef,
   participantId,
   value,
 }: {
   expenseId: Expense["id"];
-  handle: DocHandle<PartyExpenseChunk>;
+  client: AppClient;
   lastSentElementIdRef: React.RefObject<string | null>;
   participantId: PartyParticipant["id"];
   value: Pick<ExpenseParticipantPresence, "elementId"> | null;
@@ -57,7 +54,7 @@ function broadcastPresenceUpdate({
   if (!value) {
     lastSentElementIdRef.current = null;
 
-    const payload: ExpensePresenceDeletePayload = {
+    const payload: ExpensePresenceMessage = {
       type: "expense-presence-delete",
       data: {
         participantId,
@@ -65,14 +62,14 @@ function broadcastPresenceUpdate({
       },
     };
 
-    handle.broadcast(payload);
+    void mutationResult(client.mutations.presence.broadcast({ input: payload }));
 
     return;
   }
 
   lastSentElementIdRef.current = value.elementId;
 
-  const payload: ExpensePresenceUpdatePayload = {
+  const payload: ExpensePresenceMessage = {
     type: "expense-presence-update",
     data: {
       elementId: value.elementId,
@@ -82,38 +79,33 @@ function broadcastPresenceUpdate({
     },
   };
 
-  handle.broadcast(payload);
+  void mutationResult(client.mutations.presence.broadcast({ input: payload }));
 }
 
 export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEditorPresenceProps) {
-  const { chunkId } = decodeExpenseId(expenseId);
+  const client = useFateClient();
 
-  const [, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
+  const presence = useView(
+    PresenceView,
+    client.ref<ExpensePresenceEntity>("ExpensePresence", expenseId, PresenceView),
+  );
 
   const participant = useCurrentParticipant();
   const overlayRef = useRef<HTMLDivElement>(null);
   const presenceElementIdRef = useRef<string | null>(null);
-  const [visiblePresence, setVisiblePresence] = useState<ExpenseParticipantPresence[]>([]);
+
+  const visiblePresence = presence.participants.filter(
+    (entry) => entry.participantId !== participant.id,
+  );
+
   const lastSentElementIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const stalePresenceCutoff = new Date(Date.now() - 10000);
-
-      setVisiblePresence((currentPresence) =>
-        currentPresence.filter(
-          (participantPresence) =>
-            participantPresence.participantId !== participant.id &&
-            participantPresence.dateTime >= stalePresenceCutoff,
-        ),
-      );
-
       if (lastSentElementIdRef.current) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: lastSentElementIdRef.current },
@@ -124,54 +116,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     return () => {
       clearInterval(interval);
     };
-  }, [expenseId, handle, participant.id]);
-
-  useEffect(() => {
-    const listener = ({ message }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
-      // SAFETY: The ephemeral channel is owned by the expense-presence sender; the following try block checks fields and ignores malformed messages.
-      const payload = message as ExpensePresenceDeletePayload | ExpensePresenceUpdatePayload;
-
-      try {
-        if (payload.data.expenseId !== expenseId) {
-          return;
-        }
-
-        switch (payload.type) {
-          case "expense-presence-delete":
-            setVisiblePresence((currentPresence) =>
-              currentPresence.filter(
-                (participantPresence) =>
-                  participantPresence.participantId !== payload.data.participantId,
-              ),
-            );
-            break;
-          case "expense-presence-update":
-            if (payload.data.participantId === participant.id) {
-              return;
-            }
-
-            setVisiblePresence((currentPresence) => [
-              ...currentPresence.filter(
-                (participantPresence) =>
-                  participantPresence.participantId !== payload.data.participantId,
-              ),
-              payload.data,
-            ]);
-            break;
-        }
-      } catch {
-        logger.error("Failed to handle ephemeral message", { payload });
-
-        return;
-      }
-    };
-
-    handle.on("ephemeral-message", listener);
-
-    return () => {
-      handle.off("ephemeral-message", listener);
-    };
-  }, [handle, expenseId, participant.id]);
+  }, [expenseId, client, participant.id]);
 
   useEffect(() => {
     function updatePresenceFromTarget(target: Element | null, { clearOnMiss = true } = {}) {
@@ -181,7 +126,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (presenceElementId) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: presenceElementId },
@@ -197,7 +142,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
 
       broadcastPresenceUpdate({
         expenseId,
-        handle,
+        client,
         lastSentElementIdRef,
         participantId: participant.id,
         value: null,
@@ -230,7 +175,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (document.visibilityState === "hidden") {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: null,
@@ -244,7 +189,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     function onWindowBlur() {
       broadcastPresenceUpdate({
         expenseId,
-        handle,
+        client,
         lastSentElementIdRef,
         participantId: participant.id,
         value: null,
@@ -260,7 +205,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (presenceElementId) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: presenceElementId },
@@ -276,7 +221,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (presenceElementIdRef.current) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: presenceElementIdRef.current },
@@ -293,7 +238,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       window.removeEventListener("focus", onWindowFocus);
       clearInterval(interval);
     };
-  }, [expenseId, handle, participant.id]);
+  }, [expenseId, client, participant.id]);
 
   return (
     <div ref={overlayRef} className="pointer-events-none absolute inset-0 touch-none">
@@ -313,7 +258,16 @@ function Bubble({
   presence: ExpenseParticipantPresence;
   overlayRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const { party } = useCurrentParty();
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
+
+  const party = requireAvailable(
+    useView(
+      PartyParticipantsView,
+      client.ref<PartyEntity>("Party", partyId, PartyParticipantsView),
+    ),
+  );
+
   const participant = party.participants[presence.participantId];
 
   const [position, setPosition] = useState<{
@@ -396,7 +350,13 @@ function AvatarWithAvatarId({
   top: number;
   left: number;
 }) {
-  const { url } = useMediaFile(avatarId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", avatarId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return <AvatarWrapper url={url} name={name} top={top} left={left} />;
 }

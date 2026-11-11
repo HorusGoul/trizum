@@ -1,3 +1,8 @@
+import { useFateClient, useView } from "react-fate";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import type { MediaEntity } from "#src/lib/data/entities.ts";
+import { view } from "@nkzw/fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -5,8 +10,8 @@ import { Avatar } from "@trizum/ui/Avatar";
 import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
 import { Skeleton } from "@trizum/ui/Skeleton";
-import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.js";
-import { useMediaFile } from "#src/hooks/useMediaFile.js";
+import { getImageUploadErrorMessage } from "#src/lib/data/mediaCommands.ts";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFileObjectUrls.ts";
 import {
   compressionPresets,
   ImageProcessingError,
@@ -25,6 +30,12 @@ import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
 import { TrizumSpinner } from "@trizum/ui/TrizumSpinner";
 
+const MediaPreviewView = view<MediaEntity>()({
+  available: true,
+  encodedBlob: true,
+  metadata: true,
+});
+
 const logger = getLogger("components", "AvatarPicker");
 
 interface AvatarPickerProps {
@@ -37,7 +48,7 @@ interface AvatarPickerProps {
 export function AvatarPicker({ value, name, onChange, className }: AvatarPickerProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const { createMediaFile } = useMediaFileActions();
+  const client = useFateClient();
   const [isUploading, setIsUploading] = useState(false);
 
   async function updateAvatarFromFile(file: File) {
@@ -63,10 +74,10 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
     const toastId = toast.loading(t`Uploading avatar...`);
 
     try {
-      const [mediaFileId] = await createMediaFile(
-        file,
-        { type: "avatar" },
-        compressionPresets.maximum,
+      const [mediaFileId] = await mutationResult(
+        client.mutations.media.create({
+          input: { parameters: [file, { type: "avatar" }, compressionPresets.maximum] },
+        }),
       );
 
       // Pass the media file ID directly
@@ -213,7 +224,13 @@ interface AvatarWithImageProps {
 }
 
 function AvatarWithImage({ avatarId, name }: AvatarWithImageProps) {
-  const { url } = useMediaFile(avatarId);
+  const client = useFateClient();
+
+  const mediaFile = requireAvailable(
+    useView(MediaPreviewView, client.ref<MediaEntity>("Media", avatarId, MediaPreviewView)),
+  );
+
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return <Avatar url={url} name={name} className="h-32 w-32 text-lg" />;
 }

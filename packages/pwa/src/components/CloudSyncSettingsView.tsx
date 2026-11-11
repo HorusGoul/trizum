@@ -1,17 +1,21 @@
+import { useProfileId } from "#src/hooks/useProfileId.ts";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import { requireAvailable } from "#src/lib/data/availability.ts";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import { useEffect, useEffectEvent, useReducer, useRef, type FormEvent } from "react";
+import { useEffect, useEffectEvent, useReducer, useRef } from "react";
+import type { FormEvent } from "react";
 import { AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import { CloudSyncAccountSettings } from "#src/components/CloudSyncAccountSettings.tsx";
-import {
-  CloudSyncSignInForm,
-  type AuthPendingAction,
-} from "#src/components/CloudSyncSignInForm.tsx";
+import { CloudSyncSignInForm } from "#src/components/CloudSyncSignInForm.tsx";
+import type { AuthPendingAction } from "#src/components/CloudSyncSignInForm.tsx";
 import {
   AuthCallbackErrorDialog,
   CloudActionConfirmationDialog,
@@ -19,8 +23,8 @@ import {
   CloudSyncSwitchDialog,
   DeleteAccountDialog,
   SignInSuccessOverlay,
-  type CloudActionDialogType,
 } from "#src/components/CloudSyncDialogs.tsx";
+import type { CloudActionDialogType } from "#src/components/CloudSyncDialogs.tsx";
 import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
 import { clearNativeAuthToken } from "#src/lib/nativeAuthSession.ts";
 import {
@@ -34,9 +38,8 @@ import {
   requestMagicLinkEmail,
   requestPasswordResetEmail,
   signInWithSocialAuthAccount,
-  type AuthSessionUser,
-  type SocialAuthProvider,
 } from "#src/lib/auth-client.ts";
+import type { AuthSessionUser, SocialAuthProvider } from "#src/lib/auth-client.ts";
 import { clearCachedCloudUserSettings } from "#src/lib/cloudSyncSettings.ts";
 import {
   clearCachedCloudAccountState,
@@ -44,10 +47,30 @@ import {
   isPasswordFieldErrorMessage,
 } from "#src/lib/cloudSyncRouteState.ts";
 import { useCloudSyncAccountState } from "#src/hooks/useCloudSyncAccountState.ts";
-import { usePartyList } from "#src/hooks/usePartyList.js";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { Button } from "@trizum/ui/Button";
+
+const ProfileCloudView = view<ProfileEntity>()({
+  id: true,
+  available: true,
+  username: true,
+  phone: true,
+  paymentMethods: true,
+  avatarId: true,
+  locale: true,
+  openLastPartyOnLaunch: true,
+  autoOpenCalculator: true,
+  hue: true,
+  parties: true,
+  pinnedParties: true,
+  archivedParties: true,
+  lastUsedAt: true,
+  lastOpenedPartyId: true,
+  participantInParties: true,
+  type: true,
+  usageAnalyticsEnabled: true,
+});
 
 const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
 const SIGN_IN_SUCCESS_EXIT_ANIMATION_MS = 180;
@@ -237,7 +260,13 @@ export function CloudSyncSettingsView(props: CloudSyncSettingsViewProps) {
 }
 
 function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSettingsViewProps) {
-  const { partyList } = usePartyList();
+  const client = useFateClient();
+  const profileId = useProfileId();
+
+  const partyList = requireAvailable(
+    useView(ProfileCloudView, client.ref<ProfileEntity>("Profile", profileId, ProfileCloudView)),
+  );
+
   const router = useRouter();
   const currentLocation = useLocation();
   const navigate = useNavigate();
