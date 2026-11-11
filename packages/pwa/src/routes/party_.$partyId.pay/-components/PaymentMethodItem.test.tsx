@@ -83,3 +83,24 @@ it("does not turn custom instructions into executable links", async () => {
   expect(container.querySelector("a")).toBeNull();
   expect(container.textContent).toContain("javascript:alert(1)");
 });
+
+it.each<ComponentProps<typeof PaymentMethodItem> & { handle: string }>([
+  { type: "paypal", details: "https://paypal.me/Alice123", handle: "@Alice123" },
+  { type: "revolut", details: "https://revolut.me/alice", handle: "@alice" },
+  { type: "venmo", details: "https://venmo.com/u/alice-smith", handle: "@alice-smith" },
+  { type: "cash-app", details: "https://cash.app/$Alice123", handle: "$Alice123" },
+])(
+  "shows and copies the $type handle while retaining the profile URL",
+  async ({ type, details, handle }) => {
+    await renderMethod({ type, details });
+    const link = container.querySelector("a")!;
+    expect(link.href).toBe(details);
+    expect(link.textContent).toContain(handle);
+    expect(link.textContent).not.toContain("https://");
+    expect(container.querySelector("button")).toBeNull();
+    await act(async () =>
+      link.dispatchEvent(new KeyboardEvent("keydown", { key: "c", ctrlKey: true, bubbles: true })),
+    );
+    expect(writeText).toHaveBeenCalledExactlyOnceWith(handle);
+  },
+);

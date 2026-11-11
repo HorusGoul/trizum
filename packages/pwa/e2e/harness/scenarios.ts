@@ -119,7 +119,7 @@ export function createPaymentPartyFixture() {
           phone: "+34612345678",
           paymentMethods: {
             bizum: "+34612345678",
-            venmo: "@alex",
+            venmo: "https://venmo.com/u/alex",
             "bank-transfer": "Alex\nIBAN: ES00 1234",
             other: "Ask me for Wise",
           },

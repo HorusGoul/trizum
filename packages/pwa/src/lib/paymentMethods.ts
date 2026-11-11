@@ -85,6 +85,17 @@ export function getPaymentLink(type: PaymentMethodType, value: string): string |
   return `https://${profile.host}${profile.prefix}${handle}`;
 }
 
+/** Profile handles shown and copied on Pay; full provider URLs remain the navigation target. */
+export function getPaymentHandle(type: PaymentMethodType, value: string): string | null {
+  const href = getPaymentLink(type, value);
+
+  if (!href) return null;
+
+  const path = new URL(href).pathname;
+
+  return type === "cash-app" ? path.slice(1) : `@${path.slice(path.lastIndexOf("/") + 1)}`;
+}
+
 /** Missing methods means a legacy profile; an explicit empty map means all were removed. */
 export function getPaymentMethods(source: {
   phone?: string;

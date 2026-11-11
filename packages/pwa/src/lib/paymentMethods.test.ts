@@ -1,6 +1,7 @@
 import { i18n } from "@lingui/core";
 import { beforeEach, describe, expect, it } from "vite-plus/test";
 import {
+  getPaymentHandle,
   getPaymentLink,
   getPaymentMethods,
   normalizePaymentMethods,
@@ -114,4 +115,22 @@ it.each([
 it("accepts formatted and legacy Bizum numbers", () => {
   expect(validatePaymentMethod("bizum", "+34 612 345 678")).toBeNull();
   expect(validatePaymentMethod("bizum", "612345678")).toBeNull();
+});
+
+it.each<{ type: PaymentMethodType; value: string; handle: string }>([
+  { type: "paypal", value: "https://paypal.me/Alice123", handle: "@Alice123" },
+  { type: "paypal", value: "paypal.me/Alice123/", handle: "@Alice123" },
+  { type: "revolut", value: "https://revolut.me/alice", handle: "@alice" },
+  { type: "venmo", value: "https://venmo.com/u/alice-smith", handle: "@alice-smith" },
+  { type: "venmo", value: "@alice-smith", handle: "@alice-smith" },
+  { type: "cash-app", value: "https://cash.app/$Alice123", handle: "$Alice123" },
+  { type: "cash-app", value: "$Alice123", handle: "$Alice123" },
+])("extracts a display and copy handle from $type $value", ({ type, value, handle }) => {
+  expect(getPaymentHandle(type, value)).toBe(handle);
+});
+
+it("does not extract handles from unsafe links or free-text methods", () => {
+  expect(getPaymentHandle("paypal", "https://paypal.me.evil.test/alice")).toBeNull();
+  expect(getPaymentHandle("bizum", "612345678")).toBeNull();
+  expect(getPaymentHandle("other", "Send using https://venmo.com/u/alice")).toBeNull();
 });

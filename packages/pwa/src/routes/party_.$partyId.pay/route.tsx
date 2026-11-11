@@ -8,6 +8,7 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
+import { Alert, AlertDescription } from "@trizum/ui/Alert";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { toast } from "sonner";
@@ -52,6 +53,7 @@ function RouteComponent() {
   const toName = to.name;
 
   const methods = getPaymentMethods(to);
+  const hasPaymentDetails = paymentMethodTypes.some((type) => methods[type]?.trim());
 
   function onMarkAsPaid() {
     const expensePromise = addExpenseToParty({
@@ -111,30 +113,37 @@ function RouteComponent() {
           </div>
         </div>
 
-        <h2 className="mt-2 text-base font-semibold">
+        <Button color="accent" className="min-h-12 font-semibold" onPress={onMarkAsPaid}>
+          <Icon icon="lucide.circle-check" width={20} height={20} className="mr-2" />
+          <Trans>Mark as paid</Trans>
+        </Button>
+
+        <h2 className="mt-2 text-xl font-semibold">
           <Trans>How to pay?</Trans>
         </h2>
 
-        <p className="text-accent-700 dark:text-accent-300 -mt-2 text-sm">
-          <Trans>Choose how to pay. Hold a method to copy its details.</Trans>
+        <p className="text-lg">
+          <Trans>Send the money using one of the methods below, then mark this debt as paid.</Trans>
         </p>
 
-        {paymentMethodTypes.map((type) => {
-          const details = methods[type];
+        {hasPaymentDetails ? (
+          <Alert role="note" className="py-2">
+            <Icon icon="lucide.info" />
+            <AlertDescription>
+              <Trans>Hold to copy payment details.</Trans>
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
-          return details?.trim() ? (
-            <PaymentMethodItem key={type} type={type} details={details} />
-          ) : null;
-        })}
-        <CashItem />
-        <div className="border-accent-200 dark:border-accent-800 mt-2 flex flex-col gap-3 border-t pt-5">
-          <p className="text-accent-700 dark:text-accent-300 text-sm">
-            <Trans>Once you have sent the money, mark this debt as paid.</Trans>
-          </p>
-          <Button color="accent" className="min-h-12 font-semibold" onPress={onMarkAsPaid}>
-            <Icon icon="lucide.circle-check" width={20} height={20} className="mr-2" />
-            <Trans>Mark as paid</Trans>
-          </Button>
+        <div className="divide-accent-100 dark:divide-accent-800 divide-y rounded-xl">
+          {paymentMethodTypes.map((type) => {
+            const details = methods[type];
+
+            return details?.trim() ? (
+              <PaymentMethodItem key={type} type={type} details={details} />
+            ) : null;
+          })}
+          <CashItem />
         </div>
       </div>
 

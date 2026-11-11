@@ -7,7 +7,13 @@ test.beforeEach(async ({ page, context }) => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
       value: {
-        writeText: async (value: string) => localStorage.setItem("e2e-payment-copy", value),
+        writeText: async (value: string) => {
+          localStorage.setItem("e2e-payment-copy", value);
+          localStorage.setItem(
+            "e2e-payment-copy-count",
+            String(Number(localStorage.getItem("e2e-payment-copy-count") ?? 0) + 1),
+          );
+        },
       },
     });
   });
@@ -16,7 +22,7 @@ test.beforeEach(async ({ page, context }) => {
   );
 });
 
-test("payment rows open links, copy independently, and cancel opening after a hold", async ({
+test("payment cards open links, copy handles, and cancel opening after a hold", async ({
   page,
   context,
   harness,
@@ -32,14 +38,14 @@ test("payment rows open links, copy independently, and cancel opening after a ho
     `/party/${seeded.partyId}/pay?fromId=${defaultParticipants.blair.id}&toId=${defaultParticipants.alex.id}&amount=3000`,
   );
   const venmo = page.getByRole("link", { name: "Open Venmo", exact: true });
-  const copy = page.getByRole("button", { name: "Copy Venmo details", exact: true });
+  await expect(page.getByRole("button", { name: "Copy Venmo details", exact: true })).toHaveCount(
+    0,
+  );
   await expect(venmo).toHaveAttribute("href", "https://venmo.com/u/alex");
-  await expect(copy).toHaveCSS("opacity", "0");
-  await venmo.hover();
-  await expect(copy).toHaveCSS("opacity", "1");
-  await copy.focus();
-  await expect(copy).toHaveCSS("opacity", "1");
-  await copy.press("Enter");
+  await expect(venmo).toContainText("@alex");
+  await expect(venmo).not.toContainText("https://");
+  await venmo.focus();
+  await venmo.press("ControlOrMeta+c");
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
     .toBe("@alex");
@@ -77,11 +83,37 @@ test("payment rows open links, copy independently, and cancel opening after a ho
   const popup = await popupPromise;
   await expect(popup).toHaveURL("https://venmo.com/u/alex");
   await popup.close();
-  await page.getByRole("button", { name: "Copy Bank transfer details", exact: true }).click();
+  const bankDetails = page.getByRole("button", { name: "Copy Bank transfer details", exact: true });
+  await bankDetails.click();
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
+    .toBe("@alex");
+  await bankDetails.hover();
+  await page.mouse.down();
+  await page.clock.runFor(600);
+  await page.mouse.up();
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
     .toBe("Alex\nIBAN: ES00 1234");
   await expect(page.getByText("Alex\nIBAN: ES00 1234", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Copy Bizum details", exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
+    .toBe("+34612345678");
+  const bizum = page.getByRole("button", { name: "Copy Bizum details", exact: true });
+
+  const beforeHold = await page.evaluate(() =>
+    Number(localStorage.getItem("e2e-payment-copy-count")),
+  );
+
+  await bizum.hover();
+  await page.mouse.down();
+  await page.clock.runFor(600);
+  await page.mouse.up();
+  await bizum.dispatchEvent("click", { bubbles: true, cancelable: true, button: 0, detail: 1 });
+  await expect
+    .poll(() => page.evaluate(() => Number(localStorage.getItem("e2e-payment-copy-count"))))
+    .toBe(beforeHold + 1);
   await expect(
     page.getByRole("region", { name: "Other", exact: true }).getByRole("link"),
   ).toHaveCount(0);
@@ -186,7 +218,7 @@ test("blank payment methods are removed on save without restoring legacy Bizum",
 test.describe("mobile payment settings", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  test("keeps touch copy available and copies a held link without opening it", async ({
+  test("copies a held profile without opening it and opens the profile on tap", async ({
     page,
     context,
     harness,
@@ -201,13 +233,9 @@ test.describe("mobile payment settings", () => {
     await harness.navigate(
       `/party/${seeded.partyId}/pay?fromId=${defaultParticipants.blair.id}&toId=${defaultParticipants.alex.id}&amount=3000`,
     );
-    const copy = page.getByRole("button", { name: "Copy Venmo details", exact: true });
-    await expect(copy).toHaveCSS("opacity", "1");
-    await copy.tap();
-    await expect
-      .poll(() => page.evaluate(() => localStorage.getItem("e2e-payment-copy")))
-      .toBe("@alex");
-    await page.evaluate(() => localStorage.removeItem("e2e-payment-copy"));
+    await expect(page.getByRole("button", { name: "Copy Venmo details", exact: true })).toHaveCount(
+      0,
+    );
     const link = page.getByRole("link", { name: "Open Venmo", exact: true });
     await link.dispatchEvent("pointerdown", {
       pointerType: "touch",

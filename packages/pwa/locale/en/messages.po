@@ -13,8 +13,8 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party_.$partyId.pay/route.tsx:99
-#: src/routes/party_.$partyId.pay/route.tsx:105
+#: src/routes/party_.$partyId.pay/route.tsx:101
+#: src/routes/party_.$partyId.pay/route.tsx:107
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:36
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:42
 msgid "(me)"
@@ -93,7 +93,7 @@ msgstr "{message}"
 msgid "{methodName} actions"
 msgstr "{methodName} actions"
 
-#: src/lib/paymentMethods.ts:138
+#: src/lib/paymentMethods.ts:149
 msgid "{methodName} details must be 1000 characters or fewer."
 msgstr "{methodName} details must be 1000 characters or fewer."
 
@@ -798,7 +798,7 @@ msgstr "Cape Verdean Escudo"
 msgid "Cash App"
 msgstr "Cash App"
 
-#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:9
+#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:15
 msgid "Cash or other ways"
 msgstr "Cash or other ways"
 
@@ -1081,8 +1081,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:103
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:112
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:149
 msgid "Copy {methodName} details"
 msgstr "Copy {methodName} details"
 
@@ -1291,7 +1290,7 @@ msgstr "Debt being moved"
 msgid "Debt settled between {0} and {1}!"
 msgstr "Debt settled between {0} and {1}!"
 
-#: src/routes/party_.$partyId.pay/route.tsx:68
+#: src/routes/party_.$partyId.pay/route.tsx:70
 msgid "Debt settled between {fromName} and {toName}!"
 msgstr "Debt settled between {fromName} and {toName}!"
 
@@ -1533,7 +1532,7 @@ msgstr "Enjoy trizum ad-free"
 msgid "Enter a party link or code to join"
 msgstr "Enter a party link or code to join"
 
-#: src/lib/paymentMethods.ts:112
+#: src/lib/paymentMethods.ts:123
 msgid "Enter a valid $Cashtag or Cash App profile link."
 msgstr "Enter a valid $Cashtag or Cash App profile link."
 
@@ -1541,15 +1540,15 @@ msgstr "Enter a valid $Cashtag or Cash App profile link."
 msgid "Enter a valid Bizum phone number, including the country code."
 msgstr "Enter a valid Bizum phone number, including the country code."
 
-#: src/lib/paymentMethods.ts:129
+#: src/lib/paymentMethods.ts:140
 msgid "Enter a valid Bizum phone number."
 msgstr "Enter a valid Bizum phone number."
 
-#: src/lib/paymentMethods.ts:109
+#: src/lib/paymentMethods.ts:120
 msgid "Enter a valid PayPal.Me username or profile link."
 msgstr "Enter a valid PayPal.Me username or profile link."
 
-#: src/lib/paymentMethods.ts:110
+#: src/lib/paymentMethods.ts:121
 msgid "Enter a valid Revtag or Revolut.me profile link."
 msgstr "Enter a valid Revtag or Revolut.me profile link."
 
@@ -1557,7 +1556,7 @@ msgstr "Enter a valid Revtag or Revolut.me profile link."
 msgid "Enter a valid username or a profile link for this payment service."
 msgstr "Enter a valid username or a profile link for this payment service."
 
-#: src/lib/paymentMethods.ts:111
+#: src/lib/paymentMethods.ts:122
 msgid "Enter a valid Venmo username or profile link."
 msgstr "Enter a valid Venmo username or profile link."
 
@@ -1722,7 +1721,7 @@ msgstr "Failed to load licenses"
 msgid "Failed to load licenses. Please try again later."
 msgstr "Failed to load licenses. Please try again later."
 
-#: src/routes/party_.$partyId.pay/route.tsx:69
+#: src/routes/party_.$partyId.pay/route.tsx:71
 msgid "Failed to mark expense as paid"
 msgstr "Failed to mark expense as paid"
 
@@ -1771,6 +1770,10 @@ msgstr "Finishing sign in"
 msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 msgstr "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:48
+msgid "Follow these instructions to arrange payment."
+msgstr "Follow these instructions to arrange payment."
+
 #: src/components/PremiumCodeRedemption.tsx:117
 msgid "For a custom subscription code, choose a plan and continue to Google Play checkout. Tap the payment method, then Redeem code. Check the offer before confirming."
 msgstr "For a custom subscription code, choose a plan and continue to Google Play checkout. Tap the payment method, then Redeem code. Check the offer before confirming."
@@ -1799,7 +1802,7 @@ msgstr "Gambian Dalasi"
 msgid "Georgian Lari"
 msgstr "Georgian Lari"
 
-#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:12
+#: src/routes/party_.$partyId.pay/-components/CashItem.tsx:18
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 
@@ -1932,6 +1935,10 @@ msgstr "Hold for payment method actions"
 msgid "Hold to copy payment details"
 msgstr "Hold to copy payment details"
 
+#: src/routes/party_.$partyId.pay/route.tsx:133
+msgid "Hold to copy payment details."
+msgstr "Hold to copy payment details."
+
 #: src/routes/index.tsx:360
 msgid "Home"
 msgstr "Home"
@@ -1969,7 +1976,7 @@ msgstr "How Google uses information from partner apps"
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
-#: src/routes/party_.$partyId.pay/route.tsx:115
+#: src/routes/party_.$partyId.pay/route.tsx:122
 msgid "How to pay?"
 msgstr "How to pay?"
 
@@ -2323,13 +2330,13 @@ msgstr "Manage trizum cloud"
 msgid "Manage your cloud account and synced data."
 msgstr "Manage your cloud account and synced data."
 
-#: src/routes/party_.$partyId.pay/route.tsx:91
-#: src/routes/party_.$partyId.pay/route.tsx:136
+#: src/routes/party_.$partyId.pay/route.tsx:93
+#: src/routes/party_.$partyId.pay/route.tsx:118
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Mark as paid"
 msgstr "Mark as paid"
 
-#: src/routes/party_.$partyId.pay/route.tsx:67
+#: src/routes/party_.$partyId.pay/route.tsx:69
 msgid "Marking expense as paid..."
 msgstr "Marking expense as paid..."
 
@@ -2375,7 +2382,7 @@ msgstr "Migration in progress"
 msgid "Migration successful"
 msgstr "Migration successful"
 
-#: src/routes/party_.$partyId.pay/route.tsx:37
+#: src/routes/party_.$partyId.pay/route.tsx:38
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:233
 msgid "Missing search params"
 msgstr "Missing search params"
@@ -2651,6 +2658,10 @@ msgstr "Older parties stay tucked away, not gone"
 msgid "Omani Rial"
 msgstr "Omani Rial"
 
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:89
+msgid "On a keyboard, press Ctrl+C or Command+C to copy."
+msgstr "On a keyboard, press Ctrl+C or Command+C to copy."
+
 #: src/routes/party_.$partyId.pay/route.tsx:132
 msgid "Once you have sent the money, mark this debt as paid."
 msgstr "Once you have sent the money, mark this debt as paid."
@@ -2697,7 +2708,7 @@ msgstr "Only use custom templates?"
 msgid "Only your own debt can be transferred"
 msgstr "Only your own debt can be transferred"
 
-#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:95
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:125
 msgid "Open {methodName}"
 msgstr "Open {methodName}"
 
@@ -2793,7 +2804,7 @@ msgstr "Our infrastructure, sign-in, monitoring, and advertising providers may p
 msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
-#: src/routes/party_.$partyId.pay/route.tsx:102
+#: src/routes/party_.$partyId.pay/route.tsx:104
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:39
 msgid "owes"
 msgstr "owes"
@@ -2816,7 +2827,7 @@ msgstr "Paid by"
 msgid "Paid debt to {0}"
 msgstr "Paid debt to {0}"
 
-#: src/routes/party_.$partyId.pay/route.tsx:58
+#: src/routes/party_.$partyId.pay/route.tsx:60
 msgid "Paid debt to {toName}"
 msgstr "Paid debt to {toName}"
 
@@ -3006,7 +3017,7 @@ msgstr "Password updated"
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 
-#: src/routes/party_.$partyId.pay/route.tsx:91
+#: src/routes/party_.$partyId.pay/route.tsx:93
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Pay"
 msgstr "Pay"
@@ -3490,6 +3501,10 @@ msgstr "Select everyone now and automatically include new participants."
 msgid "Send password link"
 msgstr "Send password link"
 
+#: src/routes/party_.$partyId.pay/route.tsx:126
+msgid "Send the money using one of the methods below, then mark this debt as paid."
+msgstr "Send the money using one of the methods below, then mark this debt as paid."
+
 #: src/routes/support/route.tsx:52
 msgid "Send us an email and we'll get back to you as soon as possible."
 msgstr "Send us an email and we'll get back to you as soon as possible."
@@ -3945,6 +3960,14 @@ msgstr "Tanzanian Shilling"
 msgid "Tap to change"
 msgstr "Tap to change"
 
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:45
+msgid "Tap to copy the phone number and pay through Bizum using your bank app."
+msgstr "Tap to copy the phone number and pay through Bizum using your bank app."
+
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:43
+msgid "Tap to open {methodName} and pay."
+msgstr "Tap to open {methodName} and pay."
+
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:254
 msgid "Template"
 msgstr "Template"
@@ -4000,7 +4023,7 @@ msgstr "Thank you for using trizum. Your feedback helps us improve!"
 msgid "The app works offline too!"
 msgstr "The app works offline too!"
 
-#: src/lib/paymentMethods.ts:123
+#: src/lib/paymentMethods.ts:134
 msgid "The Bizum phone number must be 20 characters or fewer."
 msgstr "The Bizum phone number must be 20 characters or fewer."
 
@@ -4464,6 +4487,10 @@ msgstr "Use personal mode to filter only your expenses."
 #: src/routes/terms/-components/AccountAndUsageTerms.tsx:138
 msgid "Use the Service to store or distribute unlawful or infringing content"
 msgstr "Use the Service to store or distribute unlawful or infringing content"
+
+#: src/routes/party_.$partyId.pay/-components/PaymentMethodItem.tsx:47
+msgid "Use these bank details to make a transfer."
+msgstr "Use these bank details to make a transfer."
 
 #: src/components/CloudSyncDialogs.tsx:52
 #: src/components/CloudSyncDialogs.tsx:62
