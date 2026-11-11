@@ -120,10 +120,10 @@ class CreativeAssets
       record(asset, entry)
       attributes = entry.fetch("attributes")
       state = attributes.fetch("state")
-      @log.call("#{asset_key(asset).join('/')}: #{entry.fetch('id')} #{state}")
+      preview = attributes.dig("previewFrameImage", "state") || {}
+      @log.call("#{asset_key(asset).join('/')}: #{entry.fetch('id')} #{state} (poster=#{preview['state'] || 'unavailable'})")
       raise "Creative processing failed: #{attributes['stateDetails']}" if state == "FAILED"
       raise "Existing upload is incomplete; inspect #{entry.fetch('id')} before retrying" if state == "AWAITING_UPLOAD" && !newly_reserved
-      preview = attributes["previewFrameImage"] || {}
       raise "Poster processing failed: #{preview['errors']}" if asset.fetch("media_type") == "video" && preview["state"] == "FAILED"
       ready = READY_STATES.include?(state) && (asset.fetch("media_type") == "image" || preview["state"] == "COMPLETE")
       if ready
@@ -157,6 +157,7 @@ class CreativeAssets
 
   def record(asset, entry)
     result = asset.slice("locale", "placement_type", "media_type", "sha256", "preview_frame_time_code").merge("id" => entry.fetch("id"), "spec_id" => entry.fetch("attributes")["specId"], "state" => entry.fetch("attributes").fetch("state"))
+    result["preview_frame_state"] = entry.fetch("attributes").dig("previewFrameImage", "state") if asset.fetch("media_type") == "video"
     @result["assets"].reject! { |existing| asset_key(existing) == asset_key(asset) }
     @result["assets"] << result
     save_report

@@ -88,6 +88,7 @@ check_ios() {
     "fastlane/Appfile" \
     "fastlane/Deliverfile" \
     "fastlane/Fastfile" \
+    "fastlane/app_store_release_test.rb" \
     "fastlane/screenshot_sync_test.rb" \
     "fastlane/creative_assets.rb" \
     "fastlane/creative_assets_api_client.rb" \
@@ -95,6 +96,12 @@ check_ios() {
     "fastlane/creative_assets_test.rb" \
     "fastlane/Pluginfile"
   check_ios_podfile
+  start_group "iOS App Store release sequence"
+  (
+    cd "$SCRIPT_DIR/ios/App"
+    bundle exec ruby fastlane/app_store_release_test.rb
+  )
+  end_group
   start_group "iOS screenshot synchronization"
   (
     cd "$SCRIPT_DIR/ios/App"

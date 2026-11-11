@@ -19,8 +19,9 @@ Editable animation, preview, and original search concept source now lives in
 The [generation guide](../../screenshots/docs/creative-assets.md) covers local
 previews, exports, validation, and explicit selection. Generation writes ignored
 drafts. Only `creative:prepare` copies reviewed files into this selected manifest.
-The generic manifest supports header/search PNGs and MP4s; its current entries
-select only the approved header videos.
+The manifest selects the approved header videos and concept A (Shared adventures)
+search images in English and Spanish. The search images retain the original
+concept styling and are 1920 × 1280 RGB PNGs. Other search concepts remain drafts.
 
 `deploy_appstore_full` calls `upload_creative_assets` after `deliver` creates or
 updates the version and before submitting it for review. The lane uses the
@@ -28,6 +29,16 @@ existing API key and the native version number. It validates the approved file
 hashes, discovers compatible image/video specs and mobile groups from Apple's
 current catalog, and requires the selected localizations on that exact editable
 iOS version. It processes every selected asset before changing any placement.
+
+The release first waits for its uploaded build and explicitly attaches it to the
+matching iOS version, even when review submission is disabled. Creative videos
+must also have `previewFrameImage.state.state == "COMPLETE"`; `state` on the
+preview frame is an object, not the status string. Reading it as a string would
+keep an already processed video waiting until the timeout, blocking placement
+and review. Tests exercise Apple's nested response shape, and reports retain
+poster diagnostics.
+The `submit_review` lane can recover an uploaded release by attaching its build
+and selected creatives before submitting, without uploading another binary.
 
 Reference names contain the locale and full content hash, plus the selected
 poster timecode for videos. Identical selections reuse library assets; changing
@@ -56,7 +67,7 @@ is replayed after a timeout or connection failure.
 Merging this integration performs no Apple mutations. The next normal App Store
 release uploads, reviews, and publishes these placements with its app version.
 No standalone submission or automatic deployment is added to the merge workflow.
-Search artwork is supported by the adapter but remains unselected until reviewed. The image/poster PNGs in
+The selected `search.png` files are uploaded as image assets. The header image/poster PNGs in
 the directory are references; Apple generates the video's poster from its
 timecode. A live authenticated API test remains deferred to that release.
 

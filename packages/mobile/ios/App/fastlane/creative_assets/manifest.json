@@ -5,25 +5,43 @@
       "locale": "en-US",
       "path": "en-US/header.mp4",
       "sha256": "bb0c3017899898f7b44298baf5efefa60285a7b3661a404e188115396f330eda",
-      "preview_frame_time_code": "00:00:10:48",
       "placement_type": "PRODUCT_PAGE_HEADER_ASSET",
       "media_type": "video",
       "width": 3840,
       "height": 1646,
       "fps": 60,
-      "duration": 20
+      "duration": 20,
+      "preview_frame_time_code": "00:00:10:48"
     },
     {
       "locale": "es-ES",
       "path": "es-ES/header.mp4",
       "sha256": "fe72fb3595c52e9bccd393582294fd1eb0471c88eba93080552400a1a751caf1",
-      "preview_frame_time_code": "00:00:10:48",
       "placement_type": "PRODUCT_PAGE_HEADER_ASSET",
       "media_type": "video",
       "width": 3840,
       "height": 1646,
       "fps": 60,
-      "duration": 20
+      "duration": 20,
+      "preview_frame_time_code": "00:00:10:48"
+    },
+    {
+      "locale": "en-US",
+      "path": "en-US/search.png",
+      "placement_type": "APP_STORE_SEARCH_RESULTS_ASSET",
+      "media_type": "image",
+      "width": 1920,
+      "height": 1280,
+      "sha256": "5d5b95c26474a798dd7aa35b0e3a9ef29099e257a4091e0c5812d76e81f94202"
+    },
+    {
+      "locale": "es-ES",
+      "path": "es-ES/search.png",
+      "placement_type": "APP_STORE_SEARCH_RESULTS_ASSET",
+      "media_type": "image",
+      "width": 1920,
+      "height": 1280,
+      "sha256": "ea311dc1707a3aeb3a64ffbf3f066fde6fccabd1e65db7ee7e0ef82daf02e601"
     }
   ]
 }
