@@ -145,22 +145,7 @@ export function createAppData(repo: Repo) {
 
             if (!handle) return projection(type, entityId, document(id));
 
-            handles.set(id, handle);
-
-            if (!listeners.has(id)) {
-              retained.set(id, fate.retain({ record: { id, view: RecordView } }));
-              const publish = () => publishDocument(id);
-              handle.on("change", publish);
-
-              const onDelete = () => publishDocument(id, true);
-              handle.on("delete", onDelete);
-              listeners.set(id, () => {
-                handle.off("change", publish);
-                handle.off("delete", onDelete);
-              });
-            }
-
-            publishDocument(id);
+            attachHandle(handle);
 
             return projection(type, entityId, document(id));
           }),
@@ -177,6 +162,34 @@ export function createAppData(repo: Repo) {
       },
     },
   });
+
+  function attachHandle(handle: DocHandle<object>) {
+    const id = handle.documentId;
+    handles.set(id, handle);
+
+    if (!listeners.has(id)) {
+      retained.set(id, fate.retain({ record: { id, view: RecordView } }));
+      const publish = () => publishDocument(id);
+      const onDelete = () => publishDocument(id, true);
+      handle.on("change", publish);
+      handle.on("delete", onDelete);
+      listeners.set(id, () => {
+        handle.off("change", publish);
+        handle.off("delete", onDelete);
+      });
+    }
+
+    publishDocument(id);
+  }
+
+  function hydrateLocal(id: string) {
+    if (disposed) throw new Error("Data client disposed");
+
+    if (!isValidDocumentId(id)) return;
+    const handle = handles.get(id) ?? repo.handles[id];
+
+    if (handle?.isReady()) attachHandle(handle);
+  }
 
   function document(id: string): SourceDocument | undefined {
     const handle = handles.get(id);
@@ -264,11 +277,20 @@ export function createAppData(repo: Repo) {
     id: string,
     selected: View<Model, Selection<Model>>,
   ) {
-    return fate.ref<Model>(type, id, selected);
+    const result = fate.ref<Model>(type, id, selected);
+    const sourceId = type === "Expense" ? decodeExpenseId(id).chunkId : id;
+
+    if (!handles.has(sourceId) || !fate.peekView(selected, result)) hydrateLocal(sourceId);
+
+    return result;
   }
 
   function ref(id: string) {
-    return fate.ref<RecordSnapshot>("RecordSnapshot", id, RecordView);
+    const result = fate.ref<RecordSnapshot>("RecordSnapshot", id, RecordView);
+
+    if (!handles.has(id) || !fate.peekView(RecordView, result)) hydrateLocal(id);
+
+    return result;
   }
 
   async function read<T>(id: string): Promise<T | undefined> {
@@ -279,9 +301,11 @@ export function createAppData(repo: Repo) {
     return (result.data.value ?? undefined) as T | undefined;
   }
 
+  // Observe acquired records without loading another expense page.
   function peek<T>(id: string): T | undefined {
     // SAFETY: Domain callers select the model matching this opaque record ID.
-    return (fate.peekView(RecordView, ref(id))?.data.value ?? undefined) as T | undefined;
+    return (fate.peekView(RecordView, fate.ref<RecordSnapshot>("RecordSnapshot", id, RecordView))
+      ?.data.value ?? undefined) as T | undefined;
   }
 
   function subscribe(id: string, listener: () => void) {

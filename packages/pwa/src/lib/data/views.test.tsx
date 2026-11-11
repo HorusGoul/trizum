@@ -6,6 +6,7 @@ import type { ExpenseEntity, ExpenseChunkEntity, PartyEntity, ProfileEntity } fr
 import { Repo } from "@automerge/automerge-repo";
 import { act, Suspense } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { flushSync } from "react-dom";
 import { useView } from "react-fate";
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import type { Party, PartyExpenseChunk } from "#src/models/party.ts";
@@ -131,6 +132,59 @@ async function mount(children: React.ReactNode) {
     );
   });
 }
+
+test("cold and evicted Fate caches render a ready local party without entering Suspense", async () => {
+  const handle = party();
+  const coldRef = data.fate.ref<PartyEntity>("Party", handle.documentId, PartyHeaderView);
+  expect(handle.isReady()).toBe(true);
+  expect(data.fate.peekView(PartyHeaderView, coldRef)).toBeUndefined();
+  const find = vi.spyOn(repo, "find");
+  const on = vi.spyOn(handle, "on");
+  const fallback = vi.fn<() => void>();
+
+  function Pending() {
+    fallback();
+
+    return <span>Loading</span>;
+  }
+
+  function Header() {
+    const { party } = useParty(handle.documentId, PartyHeaderView);
+
+    return <span>{party.name}</span>;
+  }
+
+  await act(async () => {
+    flushSync(() => {
+      root.render(
+        <DataProvider data={data}>
+          <Suspense fallback={<Pending />}>
+            <Header />
+          </Suspense>
+        </DataProvider>,
+      );
+    });
+    expect(container.textContent).toBe("Trip");
+  });
+  await act(async () => root.render(null));
+  data.fate.deleteRecord("Party", handle.documentId);
+  expect(data.fate.peekView(PartyHeaderView, coldRef)).toBeUndefined();
+  await act(async () => {
+    flushSync(() => {
+      root.render(
+        <DataProvider data={data}>
+          <Suspense fallback={<Pending />}>
+            <Header />
+          </Suspense>
+        </DataProvider>,
+      );
+    });
+    expect(container.textContent).toBe("Trip");
+  });
+  expect(on.mock.calls.filter(([event]) => event === "change")).toHaveLength(1);
+  expect(fallback).not.toHaveBeenCalled();
+  expect(find).not.toHaveBeenCalled();
+});
 
 test("React party views isolate fields, share a source listener, and clear removed optional fields", async () => {
   const handle = party();

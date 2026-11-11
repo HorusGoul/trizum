@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { view } from "@nkzw/fate";
-import type { PartyEntity } from "./entities.ts";
+import type { PartyEntity, ExpenseEntity } from "./entities.ts";
 
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import {
@@ -148,6 +148,29 @@ test("Fate mutations acknowledge a durable local save and reopen while offline",
     description: "Saved",
     symbol: "🌴",
   });
+  const warmSource = runtime(storage);
+  await warmSource.repo.find<Party>(handle.documentId);
+
+  const coldRef = warmSource.data.fate.ref<PartyEntity>(
+    "Party",
+    handle.documentId,
+    PartyDetailsView,
+  );
+
+  expect(warmSource.data.fate.peekView(PartyDetailsView, coldRef)).toBeUndefined();
+
+  const localRef = warmSource.data.entityRef<PartyEntity>(
+    "Party",
+    handle.documentId,
+    PartyDetailsView,
+  );
+
+  expect(warmSource.data.fate.peekView(PartyDetailsView, localRef)?.data).toMatchObject({
+    available: true,
+    name: "Offline edit",
+    description: "Saved",
+    symbol: "🌴",
+  });
 });
 
 test("deletion clears views and disposal removes source listeners", async () => {
@@ -162,12 +185,13 @@ test("deletion clears views and disposal removes source listeners", async () => 
   expect(off).toHaveBeenCalledWith("delete", expect.any(Function));
 });
 
-test("parallel readers share acquisition and retained history survives Fate collection", async () => {
+test("local readers reuse ready handles and retained history survives Fate collection", async () => {
   const { repo, data } = runtime();
   const handle = party(repo);
+  expect(data.peek(handle.documentId)).toBeUndefined();
   const find = vi.spyOn(repo, "find");
   await Promise.all([data.read(handle.documentId), data.read(handle.documentId)]);
-  expect(find).toHaveBeenCalledTimes(1);
+  expect(find).not.toHaveBeenCalled();
 
   for (let index = 0; index < 12; index++) {
     await data.read(party(repo).documentId);
@@ -206,6 +230,15 @@ test("expense drafts preserve Dates and unchanged nested values through a Fate m
   chunk.change((doc) => {
     doc.id = chunk.documentId;
     doc.expenses.push(expense);
+  });
+  const expenseView = view<ExpenseEntity>()({ available: true, name: true, paidAt: true });
+  const coldRef = data.fate.ref<ExpenseEntity>("Expense", expense.id, expenseView);
+  expect(data.fate.peekView(expenseView, coldRef)).toBeUndefined();
+  const readyRef = data.entityRef<ExpenseEntity>("Expense", expense.id, expenseView);
+  expect(data.fate.peekView(expenseView, readyRef)?.data).toMatchObject({
+    available: true,
+    name: "Lunch",
+    paidAt: new Date("2026-01-02"),
   });
   await data.read(chunk.documentId);
   await data.editExpenseDraft(expense.id, [{ t: 2, p: ["name"], v: "Dinner" }]);

@@ -7,7 +7,9 @@ and synchronization. Existing saved documents and share links keep their format.
 ## Runtime
 
 - [`data/client.ts`](../src/lib/data/client.ts) creates one Fate client per Repo.
-  Its local transport awaits ready handles and publishes immutable snapshots.
+  View references synchronously hydrate a missing Fate projection from an already
+  ready local handle. The transport awaits readiness only when the document must
+  be loaded from storage or obtained from a peer.
   Bounded retries keep a temporary unavailable response from becoming a cached
   missing profile while another peer or deferred import supplies the document.
   Commands update Automerge locally, update Fate through source change events,
@@ -38,8 +40,15 @@ mutation waits for the local command and storage flush, so navigation after a sa
 cannot acknowledge an uncommitted write. There is no additional Fate IndexedDB
 copy or durable remote-mutation queue: Automerge owns offline edits and merges.
 
+A Fate miss or eviction does not require an asynchronous read when Automerge
+already has the document ready in memory: the adapter registers its source listener
+and projects it before React reads the view. Local storage loading remains
+asynchronous and does not require network access. Cache-only `peek` stays
+observational so history pagination still controls which chunks are acquired.
+
 The transport retains each loaded record and its source subscription for the
 application data client's lifetime, matching the previous session cache behavior.
+Retention avoids rebuilding projections; ready local documents remain synchronous even after Fate eviction.
 `dispose()` aborts outstanding reads, releases retained requests, and removes
 source listeners. Reload reconstructs the Fate cache from local Automerge storage.
 Initial expense history still loads one chunk, and further pages load on demand.
@@ -96,7 +105,8 @@ acknowledged save/offline reopen, draft round trips, retained history, deletion,
 and listener cleanup. [`views.test.tsx`](../src/lib/data/views.test.tsx) mounts
 React against real repositories to verify field isolation, shared listeners,
 optional-field removal, normalized expense membership, draft write round trips,
-incoming merges, deletion, and retention. [HTTP adapter tests](../src/lib/data/http.test.ts) cover
+incoming merges, deletion, retention, and immediate rendering from cold or evicted
+Fate caches when the source is ready locally. [HTTP adapter tests](../src/lib/data/http.test.ts) cover
 read sharing, refresh, server errors, and in-flight account isolation. Existing domain,
 account, SDK, and API tests exercise the production implementations behind Fate.
 
