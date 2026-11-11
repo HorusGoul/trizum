@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -30,7 +32,8 @@ export const Route = createFileRoute("/party_/$partyId/settings/details")({
 function PartyDetailsSettings() {
   const { partyId } = Route.useParams();
   const router = useRouter();
-  const { party, updateDetails } = useParty(partyId, PartyDetailsView);
+  const client = useFateClient();
+  const { party } = useParty(partyId, PartyDetailsView);
 
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",
@@ -64,7 +67,11 @@ function PartyDetailsSettings() {
       let didSave = false;
 
       try {
-        await updateDetails(value);
+        await mutationResult(
+          client.mutations.party.updateDetails({
+            input: { partyId: party.id, parameters: [value] },
+          }),
+        );
         didSave = true;
       } catch {
         if (canCompleteHere) toast.error(t`Could not save party details. Please try again.`);

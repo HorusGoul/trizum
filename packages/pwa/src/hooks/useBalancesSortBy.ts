@@ -1,13 +1,8 @@
-import { view } from "@nkzw/fate";
-import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import type { BalancesSortedBy } from "#src/models/party.ts";
-import { useCurrentParty } from "./useParty";
+import { useCurrentPartyId } from "./useParty";
 import { useCurrentParticipant } from "./useCurrentParticipant";
-
-const PartyIdentityView = view<PartyEntity>()({
-  id: true,
-  available: true,
-});
 
 const defaultBalancesSortedBy: BalancesSortedBy = "name";
 
@@ -16,7 +11,8 @@ function isBalanceSortedBy(sortedBy: string): sortedBy is BalancesSortedBy {
 }
 
 export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSortedBy) => void] {
-  const { setParticipantDetails } = useCurrentParty(PartyIdentityView);
+  const client = useFateClient();
+  const partyId = useCurrentPartyId();
   const participant = useCurrentParticipant();
 
   const sortedBy =
@@ -25,9 +21,19 @@ export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSorte
       : defaultBalancesSortedBy;
 
   async function setter(sortedBy: BalancesSortedBy) {
-    await setParticipantDetails(participant.id, {
-      balancesSortedBy: sortedBy,
-    });
+    await mutationResult(
+      client.mutations.party.setParticipantDetails({
+        input: {
+          partyId,
+          parameters: [
+            participant.id,
+            {
+              balancesSortedBy: sortedBy,
+            },
+          ],
+        },
+      }),
+    );
   }
 
   return [sortedBy, setter];

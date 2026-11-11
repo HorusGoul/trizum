@@ -1,3 +1,6 @@
+import { PartyCardView } from "#src/components/PartyListCard.view.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -11,9 +14,11 @@ import { PartyListCard, type PartyListCardAction } from "#src/components/PartyLi
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { OrderedProfile } from "#src/lib/partyListOrdering.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { Icon } from "@trizum/ui/Icon";
 import { cn } from "@trizum/ui/utils";
+
+const PartyPrefetchView = view<PartyEntity>()({ id: true, available: true });
 
 const ProfileHomeView = view<ProfileEntity>()({
   id: true,
@@ -31,7 +36,8 @@ export const Route = createFileRoute("/archived")({
 });
 
 function ArchivedParties() {
-  const { partyList, setPartyArchived } = usePartyList(ProfileHomeView);
+  const client = useFateClient();
+  const { partyList } = usePartyList(ProfileHomeView);
   const archivedPartyIds = useArchivedPartyIds(partyList);
 
   return (
@@ -53,7 +59,11 @@ function ArchivedParties() {
                 icon: "lucide.archive-restore",
                 label: <Trans>Restore to home</Trans>,
                 onAction: async () => {
-                  await setPartyArchived(partyId, false);
+                  await mutationResult(
+                    client.mutations.profile.setPartyArchived({
+                      input: { profileId: partyList.id, parameters: [partyId, false] },
+                    }),
+                  );
                   trackEvent("party_restored");
                   toast.success(t`Party restored to home`);
                 },
@@ -64,7 +74,7 @@ function ArchivedParties() {
               <PartyListCard
                 actions={actions}
                 key={partyId}
-                partyId={partyId}
+                partyRef={client.ref<PartyEntity>("Party", partyId, PartyCardView)}
                 isArchived={true}
                 currentParticipantId={partyList.participantInParties[partyId] ?? null}
               />
@@ -79,11 +89,14 @@ function ArchivedParties() {
 }
 
 function useArchivedPartyIds(partyList: OrderedProfile) {
-  const data = useAppData();
+  const client = useFateClient();
   const { archivedPartyIds } = getOrderedPartySections(partyList);
 
   for (const partyId of archivedPartyIds) {
-    void data.read(partyId);
+    void client.readView(
+      PartyPrefetchView,
+      client.ref<PartyEntity>("Party", partyId, PartyPrefetchView),
+    );
   }
 
   return archivedPartyIds;

@@ -1,6 +1,6 @@
 import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { msg, t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
@@ -1178,11 +1178,11 @@ function CalculatorMobileAttachmentContent({
   const attachmentButtonIdPrefix = useId();
   const pendingAttachmentFocusIndexRef = useRef<number | null>(null);
 
-  const data = useAppData();
+  const client = useFateClient();
 
   const mediaFiles = useRequiredViews(
     MediaContentView,
-    photoIds.map((id) => data.entityRef<MediaEntity>("Media", id, MediaContentView)),
+    photoIds.map((id) => client.ref<MediaEntity>("Media", id, MediaContentView)),
   );
 
   const urls = useMediaFileObjectUrls(mediaFiles);

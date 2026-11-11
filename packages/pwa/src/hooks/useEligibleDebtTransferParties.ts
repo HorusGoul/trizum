@@ -1,6 +1,6 @@
 import { view } from "@nkzw/fate";
 import type { PartyEntity, ProfileEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
 import { useViews } from "react-fate";
@@ -84,12 +84,12 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
     ];
   });
 
-  const data = useAppData();
+  const client = useFateClient();
 
   const partyEntries = useViews(
     PartyTransferView,
     joinedActiveParties.map(({ partyId }) =>
-      data.entityRef<PartyEntity>("Party", partyId, PartyTransferView),
+      client.ref<PartyEntity>("Party", partyId, PartyTransferView),
     ),
   );
 

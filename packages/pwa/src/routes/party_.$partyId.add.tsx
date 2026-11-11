@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import {
@@ -60,7 +62,8 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 });
 
 function AddExpense() {
-  const { party, partyId, addExpenseToParty } = useCurrentParty(PartyTemplatesView);
+  const client = useFateClient();
+  const { party, partyId } = useCurrentParty(PartyTemplatesView);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
@@ -126,13 +129,22 @@ function AddExpense() {
         id: "add-expense",
       });
 
-      const expense = await addExpenseToParty({
-        name: values.name,
-        paidAt: values.paidAt,
-        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-        shares,
-        photos: values.photos,
-      });
+      const expense = await mutationResult(
+        client.mutations.party.addExpenseToParty({
+          input: {
+            partyId: party.id,
+            parameters: [
+              {
+                name: values.name,
+                paidAt: values.paidAt,
+                paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+                shares,
+                photos: values.photos,
+              },
+            ],
+          },
+        }),
+      );
 
       trackEvent("expense_created");
 

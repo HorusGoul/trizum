@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -55,12 +57,8 @@ function ExpenseTemplatesSettings() {
   const { partyId } = Route.useParams();
   const { t: translate, i18n } = useLingui();
 
-  const {
-    party,
-    setDefaultExpenseTemplate,
-    setOnlyUseCustomExpenseTemplates,
-    setParticipantDetails,
-  } = useParty(partyId, PartyTemplatesView);
+  const client = useFateClient();
+  const { party } = useParty(partyId, PartyTemplatesView);
 
   const participant = useCurrentParticipant();
   const [isOnlyCustomTemplatesSheetOpen, setIsOnlyCustomTemplatesSheetOpen] = useState(false);
@@ -103,7 +101,11 @@ function ExpenseTemplatesSettings() {
 
   async function changeOnlyUseCustomTemplates(isSelected: boolean) {
     if (!isSelected) {
-      await setOnlyUseCustomExpenseTemplates(false);
+      await mutationResult(
+        client.mutations.party.setOnlyUseCustomExpenseTemplates({
+          input: { partyId: party.id, parameters: [false] },
+        }),
+      );
       trackEvent("custom_templates_only_disabled");
 
       return;
@@ -116,7 +118,11 @@ function ExpenseTemplatesSettings() {
     }
 
     if (configuredDefaultTemplate) {
-      await setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      await mutationResult(
+        client.mutations.party.setOnlyUseCustomExpenseTemplates({
+          input: { partyId: party.id, parameters: [true, firstTemplate.id] },
+        }),
+      );
       trackEvent("custom_templates_only_enabled");
 
       return;
@@ -129,7 +135,11 @@ function ExpenseTemplatesSettings() {
     const firstTemplate = templates[0];
 
     if (firstTemplate) {
-      await setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      await mutationResult(
+        client.mutations.party.setOnlyUseCustomExpenseTemplates({
+          input: { partyId: party.id, parameters: [true, firstTemplate.id] },
+        }),
+      );
       trackEvent("custom_templates_only_enabled");
     }
 
@@ -170,9 +180,19 @@ function ExpenseTemplatesSettings() {
               aria-describedby={ALWAYS_USE_DEFAULT_TEMPLATE_DESCRIPTION_ID}
               isSelected={participant.alwaysUseDefaultExpenseTemplate ?? false}
               onChange={async (isSelected) => {
-                await setParticipantDetails(participant.id, {
-                  alwaysUseDefaultExpenseTemplate: isSelected,
-                });
+                await mutationResult(
+                  client.mutations.party.setParticipantDetails({
+                    input: {
+                      partyId: party.id,
+                      parameters: [
+                        participant.id,
+                        {
+                          alwaysUseDefaultExpenseTemplate: isSelected,
+                        },
+                      ],
+                    },
+                  }),
+                );
                 trackEvent(
                   isSelected
                     ? "expense_template_shortcut_enabled"
@@ -193,8 +213,13 @@ function ExpenseTemplatesSettings() {
                 selectedKey={selectedDefaultId}
                 onSelectionChange={async (key) => {
                   const templateId = String(key);
-                  await setDefaultExpenseTemplate(
-                    templateId === BLANK_TEMPLATE_ID ? undefined : templateId,
+                  await mutationResult(
+                    client.mutations.party.setDefaultExpenseTemplate({
+                      input: {
+                        partyId: party.id,
+                        parameters: [templateId === BLANK_TEMPLATE_ID ? undefined : templateId],
+                      },
+                    }),
                   );
 
                   if (templateId !== selectedDefaultId)

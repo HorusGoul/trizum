@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { z } from "zod";
@@ -257,7 +259,8 @@ function RouteComponent() {
 
 function useTransferDebtRouteView() {
   const { fromId, toId, amount } = Route.useSearch();
-  const { party, transferDebtToParty } = useCurrentParty(PartyTransferView);
+  const client = useFateClient();
+  const { party } = useCurrentParty(PartyTransferView);
   const currentParticipant = useCurrentParticipant();
   const eligibleDestinationParties = useEligibleDebtTransferParties();
   const navigate = useNavigate();
@@ -388,17 +391,26 @@ function useTransferDebtRouteView() {
     try {
       dispatch({ type: "submitStarted" });
 
-      const { originExpense } = await transferDebtToParty({
-        destinationPartyId: selectedDestinationParty.entry.party.id,
-        originDebtorId: fromId,
-        originCreditorId: toId,
-        destinationDebtorId: selectedDestinationParty.currentParticipant.id,
-        destinationCreditorId: selectedDestinationCounterparty.id,
-        amount,
-        paidAt: new Date(),
-        originExpenseName: t`Debt transfer to another party`,
-        destinationExpenseName: t`Debt transfer from another party`,
-      });
+      const { originExpense } = await mutationResult(
+        client.mutations.party.transferDebtToParty({
+          input: {
+            partyId: party.id,
+            parameters: [
+              {
+                destinationPartyId: selectedDestinationParty.entry.party.id,
+                originDebtorId: fromId,
+                originCreditorId: toId,
+                destinationDebtorId: selectedDestinationParty.currentParticipant.id,
+                destinationCreditorId: selectedDestinationCounterparty.id,
+                amount,
+                paidAt: new Date(),
+                originExpenseName: t`Debt transfer to another party`,
+                destinationExpenseName: t`Debt transfer from another party`,
+              },
+            ],
+          },
+        }),
+      );
 
       trackEvent("debt_transferred");
       dispatch({ type: "submitSucceeded" });

@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 
-import { view } from "@nkzw/fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+
+import { view, toEntityId } from "@nkzw/fate";
 import type { PartyEntity, ExpenseEntity } from "./entities.ts";
 
 import type { PartyExpenseChunk } from "#src/models/party.ts";
@@ -132,16 +134,21 @@ test("Fate mutations acknowledge a durable local save and reopen while offline",
   const first = runtime(storage);
   const handle = party(first.repo);
   await first.data.read<Party>(handle.documentId);
-  await first.data
-    .readyPartyActions(handle.documentId)
-    .updateDetails({ name: "Offline edit", symbol: "🌴", description: "Saved" });
+  await mutationResult(
+    first.data.fate.mutations.party.updateDetails({
+      input: {
+        partyId: handle.documentId,
+        parameters: [{ name: "Offline edit", symbol: "🌴", description: "Saved" }],
+      },
+    }),
+  );
   const reopened = runtime(storage);
   expect(await reopened.data.read<Party>(handle.documentId)).toMatchObject({
     name: "Offline edit",
     description: "Saved",
     symbol: "🌴",
   });
-  const ref = reopened.data.entityRef<PartyEntity>("Party", handle.documentId, PartyDetailsView);
+  const ref = reopened.data.fate.ref<PartyEntity>("Party", handle.documentId, PartyDetailsView);
   expect((await reopened.data.fate.readView(PartyDetailsView, ref)).data).toMatchObject({
     available: true,
     name: "Offline edit",
@@ -151,15 +158,9 @@ test("Fate mutations acknowledge a durable local save and reopen while offline",
   const warmSource = runtime(storage);
   await warmSource.repo.find<Party>(handle.documentId);
 
-  const coldRef = warmSource.data.fate.ref<PartyEntity>(
-    "Party",
-    handle.documentId,
-    PartyDetailsView,
-  );
+  expect(warmSource.data.fate.store.read(toEntityId("Party", handle.documentId))).toBeUndefined();
 
-  expect(warmSource.data.fate.peekView(PartyDetailsView, coldRef)).toBeUndefined();
-
-  const localRef = warmSource.data.entityRef<PartyEntity>(
+  const localRef = warmSource.data.fate.ref<PartyEntity>(
     "Party",
     handle.documentId,
     PartyDetailsView,
@@ -232,16 +233,19 @@ test("expense drafts preserve Dates and unchanged nested values through a Fate m
     doc.expenses.push(expense);
   });
   const expenseView = view<ExpenseEntity>()({ available: true, name: true, paidAt: true });
-  const coldRef = data.fate.ref<ExpenseEntity>("Expense", expense.id, expenseView);
-  expect(data.fate.peekView(expenseView, coldRef)).toBeUndefined();
-  const readyRef = data.entityRef<ExpenseEntity>("Expense", expense.id, expenseView);
+  expect(data.fate.store.read(toEntityId("Expense", expense.id))).toBeUndefined();
+  const readyRef = data.fate.ref<ExpenseEntity>("Expense", expense.id, expenseView);
   expect(data.fate.peekView(expenseView, readyRef)?.data).toMatchObject({
     available: true,
     name: "Lunch",
     paidAt: new Date("2026-01-02"),
   });
   await data.read(chunk.documentId);
-  await data.editExpenseDraft(expense.id, [{ t: 2, p: ["name"], v: "Dinner" }]);
+  await mutationResult(
+    data.fate.mutations.expense.editDraft({
+      input: { expenseId: expense.id, patches: [{ t: 2, p: ["name"], v: "Dinner" }] },
+    }),
+  );
   const saved = chunk.doc().expenses[0];
   expect(saved.__editCopy?.name).toBe("Dinner");
   expect(saved.__editCopy?.paidAt).toEqual(new Date("2026-01-02"));

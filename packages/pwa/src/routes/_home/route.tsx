@@ -1,3 +1,7 @@
+import { PartyCardView } from "#src/components/PartyListCard.view.ts";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
+import type { PartyEntity } from "#src/lib/data/entities.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
@@ -12,7 +16,7 @@ import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrderi
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { Menu, MenuItem } from "@trizum/ui/Menu";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { use } from "react";
@@ -24,6 +28,8 @@ import { NoActivePartiesCard } from "#src/routes/index/-components/NoActiveParti
 import { HomeBanner } from "#src/routes/index/-components/HomeBanner.tsx";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
+
+const PartyPrefetchView = view<PartyEntity>()({ id: true, available: true });
 
 const ProfileHomeView = view<ProfileEntity>()({
   id: true,
@@ -48,7 +54,8 @@ export const Route = createFileRoute("/_home")({
 });
 
 function Home() {
-  const { partyList, setPartyArchived, setPartyPinned } = usePartyList(ProfileHomeView);
+  const client = useFateClient();
+  const { partyList } = usePartyList(ProfileHomeView);
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, isUpdating, checkForUpdate } = use(UpdateContext);
   const session = useAppSession();
@@ -167,10 +174,10 @@ function Home() {
                   const actions = createPartyActions({
                     isPinned: pinned,
                     onTogglePinned: () => {
-                      return togglePartyPinned(partyList, partyId, setPartyPinned);
+                      return togglePartyPinned(partyList, partyId, client);
                     },
                     onArchive: () => {
-                      return archiveParty(partyId, setPartyArchived);
+                      return archiveParty(partyId, partyList.id, client);
                     },
                   });
 
@@ -178,7 +185,7 @@ function Home() {
                     <PartyListCard
                       key={partyId}
                       actions={actions}
-                      partyId={partyId}
+                      partyRef={client.ref<PartyEntity>("Party", partyId, PartyCardView)}
                       isPinned={pinned}
                       currentParticipantId={partyList.participantInParties[partyId] ?? null}
                     />
@@ -235,11 +242,14 @@ function Home() {
 }
 
 function usePartySections(partyList: OrderedProfile) {
-  const data = useAppData();
+  const client = useFateClient();
   const sections = getOrderedPartySections(partyList);
 
   for (const partyId of [...sections.activePartyIds, ...sections.archivedPartyIds]) {
-    void data.read(partyId);
+    void client.readView(
+      PartyPrefetchView,
+      client.ref<PartyEntity>("Party", partyId, PartyPrefetchView),
+    );
   }
 
   return sections;
@@ -271,21 +281,30 @@ function createPartyActions({
 }
 
 async function togglePartyPinned(
-  partyList: OrderedProfile,
+  partyList: OrderedProfile & Pick<ProfileEntity, "id">,
   partyId: Party["id"],
-  setPartyPinned: ReturnType<typeof usePartyList>["setPartyPinned"],
+  client: AppClient,
 ) {
   const currentlyPinned = isPartyPinned(partyList, partyId);
-  await setPartyPinned(partyId, !currentlyPinned);
+  await mutationResult(
+    client.mutations.profile.setPartyPinned({
+      input: { profileId: partyList.id, parameters: [partyId, !currentlyPinned] },
+    }),
+  );
   trackEvent(currentlyPinned ? "party_unpinned" : "party_pinned");
   toast.success(currentlyPinned ? t`Party unpinned` : t`Party pinned`);
 }
 
 async function archiveParty(
   partyId: Party["id"],
-  setPartyArchived: ReturnType<typeof usePartyList>["setPartyArchived"],
+  profileId: ProfileEntity["id"],
+  client: AppClient,
 ) {
-  await setPartyArchived(partyId, true);
+  await mutationResult(
+    client.mutations.profile.setPartyArchived({
+      input: { profileId, parameters: [partyId, true] },
+    }),
+  );
   trackEvent("party_archived");
   toast.success(t`Party archived`);
 }

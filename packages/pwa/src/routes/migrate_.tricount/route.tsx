@@ -1,14 +1,19 @@
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useState, useId } from "react";
+import { useFateClient, useView } from "react-fate";
+import { view } from "@nkzw/fate";
+import type { ImportProgressEntity } from "#src/lib/data/entities.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { MigrationApiError, trizumApiClient } from "#src/lib/trizumApiClient.ts";
 import type { Party } from "#src/models/party.ts";
 import { ErrorState, SuccessState } from "./-components/FinishedStates.js";
 import { IdleState } from "./-components/IdleState.js";
 import { InProgressState } from "./-components/InProgressState.js";
 import type { MigrateParams } from "./-components/types.js";
+
+const ProgressView = view<ImportProgressEntity>()({ name: true, progress: true });
 
 export const Route = createFileRoute("/migrate_/tricount")({
   component: RouteComponent,
@@ -49,7 +54,13 @@ type MigrationState =
 
 function useMigrateTricount() {
   const [state, setState] = useState<MigrationState>({ type: "idle" });
-  const appData = useAppData();
+  const client = useFateClient();
+  const operationId = useId();
+
+  const progress = useView(
+    ProgressView,
+    client.ref<ImportProgressEntity>("ImportProgress", operationId, ProgressView),
+  );
 
   async function migrate({ key, importAttachments }: MigrateParams) {
     trackEvent("tricount_import_started");
@@ -62,17 +73,9 @@ function useMigrateTricount() {
     try {
       const data = await trizumApiClient.migration.importTricount(key);
 
-      const partyId = await appData.importParty({
-        data,
-        importAttachments,
-        onProgress: (progress) => {
-          setState({
-            type: "in-progress",
-            name: progress.name,
-            progress: progress.progress,
-          });
-        },
-      });
+      const partyId = await mutationResult(
+        client.mutations.party.import({ input: { data, importAttachments, operationId } }),
+      );
 
       trackEvent("tricount_import_completed");
       setState({ type: "success", partyId });
@@ -90,5 +93,8 @@ function useMigrateTricount() {
     }
   }
 
-  return [state, migrate] as const;
+  const displayedState =
+    state.type === "in-progress" && progress.name ? { ...state, ...progress } : state;
+
+  return [displayedState, migrate] as const;
 }

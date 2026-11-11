@@ -1,5 +1,5 @@
 import { getAppData } from "#src/lib/data/client.ts";
-import type { AppData } from "#src/lib/data/client.ts";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
 // @vitest-environment jsdom
 
 import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-repo/slim";
@@ -24,7 +24,7 @@ import { DataHarness } from "#src/lib/testing/DataHarness.tsx";
 let repo: Repo;
 
 const readDocument =
-  vi.fn<(data: AppData, id: PartyList["id"]) => Promise<PartyList | undefined>>();
+  vi.fn<(client: AppClient, id: PartyList["id"]) => Promise<PartyList | undefined>>();
 
 const setAnalyticsEnabled = vi.fn<typeof setAnalyticsEnabledType>();
 const trackCloudSyncActivated = vi.fn<typeof trackCloudSyncActivatedType>();
@@ -135,7 +135,7 @@ it.each(["missing", "rejected"])(
           </DataHarness>,
         ),
       );
-      expect(readDocument).toHaveBeenCalledWith(getAppData(repo), destination.id);
+      expect(readDocument).toHaveBeenCalledWith(getAppData(repo).fate, destination.id);
       expect(account.isAccountStateResolved).toBe(true);
       expect(account.isCloudSyncSwitchOpen).toBe(false);
       expect(setPartyListId).not.toHaveBeenCalled();

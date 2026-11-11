@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -31,7 +33,8 @@ export const Route = createFileRoute("/party_/$partyId/settings/participants")({
 
 function PartyParticipantSettings() {
   const { partyId } = Route.useParams();
-  const { party, updateParticipants } = useParty(partyId, PartyParticipantsView);
+  const client = useFateClient();
+  const { party } = useParty(partyId, PartyParticipantsView);
 
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",
@@ -49,7 +52,11 @@ function PartyParticipantSettings() {
     onSubmit: async ({ value }) => {
       const participants = toPartyParticipantRecord(value.participants);
 
-      await updateParticipants(participants);
+      await mutationResult(
+        client.mutations.party.updateParticipants({
+          input: { partyId: party.id, parameters: [participants] },
+        }),
+      );
       trackEvent("party_participants_updated");
       form.reset({ participants: Object.values(participants) });
       toast.success(t`Participants saved!`);

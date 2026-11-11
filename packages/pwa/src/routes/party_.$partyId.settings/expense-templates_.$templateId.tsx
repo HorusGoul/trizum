@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -85,10 +87,8 @@ function ExpenseTemplateEditor() {
   const isNew = templateId === "new";
   const { i18n, t: translate } = useLingui();
 
-  const { party, deleteExpenseTemplate, saveExpenseTemplate } = useParty(
-    partyId,
-    PartyTemplatesView,
-  );
+  const client = useFateClient();
+  const { party } = useParty(partyId, PartyTemplatesView);
 
   const template = isNew ? undefined : party.expenseTemplates?.[templateId];
 
@@ -192,7 +192,11 @@ function ExpenseTemplateEditor() {
       if (value.amount > 0) savedTemplate.amount = convertToUnits(value.amount);
 
       try {
-        await saveExpenseTemplate(savedTemplate);
+        await mutationResult(
+          client.mutations.party.saveExpenseTemplate({
+            input: { partyId: party.id, parameters: [savedTemplate] },
+          }),
+        );
       } catch (error) {
         if (error instanceof ExpenseTemplateLimitError) {
           announceTemplateLimit();
@@ -249,7 +253,11 @@ function ExpenseTemplateEditor() {
       return;
     }
 
-    await deleteExpenseTemplate(template.id);
+    await mutationResult(
+      client.mutations.party.deleteExpenseTemplate({
+        input: { partyId: party.id, parameters: [template.id] },
+      }),
+    );
     trackEvent("expense_template_deleted");
     setIsDeleteSheetOpen(false);
     toast.success(t`Expense template deleted`);

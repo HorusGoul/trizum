@@ -1,5 +1,5 @@
+import { useFateClient } from "react-fate";
 import { useRequiredView } from "#src/lib/data/hooks.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
 import { useParams } from "@tanstack/react-router";
 import type { View, Selection } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
@@ -8,32 +8,22 @@ export function useParty<const Selected extends Selection<PartyEntity>>(
   partyId: string,
   selected: View<PartyEntity, Selected>,
 ) {
-  const data = useAppData();
-  const party = useRequiredView(selected, data.entityRef<PartyEntity>("Party", partyId, selected));
+  const client = useFateClient();
+  const party = useRequiredView(selected, client.ref<PartyEntity>("Party", partyId, selected));
 
-  async function createTestExpenses() {
-    const answer = window.prompt("How many test expenses to create?");
+  return { party, partyId };
+}
 
-    if (!answer) return;
+export function useCurrentPartyId() {
+  const partyId = useParams({ strict: false, select: (params) => params.partyId });
 
-    await data.createTestExpenses(partyId, parseInt(answer));
-  }
+  if (!partyId) throw new Error("No Party ID found in URL");
 
-  return {
-    party,
-    partyId,
-    isLoading: false,
-    ...data.readyPartyActions(partyId),
-    dev: { createTestExpenses },
-  };
+  return partyId;
 }
 
 export function useCurrentParty<const Selected extends Selection<PartyEntity>>(
   selected: View<PartyEntity, Selected>,
 ) {
-  const partyId = useParams({ strict: false, select: (params) => params.partyId });
-
-  if (!partyId) throw new Error("No Party ID found in URL");
-
-  return useParty(partyId, selected);
+  return useParty(useCurrentPartyId(), selected);
 }

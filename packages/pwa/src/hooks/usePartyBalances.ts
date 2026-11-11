@@ -1,6 +1,6 @@
 import { view } from "@nkzw/fate";
 import type { BalanceEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { useParty } from "./useParty.ts";
 import type { Party } from "#src/models/party.ts";
 import { useRequiredViews } from "#src/lib/data/hooks.ts";
@@ -25,13 +25,13 @@ const BalanceView = view<BalanceEntity>()({
 });
 
 export function usePartyBalances(partyId: Party["id"]): BalancesByParticipant {
-  const data = useAppData();
+  const client = useFateClient();
   const { party } = useParty(partyId, PartyBalancesView);
 
   const results = useRequiredViews(
     BalanceView,
     party.chunkRefs.map(({ balancesId }) =>
-      data.entityRef<BalanceEntity>("Balance", balancesId, BalanceView),
+      client.ref<BalanceEntity>("Balance", balancesId, BalanceView),
     ),
   );
 

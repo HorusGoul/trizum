@@ -1,12 +1,17 @@
 import type {
   PartyEntity,
   ProfileEntity,
-  ExpenseEntity,
   ExpenseChunkEntity,
   BalanceEntity,
   MediaEntity,
 } from "./entities.ts";
-import type { Entity, View, Selection } from "@nkzw/fate";
+import type { MutationInput } from "@nkzw/fate";
+import { LocalFateClient, type AppClient } from "./LocalFateClient.ts";
+import { appRoots, appMutations, type RecordSnapshot } from "./schema.ts";
+import { createMutationHandlers } from "./mutations.ts";
+import { createExpenseHistory } from "./history.ts";
+import { createPresenceStore } from "./presenceStore.ts";
+import type { ImportProgressEntity } from "./entities.ts";
 import {
   entityTypes,
   projectDocument,
@@ -17,22 +22,15 @@ import {
 } from "./projection.ts";
 import { createReadScope } from "./readScope.ts";
 import { loadRecord } from "./loadRecord.ts";
-import { createFateState } from "./fateState.ts";
 import type { MutationResult } from "@nkzw/fate";
-import type { ExpensePresenceMessage } from "./presence.ts";
-import type { DiffResult } from "@opentf/obj-diff";
-import { decodeExpenseId, calculateExpenseHash, type Expense } from "#src/models/expense.ts";
-import type { PartyExpenseChunk } from "#src/models/party.ts";
-import { patchMutate } from "../patchMutate.ts";
-import { getOrCreateExpenseEditCopy } from "#src/lib/data/expenseDraft.ts";
-import { createClient, clientRoot, valueMutation, view, toEntityId } from "@nkzw/fate";
+
+import { decodeExpenseId } from "#src/models/expense.ts";
+import { view, toEntityId } from "@nkzw/fate";
 import { isValidDocumentId, type DocHandle, type Repo } from "@automerge/automerge-repo/slim";
 import { getPartyHelpers } from "./partyCommands.ts";
 import { getProfileHelpers } from "./profileCommands.ts";
-import { getMediaFileHelpers } from "./mediaCommands.ts";
 import { getPartyListId, subscribeToPartyListId, type PartyList } from "#src/models/partyList.ts";
 import type { Party } from "#src/models/party.ts";
-import { createPartyFromMigrationData } from "#src/models/migration.ts";
 import { bindAnalytics } from "../analytics.ts";
 
 const RetainedPartyView = view<PartyEntity>()({ id: true });
@@ -45,29 +43,8 @@ const RetainedBalanceView = view<BalanceEntity>()({ id: true });
 
 const RetainedMediaView = view<MediaEntity>()({ id: true });
 
-interface RecordSnapshot {
-  __typename: "RecordSnapshot";
-  id: string;
-  value: object | null;
-}
-
 export const RecordView = view<RecordSnapshot>()({ id: true, value: true });
 const selection = new Set(["id", "value", "__typename"]);
-
-// The command closure is private, local-only, and never persisted or sent over a network.
-interface LocalCommand {
-  run(): Promise<void>;
-}
-
-type CommandResult = object | void | string | boolean;
-
-type Commands = Record<string, (...args: never[]) => CommandResult | Promise<CommandResult>>;
-
-type Actions<T extends Commands> = {
-  [Name in keyof T]: T[Name] extends (...args: infer Args) => infer Result
-    ? (...args: Args) => Promise<Awaited<Result>>
-    : never;
-};
 
 /** One Fate cache per repository; Automerge objects never become mutation inputs. */
 export function createAppData(repo: Repo) {
@@ -79,16 +56,9 @@ export function createAppData(repo: Repo) {
   const previousExpenses = new Map<string, Set<string>>();
   const sourceKinds = new Map<string, SourceDocument["type"]>();
 
-  const presenceChannels = new Map<
-    string,
-    {
-      broadcast(message: ExpensePresenceMessage): void;
-      subscribe(listener: (payload: { message: unknown }) => void): () => void;
-    }
-  >();
-
-  const activeProfile = createFateState(getPartyListId(repo));
-  const stopProfile = subscribeToPartyListId(activeProfile.set);
+  let profileId = getPartyListId(repo);
+  let analyticsPath: (() => string) | undefined;
+  let stopAnalytics: (() => void) | undefined;
   let disposed = false;
 
   function snapshot(id: string): RecordSnapshot {
@@ -97,71 +67,190 @@ export function createAppData(repo: Repo) {
     return { __typename: "RecordSnapshot", id, value: handle?.isReady() ? handle.doc() : null };
   }
 
-  const roots = {
-    record: clientRoot<RecordSnapshot, "RecordSnapshot", { id: string }>("RecordSnapshot"),
-    party: clientRoot<PartyEntity, "Party">("Party"),
-    profile: clientRoot<ProfileEntity, "Profile">("Profile"),
-    expense: clientRoot<ExpenseEntity, "Expense">("Expense"),
-    expenseChunk: clientRoot<ExpenseChunkEntity, "ExpenseChunk">("ExpenseChunk"),
-    balance: clientRoot<BalanceEntity, "Balance">("Balance"),
-    media: clientRoot<MediaEntity, "Media">("Media"),
-  };
+  const fate: AppClient = new LocalFateClient(
+    {
+      roots: appRoots,
+      mutations: appMutations,
+      types: [
+        { type: "RecordSnapshot", fields: { value: "scalar" } },
+        { type: "LoadState" },
+        { type: "Session" },
+        { type: "ExpenseHistory", fields: { expenseIds: "scalar" } },
+        { type: "ExpensePresence", fields: { participants: "scalar" } },
+        { type: "ImportProgress" },
+        ...entityTypes,
+      ],
+      transport: {
+        async fetchById(type, ids, _select, _args, context) {
+          return Promise.all(
+            ids.map(async (value) => {
+              const entityId = String(value);
 
-  const mutations = { "local.run": valueMutation<LocalCommand, { done: true }>() };
+              if (type === "ExpenseHistory") return history.load(entityId);
 
-  const fate = createClient<[typeof roots, typeof mutations]>({
-    roots,
-    mutations,
-    types: [
-      { type: "RecordSnapshot", fields: { value: "scalar" } },
-      { type: "LoadState" },
-      ...entityTypes,
-    ],
-    transport: {
-      async fetchById(type, ids, _select, _args, context) {
-        return Promise.all(
-          ids.map(async (value) => {
-            const entityId = String(value);
-            const id = type === "Expense" ? decodeExpenseId(entityId).chunkId : entityId;
+              if (type === "ExpensePresence") {
+                await read(decodeExpenseId(entityId).chunkId);
+                preparePresence(entityId, true);
 
-            if (!isValidDocumentId(id)) throw new Error("Malformed record ID");
+                return presence.get(entityId);
+              }
 
-            if (handles.get(id)?.isReady()) return projection(type, entityId, document(id));
+              const id = type === "Expense" ? decodeExpenseId(entityId).chunkId : entityId;
 
-            pending.add(id);
-            fate.write("LoadState", { id, pending: true }, new Set(["pending"]));
-            let handle: DocHandle<object> | undefined;
-            const scope = createReadScope([lifetime.signal, context?.signal]);
+              if (!isValidDocumentId(id)) throw new Error("Malformed record ID");
 
-            try {
-              handle = await loadRecord(repo, id, scope.signal);
-            } finally {
-              scope.dispose();
-              pending.delete(id);
-              fate.write("LoadState", { id, pending: false }, new Set(["pending"]));
-            }
+              if (handles.get(id)?.isReady()) return projection(type, entityId, document(id));
 
-            if (disposed) throw new Error("Data client disposed");
+              pending.add(id);
+              fate.write("LoadState", { id, pending: true }, new Set(["pending"]));
+              let handle: DocHandle<object> | undefined;
+              const scope = createReadScope([lifetime.signal, context?.signal]);
 
-            if (!handle) return projection(type, entityId, document(id));
+              try {
+                handle = await loadRecord(repo, id, scope.signal);
+              } finally {
+                scope.dispose();
+                pending.delete(id);
+                fate.write("LoadState", { id, pending: false }, new Set(["pending"]));
+              }
 
-            attachHandle(handle);
+              if (disposed) throw new Error("Data client disposed");
 
-            return projection(type, entityId, document(id));
-          }),
-        );
-      },
-      async mutate<Name extends keyof typeof mutations>(
-        _name: Name,
-        command: LocalCommand,
-      ): Promise<MutationResult<(typeof mutations)[Name]>> {
-        await command.run();
+              if (!handle) return projection(type, entityId, document(id));
 
-        // SAFETY: The single registered transport command always returns this completion marker.
-        return { done: true } as MutationResult<(typeof mutations)[Name]>;
+              attachHandle(handle);
+
+              return projection(type, entityId, document(id));
+            }),
+          );
+        },
+        async mutate<Name extends keyof typeof appMutations>(
+          name: Name,
+          input: MutationInput<(typeof appMutations)[Name]>,
+        ): Promise<MutationResult<(typeof appMutations)[Name]>> {
+          if (disposed) throw new Error("Data client disposed");
+
+          const handler = mutationHandlers[name];
+          const result = await handler(input);
+
+          if (name !== "presence.broadcast") await repo.flush();
+
+          return result;
+        },
       },
     },
+    (type, id, missing) => {
+      if (type === "RecordSnapshot") return;
+
+      if (type === "Session") {
+        if (missing) publishSession();
+
+        return;
+      }
+
+      if (type === "ExpenseHistory") {
+        history.prepare(id, missing);
+
+        return;
+      }
+
+      if (type === "ExpensePresence") {
+        preparePresence(id, missing);
+
+        return;
+      }
+
+      if (type === "ImportProgress") {
+        if (missing) publishProgress({ __typename: "ImportProgress", id, name: "", progress: 0 });
+
+        return;
+      }
+
+      const sourceId = type === "Expense" ? decodeExpenseId(id).chunkId : id;
+
+      if (!handles.has(sourceId) || missing) hydrateLocal(sourceId);
+    },
+  );
+
+  const source = {
+    read,
+    peek,
+    subscribe,
+    status: (id: string) =>
+      pending.has(id) ? "pending" : handles.has(id) ? "resolved" : "not-found",
+  };
+
+  const history = createExpenseHistory(source, hydrateLocal, (page) =>
+    fate.write(
+      "ExpenseHistory",
+      { ...page },
+      new Set(["id", "expenseIds", "hasNext", "isLoadingNext"]),
+    ),
+  );
+
+  const presence = createPresenceStore((value) =>
+    fate.write("ExpensePresence", { ...value }, new Set(["id", "participants"])),
+  );
+
+  const mutationHandlers = createMutationHandlers(repo, {
+    party: async (id) => {
+      await read(id);
+
+      return readyPartyHelpers(id);
+    },
+    profile: async (id) => {
+      await read(id);
+
+      return readyProfileHelpers(id);
+    },
+    loadNext: (id) => history.loadNext(id),
+    progress: publishProgress,
+    broadcast: async (message) => {
+      const id = decodeExpenseId(message.data.expenseId).chunkId;
+      await read(id);
+      const handle = handles.get(id);
+
+      if (!handle) throw new Error("Expense has not loaded");
+      handle.broadcast(message);
+    },
   });
+
+  function publishSession() {
+    fate.write("Session", { id: "current", profileId }, new Set(["id", "profileId"]));
+  }
+
+  function publishProgress(value: ImportProgressEntity) {
+    fate.write("ImportProgress", { ...value }, new Set(["id", "name", "progress"]));
+  }
+
+  function preparePresence(id: string, force: boolean) {
+    const chunkId = decodeExpenseId(id).chunkId;
+    hydrateLocal(chunkId);
+    const handle = handles.get(chunkId);
+
+    if (handle?.isReady()) presence.prepare(id, handle, force);
+  }
+
+  publishSession();
+
+  const stopProfile = subscribeToPartyListId((id) => {
+    profileId = id;
+    publishSession();
+
+    if (analyticsPath) void refreshAnalytics();
+  });
+
+  async function refreshAnalytics() {
+    stopAnalytics?.();
+    stopAnalytics = undefined;
+    const id = profileId;
+    const profile = await read<PartyList>(id).catch(() => undefined);
+
+    if (!profile || disposed || id !== profileId || !analyticsPath) return;
+    // SAFETY: The active profile was acquired through its canonical profile ID.
+    const handle = handles.get(id) as DocHandle<PartyList>;
+    stopAnalytics = bindAnalytics(handle, analyticsPath);
+  }
 
   function attachHandle(handle: DocHandle<object>) {
     const id = handle.documentId;
@@ -272,19 +361,6 @@ export function createAppData(repo: Repo) {
     }
   }
 
-  function entityRef<Model extends Entity>(
-    type: Model["__typename"],
-    id: string,
-    selected: View<Model, Selection<Model>>,
-  ) {
-    const result = fate.ref<Model>(type, id, selected);
-    const sourceId = type === "Expense" ? decodeExpenseId(id).chunkId : id;
-
-    if (!handles.has(sourceId) || !fate.peekView(selected, result)) hydrateLocal(sourceId);
-
-    return result;
-  }
-
   function ref(id: string) {
     const result = fate.ref<RecordSnapshot>("RecordSnapshot", id, RecordView);
 
@@ -295,6 +371,8 @@ export function createAppData(repo: Repo) {
 
   async function read<T>(id: string): Promise<T | undefined> {
     if (disposed) throw new Error("Data client disposed");
+
+    if (!handles.has(id) || !fate.peekView(RecordView, ref(id))) hydrateLocal(id);
     const result = await fate.readView(RecordView, ref(id));
 
     // SAFETY: Domain callers own the opaque ID and its model; Fate stores immutable source snapshots.
@@ -318,172 +396,37 @@ export function createAppData(repo: Repo) {
     };
   }
 
-  async function execute<Result>(operation: () => Result | Promise<Result>): Promise<Result> {
-    if (disposed) throw new Error("Data client disposed");
-
-    let value!: Result;
-
-    const response = await fate.mutations.local.run({
-      input: {
-        run: async () => {
-          value = await operation();
-          await repo.flush();
-        },
-      },
-    });
-
-    if (response.error) throw response.error;
-
-    return value;
-  }
-
-  function actions<T extends Commands>(helpers: T): Actions<T> {
-    // SAFETY: Each wrapper preserves its helper's key, argument tuple, and awaited result.
-    return Object.fromEntries(
-      Object.entries(helpers).map(([name, command]) => [
-        name,
-        (...args: never[]) => execute(() => command(...args)),
-      ]),
-    ) as Actions<T>;
-  }
-
-  function readyPartyActions(id: string) {
-    // SAFETY: React reads the required Party snapshot before requesting its commands.
+  function readyPartyHelpers(id: string) {
+    // SAFETY: The dispatcher acquires the document; its discriminant is checked below.
     const handle = handles.get(id) as DocHandle<Party> | undefined;
 
-    if (!handle) throw new Error("Party has not loaded");
+    if (!handle || document(id)?.type !== "party") throw new Error("Party has not loaded");
 
-    return actions(getPartyHelpers(repo, handle));
+    return getPartyHelpers(repo, handle);
   }
 
-  function profileActions(id: string) {
-    // SAFETY: React reads the required profile snapshot before requesting its commands.
+  function readyProfileHelpers(id: string) {
+    // SAFETY: The dispatcher acquires the document; its discriminant is checked below.
     const handle = handles.get(id) as DocHandle<PartyList> | undefined;
 
-    if (!handle) throw new Error("Profile has not loaded");
+    if (!handle || document(id)?.type !== "partyList") throw new Error("Profile has not loaded");
 
-    return actions(getProfileHelpers(repo, handle));
+    return getProfileHelpers(repo, handle);
   }
 
   return {
     fate,
-    entityRef,
-    ref,
-    read,
-    peek,
-    subscribe,
-    readyPartyActions,
-    profileActions,
-    status: (id: string) =>
-      pending.has(id) ? "pending" : handles.has(id) ? "resolved" : "not-found",
-    activeProfileId: activeProfile.getSnapshot,
-    subscribeToProfile: activeProfile.subscribe,
-    createTestExpenses: async (id: string, count: number) => {
-      const source = await read<Party>(id);
-
-      if (!source) throw new Error("Party unavailable");
-      const participants = Object.keys(source.participants);
-      const helpers = readyPartyActions(id);
-      await Promise.all(
-        Array.from({ length: count }, (_, index) =>
-          helpers.addExpenseToParty({
-            name: `Test Expense ${index + 1}`,
-            paidAt: new Date(),
-            photos: [],
-            paidBy: { [participants[0]]: 100 },
-            shares: {
-              [participants[0]]: { type: "divide", value: 1 },
-              [participants[1]]: { type: "divide", value: 1 },
-            },
-          }),
-        ),
-      );
-    },
-    media: {
-      createMediaFile: (
-        ...args: Parameters<ReturnType<typeof getMediaFileHelpers>["createMediaFile"]>
-      ) =>
-        execute(async () => {
-          const [id] = await getMediaFileHelpers(repo).createMediaFile(...args);
-          await repo.flush([id]);
-
-          return [id] as const;
-        }),
-    },
-    editExpenseDraft: (expenseId: Expense["id"], patches: DiffResult[]) =>
-      execute(async () => {
-        const { chunkId } = decodeExpenseId(expenseId);
-        const handle = await repo.find<PartyExpenseChunk>(chunkId);
-        handle.change((chunk) => {
-          const entry = chunk.expenses.find((expense) => expense.id === expenseId);
-
-          if (!entry) return;
-          const editCopy = getOrCreateExpenseEditCopy(entry);
-          patchMutate(editCopy, patches);
-          editCopy.__hash = calculateExpenseHash(editCopy);
-          entry.__editCopyLastUpdatedAt = new Date();
-        });
-      }),
-    presence: (expenseId: Expense["id"]) => {
-      const existing = presenceChannels.get(expenseId);
-
-      if (existing) return existing;
-
-      const { chunkId } = decodeExpenseId(expenseId);
-      const handle = handles.get(chunkId);
-
-      if (!handle) throw new Error("Expense has not loaded");
-
-      const channel = {
-        broadcast: (message: ExpensePresenceMessage) => {
-          void execute(() => handle.broadcast(message));
-        },
-        subscribe: (listener: (payload: { message: unknown }) => void) => {
-          handle.on("ephemeral-message", listener);
-
-          return () => {
-            handle.off("ephemeral-message", listener);
-          };
-        },
-      };
-
-      presenceChannels.set(expenseId, channel);
-
-      return channel;
-    },
-    createParty: (values: Omit<Party, "id" | "type" | "chunkRefs">) =>
-      execute(async () => {
-        // SAFETY: The allocated document ID replaces this placeholder before publication.
-        const handle = repo.create<Party>({
-          ...values,
-          id: "" as Party["id"],
-          type: "party",
-          chunkRefs: [],
-        });
-
-        handle.change((doc) => {
-          doc.id = handle.documentId;
-        });
-        await repo.flush([handle.documentId]);
-
-        return handle.documentId;
-      }),
-    importParty: (options: Omit<Parameters<typeof createPartyFromMigrationData>[0], "repo">) =>
-      execute(async () => {
-        const id = await createPartyFromMigrationData({ ...options, repo });
-        await repo.flush();
-
-        return id;
-      }),
-    bindAnalytics: (id: PartyList["id"], pathname: () => string) => {
-      // SAFETY: The active profile was loaded before the analytics binding is installed.
-      const handle = handles.get(id) as DocHandle<PartyList>;
-
-      return bindAnalytics(handle, pathname);
+    ...source,
+    bindAnalytics: (pathname: () => string) => {
+      analyticsPath = pathname;
+      void refreshAnalytics();
     },
     dispose() {
       disposed = true;
       stopProfile();
+      stopAnalytics?.();
+      history.dispose();
+      presence.dispose();
       lifetime.abort(new Error("Data client disposed"));
 
       for (const request of retained.values()) request.dispose();
@@ -494,7 +437,6 @@ export function createAppData(repo: Repo) {
       handles.clear();
       sourceKinds.clear();
       previousExpenses.clear();
-      presenceChannels.clear();
     },
   };
 }

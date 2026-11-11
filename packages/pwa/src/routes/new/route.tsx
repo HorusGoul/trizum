@@ -1,3 +1,4 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -5,7 +6,7 @@ import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "@trizum/ui/IconButton";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
@@ -37,7 +38,7 @@ function createDraftParticipant(name: string): Pick<PartyParticipant, "id" | "na
 }
 
 function New() {
-  const data = useAppData();
+  const client = useFateClient();
   const { partyList } = usePartyList(ProfileNameView);
   const navigate = useNavigate();
   const [initialParticipant] = useState(() => createDraftParticipant(partyList.username));
@@ -47,20 +48,24 @@ function New() {
   async function onCreateParty(values: NewPartyFormValues) {
     const participants = values.participants.map(({ id, name }) => ({ id, name }));
 
-    const partyId = await data.createParty({
-      name: values.name,
-      symbol: values.symbol,
-      description: values.description,
-      currency: values.currency,
-      participants: participants.reduce<Party["participants"]>((result, next) => {
-        result[next.id] = {
-          id: next.id,
-          name: next.name,
-        };
+    const partyId = await mutationResult(
+      client.mutations.party.create({
+        input: {
+          name: values.name,
+          symbol: values.symbol,
+          description: values.description,
+          currency: values.currency,
+          participants: participants.reduce<Party["participants"]>((result, next) => {
+            result[next.id] = {
+              id: next.id,
+              name: next.name,
+            };
 
-        return result;
-      }, {}),
-    });
+            return result;
+          }, {}),
+        },
+      }),
+    );
 
     trackEvent("party_created");
     void navigate({

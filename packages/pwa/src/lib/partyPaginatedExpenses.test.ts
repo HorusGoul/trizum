@@ -1,4 +1,4 @@
-import type { AppData } from "./data/client.ts";
+import type { ExpenseHistorySource } from "./partyPaginatedExpenses.ts";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { createMockDocumentCacheCollection } from "#src/lib/testing/mockDocumentCache.ts";
 import type { Expense } from "#src/models/expense.ts";
@@ -12,7 +12,10 @@ type MockChunk = {
   expenses: Expense[];
 };
 
-const mockDocumentCacheCollection = createMockDocumentCacheCollection<MockChunk, AppData>();
+const mockDocumentCacheCollection = createMockDocumentCacheCollection<
+  MockChunk,
+  ExpenseHistorySource
+>();
 
 const {
   availableDocuments: availableChunks,
@@ -44,7 +47,7 @@ const {
 });
 
 // SAFETY: All cache operations are mocked in this test; the repo is only an identity key and no Repo method is called.
-const repo = {} as AppData;
+const repo = {} as ExpenseHistorySource;
 const chunk1 = toChunkId("chunk-1");
 const chunk2 = toChunkId("chunk-2");
 const chunk3 = toChunkId("chunk-3");

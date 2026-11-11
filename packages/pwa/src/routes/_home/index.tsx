@@ -1,6 +1,15 @@
-import type { PartyList } from "#src/models/partyList.js";
+import { view } from "@nkzw/fate";
+import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
+const LaunchView = view<ProfileEntity>()({
+  available: true,
+  parties: true,
+  archivedParties: true,
+  openLastPartyOnLaunch: true,
+  lastOpenedPartyId: true,
+});
 
 let hasRedirectedThisSession = false;
 
@@ -24,10 +33,12 @@ export const Route = createFileRoute("/_home/")({
       return;
     }
 
-    // SAFETY: getPartyListId selects the local PartyList document; the shared cache erases its document type.
-    const partyList = (await context.data.read(partyListId)) as PartyList | undefined;
+    const { data: partyList } = await context.client.readView(
+      LaunchView,
+      context.client.ref<ProfileEntity>("Profile", partyListId, LaunchView),
+    );
 
-    if (!partyList) {
+    if (!partyList.available) {
       return;
     }
 

@@ -3,7 +3,7 @@ import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { getBrowserLocale, setLocale } from "./lib/i18n.ts";
 import { setThemeHue, defaultThemeHue } from "@trizum/ui/theme";
 import { optionalNonemptySearchTextSchema } from "./lib/routerSearch.ts";
-import type {} from "./lib/testing/browserHarnessApi.ts";
+
 import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import type { DocumentId } from "@automerge/automerge-repo/slim";
@@ -31,8 +31,7 @@ import { routeTree } from "./routeTree.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "@trizum/ui/MediaGalleryController";
 import { usePartyList } from "./hooks/usePartyList.ts";
-import { DataProvider } from "./lib/data/context.tsx";
-import { useAppData } from "./lib/data/useAppData.ts";
+import { FateClient } from "react-fate";
 import { getAppData } from "./lib/data/client.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
@@ -253,12 +252,14 @@ const router = createRouter({
   stringifySearch: stringifyAppSearch,
   routeTree,
   history,
-  context: { data },
+  context: { client: data.fate },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
 
 initializeAnalytics(Object.values(router.routesById).map((route) => route.fullPath));
+
+data.bindAnalytics(() => router.state.location.pathname);
 
 router.subscribe("onResolved", () => trackPage(router.state.location.pathname));
 
@@ -337,14 +338,14 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <PwaUIProvider>
         <UpdateControllerComponent>
-          <DataProvider data={data}>
+          <FateClient client={data.fate}>
             <MediaGalleryController>
               <PremiumProvider>
                 <RouterProvider router={router} InnerWrap={InnerWrap} />
               </PremiumProvider>
               <Toaster />
             </MediaGalleryController>
-          </DataProvider>
+          </FateClient>
         </UpdateControllerComponent>
       </PwaUIProvider>
     </I18nProvider>,
@@ -355,7 +356,6 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
   const { partyList } = usePartyList(ProfileAppearanceView);
-  const data = useAppData();
 
   useEffect(() => {
     setLocale(partyList.locale ?? getBrowserLocale());
@@ -363,10 +363,6 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setThemeHue(partyList.hue ?? defaultThemeHue);
   }, [partyList.hue]);
-
-  useEffect(() => {
-    return data.bindAnalytics(partyList.id, () => router.state.location.pathname);
-  }, [data, partyList.id]);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {

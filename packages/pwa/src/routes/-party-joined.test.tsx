@@ -90,7 +90,9 @@ async function setup(joined = false, loader?: () => Promise<void>) {
   initializeAnalytics(["/party/$partyId/who", "/party/$partyId"]);
   unbind = bindAnalytics(profile, () => `/party/${party.documentId}/who`);
 
-  const rootRoute = createRootRouteWithContext<{ data: ReturnType<typeof getAppData> }>()({});
+  const rootRoute = createRootRouteWithContext<{ client: ReturnType<typeof getAppData>["fate"] }>()(
+    {},
+  );
 
   const whoRouteOptions = {
     getParentRoute: () => rootRoute,
@@ -109,7 +111,7 @@ async function setup(joined = false, loader?: () => Promise<void>) {
   });
 
   const router = createRouter({
-    context: { data: getAppData(repo) },
+    context: { client: getAppData(repo).fate },
     routeTree: rootRoute.addChildren([whoRoute, partyRoute]),
     history: createMemoryHistory({
       initialEntries: [

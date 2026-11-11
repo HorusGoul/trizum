@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { PaymentMethodsEditor } from "#src/components/PaymentMethodsEditor.tsx";
@@ -83,21 +85,31 @@ function getLocaleOptions(): LocaleOption[] {
 }
 
 export function Settings() {
-  const { partyList, updateSettings } = usePartyList(ProfileSettingsView);
+  const client = useFateClient();
+  const { partyList } = usePartyList(ProfileSettingsView);
   const navigate = useNavigate();
   const localeOptions = getLocaleOptions();
 
   async function onSaveSettings(values: SettingsFormValues) {
-    await updateSettings({
-      username: values.username,
-      phone: values.paymentMethods.bizum?.trim() ?? "",
-      paymentMethods: normalizePaymentMethods(values.paymentMethods),
-      avatarId: values.avatarId,
-      locale: values.locale === "system" ? undefined : values.locale,
-      openLastPartyOnLaunch: values.openLastPartyOnLaunch,
-      autoOpenCalculator: values.autoOpenCalculator,
-      hue: values.hue,
-    });
+    await mutationResult(
+      client.mutations.profile.updateSettings({
+        input: {
+          profileId: partyList.id,
+          parameters: [
+            {
+              username: values.username,
+              phone: values.paymentMethods.bizum?.trim() ?? "",
+              paymentMethods: normalizePaymentMethods(values.paymentMethods),
+              avatarId: values.avatarId,
+              locale: values.locale === "system" ? undefined : values.locale,
+              openLastPartyOnLaunch: values.openLastPartyOnLaunch,
+              autoOpenCalculator: values.autoOpenCalculator,
+              hue: values.hue,
+            },
+          ],
+        },
+      }),
+    );
     trackEvent("settings_saved");
     form.reset(values);
     toast.success(t`Settings saved`);
@@ -326,7 +338,8 @@ function SettingsFormFields({
 }
 
 function UsageAnalyticsSetting() {
-  const { partyList, setUsageAnalyticsEnabled } = usePartyList(ProfileAnalyticsView);
+  const client = useFateClient();
+  const { partyList } = usePartyList(ProfileAnalyticsView);
 
   return (
     <SwitchField
@@ -335,7 +348,11 @@ function UsageAnalyticsSetting() {
       isSelected={partyList.usageAnalyticsEnabled !== false}
       onChange={async (enabled) => {
         if (!enabled) setAnalyticsEnabled(false);
-        await setUsageAnalyticsEnabled(enabled);
+        await mutationResult(
+          client.mutations.profile.setUsageAnalyticsEnabled({
+            input: { profileId: partyList.id, parameters: [enabled] },
+          }),
+        );
       }}
     />
   );

@@ -1,6 +1,6 @@
 import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
 import { isValidRecordId } from "#src/lib/data/ids.ts";
@@ -107,11 +107,11 @@ export function useMediaFile(mediaFileId: string) {
     throw new Error("Malformed MediaFile ID");
   }
 
-  const data = useAppData();
+  const client = useFateClient();
 
   const mediaFile = useRequiredView(
     MediaContentView,
-    data.entityRef<MediaEntity>("Media", mediaFileId, MediaContentView),
+    client.ref<MediaEntity>("Media", mediaFileId, MediaContentView),
   );
 
   const [url] = useMediaFileObjectUrls([mediaFile]);

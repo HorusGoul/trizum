@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -24,7 +26,8 @@ const ProfileBannerView = view<ProfileEntity>()({
 });
 
 export function HomeBanner({ isVisible }: { isVisible: boolean }) {
-  const { partyList, dismissPremiumBanner } = usePartyList(ProfileBannerView);
+  const client = useFateClient();
+  const { partyList } = usePartyList(ProfileBannerView);
   const navigate = useNavigate();
   const isHome = useLocation({ select: (location) => location.pathname === "/" });
   const resumePremium = useSearch({ strict: false, select: (search) => search.premium });
@@ -92,7 +95,11 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
                 icon="lucide.x"
                 aria-label={t`Dismiss Premium banner`}
                 onPress={async () => {
-                  await dismissPremiumBanner();
+                  await mutationResult(
+                    client.mutations.profile.dismissPremiumBanner({
+                      input: { profileId: partyList.id, parameters: [] },
+                    }),
+                  );
                   trackEvent("premium_banner_dismissed");
                 }}
                 isDisabled={dialogs.dialog.kind !== "closed"}

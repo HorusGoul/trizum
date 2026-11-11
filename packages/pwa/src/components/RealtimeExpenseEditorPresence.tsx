@@ -1,17 +1,17 @@
 import { view } from "@nkzw/fate";
-import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
+import type { ExpensePresenceEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import type { ExpensePresenceMessage } from "#src/lib/data/presence.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { useRequiredView } from "#src/lib/data/hooks.ts";
+
 import { type Expense, type ExpenseParticipantPresence } from "#src/models/expense.ts";
 import type { MediaFile } from "#src/models/media.ts";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "@trizum/ui/Avatar";
-import { getLogger } from "#src/lib/log.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
-import type { AppData } from "#src/lib/data/client.ts";
+import { useFateClient, useView } from "react-fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   arePresenceBubblePositionsEqual,
@@ -20,10 +20,7 @@ import {
   type PresenceBubblePosition,
 } from "./presencePosition.ts";
 
-const ExpenseIdentityView = view<ExpenseEntity>()({
-  id: true,
-  available: true,
-});
+const PresenceView = view<ExpensePresenceEntity>()({ participants: true });
 
 const PartyParticipantsView = view<PartyEntity>()({
   id: true,
@@ -31,21 +28,19 @@ const PartyParticipantsView = view<PartyEntity>()({
   participants: true,
 });
 
-const logger = getLogger("components", "RealtimeExpenseEditorPresence");
-
 interface RealtimeExpenseEditorPresenceProps {
   expenseId: Expense["id"];
 }
 
 function broadcastPresenceUpdate({
   expenseId,
-  handle,
+  client,
   lastSentElementIdRef,
   participantId,
   value,
 }: {
   expenseId: Expense["id"];
-  handle: ReturnType<AppData["presence"]>;
+  client: AppClient;
   lastSentElementIdRef: React.RefObject<string | null>;
   participantId: PartyParticipant["id"];
   value: Pick<ExpenseParticipantPresence, "elementId"> | null;
@@ -61,7 +56,7 @@ function broadcastPresenceUpdate({
       },
     };
 
-    handle.broadcast(payload);
+    void mutationResult(client.mutations.presence.broadcast({ input: payload }));
 
     return;
   }
@@ -78,38 +73,33 @@ function broadcastPresenceUpdate({
     },
   };
 
-  handle.broadcast(payload);
+  void mutationResult(client.mutations.presence.broadcast({ input: payload }));
 }
 
 export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEditorPresenceProps) {
-  const data = useAppData();
-  useRequiredView(
-    ExpenseIdentityView,
-    data.entityRef<ExpenseEntity>("Expense", expenseId, ExpenseIdentityView),
+  const client = useFateClient();
+
+  const presence = useView(
+    PresenceView,
+    client.ref<ExpensePresenceEntity>("ExpensePresence", expenseId, PresenceView),
   );
-  const handle = data.presence(expenseId);
+
   const participant = useCurrentParticipant();
   const overlayRef = useRef<HTMLDivElement>(null);
   const presenceElementIdRef = useRef<string | null>(null);
-  const [visiblePresence, setVisiblePresence] = useState<ExpenseParticipantPresence[]>([]);
+
+  const visiblePresence = presence.participants.filter(
+    (entry) => entry.participantId !== participant.id,
+  );
+
   const lastSentElementIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const stalePresenceCutoff = new Date(Date.now() - 10000);
-
-      setVisiblePresence((currentPresence) =>
-        currentPresence.filter(
-          (participantPresence) =>
-            participantPresence.participantId !== participant.id &&
-            participantPresence.dateTime >= stalePresenceCutoff,
-        ),
-      );
-
       if (lastSentElementIdRef.current) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: lastSentElementIdRef.current },
@@ -120,50 +110,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     return () => {
       clearInterval(interval);
     };
-  }, [expenseId, handle, participant.id]);
-
-  useEffect(() => {
-    const listener = ({ message }: { message: unknown }) => {
-      // SAFETY: The ephemeral channel is owned by the expense-presence sender; the following try block checks fields and ignores malformed messages.
-      const payload = message as ExpensePresenceMessage;
-
-      try {
-        if (payload.data.expenseId !== expenseId) {
-          return;
-        }
-
-        switch (payload.type) {
-          case "expense-presence-delete":
-            setVisiblePresence((currentPresence) =>
-              currentPresence.filter(
-                (participantPresence) =>
-                  participantPresence.participantId !== payload.data.participantId,
-              ),
-            );
-            break;
-          case "expense-presence-update":
-            if (payload.data.participantId === participant.id) {
-              return;
-            }
-
-            setVisiblePresence((currentPresence) => [
-              ...currentPresence.filter(
-                (participantPresence) =>
-                  participantPresence.participantId !== payload.data.participantId,
-              ),
-              payload.data,
-            ]);
-            break;
-        }
-      } catch {
-        logger.error("Failed to handle ephemeral message", { payload });
-
-        return;
-      }
-    };
-
-    return handle.subscribe(listener);
-  }, [handle, expenseId, participant.id]);
+  }, [expenseId, client, participant.id]);
 
   useEffect(() => {
     function updatePresenceFromTarget(target: Element | null, { clearOnMiss = true } = {}) {
@@ -173,7 +120,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (presenceElementId) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: presenceElementId },
@@ -189,7 +136,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
 
       broadcastPresenceUpdate({
         expenseId,
-        handle,
+        client,
         lastSentElementIdRef,
         participantId: participant.id,
         value: null,
@@ -222,7 +169,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (document.visibilityState === "hidden") {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: null,
@@ -236,7 +183,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     function onWindowBlur() {
       broadcastPresenceUpdate({
         expenseId,
-        handle,
+        client,
         lastSentElementIdRef,
         participantId: participant.id,
         value: null,
@@ -252,7 +199,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (presenceElementId) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: presenceElementId },
@@ -268,7 +215,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       if (presenceElementIdRef.current) {
         broadcastPresenceUpdate({
           expenseId,
-          handle,
+          client,
           lastSentElementIdRef,
           participantId: participant.id,
           value: { elementId: presenceElementIdRef.current },
@@ -285,7 +232,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       window.removeEventListener("focus", onWindowFocus);
       clearInterval(interval);
     };
-  }, [expenseId, handle, participant.id]);
+  }, [expenseId, client, participant.id]);
 
   return (
     <div ref={overlayRef} className="pointer-events-none absolute inset-0 touch-none">

@@ -1,23 +1,14 @@
 import { view } from "@nkzw/fate";
-import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useParty } from "./useParty.ts";
+import { useFateClient, useView } from "react-fate";
+import type { ExpenseEntity, ExpenseHistoryEntity } from "#src/lib/data/entities.ts";
 import { useRequiredViews } from "#src/lib/data/hooks.ts";
-import {
-  getPartyPaginatedExpensesSnapshot,
-  getVisiblePartyExpenseChunkIdsToLoad,
-  loadVisiblePartyExpenseChunks,
-  loadNextPartyExpenseChunks,
-  type PartyPaginatedExpensesSnapshot,
-  subscribeToPartyPaginatedExpenses,
-} from "#src/lib/partyPaginatedExpenses.ts";
-import type { Party } from "#src/models/party.js";
-import { useAppData } from "#src/lib/data/useAppData.ts";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import type { Party } from "#src/models/party.ts";
 
-const PartyHistoryView = view<PartyEntity>()({
-  id: true,
-  available: true,
-  chunkRefs: true,
+const HistoryView = view<ExpenseHistoryEntity>()({
+  expenseIds: true,
+  hasNext: true,
+  isLoadingNext: true,
 });
 
 const ExpenseDetailView = view<ExpenseEntity>()({
@@ -33,89 +24,21 @@ const ExpenseDetailView = view<ExpenseEntity>()({
 });
 
 export function usePartyPaginatedExpenses(partyId: Party["id"]) {
-  const data = useAppData();
+  const client = useFateClient();
 
-  const { party } = useParty(partyId, PartyHistoryView);
-
-  const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
-  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(data, chunkIds);
-  const snapshotRef = useRef<PartyPaginatedExpensesSnapshot | undefined>(undefined);
-  const snapshotKeyRef = useRef<string>("");
-  const snapshotKey = `${String(partyId)}:${chunkIds.join(",")}`;
-  const requestedVisibleChunkIdsKeyRef = useRef("");
-  const visibleChunkIdsToLoadKey = visibleChunkIdsToLoad.join(",");
-
-  useEffect(() => {
-    if (visibleChunkIdsToLoad.length === 0) {
-      requestedVisibleChunkIdsKeyRef.current = "";
-
-      return;
-    }
-
-    if (requestedVisibleChunkIdsKeyRef.current === visibleChunkIdsToLoadKey) {
-      return;
-    }
-
-    requestedVisibleChunkIdsKeyRef.current = visibleChunkIdsToLoadKey;
-    void loadVisiblePartyExpenseChunks(data, chunkIds);
-  }, [chunkIds, data, visibleChunkIdsToLoad, visibleChunkIdsToLoadKey]);
-
-  const snapshot = useSyncExternalStore(
-    (onStoreChange) => subscribeToPartyPaginatedExpenses(onStoreChange, data, chunkIds),
-    () => {
-      if (snapshotKeyRef.current !== snapshotKey) {
-        snapshotKeyRef.current = snapshotKey;
-        snapshotRef.current = undefined;
-      }
-
-      const nextSnapshot = getPartyPaginatedExpensesSnapshot(data, chunkIds);
-
-      if (snapshotRef.current && areSnapshotsEqual(snapshotRef.current, nextSnapshot)) {
-        return snapshotRef.current;
-      }
-
-      snapshotRef.current = nextSnapshot;
-
-      return nextSnapshot;
-    },
+  const page = useView(
+    HistoryView,
+    client.ref<ExpenseHistoryEntity>("ExpenseHistory", partyId, HistoryView),
   );
-
-  function loadNext() {
-    void loadNextPartyExpenseChunks(data, chunkIds);
-  }
 
   const expenses = useRequiredViews(
     ExpenseDetailView,
-    snapshot.expenses.map(({ id }) =>
-      data.entityRef<ExpenseEntity>("Expense", id, ExpenseDetailView),
-    ),
+    page.expenseIds.map((id) => client.ref<ExpenseEntity>("Expense", id, ExpenseDetailView)),
   );
 
-  return {
-    expenses,
-    loadNext,
-    isLoadingNext: snapshot.isLoadingNext,
-    hasNext: snapshot.hasNext,
-  };
-}
-
-function areSnapshotsEqual(
-  previous: PartyPaginatedExpensesSnapshot,
-  next: PartyPaginatedExpensesSnapshot,
-): boolean {
-  if (previous.hasNext !== next.hasNext || previous.isLoadingNext !== next.isLoadingNext) {
-    return false;
+  function loadNext() {
+    void mutationResult(client.mutations.expenseHistory.loadNext({ input: { partyId } }));
   }
 
-  if (previous.expenses.length !== next.expenses.length) {
-    return false;
-  }
-
-  for (let index = 0; index < previous.expenses.length; index++) {
-    if (previous.expenses[index]?.id !== next.expenses[index]?.id) {
-      return false;
-    }
-  }
-
-  return true;
+  return { expenses, loadNext, isLoadingNext: page.isLoadingNext, hasNext: page.hasNext };
 }

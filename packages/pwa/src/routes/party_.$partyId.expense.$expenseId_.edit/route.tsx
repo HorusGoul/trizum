@@ -1,6 +1,7 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
-import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
+import { useFateClient } from "react-fate";
 import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
 import { getFailureMessage } from "#src/lib/failureMessage.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -11,12 +12,11 @@ import {
   type ExpenseEditorRef,
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { decodeExpenseId, calculateExpenseHash, type Expense } from "#src/models/expense.ts";
+import { calculateExpenseHash, type Expense } from "#src/models/expense.ts";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
@@ -44,11 +44,6 @@ const ExpenseEditorView = view<ExpenseEntity>()({
   __editCopyLastUpdatedAt: true,
 });
 
-const PartyIdentityView = view<PartyEntity>()({
-  id: true,
-  available: true,
-});
-
 interface EditExpenseSearchParams {
   calculator?: string;
   media?: number;
@@ -65,8 +60,10 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
   async loader({ location, context, params: { expenseId, partyId } }) {
     await guardParticipatingInParty(partyId, context, location);
 
-    const { chunkId } = decodeExpenseId(expenseId);
-    await context.data.read(chunkId);
+    await context.client.readView(
+      ExpenseEditorView,
+      context.client.ref<ExpenseEntity>("Expense", expenseId, ExpenseEditorView),
+    );
   },
 });
 
@@ -248,31 +245,34 @@ function EditExpense() {
 }
 
 function useExpense() {
-  const data = useAppData();
+  const client = useFateClient();
   const { partyId, expenseId } = Route.useParams();
-  const { updateExpense } = useCurrentParty(PartyIdentityView);
 
   const expense = useRequiredView(
     ExpenseEditorView,
-    data.entityRef<ExpenseEntity>("Expense", expenseId, ExpenseEditorView),
+    client.ref<ExpenseEntity>("Expense", expenseId, ExpenseEditorView),
   );
 
   async function onUpdateExpense(expense: Expense) {
-    const result = await updateExpense(expense);
+    const result = await mutationResult(
+      client.mutations.party.updateExpense({
+        input: { partyId, parameters: [expense] },
+      }),
+    );
+
     trackEvent("expense_updated");
 
     return result;
   }
 
   function onChangeExpense(patches: DiffResult[]) {
-    void data.editExpenseDraft(expenseId, patches);
+    void mutationResult(client.mutations.expense.editDraft({ input: { expenseId, patches } }));
   }
 
   return {
     partyId,
     expense,
     expenseId,
-    isLoading: false,
     onChangeExpense,
     onUpdateExpense,
   };

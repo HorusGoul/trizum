@@ -1,24 +1,24 @@
-import { useSyncExternalStore } from "react";
+import { useFateClient, useView } from "react-fate";
+import { view, type View, type Selection } from "@nkzw/fate";
 import { useRequiredView } from "#src/lib/data/hooks.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
-import type { View, Selection } from "@nkzw/fate";
-import type { ProfileEntity } from "#src/lib/data/entities.ts";
+import type { ProfileEntity, SessionEntity } from "#src/lib/data/entities.ts";
+
+const ProfileSessionView = view<SessionEntity>()({ profileId: true });
 
 export function usePartyList<const Selected extends Selection<ProfileEntity>>(
   selected: View<ProfileEntity, Selected>,
 ) {
-  const data = useAppData();
+  const client = useFateClient();
 
-  const id = useSyncExternalStore(
-    data.subscribeToProfile,
-    data.activeProfileId,
-    data.activeProfileId,
+  const { profileId } = useView(
+    ProfileSessionView,
+    client.ref<SessionEntity>("Session", "current", ProfileSessionView),
   );
 
   const partyList = useRequiredView(
     selected,
-    data.entityRef<ProfileEntity>("Profile", id, selected),
+    client.ref<ProfileEntity>("Profile", profileId, selected),
   );
 
-  return { partyList, ...data.profileActions(id) };
+  return { partyList };
 }

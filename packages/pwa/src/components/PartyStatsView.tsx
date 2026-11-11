@@ -1,6 +1,6 @@
 import { view } from "@nkzw/fate";
 import type { ExpenseChunkEntity, ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { endOfWeek, getLocalTimeZone, startOfWeek, today } from "@internationalized/date";
 import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
@@ -190,21 +190,19 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
 
-  const data = useAppData();
+  const client = useFateClient();
 
   const chunks = useRequiredViews(
     ExpenseChunkView,
     party.chunkRefs.map(({ chunkId }) =>
-      data.entityRef<ExpenseChunkEntity>("ExpenseChunk", chunkId, ExpenseChunkView),
+      client.ref<ExpenseChunkEntity>("ExpenseChunk", chunkId, ExpenseChunkView),
     ),
   );
 
   const expenses = useRequiredViews(
     ExpenseDetailView,
     chunks.flatMap((chunk) =>
-      chunk.expenses.map(({ id }) =>
-        data.entityRef<ExpenseEntity>("Expense", id, ExpenseDetailView),
-      ),
+      chunk.expenses.map(({ id }) => client.ref<ExpenseEntity>("Expense", id, ExpenseDetailView)),
     ),
   );
 

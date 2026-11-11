@@ -1,6 +1,7 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
@@ -62,9 +63,9 @@ interface WhoFormValues {
 function Who() {
   const params = Route.useParams();
   const search = Route.useSearch();
-  const data = useAppData();
-  const { party, setParticipantDetails } = useParty(params.partyId, PartyMembershipView);
-  const { partyList, addPartyToList } = usePartyList(ProfileJoiningView);
+  const client = useFateClient();
+  const { party } = useParty(params.partyId, PartyMembershipView);
+  const { partyList } = usePartyList(ProfileJoiningView);
   const navigate = useNavigate();
   const partyName = party.name;
 
@@ -77,21 +78,42 @@ function Who() {
   async function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
     const participantName = participant.name;
-    const currentPartyList = data.peek<typeof partyList>(partyList.id)!;
+
+    const currentPartyList = client.peekView(
+      ProfileJoiningView,
+      client.ref<ProfileEntity>("Profile", partyList.id, ProfileJoiningView),
+    )!.data;
+
     const previousParticipantId = currentPartyList.participantInParties?.[party.id];
 
     const isJoining =
       currentPartyList.parties[party.id] !== true || previousParticipantId === undefined;
 
-    await addPartyToList(party.id, participant.id);
+    await mutationResult(
+      client.mutations.profile.addPartyToList({
+        input: { profileId: partyList.id, parameters: [party.id, participant.id] },
+      }),
+    );
 
     if (isJoining) {
       trackEvent("party_joined");
-      await setParticipantDetails(participant.id, {
-        phone: partyList.phone,
-        paymentMethods: partyList.paymentMethods ? { ...partyList.paymentMethods } : undefined,
-        avatarId: partyList.avatarId,
-      });
+      await mutationResult(
+        client.mutations.party.setParticipantDetails({
+          input: {
+            partyId: party.id,
+            parameters: [
+              participant.id,
+              {
+                phone: partyList.phone,
+                paymentMethods: partyList.paymentMethods
+                  ? { ...partyList.paymentMethods }
+                  : undefined,
+                avatarId: partyList.avatarId,
+              },
+            ],
+          },
+        }),
+      );
 
       toast.success(t({ message: `Welcome to the party, ${participantName}!` }));
     } else {

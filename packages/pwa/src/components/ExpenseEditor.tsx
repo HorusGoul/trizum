@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -30,7 +32,7 @@ import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "@trizum/ui/Skeleton";
 import type { MediaFile } from "#src/models/media.ts";
-import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
+import { getImageUploadErrorMessage } from "#src/lib/data/mediaCommands.ts";
 import {
   compressionPresets,
   ImageProcessingError,
@@ -117,7 +119,8 @@ export function ExpenseEditor({
   onCloseCalculator,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
-  const { partyList, setAutoOpenCalculator } = usePartyList(ProfileCalculatorView);
+  const client = useFateClient();
+  const { partyList } = usePartyList(ProfileCalculatorView);
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
@@ -287,7 +290,11 @@ export function ExpenseEditor({
         formId={formId}
         goBackFallbackOptions={goBackFallbackOptions}
         onToggleAutoOpenCalculator={async () => {
-          await setAutoOpenCalculator(!autoOpenCalculator);
+          await mutationResult(
+            client.mutations.profile.setAutoOpenCalculator({
+              input: { profileId: partyList.id, parameters: [!autoOpenCalculator] },
+            }),
+          );
           trackEvent(
             autoOpenCalculator ? "calculator_auto_open_disabled" : "calculator_auto_open_enabled",
           );
@@ -986,7 +993,7 @@ interface AddPhotoButtonProps {
 function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const { createMediaFile } = useMediaFileActions();
+  const client = useFateClient();
 
   async function addPhotoFiles(files: Blob[]) {
     if (files.length === 0) {
@@ -998,7 +1005,11 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
     try {
       const photoIds = await Promise.all(
         files.map(async (blob) => {
-          const [mediaFileId] = await createMediaFile(blob, {}, compressionPresets.balanced);
+          const [mediaFileId] = await mutationResult(
+            client.mutations.media.create({
+              input: { parameters: [blob, {}, compressionPresets.balanced] },
+            }),
+          );
 
           return mediaFileId;
         }),

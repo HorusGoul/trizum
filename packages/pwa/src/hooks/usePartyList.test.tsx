@@ -1,5 +1,9 @@
 // @vitest-environment jsdom
 
+import { useFateClient } from "react-fate";
+import type { AppClient } from "#src/lib/data/LocalFateClient.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+
 import { view } from "@nkzw/fate";
 import type { ProfileEntity } from "#src/lib/data/entities.ts";
 
@@ -70,10 +74,11 @@ it("syncs saved methods and removals to existing groups without changing other p
   await documentCache.readAsync(repo, profile.documentId);
   await documentCache.readAsync(repo, party.documentId);
 
-  let settings!: ReturnType<typeof usePartyList>;
+  let client!: AppClient;
 
   function Harness() {
-    settings = usePartyList(ProfileSettingsView);
+    usePartyList(ProfileSettingsView);
+    client = useFateClient();
 
     return null;
   }
@@ -107,12 +112,30 @@ it("syncs saved methods and removals to existing groups without changing other p
       "cash-app": "https://cash.app/$Alice123",
     };
 
-    await act(async () => settings.updateSettings({ ...values, paymentMethods: methods }));
+    await act(async () =>
+      mutationResult(
+        client.mutations.profile.updateSettings({
+          input: {
+            profileId: profile.documentId,
+            parameters: [{ ...values, paymentMethods: methods }],
+          },
+        }),
+      ),
+    );
     expect(profile.doc().paymentMethods).toEqual(methods);
     await vi.waitFor(() => expect(party.doc().participants.alice?.paymentMethods).toEqual(methods));
     expect(party.doc().participants.bob?.paymentMethods).toEqual({ venmo: "bob" });
 
-    await act(async () => settings.updateSettings({ ...values, phone: "", paymentMethods: {} }));
+    await act(async () =>
+      mutationResult(
+        client.mutations.profile.updateSettings({
+          input: {
+            profileId: profile.documentId,
+            parameters: [{ ...values, phone: "", paymentMethods: {} }],
+          },
+        }),
+      ),
+    );
     await vi.waitFor(() => expect(party.doc().participants.alice?.paymentMethods).toEqual({}));
     expect(party.doc().participants.alice?.phone).toBe("");
     expect(profile.doc().paymentMethods).toEqual({});

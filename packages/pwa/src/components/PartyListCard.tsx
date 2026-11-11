@@ -1,6 +1,5 @@
-import { view } from "@nkzw/fate";
-import type { PartyEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import type { ViewRef } from "@nkzw/fate";
+import { PartyCardView } from "./PartyListCard.view.ts";
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -32,15 +31,6 @@ import {
 } from "@trizum/ui/ModalSheet";
 import { cn } from "@trizum/ui/utils";
 
-const PartyCardView = view<PartyEntity>()({
-  id: true,
-  available: true,
-  name: true,
-  symbol: true,
-  description: true,
-  participants: true,
-});
-
 export interface PartyListCardAction {
   key: string;
   icon: ComponentProps<typeof Icon>["icon"];
@@ -51,7 +41,7 @@ export interface PartyListCardAction {
 
 interface PartyListCardProps {
   actions?: PartyListCardAction[];
-  partyId: string;
+  partyRef: ViewRef<"Party">;
   isArchived?: boolean;
   isPinned?: boolean;
   currentParticipantId?: PartyParticipant["id"] | null;
@@ -67,19 +57,15 @@ const suppressNativeLongPress = {
 
 export function PartyListCard({
   actions = EMPTY_PARTY_LIST_CARD_ACTIONS,
-  partyId,
+  partyRef,
   isArchived = false,
   isPinned = false,
   currentParticipantId = null,
 }: PartyListCardProps) {
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery("(min-width: 768px)");
-  const data = useAppData();
 
-  const entity = useView(
-    PartyCardView,
-    data.entityRef<PartyEntity>("Party", partyId, PartyCardView),
-  );
+  const entity = useView(PartyCardView, partyRef);
 
   const party = entity.available ? entity : undefined;
   const [isFocusWithin, setIsFocusWithin] = useState(false);

@@ -1,3 +1,5 @@
+import { view } from "@nkzw/fate";
+import type { ExpenseChunkEntity } from "#src/lib/data/entities.ts";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
@@ -6,13 +8,26 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { PartyStatsView } from "#src/components/PartyStatsView.tsx";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 
+const ChunkPreloadView = view<ExpenseChunkEntity>()({ available: true, expenses: { id: true } });
+
 export const Route = createFileRoute("/party_/$partyId/stats")({
   component: PartyStatsRoute,
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId }, location }) => {
     const { party } = await guardParticipatingInParty(partyId, context, location);
 
-    await Promise.all(party.chunkRefs.map((chunkRef) => context.data.read(chunkRef.chunkId)));
+    await Promise.all(
+      party.chunkRefs.map((chunkRef) =>
+        context.client.readView(
+          ChunkPreloadView,
+          context.client.ref<ExpenseChunkEntity>(
+            "ExpenseChunk",
+            chunkRef.chunkId,
+            ChunkPreloadView,
+          ),
+        ),
+      ),
+    );
 
     return;
   },

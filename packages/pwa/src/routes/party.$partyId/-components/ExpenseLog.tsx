@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { t } from "@lingui/core/macro";
@@ -27,7 +29,8 @@ import { cn } from "@trizum/ui/utils";
 import { VirtualizedExpenseList } from "./VirtualizedExpenseList.js";
 
 export function ExpenseLog() {
-  const { party, dev, setParticipantDetails } = useCurrentParty(PartyTemplatesView);
+  const client = useFateClient();
+  const { party } = useCurrentParty(PartyTemplatesView);
   const { expenses, hasNext, isLoadingNext, loadNext } = usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
   const navigate = useNavigate();
@@ -77,9 +80,19 @@ export function ExpenseLog() {
   }
 
   async function toggleAlwaysUseDefaultTemplate() {
-    await setParticipantDetails(participant.id, {
-      alwaysUseDefaultExpenseTemplate: !participant.alwaysUseDefaultExpenseTemplate,
-    });
+    await mutationResult(
+      client.mutations.party.setParticipantDetails({
+        input: {
+          partyId: party.id,
+          parameters: [
+            participant.id,
+            {
+              alwaysUseDefaultExpenseTemplate: !participant.alwaysUseDefaultExpenseTemplate,
+            },
+          ],
+        },
+      }),
+    );
     trackEvent(
       participant.alwaysUseDefaultExpenseTemplate
         ? "expense_template_shortcut_disabled"
@@ -182,7 +195,18 @@ export function ExpenseLog() {
                   </MenuItem>
 
                   {import.meta.env.DEV ? (
-                    <MenuItem menuAction={dev.createTestExpenses}>
+                    <MenuItem
+                      menuAction={async () => {
+                        const answer = window.prompt("How many test expenses to create?");
+
+                        if (answer)
+                          await mutationResult(
+                            client.mutations.party.createTestExpenses({
+                              input: { partyId: party.id, count: parseInt(answer) },
+                            }),
+                          );
+                      }}
+                    >
                       <Icon
                         icon="lucide.test-tube-diagonal"
                         width={20}

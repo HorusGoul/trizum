@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 
-import { view } from "@nkzw/fate";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+
+import { view, toEntityId } from "@nkzw/fate";
 import type { ExpenseEntity, ExpenseChunkEntity, PartyEntity, ProfileEntity } from "./entities.ts";
 
 import { Repo } from "@automerge/automerge-repo";
@@ -15,7 +17,7 @@ import { getPartyListHandle } from "#src/models/partyList.ts";
 import { useParty } from "#src/hooks/useParty.ts";
 import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { createAppData, type AppData } from "./client.ts";
-import { DataProvider } from "./context.tsx";
+import { FateClient } from "react-fate";
 
 const PartyHeaderView = view<PartyEntity>()({
   id: true,
@@ -126,18 +128,17 @@ function party() {
 async function mount(children: React.ReactNode) {
   await act(async () => {
     root.render(
-      <DataProvider data={data}>
+      <FateClient client={data.fate}>
         <Suspense fallback="Loading">{children}</Suspense>
-      </DataProvider>,
+      </FateClient>,
     );
   });
 }
 
 test("cold and evicted Fate caches render a ready local party without entering Suspense", async () => {
   const handle = party();
-  const coldRef = data.fate.ref<PartyEntity>("Party", handle.documentId, PartyHeaderView);
   expect(handle.isReady()).toBe(true);
-  expect(data.fate.peekView(PartyHeaderView, coldRef)).toBeUndefined();
+  expect(data.fate.store.read(toEntityId("Party", handle.documentId))).toBeUndefined();
   const find = vi.spyOn(repo, "find");
   const on = vi.spyOn(handle, "on");
   const fallback = vi.fn<() => void>();
@@ -157,26 +158,26 @@ test("cold and evicted Fate caches render a ready local party without entering S
   await act(async () => {
     flushSync(() => {
       root.render(
-        <DataProvider data={data}>
+        <FateClient client={data.fate}>
           <Suspense fallback={<Pending />}>
             <Header />
           </Suspense>
-        </DataProvider>,
+        </FateClient>,
       );
     });
     expect(container.textContent).toBe("Trip");
   });
   await act(async () => root.render(null));
   data.fate.deleteRecord("Party", handle.documentId);
-  expect(data.fate.peekView(PartyHeaderView, coldRef)).toBeUndefined();
+  expect(data.fate.store.read(toEntityId("Party", handle.documentId))).toBeUndefined();
   await act(async () => {
     flushSync(() => {
       root.render(
-        <DataProvider data={data}>
+        <FateClient client={data.fate}>
           <Suspense fallback={<Pending />}>
             <Header />
           </Suspense>
-        </DataProvider>,
+        </FateClient>,
       );
     });
     expect(container.textContent).toBe("Trip");
@@ -237,7 +238,7 @@ test("React party views isolate fields, share a source listener, and clear remov
     });
   });
   expect(container.textContent).toBe("TripRemote details");
-  const ref = data.entityRef<PartyEntity>("Party", handle.documentId, PartyHeaderView);
+  const ref = data.fate.ref<PartyEntity>("Party", handle.documentId, PartyHeaderView);
   expect(data.fate.peekView(PartyHeaderView, ref)?.data.symbol).toBeUndefined();
   await act(async () => root.render(null));
   data.fate.gc();
@@ -309,7 +310,7 @@ test("normalized expense views update drafts independently of list membership an
   const rowRender = vi.fn<() => void>();
 
   function List() {
-    const ref = data.entityRef<ExpenseChunkEntity>(
+    const ref = data.fate.ref<ExpenseChunkEntity>(
       "ExpenseChunk",
       chunk.documentId,
       ExpenseChunkView,
@@ -322,7 +323,7 @@ test("normalized expense views update drafts independently of list membership an
   }
 
   function Row() {
-    const ref = data.entityRef<ExpenseEntity>("Expense", expense.id, ExpenseDetailView);
+    const ref = data.fate.ref<ExpenseEntity>("Expense", expense.id, ExpenseDetailView);
     const result = useView(ExpenseDetailView, ref);
     rowRender();
 
@@ -330,7 +331,7 @@ test("normalized expense views update drafts independently of list membership an
   }
 
   function Editor() {
-    const ref = data.entityRef<ExpenseEntity>("Expense", expense.id, ExpenseEditorView);
+    const ref = data.fate.ref<ExpenseEntity>("Expense", expense.id, ExpenseEditorView);
     const result = useView(ExpenseEditorView, ref);
 
     return <span>{result.available ? (result.__editCopy?.name ?? result.name) : "Removed"}</span>;
@@ -347,7 +348,11 @@ test("normalized expense views update drafts independently of list membership an
   const listRenders = listRender.mock.calls.length;
   const rowRenders = rowRender.mock.calls.length;
   await act(async () => {
-    await data.editExpenseDraft(expense.id, [{ t: 2, p: ["name"], v: "Dinner" }]);
+    await mutationResult(
+      data.fate.mutations.expense.editDraft({
+        input: { expenseId: expense.id, patches: [{ t: 2, p: ["name"], v: "Dinner" }] },
+      }),
+    );
   });
   expect(container.textContent).toBe("1LunchDinner");
   expect(listRender).toHaveBeenCalledTimes(listRenders);
@@ -375,7 +380,7 @@ test("normalized expense views update drafts independently of list membership an
 
 test("incoming merges update typed views and source deletion publishes an unavailable entity", async () => {
   const handle = party();
-  const ref = data.entityRef<PartyEntity>("Party", handle.documentId, PartyDetailsView);
+  const ref = data.fate.ref<PartyEntity>("Party", handle.documentId, PartyDetailsView);
   await data.fate.readView(PartyDetailsView, ref);
   const remoteRepo = new Repo({ network: [] });
 

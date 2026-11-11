@@ -1,11 +1,12 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
 import { view } from "@nkzw/fate";
-import type { ExpenseEntity, PartyEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import type { ExpenseEntity } from "#src/lib/data/entities.ts";
+import { useFateClient } from "react-fate";
 import { optionalSearchNumberSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import { decodeExpenseId, getExpenseTotalAmount } from "#src/models/expense.js";
+import { getExpenseTotalAmount } from "#src/models/expense.js";
 import { isValidRecordId } from "#src/lib/data/ids.ts";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
@@ -16,7 +17,6 @@ import { Icon } from "@trizum/ui/Icon";
 import { useRequiredView } from "#src/lib/data/hooks.ts";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
@@ -45,11 +45,6 @@ const ExpenseDetailView = view<ExpenseEntity>()({
   __hash: true,
 });
 
-const PartyIdentityView = view<PartyEntity>()({
-  id: true,
-  available: true,
-});
-
 interface ExpenseSearchParams {
   media?: number;
 }
@@ -71,13 +66,15 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
 
-    const { chunkId } = decodeExpenseId(expenseId);
-    await context.data.read(chunkId);
+    await context.client.readView(
+      ExpenseDetailView,
+      context.client.ref<ExpenseEntity>("Expense", expenseId, ExpenseDetailView),
+    );
   },
 });
 
 function ExpenseById() {
-  const { expenseId, partyId, expense, onDeleteExpense, isLoading } = useExpense();
+  const { expenseId, partyId, expense, onDeleteExpense } = useExpense();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -96,10 +93,6 @@ function ExpenseById() {
 
   if (expenseId === undefined) {
     return <span>Invalid Expense ID</span>;
-  }
-
-  if (isLoading) {
-    return null;
   }
 
   if (!expense) {
@@ -257,7 +250,7 @@ function ExpenseDeleteConfirmationDialog({
 }
 
 function useExpense() {
-  const data = useAppData();
+  const client = useFateClient();
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
   const currentLocation = useLocation();
@@ -267,16 +260,18 @@ function useExpense() {
 
   const expense = useRequiredView(
     ExpenseDetailView,
-    data.entityRef<ExpenseEntity>("Expense", expenseId, ExpenseDetailView),
+    client.ref<ExpenseEntity>("Expense", expenseId, ExpenseDetailView),
   );
-
-  const { removeExpense } = useCurrentParty(PartyIdentityView);
 
   async function onDeleteExpense() {
     if (expenseId === undefined) return;
 
     try {
-      await removeExpense(expenseId);
+      await mutationResult(
+        client.mutations.party.removeExpense({
+          input: { partyId, parameters: [expenseId] },
+        }),
+      );
     } catch (error) {
       logger.error("Failed to delete expense", { error });
       toast.error(t`Failed to delete expense. Please try again.`);
@@ -299,6 +294,5 @@ function useExpense() {
     onDeleteExpense,
     expense,
     expenseId,
-    isLoading: false,
   };
 }

@@ -11,7 +11,7 @@ import {
 import { type Repo, RawString, type DocumentId } from "@automerge/automerge-repo";
 import { getLogger } from "#src/lib/log.ts";
 
-const logger = getLogger("hooks", "useMediaFileActions");
+const logger = getLogger("data", "mediaCommands");
 
 export function getImageUploadErrorMessage(cause: unknown): string | null {
   if (!(cause instanceof ImageProcessingError)) {

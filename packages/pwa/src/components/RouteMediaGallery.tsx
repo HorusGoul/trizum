@@ -1,6 +1,6 @@
 import { view } from "@nkzw/fate";
 import type { MediaEntity } from "#src/lib/data/entities.ts";
-import { useAppData } from "#src/lib/data/useAppData.ts";
+import { useFateClient } from "react-fate";
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState, useRef } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
@@ -92,11 +92,11 @@ export function RouteMediaGallery({
 }
 
 function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
-  const data = useAppData();
+  const client = useFateClient();
 
   const mediaFile = useRequiredView(
     MediaContentView,
-    data.entityRef<MediaEntity>("Media", photoId, MediaContentView),
+    client.ref<MediaEntity>("Media", photoId, MediaContentView),
   );
 
   const [url] = useMediaFileObjectUrls([mediaFile]);

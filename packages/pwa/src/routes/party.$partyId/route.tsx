@@ -1,3 +1,6 @@
+import type { ExpenseHistoryEntity } from "#src/lib/data/entities.ts";
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { ProfileEntity, PartyEntity } from "#src/lib/data/entities.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -11,7 +14,7 @@ import { Menu, MenuItem } from "@trizum/ui/Menu";
 import { Icon } from "@trizum/ui/Icon";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
-import { cn } from "@trizum/ui/utils";
+
 import { toast } from "sonner";
 import { useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
@@ -20,7 +23,6 @@ import { AnimatedTabs } from "@trizum/ui/AnimatedTabs";
 import { Suspense, useEffect, useRef, type Key } from "react";
 import { Switch } from "@trizum/ui/Switch";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
-import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.ts";
 import { Balances } from "./-components/Balances.js";
 import { ExpenseLog } from "./-components/ExpenseLog.js";
 
@@ -36,6 +38,8 @@ const PartyHeaderView = view<PartyEntity>()({
   symbol: true,
 });
 
+const HistoryPreloadView = view<ExpenseHistoryEntity>()({ expenseIds: true });
+
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";
 }
@@ -46,9 +50,9 @@ export const Route = createFileRoute("/party/$partyId")({
   loader: async ({ context, params: { partyId }, location }) => {
     const { party } = await guardParticipatingInParty(partyId, context, location);
 
-    await loadVisiblePartyExpenseChunks(
-      context.data,
-      party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
+    await context.client.readView(
+      HistoryPreloadView,
+      context.client.ref<ExpenseHistoryEntity>("ExpenseHistory", party.id, HistoryPreloadView),
     );
 
     return;
@@ -64,12 +68,10 @@ function PartyById() {
   const params = Route.useParams();
   const { tab: selectedTab } = Route.useSearch();
 
-  const { party, partyId, isLoading, setParticipantDetails, recalculateBalances } = useParty(
-    params.partyId,
-    PartyHeaderView,
-  );
+  const client = useFateClient();
+  const { party, partyId } = useParty(params.partyId, PartyHeaderView);
 
-  const { removeParty } = usePartyList(ProfileIdentityView);
+  const { partyList } = usePartyList(ProfileIdentityView);
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
@@ -82,7 +84,14 @@ function PartyById() {
   }
 
   async function refreshBalances() {
-    if (await recalculateBalances()) trackEvent("balances_recalculated");
+    if (
+      await mutationResult(
+        client.mutations.party.recalculateBalances({
+          input: { partyId: party.id, parameters: [] },
+        }),
+      )
+    )
+      trackEvent("balances_recalculated");
   }
 
   async function selectedTabChangeAction(tab: Key) {
@@ -98,7 +107,6 @@ function PartyById() {
       trackEvent(tab === "balances" ? "party_balances_selected" : "party_expenses_selected");
   }
 
-  const { setLastOpenedPartyId } = usePartyList(ProfileIdentityView);
   const lastRecordedPartyIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -107,23 +115,27 @@ function PartyById() {
     }
 
     lastRecordedPartyIdRef.current = partyId;
-    void setLastOpenedPartyId(party.id);
-  }, [party.id, partyId, setLastOpenedPartyId]);
+    void mutationResult(
+      client.mutations.profile.setLastOpenedPartyId({
+        input: { profileId: partyList.id, parameters: [party.id] },
+      }),
+    );
+  }, [client, party.id, partyId, partyList.id]);
 
   async function onLeaveParty() {
     if (!partyId) return;
     await navigate({ to: "/", replace: true });
-    await removeParty(party.id);
+    await mutationResult(
+      client.mutations.profile.removeParty({
+        input: { profileId: partyList.id, parameters: [party.id] },
+      }),
+    );
     trackEvent("party_left");
     toast.success(t`You left the party!`);
   }
 
   if (partyId === undefined) {
     return <span>Invalid Party ID</span>;
-  }
-
-  if (isLoading) {
-    return null;
   }
 
   if (party === undefined) {
@@ -133,9 +145,19 @@ function PartyById() {
   const participantName = participant.name;
 
   async function onTogglePersonalMode() {
-    await setParticipantDetails(participant.id, {
-      personalMode: !participant.personalMode,
-    });
+    await mutationResult(
+      client.mutations.party.setParticipantDetails({
+        input: {
+          partyId: party.id,
+          parameters: [
+            participant.id,
+            {
+              personalMode: !participant.personalMode,
+            },
+          ],
+        },
+      }),
+    );
     trackEvent(participant.personalMode ? "personal_mode_disabled" : "personal_mode_enabled");
   }
 

@@ -1,3 +1,5 @@
+import { mutationResult } from "#src/lib/data/mutationResult.ts";
+import { useFateClient } from "react-fate";
 import { view } from "@nkzw/fate";
 import type { PartyEntity } from "#src/lib/data/entities.ts";
 import { z } from "zod";
@@ -55,7 +57,8 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
 
 function RouteComponent() {
   const { fromId, toId, amount } = Route.useSearch();
-  const { party, addExpenseToParty } = useCurrentParty(PartyTransferView);
+  const client = useFateClient();
+  const { party } = useCurrentParty(PartyTransferView);
   const me = useCurrentParticipant();
   const from = party.participants[fromId];
   const to = party.participants[toId];
@@ -68,14 +71,23 @@ function RouteComponent() {
   const hasPaymentDetails = paymentMethodTypes.some((type) => methods[type]?.trim());
 
   function onMarkAsPaid() {
-    const expensePromise = addExpenseToParty({
-      name: t({ message: `Paid debt to ${toName}` }),
-      paidAt: new Date(),
-      paidBy: { [fromId]: amount },
-      isTransfer: true,
-      shares: { [toId]: { type: "divide", value: 1 } },
-      photos: [],
-    });
+    const expensePromise = mutationResult(
+      client.mutations.party.addExpenseToParty({
+        input: {
+          partyId: party.id,
+          parameters: [
+            {
+              name: t({ message: `Paid debt to ${toName}` }),
+              paidAt: new Date(),
+              paidBy: { [fromId]: amount },
+              isTransfer: true,
+              shares: { [toId]: { type: "divide", value: 1 } },
+              photos: [],
+            },
+          ],
+        },
+      }),
+    );
 
     toast.promise(expensePromise, {
       loading: t`Marking expense as paid...`,
