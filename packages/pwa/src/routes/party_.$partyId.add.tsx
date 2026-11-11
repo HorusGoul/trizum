@@ -24,6 +24,7 @@ import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { useState } from "react";
 import { resolveExpenseTemplateValues } from "#src/models/expenseTemplate.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
+import { getLatestExchangeRates } from "#src/lib/exchangeRates.ts";
 
 interface AddExpenseSearchParams {
   calculator?: string;
@@ -43,14 +44,26 @@ export const Route = createFileRoute("/party_/$partyId/add")({
       .parse(search);
   },
 
-  async loader({ context, params, location }) {
-    await guardParticipatingInParty(params.partyId, context, location);
+  loaderDeps: ({ search }) => ({ template: search.template }),
+  async loader({ context, params, location, deps }) {
+    const { party } = await guardParticipatingInParty(params.partyId, context, location);
+    const template = deps.template ? party.expenseTemplates?.[deps.template] : undefined;
+
+    const exchangeRates =
+      template?.currency &&
+      template.currency !== party.currency &&
+      template.exchangeRateMode !== "fixed"
+        ? await getLatestExchangeRates(party.currency)
+        : undefined;
+
+    return { exchangeRates };
   },
 });
 
 function AddExpense() {
   const { party, partyId, addExpenseToParty } = useCurrentParty();
   const search = Route.useSearch();
+  const { exchangeRates } = Route.useLoaderData();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
   const currentLocation = useLocation();
@@ -97,6 +110,7 @@ function AddExpense() {
       now: new Date(),
       party,
       templateId: search.template,
+      exchangeRates,
     }),
     isPrefilled: Boolean(search.template && party.expenseTemplates?.[search.template]),
   }));

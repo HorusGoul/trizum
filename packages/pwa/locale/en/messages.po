@@ -56,7 +56,7 @@ msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {and # other} other {and # others}}"
 
 #. placeholder {0}: participant.name
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:101
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:106
 msgid "{0} (archived)"
 msgstr "{0} (archived)"
 
@@ -165,7 +165,7 @@ msgstr "<0>{fromName}</0> stops owing <1>{toName}</1>"
 msgid "$Cashtag or Cash App link"
 msgstr "$Cashtag or Cash App link"
 
-#: src/routes/party_.$partyId.expense.$expenseId/-components/Amount.tsx:32
+#: src/routes/party_.$partyId.expense.$expenseId/-components/ExchangeRate.tsx:25
 msgid "1 {currency} = {rate} {partyCurrency}"
 msgstr "1 {currency} = {rate} {partyCurrency}"
 
@@ -271,7 +271,7 @@ msgstr "A name for the participant is required"
 msgid "A Premium member is boosting this party."
 msgstr "A Premium member is boosting this party."
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:140
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:145
 msgid "A template with this name already exists"
 msgstr "A template with this name already exists"
 
@@ -382,7 +382,7 @@ msgstr "Add your name so others know who you are and how to pay you"
 msgid "Add, edit, and archive participants"
 msgstr "Add, edit, and archive participants"
 
-#: src/routes/party_.$partyId.add.tsx:114
+#: src/routes/party_.$partyId.add.tsx:128
 msgid "Adding expense..."
 msgstr "Adding expense..."
 
@@ -430,9 +430,9 @@ msgstr "All time"
 msgid "Already redeemed?"
 msgstr "Already redeemed?"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:353
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:357
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:368
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:430
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:434
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:445
 msgid "Always include everyone"
 msgstr "Always include everyone"
 
@@ -443,8 +443,8 @@ msgstr "Always include everyone"
 msgid "Always use default template"
 msgstr "Always use default template"
 
-#: src/components/ExpenseCurrencyFields.tsx:98
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:322
+#: src/components/ExpenseCurrencyFields.tsx:90
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:324
 msgid "Amount"
 msgstr "Amount"
 
@@ -452,11 +452,11 @@ msgstr "Amount"
 msgid "Amount for {0}"
 msgstr "Amount for {0}"
 
-#: src/components/ExpenseEditor.tsx:850
+#: src/components/ExpenseEditor.tsx:852
 msgid "Amount for {participantName}"
 msgstr "Amount for {participantName}"
 
-#: src/components/ExpenseCurrencyFields.tsx:89
+#: src/components/ExpenseCurrencyFields.tsx:81
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
@@ -581,7 +581,7 @@ msgstr "Authentication error"
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
-#: src/components/ExpenseEditor.tsx:417
+#: src/components/ExpenseEditor.tsx:419
 #: src/routes/settings.tsx:257
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
@@ -791,7 +791,7 @@ msgstr "Canadian Dollar"
 
 #: src/components/CloudSyncDialogs.tsx:470
 #: src/components/CloudSyncDialogs.tsx:642
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:234
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:232
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:167
@@ -1093,7 +1093,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/components/ExpenseCurrencyFields.tsx:49
+#: src/components/ExpenseCurrencyFields.tsx:41
 msgid "Converted amount ({partyCurrency})"
 msgstr "Converted amount ({partyCurrency})"
 
@@ -1259,7 +1259,7 @@ msgstr "Cuban Convertible Peso"
 msgid "Cuban Peso"
 msgstr "Cuban Peso"
 
-#: src/components/ExpenseCurrencyFields.tsx:157
+#: src/components/CurrencySelect.tsx:29
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:91
 msgid "Currency"
 msgstr "Currency"
@@ -1268,7 +1268,7 @@ msgstr "Currency"
 msgid "Current month"
 msgstr "Current month"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:95
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:100
 msgid "Current participant"
 msgstr "Current participant"
 
@@ -1295,7 +1295,7 @@ msgstr "Czech Koruna"
 msgid "Danish Krone"
 msgstr "Danish Krone"
 
-#: src/components/ExpenseEditor.tsx:539
+#: src/components/ExpenseEditor.tsx:541
 msgid "Date"
 msgstr "Date"
 
@@ -1328,7 +1328,7 @@ msgstr "Debt transferred"
 msgid "Decimal point"
 msgstr "Decimal point"
 
-#: src/components/ExpenseEditor.tsx:773
+#: src/components/ExpenseEditor.tsx:775
 msgid "Decrease shares for {participantName}"
 msgstr "Decrease shares for {participantName}"
 
@@ -1340,7 +1340,7 @@ msgstr "Default"
 msgid "Default template"
 msgstr "Default template"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:119
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:120
 msgid "Delete"
 msgstr "Delete"
 
@@ -1354,8 +1354,8 @@ msgstr "Delete account"
 msgid "Delete account?"
 msgstr "Delete account?"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:193
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:223
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:191
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:221
 msgid "Delete expense"
 msgstr "Delete expense"
 
@@ -1363,12 +1363,12 @@ msgstr "Delete expense"
 msgid "Delete expense template?"
 msgstr "Delete expense template?"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:203
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:201
 msgid "Delete expense?"
 msgstr "Delete expense?"
 
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:38
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:396
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:474
 msgid "Delete template"
 msgstr "Delete template"
 
@@ -1452,7 +1452,7 @@ msgstr "East Caribbean Dollar"
 
 #: src/components/PaymentMethodEditorRow.tsx:193
 #: src/components/PaymentMethodEditorRow.tsx:221
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:113
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:114
 msgid "Edit"
 msgstr "Edit"
 
@@ -1629,15 +1629,22 @@ msgstr "Everything is archived for now. You can reopen any party from the archiv
 msgid "Exact"
 msgstr "Exact"
 
-#: src/components/ExpenseCurrencyFields.tsx:137
+#: src/routes/party_.$partyId.expense.$expenseId/-components/ExchangeRate.tsx:22
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:355
 msgid "Exchange rate"
 msgstr "Exchange rate"
 
-#: src/components/ExpenseCurrencyFields.tsx:147
+#: src/components/ExpenseCurrencyFields.tsx:42
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:390
+msgid "Exchange rate ({partyCurrency}/{currency})"
+msgstr "Exchange rate ({partyCurrency}/{currency})"
+
+#: src/components/ExpenseCurrencyFields.tsx:138
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:191
 msgid "Exchange rate must be greater than 0"
 msgstr "Exchange rate must be greater than 0"
 
-#: src/routes/party_.$partyId.add.tsx:140
+#: src/routes/party_.$partyId.add.tsx:154
 msgid "Expense added"
 msgstr "Expense added"
 
@@ -1654,7 +1661,7 @@ msgstr "Expense checks"
 msgid "Expense defaults"
 msgstr "Expense defaults"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:281
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:279
 msgid "Expense deleted"
 msgstr "Expense deleted"
 
@@ -1666,7 +1673,7 @@ msgstr "Expense Split Mode"
 msgid "Expense template"
 msgstr "Expense template"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:191
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:181
 msgid "Expense template created"
 msgstr "Expense template created"
 
@@ -1678,7 +1685,7 @@ msgstr "Expense template deleted"
 msgid "Expense template options"
 msgstr "Expense template options"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:191
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:181
 msgid "Expense template saved"
 msgstr "Expense template saved"
 
@@ -1713,12 +1720,12 @@ msgid "Explore Premium"
 msgstr "Explore Premium"
 
 #: src/components/AvatarPicker.tsx:123
-#: src/components/ExpenseEditor.tsx:1029
+#: src/components/ExpenseEditor.tsx:1031
 #: src/components/QRCodeScanner.tsx:129
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
 
-#: src/routes/party_.$partyId.add.tsx:145
+#: src/routes/party_.$partyId.add.tsx:159
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
 
@@ -1734,7 +1741,7 @@ msgstr "Failed to copy party link to clipboard, please copy it manually"
 msgid "Failed to copy phone number to clipboard, please copy it manually"
 msgstr "Failed to copy phone number to clipboard, please copy it manually"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:269
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:267
 msgid "Failed to delete expense. Please try again."
 msgstr "Failed to delete expense. Please try again."
 
@@ -1762,7 +1769,7 @@ msgstr "Failed to update expense"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Failed to upload avatar. Please try again."
 
-#: src/components/ExpenseEditor.tsx:1002
+#: src/components/ExpenseEditor.tsx:1004
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
@@ -1790,6 +1797,11 @@ msgstr "Filter totals and rankings"
 #: src/components/CloudSyncDialogs.tsx:279
 msgid "Finishing sign in"
 msgstr "Finishing sign in"
+
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:375
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:376
+msgid "Fixed rate"
+msgstr "Fixed rate"
 
 #: src/components/PremiumRedemptionHelp.tsx:100
 msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
@@ -2037,7 +2049,7 @@ msgstr "If you have questions about these Terms, please contact us:"
 msgid "Image must be smaller than 10MB"
 msgstr "Image must be smaller than 10MB"
 
-#: src/routes/party.$partyId/-components/ExpenseItem.tsx:47
+#: src/routes/party.$partyId/-components/ExpenseItem.tsx:55
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
@@ -2065,11 +2077,11 @@ msgstr "Importing attachments ({0} of {1})"
 msgid "Importing Tricount data..."
 msgstr "Importing Tricount data..."
 
-#: src/components/ExpenseEditor.tsx:597
+#: src/components/ExpenseEditor.tsx:599
 msgid "Include all"
 msgstr "Include all"
 
-#: src/components/ExpenseEditor.tsx:809
+#: src/components/ExpenseEditor.tsx:811
 msgid "Increase shares for {participantName}"
 msgstr "Increase shares for {participantName}"
 
@@ -2247,6 +2259,11 @@ msgstr "Last used"
 msgid "Last year"
 msgstr "Last year"
 
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:371
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:372
+msgid "Latest rate"
+msgstr "Latest rate"
+
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:247
 msgid "Leave at zero for an empty amount"
 msgstr "Leave at zero for an empty amount"
@@ -2327,7 +2344,7 @@ msgstr "Malaysian Ringgit"
 msgid "Maldivian Rufiyaa"
 msgstr "Maldivian Rufiyaa"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:250
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:248
 msgid "Malformed Party ID"
 msgstr "Malformed Party ID"
 
@@ -2376,12 +2393,12 @@ msgstr "Mauritian Rupee"
 #: src/components/PartyStatsView.tsx:622
 #: src/components/PartyStatsView.tsx:709
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:24
-#: src/routes/party_.$partyId.expense.$expenseId/-components/Shares.tsx:41
+#: src/routes/party_.$partyId.expense.$expenseId/-components/Shares.tsx:49
 msgid "Me"
 msgstr "Me"
 
-#: src/components/ExpenseEditor.tsx:410
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:98
+#: src/components/ExpenseEditor.tsx:412
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:99
 #: src/routes/party.$partyId/route.tsx:191
 msgid "Menu"
 msgstr "Menu"
@@ -2488,7 +2505,7 @@ msgstr "Name"
 msgid "Name is required"
 msgstr "Name is required"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:129
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:134
 msgid "Name is too long"
 msgstr "Name is too long"
 
@@ -2520,7 +2537,7 @@ msgstr "Nepalese Rupee"
 msgid "Netherlands Antillean Guilder"
 msgstr "Netherlands Antillean Guilder"
 
-#: src/routes/party_.$partyId.add.tsx:157
+#: src/routes/party_.$partyId.add.tsx:171
 msgid "New expense"
 msgstr "New expense"
 
@@ -2752,7 +2769,7 @@ msgstr "Open archived parties"
 msgid "Open calculator"
 msgstr "Open calculator"
 
-#: src/components/ExpenseEditor.tsx:420
+#: src/components/ExpenseEditor.tsx:422
 msgid "Open calculator when focusing amount fields"
 msgstr "Open calculator when focusing amount fields"
 
@@ -2816,7 +2833,7 @@ msgstr "or enter code"
 msgid "or use email"
 msgstr "or use email"
 
-#: src/components/ExpenseCurrencyFields.tsx:69
+#: src/components/ExpenseCurrencyFields.tsx:61
 msgid "Original amount ({currency})"
 msgstr "Original amount ({currency})"
 
@@ -2849,9 +2866,9 @@ msgstr "Paid as {currentParticipantName}"
 msgid "Paid at"
 msgstr "Paid at"
 
-#: src/components/ExpenseEditor.tsx:514
+#: src/components/ExpenseEditor.tsx:516
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:49
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:335
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:412
 msgid "Paid by"
 msgstr "Paid by"
 
@@ -3158,7 +3175,7 @@ msgstr "Please correct it before saving."
 msgid "Please don't close the app while we migrate your data"
 msgstr "Please don't close the app while we migrate your data"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:125
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:130
 msgid "Please give this template a name"
 msgstr "Please give this template a name"
 
@@ -3370,7 +3387,7 @@ msgstr "Remove avatar"
 msgid "Remove payment method"
 msgstr "Remove payment method"
 
-#: src/components/ExpenseEditor.tsx:1122
+#: src/components/ExpenseEditor.tsx:1124
 msgid "Remove photo"
 msgstr "Remove photo"
 
@@ -3480,7 +3497,7 @@ msgstr "São Tomé and Príncipe Dobra"
 msgid "Saudi Riyal"
 msgstr "Saudi Riyal"
 
-#: src/components/ExpenseEditor.tsx:319
+#: src/components/ExpenseEditor.tsx:321
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
 #: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
@@ -3529,7 +3546,7 @@ msgstr "See spending totals and rankings"
 msgid "Select emoji"
 msgstr "Select emoji"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:363
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:440
 msgid "Select everyone now and automatically include new participants."
 msgstr "Select everyone now and automatically include new participants."
 
@@ -3625,7 +3642,7 @@ msgstr "Shares"
 msgid "Shares for {0}"
 msgstr "Shares for {0}"
 
-#: src/components/ExpenseEditor.tsx:805
+#: src/components/ExpenseEditor.tsx:807
 msgid "Shares for {participantName}"
 msgstr "Shares for {participantName}"
 
@@ -3890,7 +3907,7 @@ msgstr "Stop trizum cloud on this device"
 msgid "Submit a Request"
 msgstr "Submit a Request"
 
-#: src/components/ExpenseEditor.tsx:319
+#: src/components/ExpenseEditor.tsx:321
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
 #: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
@@ -3939,12 +3956,12 @@ msgstr "Swipe between expenses and balances tabs."
 msgid "Swiss Franc"
 msgstr "Swiss Franc"
 
-#: src/components/ExpenseEditor.tsx:831
+#: src/components/ExpenseEditor.tsx:833
 msgid "Switch to a set amount"
 msgstr "Switch to a set amount"
 
-#: src/components/ExpenseEditor.tsx:821
-#: src/components/ExpenseEditor.tsx:832
+#: src/components/ExpenseEditor.tsx:823
+#: src/components/ExpenseEditor.tsx:834
 msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
@@ -3983,8 +4000,8 @@ msgstr "Tajikistani Somoni"
 
 #: src/components/AvatarPicker.tsx:171
 #: src/components/AvatarPicker.tsx:186
-#: src/components/ExpenseEditor.tsx:1050
-#: src/components/ExpenseEditor.tsx:1064
+#: src/components/ExpenseEditor.tsx:1052
+#: src/components/ExpenseEditor.tsx:1066
 msgid "Take photo"
 msgstr "Take photo"
 
@@ -4008,7 +4025,7 @@ msgstr "Tap to open {methodName} and pay."
 msgid "Template"
 msgstr "Template"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:41
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:44
 msgid "Template {number}"
 msgstr "Template {number}"
 
@@ -4161,7 +4178,7 @@ msgstr "This device is already using trizum cloud"
 msgid "This device is synced"
 msgstr "This device is synced"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:206
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:204
 msgid "This expense will be permanently deleted. This action cannot be undone."
 msgstr "This expense will be permanently deleted. This action cannot be undone."
 
@@ -4214,8 +4231,8 @@ msgstr "This stops trizum cloud on this device. Your local data stays on this de
 msgid "Timeframe"
 msgstr "Timeframe"
 
-#: src/components/ExpenseEditor.tsx:482
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
+#: src/components/ExpenseEditor.tsx:484
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:308
 msgid "Title"
 msgstr "Title"
 
@@ -4223,7 +4240,7 @@ msgstr "Title"
 msgid "Title is required"
 msgstr "Title is required"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:301
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:302
 msgid "Title is too long"
 msgstr "Title is too long"
 
@@ -4448,14 +4465,14 @@ msgstr "Updating trizum..."
 msgid "Upload malware or content designed to disrupt or damage the Service"
 msgstr "Upload malware or content designed to disrupt or damage the Service"
 
-#: src/components/ExpenseEditor.tsx:941
+#: src/components/ExpenseEditor.tsx:943
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
 #: src/components/AvatarPicker.tsx:180
 #: src/components/AvatarPicker.tsx:198
-#: src/components/ExpenseEditor.tsx:1059
-#: src/components/ExpenseEditor.tsx:1076
+#: src/components/ExpenseEditor.tsx:1061
+#: src/components/ExpenseEditor.tsx:1078
 msgid "Upload photo"
 msgstr "Upload photo"
 
@@ -4468,7 +4485,7 @@ msgstr "Uploading avatar..."
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
-#: src/components/ExpenseEditor.tsx:982
+#: src/components/ExpenseEditor.tsx:984
 msgid "Uploading..."
 msgstr "Uploading..."
 
@@ -4593,7 +4610,7 @@ msgstr "View on GitHub"
 msgid "View party"
 msgstr "View party"
 
-#: src/components/ExpenseEditor.tsx:1111
+#: src/components/ExpenseEditor.tsx:1113
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "View photo"
@@ -4756,7 +4773,7 @@ msgstr "You are responsible for User Content you add or share. You must have the
 msgid "You can add photos to your expenses for better tracking."
 msgstr "You can add photos to your expenses for better tracking."
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:68
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:71
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:39
 msgid "You can create up to {MAX_EXPENSE_TEMPLATES} custom templates."
 msgstr "You can create up to {MAX_EXPENSE_TEMPLATES} custom templates."

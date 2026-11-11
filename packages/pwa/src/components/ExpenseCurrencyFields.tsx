@@ -1,14 +1,13 @@
 import { use } from "react";
 import { useStore } from "@tanstack/react-form";
 import { useLingui } from "@lingui/react/macro";
-import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { AppNumberField } from "@trizum/ui/fields/TextField";
 import type { ExpenseEditorFormValues } from "./ExpenseEditor";
 import type { AppFormApi } from "../lib/reactFormTypes";
 import { CurrencyContext } from "./CurrencyContext";
 import { CurrencyField } from "./CurrencyField";
 import type { CurrencyFieldProps } from "./CurrencyField";
-import { isCurrencyCode } from "../lib/money";
+import { CurrencySelect } from "./CurrencySelect";
 import { useExchangeRates } from "../hooks/useExchangeRates";
 import { getExchangeRate } from "../lib/exchangeRates";
 import { convertExpenseAmount } from "../lib/currencyConversion";
@@ -32,22 +31,15 @@ export function ExpenseCurrencyFields({
   createFieldFocusHandlers,
   ...calculatorProps
 }: ExpenseCurrencyFieldsProps) {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
   const partyCurrency = use(CurrencyContext);
   const table = useExchangeRates(partyCurrency);
   const original = useStore(form.store, (state) => state.values.originalAmount);
   const exchangeRate = useStore(form.store, (state) => state.values.exchangeRate);
   const currency = original?.currency ?? partyCurrency;
-  const currencyNames = new Intl.DisplayNames([i18n.locale], { type: "currency" });
-
-  const currencies = Array.from(
-    new Set([partyCurrency, currency, ...Intl.supportedValuesOf("currency")]),
-  )
-    .filter(isCurrencyCode)
-    .map((id) => ({ id, name: `${id} · ${currencyNames.of(id) ?? id}` }));
 
   const convertedAmountLabel = t({ message: `Converted amount (${partyCurrency})` });
-  const rateDescription = t({ message: `${partyCurrency} per 1 ${currency}` });
+  const exchangeRateLabel = t({ message: `Exchange rate (${partyCurrency}/${currency})` });
 
   function updateConversion(nextOriginal: NonNullable<typeof original>, rate: number | null) {
     form.setFieldValue("originalAmount", nextOriginal);
@@ -134,8 +126,7 @@ export function ExpenseCurrencyFields({
           <form.Field name="exchangeRate">
             {(field) => (
               <AppNumberField
-                label={t`Exchange rate`}
-                description={rateDescription}
+                label={exchangeRateLabel}
                 name={field.name}
                 value={field.state.value ?? Number.NaN}
                 onChange={(value) =>
@@ -153,15 +144,11 @@ export function ExpenseCurrencyFields({
           </form.Field>
         </>
       )}
-      <AppSelect
-        label={t`Currency`}
-        items={currencies}
-        selectedKey={currency}
+      <CurrencySelect
+        currency={currency}
+        partyCurrency={partyCurrency}
         className="min-w-0"
-        onSelectionChange={(selection) => {
-          const key = String(selection);
-
-          if (!isCurrencyCode(key) || key === currency) return;
+        onChange={(key) => {
           calculatorProps.onCloseCalculator?.();
           // Currency selection relabels the entered amount, rather than converting it again.
           const enteredAmount = original?.amount ?? convertToUnits(form.state.values.amount);
@@ -181,13 +168,7 @@ export function ExpenseCurrencyFields({
             );
           }
         }}
-      >
-        {(item) => (
-          <SelectItem key={item.id} value={item} textValue={item.name}>
-            {item.name}
-          </SelectItem>
-        )}
-      </AppSelect>
+      />
     </>
   );
 }

@@ -117,3 +117,22 @@ export function getExchangeRatesStore(base: CurrencyCode) {
 
   return store;
 }
+
+/** Start with cached rates if a slow refresh would otherwise block the expense editor. */
+export async function getLatestExchangeRates(base: CurrencyCode) {
+  const store = getExchangeRatesStore(base);
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+
+  try {
+    await Promise.race([
+      store.refresh(),
+      new Promise<void>((resolve) => {
+        timeout = setTimeout(resolve, 1500);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  return store.getSnapshot();
+}

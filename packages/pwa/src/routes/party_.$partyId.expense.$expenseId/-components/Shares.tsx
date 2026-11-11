@@ -28,6 +28,14 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmo
             .map(([userId, amount]) => {
               const isMe = userId === currentParticipant.id;
 
+              const original =
+                expense.originalAmount && expense.shares[userId].originalAmount != null
+                  ? {
+                      amount: expense.shares[userId].originalAmount,
+                      currency: expense.originalAmount.currency,
+                    }
+                  : undefined;
+
               return (
                 <li
                   key={userId}
@@ -44,14 +52,14 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmo
                   </span>
                   <span className="flex flex-col items-end">
                     <CurrencyText
-                      amount={amount}
-                      currency={party.currency}
+                      amount={original?.amount ?? amount}
+                      currency={original?.currency ?? party.currency}
                       className="font-semibold"
                     />
-                    {expense.originalAmount && expense.shares[userId].originalAmount != null ? (
+                    {original ? (
                       <CurrencyText
-                        amount={expense.shares[userId].originalAmount}
-                        currency={expense.originalAmount.currency}
+                        amount={amount}
+                        currency={party.currency}
                         className="text-accent-600 dark:text-accent-300 text-xs"
                         variant="inherit"
                       />

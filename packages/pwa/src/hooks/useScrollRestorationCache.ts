@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface ScrollRestorationCache {
   initialScrollTop: number;
   setScrollTop: (scrollTop: number) => void;
@@ -19,5 +21,14 @@ function getOrCreateCache(key: string): ScrollRestorationCache {
 }
 
 export function useScrollRestorationCache(key: string) {
-  return getOrCreateCache(key);
+  const [entry, setEntry] = useState(() => ({ key, value: getOrCreateCache(key) }));
+
+  if (entry.key !== key) {
+    const next = { key, value: getOrCreateCache(key) };
+    setEntry(next);
+
+    return next.value;
+  }
+
+  return entry.value;
 }

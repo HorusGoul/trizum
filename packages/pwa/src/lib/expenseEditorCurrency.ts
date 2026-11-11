@@ -43,10 +43,23 @@ export function getExpenseEditorDraftValues<T extends CurrencyValues>(values: T)
 }
 
 /** Saving and collaborative updates always receive exact shares in party currency. */
-export function getExpenseEditorStoredValues<T extends CurrencyValues>(values: T): T {
+export function getExpenseEditorStoredValues<T extends CurrencyValues>(
+  values: T,
+  savedValues?: CurrencyValues,
+): T {
   const { originalAmount, exchangeRate } = values;
 
   if (!originalAmount) return { ...values, shares: clearOriginalAmounts(values.shares) };
+
+  // An inferred foreign share may not represent the authoritative saved allocation exactly.
+  if (savedValues && monetaryValuesMatch(values, getExpenseEditorDraftValues(savedValues))) {
+    return {
+      ...values,
+      shares: Object.fromEntries(
+        Object.entries(savedValues.shares).map(([id, share]) => [id, { ...share }]),
+      ),
+    };
+  }
 
   const originalAmounts = getExpenseEditorUnitShares(originalAmount.amount / 100, values.shares);
 
@@ -68,6 +81,22 @@ export function getExpenseEditorStoredValues<T extends CurrencyValues>(values: T
       ]),
     ),
   };
+}
+
+function monetaryValuesMatch(left: CurrencyValues, right: CurrencyValues) {
+  const entries = Object.entries(left.shares);
+
+  return (
+    left.amount === right.amount &&
+    left.exchangeRate === right.exchangeRate &&
+    left.originalAmount?.amount === right.originalAmount?.amount &&
+    left.originalAmount?.currency === right.originalAmount?.currency &&
+    entries.length === Object.keys(right.shares).length &&
+    entries.every(
+      ([id, share]) =>
+        share.type === right.shares[id]?.type && share.value === right.shares[id]?.value,
+    )
+  );
 }
 
 function hasRate(rate: number | null | undefined): rate is number {
@@ -97,13 +126,17 @@ function convertShares(
   if (sharesTotal === sourceAmount && sourceAmount > 0) {
     const amounts = getExpenseEditorUnitShares(
       targetAmount / 100,
-      Object.fromEntries(entries.map(([id]) => [id, { type: "divide", value: sourceAmounts[id] }])),
+      Object.fromEntries(
+        entries
+          .filter(([id]) => sourceAmounts[id] > 0)
+          .map(([id]) => [id, { type: "divide", value: sourceAmounts[id] }]),
+      ),
     );
 
     return Object.fromEntries(
       entries.map(([id, share]) => [
         id,
-        share.type === "exact" ? { type: "exact", value: amounts[id] } : share,
+        share.type === "exact" ? { type: "exact", value: amounts[id] ?? 0 } : share,
       ]),
     );
   }

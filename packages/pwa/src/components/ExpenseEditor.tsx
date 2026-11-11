@@ -122,6 +122,7 @@ export function ExpenseEditor({
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
+  const savedValuesRef = useRef(defaultValues);
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
 
   const unsortedParticipants = useExpenseParticipants({
@@ -178,7 +179,7 @@ export function ExpenseEditor({
       saveInFlightRef.current = true;
 
       await Promise.resolve()
-        .then(() => onSubmit(getExpenseEditorStoredValues(value)))
+        .then(() => onSubmit(getExpenseEditorStoredValues(value, savedValuesRef.current)))
         .finally(() => {
           saveInFlightRef.current = false;
         });
@@ -241,6 +242,7 @@ export function ExpenseEditor({
     ref,
     () => ({
       setValues: (values) => {
+        savedValuesRef.current = values;
         values = getExpenseEditorDraftValues(values);
         isReceivingUpdatesRef.current = true;
         const currentFocusedField = focusedFieldRef.current;
@@ -289,8 +291,8 @@ export function ExpenseEditor({
       }
 
       onChange(
-        getExpenseEditorStoredValues(previousValues),
-        getExpenseEditorStoredValues(currentState.values),
+        getExpenseEditorStoredValues(previousValues, savedValuesRef.current),
+        getExpenseEditorStoredValues(currentState.values, savedValuesRef.current),
       );
     });
 
@@ -458,7 +460,7 @@ function ExpenseDetailsFields({
   shouldAutoFocus: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-x-2 gap-y-4">
+    <div className="grid grid-cols-2 items-end gap-x-2 gap-y-4">
       <div className="col-span-2">
         <form.Field name="photos">
           {(field) => (
@@ -588,7 +590,7 @@ export function ExpenseParticipantsSection({
   return (
     <div className={cn("mt-4 flex flex-col gap-2", className)}>
       {onIncludeAllChange ? (
-        <div className="flex items-center justify-between border-l border-transparent pl-3">
+        <div className="flex items-center justify-between border-x border-transparent px-3">
           <Checkbox
             isSelected={shareCount === participants.length}
             isIndeterminate={shareCount > 0 && shareCount < participants.length}

@@ -1,12 +1,21 @@
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { Repo } from "@automerge/automerge-repo";
 import type { Chunk, DocumentId, StorageAdapterInterface } from "@automerge/automerge-repo/slim";
-import type { Expense } from "#src/models/expense.ts";
-import type { Party, PartyParticipant } from "#src/models/party.ts";
+import { decodeExpenseId, type Expense } from "#src/models/expense.ts";
+import type { Party, PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import {
   getExpenseTemplateEditorValues,
+  getExpenseTemplateFromEditorValues,
+  resolveExpenseTemplateValues,
   type ExpenseTemplate,
 } from "#src/models/expenseTemplate.ts";
+import {
+  getExpenseEditorDraftValues,
+  getExpenseEditorStoredValues,
+} from "#src/lib/expenseEditorCurrency.ts";
+import { FormApi } from "@tanstack/react-form";
+import { convertToUnits } from "#src/lib/expenses.ts";
+import { getExpenseConversionFields } from "#src/lib/currencyConversion.ts";
 
 const appWorkerMock = vi.hoisted(() => ({
   recalculateBalances: vi.fn<(partyId: Party["id"]) => Promise<boolean>>(),
@@ -316,6 +325,153 @@ describe("getPartyHelpers", () => {
     ).not.toThrow();
     expect(partyHandle.doc().expenseTemplates?.[template.id]?.name).toBe("Updated groceries");
   });
+
+  test("preserves imported allocations through repeated title edits in a real document", async () => {
+    const { helpers, repo } = createPartyHelpers();
+    appWorkerMock.recalculateBalances.mockResolvedValue(true);
+
+    try {
+      const expense = await helpers.addExpenseToParty({
+        ...createExpenseInput(),
+        paidBy: { alice: 15000 },
+        originalAmount: { amount: 100, currency: "USD" },
+        exchangeRate: 150,
+        shares: { alice: { type: "exact", value: 5000 }, bob: { type: "divide", value: 1 } },
+      });
+
+      const chunk = await repo.find<PartyExpenseChunk>(decodeExpenseId(expense.id).chunkId);
+
+      for (const name of ["Renamed import", "Renamed again"]) {
+        const saved = chunk.doc().expenses.find((entry) => entry.id === expense.id)!;
+        const savedValues = { ...saved, amount: 150 };
+        const form = new FormApi({ defaultValues: getExpenseEditorDraftValues(savedValues) });
+        const unmount = form.mount();
+
+        try {
+          form.setFieldValue("name", name);
+          const values = getExpenseEditorStoredValues(form.state.values, savedValues);
+          await helpers.updateExpense({ ...saved, name: values.name, shares: values.shares });
+          const updated = chunk.doc().expenses.find((entry) => entry.id === expense.id)!;
+          expect(updated.name).toBe(name);
+          expect(updated.shares.alice.value).toBe(5000);
+          expect(updated.originalAmount).toEqual({ amount: 100, currency: "USD" });
+          expect(updated.paidBy.alice).toBe(15000);
+        } finally {
+          unmount();
+        }
+      }
+    } finally {
+      await repo.shutdown();
+    }
+  });
+
+  test.each(["legacy", "currency-only", "fixed"] as const)(
+    "round-trips %s currency defaults through a real template form and document",
+    async (kind) => {
+      const { helpers, partyHandle, repo } = createPartyHelpers();
+      const unmountForms: Array<() => void> = [];
+      appWorkerMock.recalculateBalances.mockResolvedValue(true);
+
+      try {
+        const template = createExpenseTemplate("currency-defaults");
+        template.amount = 10000;
+        template.expenseName = "Abroad";
+        template.shares = {
+          alice: { type: "exact", value: 2500 },
+          bob: { type: "divide", value: 1 },
+        };
+
+        if (kind !== "legacy") {
+          template.currency = "USD";
+          template.exchangeRateMode = kind === "fixed" ? "fixed" : "latest";
+        }
+
+        if (kind === "fixed") template.exchangeRate = 0.8;
+
+        if (kind === "currency-only") {
+          delete template.amount;
+          template.shares = {};
+          template.participantSelection = "specific";
+        }
+
+        helpers.saveExpenseTemplate(template);
+
+        const form = new FormApi({
+          defaultValues: getExpenseTemplateEditorValues(
+            partyHandle.doc().expenseTemplates?.[template.id],
+          ),
+        });
+
+        unmountForms.push(form.mount());
+        form.setFieldValue("name", "Renamed currency defaults");
+        helpers.saveExpenseTemplate(
+          getExpenseTemplateFromEditorValues(template.id, form.state.values),
+        );
+        const saved = partyHandle.doc().expenseTemplates?.[template.id];
+        expect(saved).toMatchObject({ name: "Renamed currency defaults", shares: template.shares });
+        expect(saved?.currency).toBe(template.currency);
+        expect(saved?.exchangeRateMode).toBe(template.exchangeRateMode);
+        expect(saved?.exchangeRate).toBe(template.exchangeRate);
+
+        let persisted: Expense | undefined;
+
+        if (kind !== "currency-only") {
+          const values = resolveExpenseTemplateValues({
+            currentParticipantId: "alice",
+            now: new Date(),
+            party: partyHandle.doc(),
+            templateId: template.id,
+          });
+
+          const expense = await helpers.addExpenseToParty({
+            name: values.name,
+            paidAt: values.paidAt,
+            paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+            shares: values.shares,
+            photos: [],
+            ...getExpenseConversionFields(values),
+          });
+
+          const chunk = (
+            await repo.find<PartyExpenseChunk>(decodeExpenseId(expense.id).chunkId)
+          ).doc();
+
+          persisted = chunk.expenses.find((entry) => entry.id === expense.id);
+        }
+
+        expect(persisted?.paidBy.alice).toBe(
+          kind === "fixed" ? 8000 : kind === "legacy" ? 10000 : undefined,
+        );
+        expect(persisted?.originalAmount?.amount).toBe(kind === "fixed" ? 10000 : undefined);
+        expect(persisted?.shares.alice.value).toBe(
+          kind === "fixed" ? 2000 : kind === "legacy" ? 2500 : undefined,
+        );
+
+        const reopened = new FormApi({
+          defaultValues: getExpenseTemplateEditorValues(
+            partyHandle.doc().expenseTemplates?.[template.id],
+          ),
+        });
+
+        unmountForms.push(reopened.mount());
+        reopened.setFieldValue("exchangeRateMode", "latest");
+        reopened.setFieldValue("exchangeRate", null);
+        helpers.saveExpenseTemplate(
+          getExpenseTemplateFromEditorValues(template.id, reopened.state.values),
+        );
+        expect(partyHandle.doc().expenseTemplates?.[template.id]?.exchangeRate).toBeUndefined();
+        reopened.setFieldValue("currency", null);
+        helpers.saveExpenseTemplate(
+          getExpenseTemplateFromEditorValues(template.id, reopened.state.values),
+        );
+        expect(partyHandle.doc().expenseTemplates?.[template.id]?.currency).toBeUndefined();
+        expect(partyHandle.doc().expenseTemplates?.[template.id]?.exchangeRateMode).toBeUndefined();
+      } finally {
+        for (const unmount of unmountForms) unmount();
+        await repo.shutdown();
+      }
+    },
+  );
 });
 
 function createPartyHelpers(storage?: StorageAdapterInterface) {

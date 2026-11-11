@@ -152,7 +152,7 @@ test("reopening a foreign expense preserves its saved rate through a late refere
   );
   expect(form.state.values.amount).toBe(80);
   expect(form.state.values.exchangeRate).toBe(0.8);
-  expect(field("Exchange rate").value).toBe("0.8");
+  expect(field("Exchange rate (EUR/USD)").value).toBe("0.8");
   expect(field("Converted amount (EUR)").value).toBe("80");
   expect(field("Converted amount (EUR)").readOnly).toBe(true);
 });
@@ -170,7 +170,7 @@ test("selects a foreign currency, edits its amount and rate, and switches back t
   });
   await enter(field("Original amount (USD)"), "40");
   expect(form.state.values.amount).toBe(20);
-  await enter(field("Exchange rate"), "0.25");
+  await enter(field("Exchange rate (EUR/USD)"), "0.25");
   expect(form.state.values).toMatchObject({
     amount: 10,
     originalAmount: { amount: 4000, currency: "USD" },
@@ -187,10 +187,10 @@ test("accepts a manually entered rate for a currency with no reference rate", as
     originalAmount: { amount: 10000, currency: "XXX" },
     exchangeRate: null,
   });
-  expect(field("Exchange rate").value).toBe("");
-  await enter(field("Exchange rate"), "0.75");
+  expect(field("Exchange rate (EUR/XXX)").value).toBe("");
+  await enter(field("Exchange rate (EUR/XXX)"), "0.75");
   expect(form.state.values).toMatchObject({ amount: 75, exchangeRate: 0.75 });
-  await enter(field("Exchange rate"), "");
+  await enter(field("Exchange rate (EUR/XXX)"), "");
   expect(form.state.values).toMatchObject({ amount: 0, exchangeRate: null });
 });
 
@@ -257,7 +257,7 @@ test("retains a changed foreign amount when relabelling it with the party curren
     exchangeRate: 0.8,
   });
   await enter(field("Original amount (USD)"), "37.25");
-  await enter(field("Exchange rate"), "0.2");
+  await enter(field("Exchange rate (EUR/USD)"), "0.2");
   await choose("EUR");
   expect(field("Amount").value).toBe("37.25");
   expect(form.state.values).toMatchObject({

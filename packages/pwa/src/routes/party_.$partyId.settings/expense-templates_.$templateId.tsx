@@ -6,22 +6,25 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { CurrencyField } from "#src/components/CurrencyField.tsx";
+import { CurrencySelect } from "#src/components/CurrencySelect.tsx";
+import { CurrencyContext } from "#src/components/CurrencyContext.tsx";
+import { useExchangeRates } from "#src/hooks/useExchangeRates.ts";
+import { getExchangeRate } from "#src/lib/exchangeRates.ts";
 import { EmojiPicker } from "#src/components/EmojiPicker.tsx";
 import { ExpenseParticipantsSection } from "#src/components/ExpenseEditor.tsx";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.ts";
 import { useParty } from "#src/hooks/useParty.ts";
-import { convertToUnits } from "#src/lib/expenses.ts";
 import {
   ExpenseTemplateLimitError,
   getExpenseTemplateEditorValues,
+  getExpenseTemplateFromEditorValues,
   MAX_EXPENSE_TEMPLATES,
-  type ExpenseTemplate,
   type ExpenseTemplateEditorValues,
 } from "#src/models/expenseTemplate.ts";
 import { Button } from "@trizum/ui/Button";
 import { AppSelect, SelectItem } from "@trizum/ui/Select";
 import { Switch } from "@trizum/ui/Switch";
-import { AppTextField } from "@trizum/ui/fields/TextField";
+import { AppNumberField, AppTextField } from "@trizum/ui/fields/TextField";
 import { ArchivedParticipantsAlert } from "./-components/ArchivedParticipantsAlert.tsx";
 import { DeleteExpenseTemplateSheet } from "./-components/DeleteExpenseTemplateSheet.tsx";
 import { ExpenseTemplateEditorHeader } from "./-components/ExpenseTemplateEditorHeader.tsx";
@@ -73,6 +76,8 @@ function ExpenseTemplateEditor() {
   const isNew = templateId === "new";
   const { i18n, t: translate } = useLingui();
   const { party, deleteExpenseTemplate, saveExpenseTemplate } = useParty(partyId);
+  const partyCurrency = party.currency;
+  const rates = useExchangeRates(partyCurrency);
   const template = isNew ? undefined : party.expenseTemplates?.[templateId];
 
   if (!isNew && !template) {
@@ -154,25 +159,10 @@ function ExpenseTemplateEditor() {
         return;
       }
 
-      const normalizedName = value.name.trim();
-
-      const savedTemplate: ExpenseTemplate = {
-        id: template?.id ?? crypto.randomUUID(),
-        name: normalizedName,
-        symbol: value.symbol,
-        paidBy:
-          value.paidBy === "current-participant"
-            ? { type: "current-participant" }
-            : { type: "participant", participantId: value.paidBy },
-        participantSelection: value.participantSelection,
-        shares: value.shares,
-      };
-
-      const expenseName = value.expenseName.trim();
-
-      if (expenseName) savedTemplate.expenseName = expenseName;
-
-      if (value.amount > 0) savedTemplate.amount = convertToUnits(value.amount);
+      const savedTemplate = getExpenseTemplateFromEditorValues(
+        template?.id ?? crypto.randomUUID(),
+        value,
+      );
 
       try {
         saveExpenseTemplate(savedTemplate);
@@ -193,7 +183,17 @@ function ExpenseTemplateEditor() {
     },
   });
 
+  function validateExchangeRate(value: number | null) {
+    if (
+      form.state.values.exchangeRateMode === "fixed" &&
+      (value == null || !Number.isFinite(value) || value <= 0)
+    )
+      return t`Exchange rate must be greater than 0`;
+  }
+
   const amount = useStore(form.store, (state) => state.values.amount);
+  const currency = useStore(form.store, (state) => state.values.currency) ?? partyCurrency;
+  const exchangeRateMode = useStore(form.store, (state) => state.values.exchangeRateMode);
   const shares = useStore(form.store, (state) => state.values.shares);
   const participantSelection = useStore(form.store, (state) => state.values.participantSelection);
 
@@ -293,98 +293,176 @@ function ExpenseTemplateEditor() {
         </PartySettingsSection>
 
         <PartySettingsSection icon="lucide.receipt-text" title={<Trans>Expense defaults</Trans>}>
-          <div className="flex flex-col gap-4 py-2">
-            <form.Field
-              name="expenseName"
-              validators={{
-                onChange: ({ value }) => {
-                  if (value.trim().length > 50) return t`Title is too long`;
-                },
-              }}
-            >
-              {(field) => (
-                <AppTextField
-                  label={t`Title`}
-                  name={field.name}
-                  value={field.state.value}
-                  onChange={field.handleChange}
-                  onBlur={field.handleBlur}
-                  maxLength={50}
-                  isInvalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
-                  errorMessage={field.state.meta.errors.join(", ")}
-                />
-              )}
-            </form.Field>
-
-            <form.Field name="amount">
-              {(field) => (
-                <CurrencyField
-                  label={t`Amount`}
-                  name={field.name}
-                  value={field.state.value}
-                  minValue={0}
-                  onChange={field.handleChange}
-                  onBlur={field.handleBlur}
-                />
-              )}
-            </form.Field>
-
-            <form.Field name="paidBy">
-              {(field) => (
-                <AppSelect<PayerOption>
-                  label={t`Paid by`}
-                  name={field.name}
-                  items={payerOptions}
-                  selectedKey={field.state.value}
-                  onSelectionChange={(key) => field.handleChange(String(key))}
-                >
-                  {(option) => (
-                    <SelectItem key={option.id} value={option} textValue={option.label}>
-                      {option.label}
-                    </SelectItem>
-                  )}
-                </AppSelect>
-              )}
-            </form.Field>
-
-            <div className="flex items-center justify-between gap-4 rounded-xl py-2">
-              <label
-                htmlFor={ALWAYS_INCLUDE_EVERYONE_ID}
-                aria-label={t`Always include everyone`}
-                className="flex min-w-0 cursor-pointer flex-col select-none"
+          <CurrencyContext value={currency}>
+            <div className="flex flex-col gap-4 py-2">
+              <form.Field
+                name="expenseName"
+                validators={{
+                  onChange: ({ value }) => {
+                    if (value.trim().length > 50) return t`Title is too long`;
+                  },
+                }}
               >
-                <span className="text-sm font-medium">
-                  <Trans>Always include everyone</Trans>
-                </span>
-                <span
-                  id={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
-                  className="text-accent-500 text-sm"
+                {(field) => (
+                  <AppTextField
+                    label={t`Title`}
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    onBlur={field.handleBlur}
+                    maxLength={50}
+                    isInvalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
+                    errorMessage={field.state.meta.errors.join(", ")}
+                  />
+                )}
+              </form.Field>
+
+              <div className="flex flex-col gap-4">
+                <form.Field name="amount">
+                  {(field) => (
+                    <CurrencyField
+                      label={t`Amount`}
+                      name={field.name}
+                      value={field.state.value}
+                      minValue={0}
+                      onChange={field.handleChange}
+                      onBlur={field.handleBlur}
+                    />
+                  )}
+                </form.Field>
+
+                <form.Field name="currency">
+                  {(field) => (
+                    <CurrencySelect
+                      currency={currency}
+                      partyCurrency={partyCurrency}
+                      className="min-w-0"
+                      onBlur={field.handleBlur}
+                      onChange={(next) => {
+                        field.handleChange(next === partyCurrency ? null : next);
+                        form.setFieldValue("exchangeRateMode", "latest");
+                        form.setFieldValue("exchangeRate", null);
+                      }}
+                    />
+                  )}
+                </form.Field>
+
+                {currency !== partyCurrency ? (
+                  <>
+                    <form.Field name="exchangeRateMode">
+                      {(field) => (
+                        <AppSelect
+                          label={t`Exchange rate`}
+                          selectedKey={field.state.value}
+                          className="min-w-0"
+                          onSelectionChange={(key) => {
+                            if (key !== "latest" && key !== "fixed") return;
+                            field.handleChange(key);
+                            form.setFieldValue(
+                              "exchangeRate",
+                              key === "fixed"
+                                ? (getExchangeRate(rates, currency)?.rate ?? null)
+                                : null,
+                            );
+                          }}
+                        >
+                          <SelectItem
+                            id="latest"
+                            textValue={t`Latest rate`}
+                          >{t`Latest rate`}</SelectItem>
+                          <SelectItem
+                            id="fixed"
+                            textValue={t`Fixed rate`}
+                          >{t`Fixed rate`}</SelectItem>
+                        </AppSelect>
+                      )}
+                    </form.Field>
+                    {exchangeRateMode === "fixed" ? (
+                      <form.Field
+                        name="exchangeRate"
+                        validators={{
+                          onChange: ({ value }) => validateExchangeRate(value),
+                          onSubmit: ({ value }) => validateExchangeRate(value),
+                        }}
+                      >
+                        {(field) => (
+                          <AppNumberField
+                            label={t({ message: `Exchange rate (${partyCurrency}/${currency})` })}
+                            value={field.state.value ?? Number.NaN}
+                            onChange={(value) =>
+                              field.handleChange(Number.isFinite(value) ? value : null)
+                            }
+                            onBlur={field.handleBlur}
+                            minValue={0}
+                            formatOptions={{ maximumSignificantDigits: 17, useGrouping: false }}
+                            isInvalid={field.state.meta.errors.length > 0}
+                            errorMessage={field.state.meta.errors.join(", ")}
+                            className="min-w-0"
+                          />
+                        )}
+                      </form.Field>
+                    ) : null}
+                  </>
+                ) : null}
+              </div>
+
+              <form.Field name="paidBy">
+                {(field) => (
+                  <AppSelect<PayerOption>
+                    label={t`Paid by`}
+                    name={field.name}
+                    items={payerOptions}
+                    selectedKey={field.state.value}
+                    onSelectionChange={(key) => field.handleChange(String(key))}
+                  >
+                    {(option) => (
+                      <SelectItem key={option.id} value={option} textValue={option.label}>
+                        {option.label}
+                      </SelectItem>
+                    )}
+                  </AppSelect>
+                )}
+              </form.Field>
+
+              <div className="flex items-center justify-between gap-4 rounded-xl py-2">
+                <label
+                  htmlFor={ALWAYS_INCLUDE_EVERYONE_ID}
+                  aria-label={t`Always include everyone`}
+                  className="flex min-w-0 cursor-pointer flex-col select-none"
                 >
-                  <Trans>Select everyone now and automatically include new participants.</Trans>
-                </span>
-              </label>
-              <Switch
-                id={ALWAYS_INCLUDE_EVERYONE_ID}
-                aria-label={t`Always include everyone`}
-                aria-describedby={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
-                isSelected={participantSelection === "all"}
-                onChange={includeAllParticipants}
+                  <span className="text-sm font-medium">
+                    <Trans>Always include everyone</Trans>
+                  </span>
+                  <span
+                    id={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
+                    className="text-accent-500 text-sm"
+                  >
+                    <Trans>Select everyone now and automatically include new participants.</Trans>
+                  </span>
+                </label>
+                <Switch
+                  id={ALWAYS_INCLUDE_EVERYONE_ID}
+                  aria-label={t`Always include everyone`}
+                  aria-describedby={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
+                  isSelected={participantSelection === "all"}
+                  onChange={includeAllParticipants}
+                />
+              </div>
+
+              <ExpenseParticipantsSection
+                className="mt-0"
+                amount={amount}
+                autoOpenCalculator={false}
+                calculatorAttachmentPhotoIds={[]}
+                enableCalculator={false}
+                onSharesChange={setShares}
+                participants={activeParticipants}
+                shares={shares}
               />
+
+              <ArchivedParticipantsAlert isVisible={archivedReferencedParticipants.length > 0} />
             </div>
-
-            <ExpenseParticipantsSection
-              className="mt-0"
-              amount={amount}
-              autoOpenCalculator={false}
-              calculatorAttachmentPhotoIds={[]}
-              enableCalculator={false}
-              onSharesChange={setShares}
-              participants={activeParticipants}
-              shares={shares}
-            />
-
-            <ArchivedParticipantsAlert isVisible={archivedReferencedParticipants.length > 0} />
-          </div>
+          </CurrencyContext>
         </PartySettingsSection>
 
         {!isNew ? (

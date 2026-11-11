@@ -75,7 +75,7 @@ for (const width of [390, 1280]) {
     const convertedBox = await converted.boundingBox();
     const selectedCurrencyBox = await currency.boundingBox();
     const originalBox = await original.boundingBox();
-    const rateBox = await page.getByLabel("Exchange rate", { exact: true }).boundingBox();
+    const rateBox = await page.getByLabel("Exchange rate (EUR/USD)", { exact: true }).boundingBox();
 
     if (!convertedBox || !selectedCurrencyBox || !originalBox || !rateBox)
       throw new Error("Expected visible conversion fields");
@@ -85,8 +85,8 @@ for (const width of [390, 1280]) {
     expect(Math.abs(selectedCurrencyBox.y - rateBox.y)).toBeLessThan(2);
     expect(selectedCurrencyBox.x).toBeGreaterThan(rateBox.x + rateBox.width);
 
-    await page.getByLabel("Exchange rate", { exact: true }).fill("0.75");
-    await page.getByLabel("Exchange rate", { exact: true }).blur();
+    await page.getByLabel("Exchange rate (EUR/USD)", { exact: true }).fill("0.75");
+    await page.getByLabel("Exchange rate (EUR/USD)", { exact: true }).blur();
     await expect(converted).toHaveValue("18.75");
 
     if (width === 390) await page.setViewportSize({ width, height: 520 });
@@ -136,7 +136,7 @@ for (const width of [390, 1280]) {
     await detail.openEdit();
     await expect(page.getByRole("heading", { name: "Editing Dinner abroad" })).toBeVisible();
     await expect(original).toHaveValue("40");
-    await expect(page.getByLabel("Exchange rate", { exact: true })).toHaveValue("0.75");
+    await expect(page.getByLabel("Exchange rate (EUR/USD)", { exact: true })).toHaveValue("0.75");
     await expect(converted).toHaveValue("30");
   });
 }
@@ -180,8 +180,8 @@ test("edits participant amounts in the expense currency and preserves their orig
   await page.getByRole("button", { name: "Increase shares for Blair", exact: true }).click();
   await expect(blair).toHaveValue("60");
   await expect(casey).toHaveValue("30");
-  await page.getByLabel("Exchange rate", { exact: true }).fill("0.75");
-  await page.getByLabel("Exchange rate", { exact: true }).blur();
+  await page.getByLabel("Exchange rate (EUR/USD)", { exact: true }).fill("0.75");
+  await page.getByLabel("Exchange rate (EUR/USD)", { exact: true }).blur();
   await expect(page.getByLabel("Converted amount (EUR)", { exact: true })).toHaveValue("90");
   await expect(alex).toHaveValue("30");
   await page
@@ -205,8 +205,8 @@ test("edits participant amounts in the expense currency and preserves their orig
   await expect(alex).toHaveValue("24");
   await expect(blair).toHaveValue("64");
   await expect(casey).toHaveValue("32");
-  await page.getByLabel("Exchange rate", { exact: true }).fill("0.5");
-  await page.getByLabel("Exchange rate", { exact: true }).blur();
+  await page.getByLabel("Exchange rate (EUR/USD)", { exact: true }).fill("0.5");
+  await page.getByLabel("Exchange rate (EUR/USD)", { exact: true }).blur();
   await expect(alex).toHaveValue("24");
   await expect(page.getByLabel("Converted amount (EUR)", { exact: true })).toHaveValue("60");
   await page.getByRole("button", { name: "Save", exact: true }).click();

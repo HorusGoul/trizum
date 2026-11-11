@@ -145,3 +145,61 @@ test("rounds mixed splits without exact shares exceeding the converted total", (
   expect(expenseEditorSharesMatchAmount(stored.amount, stored.shares)).toBe(true);
   expect(getExpenseEditorDraftValues(stored)).toEqual(values);
 });
+
+test("preserves authoritative legacy allocations until monetary inputs change", () => {
+  const saved = {
+    name: "Legacy import",
+    amount: 150,
+    originalAmount: { amount: 100, currency: "USD" as const },
+    exchangeRate: 150,
+    shares: {
+      alex: { type: "exact" as const, value: 5000 },
+      blair: { type: "divide" as const, value: 1 },
+    },
+  };
+
+  const values = getExpenseEditorDraftValues(saved);
+  expect(values.shares.alex.value).toBe(33);
+  expect(getExpenseEditorStoredValues({ ...values, name: "Renamed" }, saved).shares).toEqual(
+    saved.shares,
+  );
+  expect(
+    getExpenseEditorStoredValues({ ...values, amount: 100, exchangeRate: 100 }, saved).shares.alex
+      .value,
+  ).toBe(3300);
+  expect(
+    getExpenseEditorStoredValues(
+      { ...values, shares: { ...values.shares, alex: { type: "exact", value: 50 } } },
+      saved,
+    ).shares.alex.value,
+  ).toBe(7500);
+});
+
+test("keeps zero allocations out of conversion remainders in both directions", () => {
+  const values = {
+    amount: 96.01,
+    originalAmount: { amount: 12000, currency: "USD" as const },
+    exchangeRate: 0.8001,
+    shares: {
+      alex: { type: "exact" as const, value: 0 },
+      blair: { type: "exact" as const, value: 6000 },
+      casey: { type: "exact" as const, value: 6000 },
+    },
+  };
+
+  const stored = getExpenseEditorStoredValues(values);
+  expect(stored.shares.alex).toEqual({ type: "exact", value: 0, originalAmount: 0 });
+  expect(expenseEditorSharesMatchAmount(stored.amount, stored.shares)).toBe(true);
+
+  const legacy = {
+    ...stored,
+    shares: Object.fromEntries(
+      Object.entries(stored.shares).map(([id, share]) => [
+        id,
+        { type: share.type, value: share.value },
+      ]),
+    ),
+  };
+
+  expect(getExpenseEditorDraftValues(legacy).shares.alex.value).toBe(0);
+});

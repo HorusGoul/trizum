@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { List, useListRef, type RowComponentProps } from "react-window";
+import { useRef } from "react";
+import { List, useDynamicRowHeight, useListRef, type RowComponentProps } from "react-window";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
 import type { Expense } from "#src/models/expense.js";
 import { Skeleton } from "@trizum/ui/Skeleton";
@@ -26,7 +26,9 @@ function ExpenseListRow({
   style,
 }: RowComponentProps<ExpenseListRowProps>) {
   if (index === spacerIndex) {
-    return <div aria-hidden="true" style={style} />;
+    return (
+      <div aria-hidden="true" style={{ ...style, height: EXPENSE_LIST_BOTTOM_SPACER_HEIGHT }} />
+    );
   }
 
   return (
@@ -61,45 +63,24 @@ export function VirtualizedExpenseList({
   loadNext: () => void;
 }) {
   const listRef = useListRef(null);
+
+  const rowHeight = useDynamicRowHeight({
+    defaultRowHeight: EXPENSE_LIST_DEFAULT_ROW_HEIGHT,
+    key: partyId,
+  });
+
   const scrollRestorationCache = useScrollRestorationCache(`party-${partyId}-expense-list`);
   const loaderIndex = hasNext ? expenses.length : -1;
   const spacerIndex = expenses.length + (hasNext ? 1 : 0);
   const rowCount = spacerIndex + 1;
   const requestedNextPageRef = useRef(false);
 
-  useEffect(() => {
-    const listElement = listRef.current?.element;
-
-    if (!listElement) {
-      return;
-    }
-
-    const rAF = window.requestAnimationFrame(() => {
-      listElement.scrollTop = scrollRestorationCache.initialScrollTop;
-    });
-
-    return () => {
-      cancelAnimationFrame(rAF);
-    };
-  }, [listRef, scrollRestorationCache.initialScrollTop]);
-
-  useEffect(() => {
-    const listElement = listRef.current?.element;
-
-    if (!listElement) {
-      return;
-    }
-
-    return () => {
-      scrollRestorationCache.setScrollTop(listElement.scrollTop);
-    };
-  }, [listRef, scrollRestorationCache]);
-
   return (
     <div className="min-h-0 flex-1">
       <List
         className="no-scrollbar h-full overflow-y-auto"
         data-testid="expense-log-list"
+        defaultScrollOffset={scrollRestorationCache.initialScrollTop}
         listRef={listRef}
         onRowsRendered={(visibleRows) => {
           if (!isLoadingNext) {
@@ -123,11 +104,7 @@ export function VirtualizedExpenseList({
         overscanCount={10}
         rowComponent={ExpenseListRow}
         rowCount={rowCount}
-        rowHeight={(index) =>
-          index === spacerIndex
-            ? EXPENSE_LIST_BOTTOM_SPACER_HEIGHT
-            : EXPENSE_LIST_DEFAULT_ROW_HEIGHT
-        }
+        rowHeight={rowHeight}
         rowProps={{ expenses, partyId, loaderIndex, spacerIndex }}
         style={{ height: "100%", width: "100%" }}
       />

@@ -1,4 +1,10 @@
-import { convertFromUnits, type ExpenseUser } from "#src/lib/expenses.ts";
+import { convertFromUnits, convertToUnits, type ExpenseUser } from "#src/lib/expenses.ts";
+import type { CurrencyCode } from "#src/lib/money.ts";
+import type { ExchangeRates } from "#src/lib/api/exchangeRatesContract.ts";
+import { getExchangeRate } from "#src/lib/exchangeRates.ts";
+import { getBundledExchangeRates } from "#src/lib/exchangeRateTables.ts";
+import { convertExpenseAmount, type ExpenseConversionValues } from "#src/lib/currencyConversion.ts";
+import { getExpenseEditorStoredValues } from "#src/lib/expenseEditorCurrency.ts";
 import type { Expense } from "#src/models/expense.ts";
 import type { Party } from "#src/models/party.ts";
 
@@ -22,10 +28,15 @@ export interface ExpenseTemplate {
   name: string;
   symbol: string;
   expenseName?: string;
-  /** The total amount in integer minor units. */
+  /** The total in hundredths of currency, or the party currency when omitted. */
   amount?: number;
+  currency?: CurrencyCode;
+  exchangeRateMode?: "latest" | "fixed";
+  /** Used only in fixed mode, in party-currency units per selected-currency unit. */
+  exchangeRate?: number;
   paidBy: ExpenseTemplatePayer;
   participantSelection: "all" | "specific";
+  /** Exact share values use the template's currency. Divide values remain weights. */
   shares: Expense["shares"];
 }
 
@@ -34,12 +45,15 @@ export interface ExpenseTemplateEditorValues {
   symbol: string;
   expenseName: string;
   amount: number;
+  currency: CurrencyCode | null;
+  exchangeRateMode: "latest" | "fixed";
+  exchangeRate: number | null;
   paidBy: string;
   participantSelection: "all" | "specific";
   shares: Expense["shares"];
 }
 
-export interface ResolvedExpenseTemplateValues {
+export interface ResolvedExpenseTemplateValues extends ExpenseConversionValues {
   name: string;
   amount: number;
   paidAt: Date;
@@ -107,6 +121,9 @@ export function getExpenseTemplateEditorValues(
     symbol: template?.symbol ?? DEFAULT_EXPENSE_TEMPLATE_SYMBOL,
     expenseName: template?.expenseName ?? "",
     amount: template?.amount === undefined ? 0 : convertFromUnits(template.amount),
+    currency: template?.currency ?? null,
+    exchangeRateMode: template?.exchangeRateMode ?? "latest",
+    exchangeRate: template?.exchangeRate ?? null,
     paidBy:
       template?.paidBy.type === "participant"
         ? template.paidBy.participantId
@@ -116,16 +133,49 @@ export function getExpenseTemplateEditorValues(
   };
 }
 
+export function getExpenseTemplateFromEditorValues(
+  id: string,
+  values: ExpenseTemplateEditorValues,
+): ExpenseTemplate {
+  const template: ExpenseTemplate = {
+    id,
+    name: values.name.trim(),
+    symbol: values.symbol,
+    paidBy:
+      values.paidBy === "current-participant"
+        ? { type: "current-participant" }
+        : { type: "participant", participantId: values.paidBy },
+    participantSelection: values.participantSelection,
+    shares: copyExpenseShares(values.shares),
+  };
+
+  if (values.expenseName.trim()) template.expenseName = values.expenseName.trim();
+
+  if (values.amount > 0) template.amount = convertToUnits(values.amount);
+
+  if (values.currency) {
+    template.currency = values.currency;
+    template.exchangeRateMode = values.exchangeRateMode;
+
+    if (values.exchangeRateMode === "fixed" && values.exchangeRate != null)
+      template.exchangeRate = values.exchangeRate;
+  }
+
+  return template;
+}
+
 export function resolveExpenseTemplateValues({
   currentParticipantId,
   now,
   party,
   templateId,
+  exchangeRates,
 }: {
   currentParticipantId: ExpenseUser;
   now: Date;
   party: Party;
   templateId?: string;
+  exchangeRates?: ExchangeRates;
 }): ResolvedExpenseTemplateValues {
   const template = templateId ? party.expenseTemplates?.[templateId] : undefined;
 
@@ -177,12 +227,29 @@ export function resolveExpenseTemplateValues({
       ? configuredPayerId
       : currentParticipantId;
 
-  return {
+  const values: ResolvedExpenseTemplateValues = {
     name: template.expenseName ?? "",
     amount: template.amount === undefined ? 0 : convertFromUnits(template.amount),
     paidBy,
-    shares,
+    shares: copyExpenseShares(shares),
     paidAt: now,
     photos: [],
   };
+
+  if (!template.currency || template.currency === party.currency) return values;
+
+  const rate =
+    template.exchangeRateMode === "fixed"
+      ? template.exchangeRate
+      : getExchangeRate(exchangeRates ?? getBundledExchangeRates(party.currency), template.currency)
+          ?.rate;
+
+  const originalAmount = { amount: template.amount ?? 0, currency: template.currency };
+
+  return getExpenseEditorStoredValues({
+    ...values,
+    amount: (convertExpenseAmount(originalAmount.amount, rate ?? 0) ?? 0) / 100,
+    originalAmount,
+    exchangeRate: rate ?? null,
+  });
 }
