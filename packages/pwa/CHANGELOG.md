@@ -1,5 +1,22 @@
 # @trizum/pwa
 
+## 1.13.6
+
+### Patch Changes
+
+- [#625](https://github.com/HorusGoul/trizum/pull/625) [`df7cdb3`](https://github.com/HorusGoul/trizum/commit/df7cdb34ade209895b5d3734d64b789677b1698f) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Improve image upload diagnostics with the processing stage, MIME type, and file size. Warn at the image-processing boundary and report failed uploads once with a stable error title.
+
+- [#617](https://github.com/HorusGoul/trizum/pull/617) [`e6b0fb3`](https://github.com/HorusGoul/trizum/commit/e6b0fb334ae9db26f862228fe5aaf274f0c65583) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Recover local document storage after the browser closes its IndexedDB connection. Retry the interrupted operation once on a new connection while continuing to report persistent storage failures.
+
+- [#618](https://github.com/HorusGoul/trizum/pull/618) [`b737e97`](https://github.com/HorusGoul/trizum/commit/b737e971131b2957839fb3030f4a5514dadcfe03) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Handle failed service worker update checks without an unhandled rejection, retaining the active version and allowing later checks to retry.
+
+- [#619](https://github.com/HorusGoul/trizum/pull/619) [`d6119eb`](https://github.com/HorusGoul/trizum/commit/d6119ebb7cc0959763cd8bbeef26d4d32c61d11e) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Restore app worker initialization on older WebViews without Promise.withResolvers.
+
+- [#626](https://github.com/HorusGoul/trizum/pull/626) [`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Send warning and higher log records to Sentry in the PWA and sync server. Preserve severity and document-ID redaction; warnings appear in Sentry Logs, while errors and fatal records also create issues.
+- Updated dependencies [[`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604)]:
+  - @trizum/logging@1.1.2
+  - @trizum/react-suspense-cache@0.1.3
+
 ## 1.13.5
 
 No changes in this release.
