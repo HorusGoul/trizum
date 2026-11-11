@@ -250,3 +250,46 @@ test("preserves formatted log text and template attributes while redacting param
   });
   expect(String(message)).toBe(`Document ${documentId} unavailable`);
 });
+
+test("removes password-reset credentials from outgoing request telemetry", async () => {
+  const envelopes = initializeRecordingClient();
+  const token = "synthetic-reset-credential%2Fprivate";
+  const request = new Request(`https://trizum.app/api/auth/reset-password/${token}`);
+  const path = new URL(request.url).pathname;
+  const name = `GET ${path}`;
+  Sentry.addBreadcrumb({ category: "navigation", data: { to: request.url } });
+  Sentry.captureEvent({
+    message: "Reset failed",
+    transaction: name,
+    request: { url: request.url },
+  });
+  Sentry.logger.warn("Reset callback failed", { url: request.url });
+  Sentry.startSpan({ name, op: "http.server", forceTransaction: true }, () => {
+    Sentry.startSpan({ name, op: "http.client" }, (span) => {
+      span.setAttribute("url.full", request.url);
+      span.setAttribute("url.path", path);
+    });
+  });
+  expect(await Sentry.flush(2000)).toBe(true);
+
+  const output = JSON.stringify(envelopes);
+  const items = envelopes.flatMap(([, payloads]) => payloads);
+  expect(items.map(([header]) => header.type)).toEqual(
+    expect.arrayContaining(["event", "log", "transaction"]),
+  );
+  expect(output).not.toContain(token);
+  expect(output).not.toContain("synthetic-reset-credential");
+  expect(output).toContain("/api/auth/reset-password/[REDACTED_RESET_TOKEN]");
+  expect(items.find(([header]) => header.type === "transaction")?.[1]).toMatchObject({
+    transaction: "GET /api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+    spans: [
+      {
+        description: "GET /api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+        data: {
+          "url.full": "https://trizum.app/api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+          "url.path": "/api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+        },
+      },
+    ],
+  });
+});

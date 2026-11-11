@@ -3,6 +3,9 @@ import type { I18n } from "@lingui/core";
 import type { SupportedLocale } from "../src/lib/locales.js";
 
 export interface ApiEnv {
+  SENTRY_DSN?: string;
+  SENTRY_ENABLED?: string;
+  SENTRY_ENVIRONMENT?: string;
   ASSETS: Fetcher;
   DB: D1Database;
   EMAIL: SendEmail;
