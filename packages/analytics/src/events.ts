@@ -36,7 +36,9 @@ export const analyticsEvents = {
   settlement_recorded:
     "A debt payment was recorded, not confirmation of an external money transfer.",
   payment_contact_copied:
-    "A Bizum payment contact was copied; neither the contact nor a payment confirmation is sent.",
+    "Payment receiving details were copied; neither the details nor a payment confirmation is sent.",
+  payment_link_requested:
+    "The user followed an external payment profile link; no payment completion is inferred or details sent.",
   debt_transferred: "Both sides of a debt transfer between groups were successfully recorded.",
   tricount_import_started: "The user started a Tricount import.",
   tricount_import_completed: "A Tricount import created the destination group.",

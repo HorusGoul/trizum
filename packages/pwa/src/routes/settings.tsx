@@ -1,3 +1,10 @@
+import { PaymentMethodsEditor } from "#src/components/PaymentMethodsEditor.tsx";
+import {
+  getPaymentMethods,
+  normalizePaymentMethods,
+  validatePaymentMethod,
+} from "#src/lib/paymentMethods.ts";
+import { paymentMethodTypes, type PaymentMethods } from "#src/models/paymentMethod.ts";
 import { setAnalyticsEnabled, trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
@@ -11,7 +18,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { AvatarPicker } from "#src/components/AvatarPicker.js";
 import { SwitchField } from "@trizum/ui/SwitchField";
 import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/locales.js";
-import { validatePartyParticipantName, validatePhoneNumber } from "#src/lib/validation.js";
+import { validatePartyParticipantName } from "#src/lib/validation.js";
 import type { MediaFile } from "#src/models/media.ts";
 import { ColorSlider, ColorThumb, SliderTrack } from "@trizum/ui/Color";
 import { IconButton } from "@trizum/ui/IconButton";
@@ -33,7 +40,7 @@ export const Route = createFileRoute("/settings")({
 
 interface SettingsFormValues {
   username: string;
-  phone: string;
+  paymentMethods: PaymentMethods;
   avatarId: MediaFile["id"] | null;
   locale: SupportedLocale | "system";
   openLastPartyOnLaunch: boolean;
@@ -62,7 +69,8 @@ export function Settings() {
   function onSaveSettings(values: SettingsFormValues) {
     updateSettings({
       username: values.username,
-      phone: values.phone,
+      phone: values.paymentMethods.bizum?.trim() ?? "",
+      paymentMethods: normalizePaymentMethods(values.paymentMethods),
       avatarId: values.avatarId,
       locale: values.locale === "system" ? undefined : values.locale,
       openLastPartyOnLaunch: values.openLastPartyOnLaunch,
@@ -78,7 +86,7 @@ export function Settings() {
   const form = useForm({
     defaultValues: {
       username: partyList.username ?? "",
-      phone: partyList.phone ?? "",
+      paymentMethods: getPaymentMethods(partyList),
       avatarId: partyList.avatarId ?? null,
       locale: partyList.locale ?? ("system" as const),
       openLastPartyOnLaunch: partyList.openLastPartyOnLaunch ?? false,
@@ -194,23 +202,17 @@ function SettingsFormFields({
       </form.Field>
 
       <form.Field
-        name="phone"
+        name="paymentMethods"
         validators={{
-          onChange: ({ value }) => validatePhoneNumber(value),
+          onChange: ({ value }) =>
+            paymentMethodTypes
+              .filter((type) => value[type] !== undefined)
+              .map((type) => validatePaymentMethod(type, value[type]!))
+              .find(Boolean),
         }}
       >
         {(field) => (
-          <AppTextField
-            label={t`Phone number`}
-            description={t`For payments through Bizum or similar services`}
-            maxLength={20}
-            name={field.name}
-            value={field.state.value}
-            onChange={field.handleChange}
-            onBlur={field.handleBlur}
-            errorMessage={field.state.meta.errors?.join(", ")}
-            isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-          />
+          <PaymentMethodsEditor value={field.state.value} onChange={field.handleChange} />
         )}
       </form.Field>
 

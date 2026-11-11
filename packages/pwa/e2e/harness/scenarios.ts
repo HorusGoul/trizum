@@ -105,6 +105,30 @@ export function createImbalancedPartyFixture() {
   };
 }
 
+export function createPaymentPartyFixture() {
+  const fixture = createPartyFixture();
+
+  return {
+    ...fixture,
+    party: {
+      ...fixture.party,
+      participants: {
+        ...fixture.party.participants,
+        [defaultParticipants.alex.id]: {
+          ...defaultParticipants.alex,
+          phone: "+34612345678",
+          paymentMethods: {
+            bizum: "+34612345678",
+            venmo: "https://venmo.com/u/alex",
+            "bank-transfer": "Alex\nIBAN: ES00 1234",
+            other: "Ask me for Wise",
+          },
+        },
+      },
+    },
+  };
+}
+
 export function createSettlementPartyFixture() {
   return {
     ...createPartyFixture(),

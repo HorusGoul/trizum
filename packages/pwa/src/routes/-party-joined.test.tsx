@@ -174,6 +174,26 @@ it("counts a join once and does not count revisiting or switching as another joi
   await vi.waitFor(() => expect(events()).toEqual(["party_joined", "party_participant_switched"]));
 });
 
+it("shares receiving methods with a newly joined group", async () => {
+  const { profile, party } = await setup();
+
+  const methods = {
+    paypal: "https://paypal.me/Alice123",
+    venmo: "https://venmo.com/u/alice",
+    other: "Wise: alice@example.com",
+  };
+
+  await act(async () =>
+    profile.change((doc) => {
+      doc.paymentMethods = methods;
+    }),
+  );
+  await select("Alice");
+  await submit();
+  expect(party.doc().participants.alice?.paymentMethods).toEqual(methods);
+  expect(party.doc().participants.bob?.paymentMethods).toBeUndefined();
+});
+
 it("does not count opening an existing membership as a join", async () => {
   const { profile, party, events } = await setup(true);
   await act(async () => {
