@@ -88,8 +88,26 @@ check_ios() {
     "fastlane/Appfile" \
     "fastlane/Deliverfile" \
     "fastlane/Fastfile" \
+    "fastlane/screenshot_sync_test.rb" \
+    "fastlane/creative_assets.rb" \
+    "fastlane/creative_assets_api_client.rb" \
+    "fastlane/creative_assets_api_client_test.rb" \
+    "fastlane/creative_assets_test.rb" \
     "fastlane/Pluginfile"
   check_ios_podfile
+  start_group "iOS screenshot synchronization"
+  (
+    cd "$SCRIPT_DIR/ios/App"
+    bundle exec ruby fastlane/screenshot_sync_test.rb
+  )
+  end_group
+  start_group "iOS creative asset upload contract"
+  (
+    cd "$SCRIPT_DIR/ios/App"
+    bundle exec ruby fastlane/creative_assets_test.rb
+    bundle exec ruby fastlane/creative_assets_api_client_test.rb
+  )
+  end_group
 }
 
 case "$PLATFORM" in

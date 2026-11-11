@@ -1,5 +1,11 @@
 # @trizum/screenshots
 
+## 1.1.0
+
+### Minor Changes
+
+- [#613](https://github.com/HorusGoul/trizum/pull/613) [`e3acbab`](https://github.com/HorusGoul/trizum/commit/e3acbabbffbf5b615d24695e10c7b24ad42c2ae8) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add editable App Store header and search artwork generators with preview, validation, and explicit release asset selection. Upload the approved localized headers with the next normal App Store release, and support future selected image/video creatives through the same Fastlane workflow.
+
 ## 1.0.3
 
 ### Patch Changes

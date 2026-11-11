@@ -6,7 +6,7 @@ on:
       submit_for_review:
         description: "Submit for App Store review"
         required: false
-        default: false
+        default: true
         type: boolean
       automatic_release:
         description: "Automatically release after approval"
@@ -18,7 +18,7 @@ on:
       submit_for_review:
         description: "Submit for App Store review"
         required: false
-        default: false
+        default: true
         type: boolean
       automatic_release:
         description: "Automatically release after approval"
@@ -47,7 +47,7 @@ jobs:
     name: Build & Deploy to App Store
     needs: [check-pending-changesets, screenshots]
     runs-on: macos-26
-    timeout-minutes: 20
+    timeout-minutes: 45
     env:
       TRIZUM_LIVE_ADS: ${{ vars.TRIZUM_LIVE_ADS_ENABLED == 'true' && 'true' || 'false' }}
     steps:
@@ -88,7 +88,7 @@ jobs:
           ls -la ../mobile/ios/App/fastlane/screenshots/en-US/ || true
 
       - name: Build and Deploy to App Store
-        timeout-minutes: 18
+        timeout-minutes: 40
         working-directory: packages/mobile/ios/App
         env:
           IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
@@ -102,6 +102,15 @@ jobs:
             skip_screenshots:false \
             submit_for_review:${{ inputs.submit_for_review }} \
             automatic_release:${{ inputs.automatic_release }}
+
+      - name: Upload creative asset report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-creative-assets
+          path: ${{ runner.temp }}/trizum-creative-assets.json
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Upload IPA artifact
         timeout-minutes: 2

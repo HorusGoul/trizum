@@ -65,6 +65,24 @@ describe("getMediaFileHelpers", () => {
     });
   });
 
+  test("keeps HEIC guidance and diagnostics when decoding fails after conversion", async () => {
+    const diagnostics = {
+      processingStage: "decode_and_orient" as const,
+      imageMimeType: "image/heic",
+      imageSizeBytes: 4,
+      isHeic: true,
+    };
+
+    processImageMock.mockRejectedValue(
+      new ImageProcessingError("image_processing_failed", new Error("decode failed"), diagnostics),
+    );
+    const { repo } = createMockRepo();
+    const { createMediaFile } = getMediaFileHelpers(repo, { processImage: processImageMock });
+    await expect(
+      createMediaFile(new File(["heic"], "receipt.heic", { type: "image/heic" }), {}),
+    ).rejects.toMatchObject({ code: "heic_conversion_failed", diagnostics });
+  });
+
   test("falls back to the original blob for non-HEIC image failures and keeps MIME metadata", async () => {
     processImageMock.mockRejectedValue(new Error("canvas failed"));
 

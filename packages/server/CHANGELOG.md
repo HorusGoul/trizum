@@ -1,5 +1,11 @@
 # @trizum/server
 
+## 2.0.1
+
+### Patch Changes
+
+- [#614](https://github.com/HorusGoul/trizum/pull/614) [`7f7eed0`](https://github.com/HorusGoul/trizum/commit/7f7eed0ed2b6d02bb18d84588c85ea2d01fb1c4e) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent incomplete receipt syncs from crashing the server after a document readiness timeout. Add structured diagnostics for sync connections, large messages, and slow or failed storage operations to investigate interrupted uploads without logging receipt contents.
+
 ## 2.0.0
 
 ### Major Changes

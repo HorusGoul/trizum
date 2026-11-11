@@ -16,25 +16,67 @@ require "json"
 require "plist"
 require "spaceship/connect_api"
 require "timeout"
+require_relative "creative_assets"
+require_relative "creative_assets_api_client"
 
 IOS_APP_IDENTIFIER = "app.trizum.capacitor"
 IOS_APPSTORE_PROFILE_NAME = "App Store Profile"
 IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
 IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
+IOS_SCREENSHOT_SYNC_TIMEOUT_SECONDS = 15 * 60
 IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
 IOS_ENTITLEMENTS_PATH = File.expand_path("../App/App.entitlements", __dir__)
 ADMOB_CONFIG_PATH = File.expand_path("../../../admob.config.json", __dir__)
 
 # Fastlane's screenshot sync makes reruns idempotent, but its beta
-# implementation has no processing timeout. Bound the entire sync operation so
-# a screenshot stuck in processing cannot hold the release lane indefinitely.
+# implementation waits forever on UPLOAD_COMPLETE and never reaches its retry
+# path. Bound each processing pass so only incomplete screenshots are retried,
+# and keep a separate limit on the entire sync operation.
 ENV["FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS"] = "true"
 
 module BoundedScreenshotSync
   def sync(screenshots)
-    Timeout.timeout(IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS) { super }
+    Timeout.timeout(IOS_SCREENSHOT_SYNC_TIMEOUT_SECONDS) { super }
   rescue Timeout::Error
-    UI.user_error!("Screenshot synchronization exceeded #{IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS} seconds")
+    UI.user_error!("Screenshot synchronization exceeded #{IOS_SCREENSHOT_SYNC_TIMEOUT_SECONDS} seconds")
+  end
+
+  def wait_for_complete(iterator)
+    deadline = screenshot_processing_time + IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS
+
+    loop do
+      screenshots = iterator.each_app_screenshot.map { |_, _, screenshot| screenshot }
+      state_counts = screenshots.each_with_object(Hash.new(0)) do |screenshot, counts|
+        counts[screenshot.asset_delivery_state["state"]] += 1
+      end
+      incomplete = screenshots.reject { |screenshot| screenshot.asset_delivery_state["state"] == "COMPLETE" }
+      result = Deliver::SyncScreenshots::UploadResult.new(
+        asset_delivery_state_counts: state_counts,
+        failing_screenshots: incomplete
+      )
+      return result unless result.processing?
+
+      remaining = deadline - screenshot_processing_time
+      if remaining <= 0
+        incomplete.each do |screenshot|
+          UI.important(
+            "Screenshot processing timed out: #{screenshot.file_name} " \
+            "(id=#{screenshot.id}, state=#{screenshot.asset_delivery_state['state']}); retrying synchronization"
+          )
+        end
+        return result
+      end
+
+      interval = [30, remaining].min
+      UI.message("Waiting #{interval} seconds for screenshot processing - #{state_counts}")
+      sleep(interval)
+    end
+  end
+
+  private
+
+  def screenshot_processing_time
+    Process.clock_gettime(Process::CLOCK_MONOTONIC)
   end
 end
 
@@ -43,6 +85,22 @@ Deliver::SyncScreenshots.prepend(BoundedScreenshotSync)
 default_platform(:ios)
 
 platform :ios do
+  desc "Upload and attach selected header/search creatives to the editable release version"
+  lane :upload_creative_assets do |options|
+    load_api_key
+    UI.user_error!("App Store Connect API credentials are required") unless Spaceship::ConnectAPI.token
+    uploader = CreativeAssets.new(
+      client: CreativeAssetsAPIClient.new(token: Spaceship::ConnectAPI.token),
+      manifest: File.expand_path("creative_assets/manifest.json", __dir__),
+      report: options[:report] || File.join(ENV.fetch("RUNNER_TEMP", Dir.tmpdir), "trizum-creative-assets.json"),
+      log: ->(message) { UI.message(message) }
+    )
+    uploader.run(
+      version: options[:app_version] || get_version_number(xcodeproj: "App.xcodeproj"),
+      preflight: options[:preflight].to_s == "true"
+    )
+  end
+
   desc "Load App Store Connect API Key"
   lane :load_api_key do
     if ENV["APP_STORE_CONNECT_API_KEY_ID"] && ENV["APP_STORE_CONNECT_API_ISSUER_ID"] && ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
@@ -302,9 +360,9 @@ platform :ios do
   # ============================================
 
   desc "Full App Store deployment with metadata"
-  desc "Options: build_number, skip_screenshots (default: true), submit_for_review (default: false), automatic_release (default: false)"
+  desc "Options: build_number, skip_screenshots (default: true), submit_for_review (default: true), automatic_release (default: false)"
   lane :deploy_appstore_full do |options|
-    submit_for_review = options[:submit_for_review] || false
+    submit_for_review = options[:submit_for_review].nil? ? true : options[:submit_for_review]
     automatic_release = options[:automatic_release] || false
     skip_screenshots = options[:skip_screenshots].nil? ? true : options[:skip_screenshots]
 
@@ -325,6 +383,8 @@ platform :ios do
       version_check_wait_retry_limit: IOS_VERSION_CHECK_WAIT_RETRY_LIMIT,
       submission_information: app_store_submission_information
     )
+
+    upload_creative_assets
 
     if submit_for_review
       submit_processed_build_for_review(automatic_release: automatic_release)
