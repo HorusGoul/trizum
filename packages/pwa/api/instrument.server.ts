@@ -7,7 +7,10 @@ import type { ApiEnv } from "./env";
 export default defineCloudflareOptions<ApiEnv>((env) => ({
   ...sentryDocumentIdRedaction,
   dsn: env.SENTRY_DSN,
-  enabled: import.meta.env.PROD && env.SENTRY_ENABLED !== "false",
+  enabled:
+    import.meta.env.PROD &&
+    import.meta.env.VITE_APP_DISABLE_SENTRY !== "true" &&
+    env.SENTRY_ENABLED !== "false",
   environment: env.SENTRY_ENVIRONMENT ?? "production",
   release: env.CF_VERSION_METADATA?.id,
   initialScope: { tags: { runtime: "cloudflare-worker" } },

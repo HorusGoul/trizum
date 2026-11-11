@@ -154,7 +154,8 @@ payloads and the LogTape sink. User identity, headers, bodies, and query
 parameters are excluded from SDK data collection.
 
 Production builds use the dedicated `trizum-worker` Sentry project with
-`runtime:cloudflare-worker`. Local development disables delivery. Worker bindings
+`runtime:cloudflare-worker`. Local development disables delivery. Builds also
+honor `VITE_APP_DISABLE_SENTRY=true`, keeping CI browser journeys out of Sentry. Worker bindings
 configure `SENTRY_DSN` (a public DSN stored in `vars`) and `SENTRY_ENVIRONMENT`; `SENTRY_ENABLED=false` disables
 delivery. Set the environment binding to `preview` for preview deployments that
 should be distinguished from production. `CF_VERSION_METADATA` identifies the
