@@ -82,6 +82,13 @@ whole request fails quietly through the existing sanitized error path. Clef has
 an eight-second timeout after the bounded extraction pass. Empty extraction
 results skip verification. Neither image contents nor verifier scores are logged.
 
+`Server-Timing` reports numeric durations in milliseconds for session lookup,
+access checks, party reads, image preparation, extraction, and verification.
+Failed stages still report elapsed time; stages not reached are omitted. The
+header contains fixed stage names and durations only, without receipt data,
+identifiers, or provider errors. It can be inspected in browser developer tools
+to distinguish inference latency from authorization and image preparation.
+
 Both models receive the party currency read from the already authorized party
 document. Their prompts explicitly use it only for verification and prohibit
 defaulting, guessing, or converting to that currency.

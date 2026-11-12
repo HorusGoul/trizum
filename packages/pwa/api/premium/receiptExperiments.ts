@@ -6,6 +6,7 @@ import type { ReceiptAI } from "./receiptExtraction";
 export const receiptExperimentSchema = z.enum([
   "baseline",
   "compact-prompt",
+  "compact-prompt-v2",
   "compact-json",
   "clef-flash",
 ]);
@@ -35,6 +36,16 @@ currencyEvidence: exact printed marker/code, or concise actual visible clues sup
 items: every purchased line, excluding totals, taxes, tender/change. Preserve quantity exactly as printed, including weights/units; null if absent, never assume 1. unitPrice and lineTotal must be the respective printed columns, null if absent. Do not swap or invent them.
 Money: decimal strings in major units, period separator, no grouping/symbols, preserve printed precision.`;
 
+const compactPromptV2 = compactPrompt
+  .replace(
+    "titleSuggestions: 1–3 distinct short natural activity/category titles supported by the dominant purchases.",
+    "titleSuggestions: normally two or three distinct short natural activity/category titles supported by the dominant purchases. Offer one only if no useful distinct alternative exists.",
+  )
+  .replace(
+    "Timing: meal titles need BOTH suitable items and a plausible printed local transaction time in the visible business location.",
+    "Timing: prefer neutral purchased-item/category titles. A breakfast/lunch/dinner label must be visibly established by explicit meal-specific items or receipt labels AND a plausible printed local transaction time in the visible business location. Time and ordinary food items alone never establish a meal.",
+  );
+
 export function createReceiptExperiment(
   ai: ReceiptAI,
   experiment: z.infer<typeof receiptExperimentSchema>,
@@ -50,7 +61,7 @@ export function createReceiptExperiment(
       if (model !== "@cf/google/gemma-4-26b-a4b-it" || !("messages" in input))
         return ai.run(model, input, options);
 
-      if (experiment === "compact-prompt") {
+      if (experiment === "compact-prompt" || experiment === "compact-prompt-v2") {
         return ai.run(
           model,
           {
@@ -59,7 +70,7 @@ export function createReceiptExperiment(
               message.role === "system"
                 ? {
                     ...message,
-                    content: `${compactPrompt}\n${z.string().parse(message.content).split("\nThe party currency is ")[1] ? `The party currency is ${z.string().parse(message.content).split("\nThe party currency is ")[1]}` : ""}`,
+                    content: `${experiment === "compact-prompt-v2" ? compactPromptV2 : compactPrompt}\n${z.string().parse(message.content).split("\nThe party currency is ")[1] ? `The party currency is ${z.string().parse(message.content).split("\nThe party currency is ")[1]}` : ""}`,
                   }
                 : message,
             ),
