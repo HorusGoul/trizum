@@ -8,6 +8,7 @@ export const receiptExperimentSchema = z.enum([
   "compact-prompt",
   "compact-prompt-v2",
   "compact-json",
+  "compact-format",
   "clef-flash",
 ]);
 
@@ -71,6 +72,24 @@ export function createReceiptExperiment(
                 ? {
                     ...message,
                     content: `${experiment === "compact-prompt-v2" ? compactPromptV2 : compactPrompt}\n${z.string().parse(message.content).split("\nThe party currency is ")[1] ? `The party currency is ${z.string().parse(message.content).split("\nThe party currency is ")[1]}` : ""}`,
+                  }
+                : message,
+            ),
+          },
+          options,
+        );
+      }
+
+      if (experiment === "compact-format") {
+        return ai.run(
+          model,
+          {
+            ...input,
+            messages: input.messages?.map((message) =>
+              message.role === "system"
+                ? {
+                    ...message,
+                    content: `${z.string().parse(message.content)}\nCompact serialization only: keep all supported fields, title alternatives and item lines. Omit insignificant whitespace (indentation and newlines) from the JSON.`,
                   }
                 : message,
             ),
