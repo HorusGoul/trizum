@@ -23,7 +23,7 @@ All monetary fields must be decimal strings in major currency units with a perio
 
 export interface ReceiptAI {
   run: (
-    model: "@cf/google/gemma-4-26b-a4b-it" | "@cf/cloudflare/clef" | "@cf/cloudflare/clef-flash",
+    model: "@cf/google/gemma-4-26b-a4b-it" | "@cf/cloudflare/clef",
     input: ChatCompletionsMessagesInput | ReceiptVerificationInput,
     options?: AiOptions,
   ) => Promise<ReceiptAIResponse | ReceiptVerificationResponse>;

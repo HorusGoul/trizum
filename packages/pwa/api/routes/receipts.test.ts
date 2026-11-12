@@ -25,10 +25,7 @@ describe("receipt analysis authorization and contract", () => {
   beforeEach(async () => {
     harness = await createPartyBoostTestHarness();
     run.mockReset().mockImplementation(async (model, input) => {
-      if (
-        (model === "@cf/cloudflare/clef" || model === "@cf/cloudflare/clef-flash") &&
-        "questions" in input
-      ) {
+      if (model === "@cf/cloudflare/clef" && "questions" in input) {
         return {
           model: "clef",
           answers: Object.fromEntries(
@@ -112,57 +109,27 @@ describe("receipt analysis authorization and contract", () => {
     await expect(response.json()).resolves.toEqual(receipt);
     expect(run).toHaveBeenCalledTimes(2);
   });
-  test("restricts model experiments to previews and retains normal authorization", async () => {
+  test("keeps the suggestions-only comparison preview-only and verifies its result", async () => {
     const { partyId, owner } = await boostedParty();
-    const headers = { "X-Trizum-Receipt-Experiment": "clef-flash" };
+    const headers = { "X-Trizum-Receipt-Experiment": "suggestions-only" };
     await harness.requestReceipt(partyId, image, owner.cookie, "en", headers);
-    expect(run).toHaveBeenLastCalledWith(
-      "@cf/cloudflare/clef",
-      expect.any(Object),
-      expect.any(Object),
-    );
+    expect(gemmaInput().response_format).toMatchObject({
+      json_schema: { schema: { properties: { items: { maxItems: 300 } } } },
+    });
     harness.env.SENTRY_ENVIRONMENT = "preview";
+    run.mockClear();
+    run.mockResolvedValueOnce(completion(JSON.stringify({ ...receipt, items: [] })));
     const response = await harness.requestReceipt(partyId, image, owner.cookie, "en", headers);
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual(receipt);
-    expect(run).toHaveBeenLastCalledWith(
-      "@cf/cloudflare/clef-flash",
-      expect.objectContaining({ model: "clef-flash" }),
-      expect.any(Object),
-    );
-    run.mockClear();
-    expect((await harness.requestReceipt(partyId, image, undefined, "en", headers)).status).toBe(
-      401,
-    );
-    expect(run).not.toHaveBeenCalled();
-  });
-
-  test("normalizes compact model output before verification and the public response", async () => {
-    const { partyId, owner } = await boostedParty();
-    harness.env.SENTRY_ENVIRONMENT = "preview";
-    run.mockResolvedValueOnce(
-      completion(
-        JSON.stringify({
-          m: receipt.merchantName,
-          t: [],
-          a: receipt.total,
-          c: receipt.currency,
-          e: receipt.currencyEvidence,
-          s: null,
-          i: [{ n: "Apples", q: "0,750 kg", u: "2.490", l: "1.87" }],
-        }),
-      ),
-    );
-
-    const response = await harness.requestReceipt(partyId, image, owner.cookie, "en", {
-      "X-Trizum-Receipt-Experiment": "compact-json",
+    await expect(response.json()).resolves.toEqual({ ...receipt, items: [] });
+    expect(gemmaInput().response_format).toMatchObject({
+      json_schema: { schema: { properties: { items: { maxItems: 0 } } } },
     });
-
-    expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual(receipt);
     expect(run).toHaveBeenLastCalledWith(
       "@cf/cloudflare/clef",
-      expect.objectContaining({ state: expect.objectContaining({ receipt }) }),
+      expect.objectContaining({
+        state: expect.objectContaining({ receipt: { ...receipt, items: [] } }),
+      }),
       expect.any(Object),
     );
   });
@@ -197,6 +164,8 @@ describe("receipt analysis authorization and contract", () => {
     images.info.mockRejectedValue(new Error("Private image processing diagnostics"));
     const response = await harness.requestReceipt(partyId, image, owner.cookie);
     expect(response.status).toBe(503);
+    expect(response.headers.get("Server-Timing")).toContain("image;dur=");
+    expect(response.headers.get("Server-Timing")).not.toContain("extraction");
     await expect(response.json()).resolves.toEqual({
       error: { code: "unavailable", message: "Receipt analysis could not be completed." },
     });

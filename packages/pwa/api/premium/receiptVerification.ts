@@ -15,7 +15,7 @@ interface ReceiptVerificationQuestion {
 }
 
 export interface ReceiptVerificationInput {
-  model: "clef" | "clef-flash";
+  model: "clef";
   images: string[];
   state: {
     instructions: string;

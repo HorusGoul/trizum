@@ -144,7 +144,9 @@ export const premiumRoute = premiumApp
           );
         }
 
-        if (!c.env.AI || !c.env.IMAGES) {
+        const { AI: ai, IMAGES: images } = c.env;
+
+        if (!ai || !images) {
           return c.json(
             {
               error: { code: "unavailable" as const, message: "Receipt analysis is unavailable." },
@@ -161,7 +163,7 @@ export const premiumRoute = premiumApp
         const partyCurrency = exchangeRateCurrencySchema.parse(party.currency);
 
         const preparedImage = await timing.measure("image", () =>
-          prepareReceiptImage(image, c.env.IMAGES!),
+          prepareReceiptImage(image, images),
         );
 
         const experiment =
@@ -171,7 +173,7 @@ export const premiumRoute = premiumApp
               )
             : "baseline";
 
-        const ai = createReceiptExperiment(c.env.AI, experiment);
+        const measuredAI = createReceiptExperiment(ai, experiment);
 
         return c.json(
           await extractReceipt(
@@ -180,7 +182,7 @@ export const premiumRoute = premiumApp
               run: (model, input, options) =>
                 timing.measure(
                   model === "@cf/google/gemma-4-26b-a4b-it" ? "extraction" : "verification",
-                  () => ai.run(model, input, options),
+                  () => measuredAI.run(model, input, options),
                 ),
             },
             { locale, partyCurrency },
