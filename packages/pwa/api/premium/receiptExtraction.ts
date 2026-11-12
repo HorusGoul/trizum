@@ -51,6 +51,7 @@ export async function extractReceipt(
   image: string,
   ai: ReceiptAI,
   { locale, partyCurrency }: { locale: SupportedLocale; partyCurrency: CurrencyCode },
+  inspect?: Parameters<typeof verifyReceipt>[4],
 ) {
   const result: unknown = await ai.run(
     "@cf/google/gemma-4-26b-a4b-it",
@@ -95,5 +96,6 @@ export async function extractReceipt(
     },
     ai,
     { locale, partyCurrency },
+    inspect,
   );
 }

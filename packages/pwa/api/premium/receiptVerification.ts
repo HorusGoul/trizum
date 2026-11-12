@@ -71,6 +71,7 @@ export async function verifyReceipt(
   receipt: Receipt,
   ai: ReceiptAI,
   context: { locale: SupportedLocale; partyCurrency: CurrencyCode },
+  inspect?: (receipt: Receipt, response: ReceiptVerificationResponse | null) => void,
 ): Promise<Receipt> {
   const fields: Array<[string, ReceiptVerificationQuestion]> = [];
 
@@ -114,7 +115,11 @@ export async function verifyReceipt(
       ),
     ]);
 
-  if (fields.length === 0) return receipt;
+  if (fields.length === 0) {
+    inspect?.(receipt, null);
+
+    return receipt;
+  }
 
   const response: unknown = await ai.run(
     "@cf/cloudflare/clef",
@@ -132,7 +137,9 @@ export async function verifyReceipt(
     { signal: AbortSignal.timeout(8_000) },
   );
 
-  const { answers } = verificationSchema.parse(response);
+  const verified = verificationSchema.parse(response);
+  inspect?.(receipt, verified);
+  const { answers } = verified;
 
   function supported(field: string, threshold = 0.95) {
     const answer = answers[field];
