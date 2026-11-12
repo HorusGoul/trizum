@@ -20,9 +20,9 @@ Browser and Android Back dismiss the top open sheet before changing routes;
 `isDismissable={false}` consumes Back while the sheet is locked. Normal close
 and unmount release registration. At the first app entry, where browser Back
 would leave the document, the adapter uses a temporary same-URL guard and consumes
-it on close; it adds no residual Back step. SPA entries use the router blocker.
-Keep feature
-state and discard/accept behavior in the sheet's existing callbacks.
+it on close; it adds no residual Back step. Initialization recovers and consumes
+a guard left by a document reload. SPA entries use the router blocker. Keep
+feature state and discard/accept behavior in the sheet's existing callbacks.
 
 Sheets already represented by route/search state, such as the calculator,
 keep their route-driven navigation. Avoid per-feature `popstate` listeners or

@@ -1,4 +1,5 @@
 import type { RouterHistory } from "@tanstack/react-router";
+import { z } from "zod";
 import type { ModalSheetNavigation } from "@trizum/ui/modalSheetNavigation";
 
 const guardStateKey = "__trizumSheetGuard";
@@ -7,6 +8,10 @@ const guardStateKey = "__trizumSheetGuard";
 export function createSheetNavigation(createHistory: () => RouterHistory) {
   const pushState = window.history.pushState.bind(window.history);
   const back = window.history.back.bind(window.history);
+
+  const restoredOwner = z.object({ [guardStateKey]: z.uuid() }).safeParse(window.history.state)
+    .data?.[guardStateKey];
+
   const history = createHistory();
   const sheets: { dismiss: () => boolean }[] = [];
   let unblock: (() => void) | undefined;
@@ -17,11 +22,13 @@ export function createSheetNavigation(createHistory: () => RouterHistory) {
         key: string | undefined;
         release?: { done: Promise<void>; resolve: () => void };
       }
-    | undefined;
+    | undefined = restoredOwner
+    ? { href: history.location.href, key: history.location.state.__TSR_key }
+    : undefined;
 
   let navigating = false;
   let destroyed = false;
-  const owner = crypto.randomUUID();
+  const owner = restoredOwner ?? crypto.randomUUID();
 
   function armGuard() {
     if (
@@ -154,6 +161,9 @@ export function createSheetNavigation(createHistory: () => RouterHistory) {
     window.removeEventListener("popstate", onGuardPop, { capture: true });
     history.destroy();
   }
+
+  // A reload removes the sheet but preserves its native history entry.
+  if (restoredOwner) void releaseGuard();
 
   return { history, register, handleBack, destroy };
 }

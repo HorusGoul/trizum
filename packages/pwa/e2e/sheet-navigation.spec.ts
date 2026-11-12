@@ -128,3 +128,16 @@ test("Forward cannot restore a retired guard as an extra Back step", async ({ pa
   await page.goBack();
   await expect(page).toHaveURL(/\/sheet-landing$/);
 });
+
+test("reload consumes the vanished sheet's guard before the next Back", async ({ page }) => {
+  await page.getByRole("button", { name: "Open suggestions" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(1);
+  await page.reload();
+  await expect(page.getByLabel("Expense draft")).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect
+    .poll(() => page.evaluate(() => window.history.state?.__trizumSheetGuard))
+    .toBeUndefined();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/sheet-landing$/);
+});
