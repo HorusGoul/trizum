@@ -47,16 +47,25 @@ import {
   type ExpenseEditorMode,
   getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
+  type ExpenseEditorShares,
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
+import { ExpenseCurrencyFields } from "./ExpenseCurrencyFields";
+import type { ExpenseConversionValues } from "#src/lib/currencyConversion.ts";
 import { cn } from "@trizum/ui/utils";
+import { CurrencyContext } from "./CurrencyContext";
+import {
+  getExpenseEditorCurrencyAmount,
+  getExpenseEditorDraftValues,
+  getExpenseEditorStoredValues,
+} from "#src/lib/expenseEditorCurrency.ts";
 
-export interface ExpenseEditorFormValues {
+export interface ExpenseEditorFormValues extends ExpenseConversionValues {
   name: string;
   amount: number;
   paidAt: Date;
   paidBy: ExpenseUser;
-  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  shares: ExpenseEditorShares;
   photos: MediaFile["id"][];
 }
 
@@ -109,9 +118,11 @@ export function ExpenseEditor({
   onCloseCalculator,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
+  const partyCurrency = use(CurrencyContext);
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
+  const savedValuesRef = useRef(defaultValues);
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
 
   const unsortedParticipants = useExpenseParticipants({
@@ -124,29 +135,36 @@ export function ExpenseEditor({
   const participants = unsortedParticipants.slice();
   participants.sort((a, b) => a.name.localeCompare(b.name, i18n.locale));
 
-  const form = useForm({
-    defaultValues: {
-      ...defaultValues,
-      shares:
-        defaultValues.shares ||
-        participants.reduce<Record<ExpenseUser, { type: "divide" | "exact"; value: number }>>(
-          (acc, { id }) => {
-            acc[id] = { type: "divide" as const, value: 1 };
+  const formDefaultValues: ExpenseEditorFormValues = getExpenseEditorDraftValues({
+    ...defaultValues,
+    originalAmount: defaultValues.originalAmount ?? null,
+    exchangeRate: defaultValues.exchangeRate ?? null,
+    shares:
+      defaultValues.shares ||
+      participants.reduce<Record<ExpenseUser, { type: "divide" | "exact"; value: number }>>(
+        (acc, { id }) => {
+          acc[id] = { type: "divide" as const, value: 1 };
 
-            return acc;
-          },
-          {},
-        ),
-    },
+          return acc;
+        },
+        {},
+      ),
+  });
+
+  const form = useForm({
+    defaultValues: formDefaultValues,
     onSubmit: async ({ value }) => {
       if (saveInFlightRef.current) {
         return;
       }
 
-      const submissionValidation = getExpenseEditorValidationResult(value, {
-        isDirty: true,
-        mode,
-      });
+      const submissionValidation = getExpenseEditorValidationResult(
+        { ...value, amount: getExpenseEditorCurrencyAmount(value) },
+        {
+          isDirty: true,
+          mode,
+        },
+      );
 
       if (submissionValidation.status === "error") {
         setIsValidationDialogOpen(true);
@@ -161,7 +179,7 @@ export function ExpenseEditor({
       saveInFlightRef.current = true;
 
       await Promise.resolve()
-        .then(() => onSubmit(value))
+        .then(() => onSubmit(getExpenseEditorStoredValues(value, savedValuesRef.current)))
         .finally(() => {
           saveInFlightRef.current = false;
         });
@@ -189,13 +207,17 @@ export function ExpenseEditor({
 
   const shares = useStore(form.store, (state) => state.values.shares);
   const amount = useStore(form.store, (state) => state.values.amount);
+  const originalAmount = useStore(form.store, (state) => state.values.originalAmount);
+  const exchangeRate = useStore(form.store, (state) => state.values.exchangeRate);
+  const currency = originalAmount?.currency ?? partyCurrency;
+  const participantAmount = getExpenseEditorCurrencyAmount({ amount, shares, originalAmount });
   const name = useStore(form.store, (state) => state.values.name);
   const paidBy = useStore(form.store, (state) => state.values.paidBy);
   const photos = useStore(form.store, (state) => state.values.photos);
   const isDirty = useStore(form.store, (state) => state.isDirty);
 
   const validation = getExpenseEditorValidationResult(
-    { amount, name, paidBy, shares },
+    { amount: participantAmount, name, paidBy, shares, originalAmount, exchangeRate },
     { isDirty, isPrefilled, mode },
   );
 
@@ -220,6 +242,8 @@ export function ExpenseEditor({
     ref,
     () => ({
       setValues: (values) => {
+        savedValuesRef.current = values;
+        values = getExpenseEditorDraftValues(values);
         isReceivingUpdatesRef.current = true;
         const currentFocusedField = focusedFieldRef.current;
 
@@ -266,7 +290,10 @@ export function ExpenseEditor({
         return;
       }
 
-      onChange(previousValues, currentState.values);
+      onChange(
+        getExpenseEditorStoredValues(previousValues, savedValuesRef.current),
+        getExpenseEditorStoredValues(currentState.values, savedValuesRef.current),
+      );
     });
 
     return () => subscription.unsubscribe();
@@ -305,11 +332,13 @@ export function ExpenseEditor({
         title={title}
       />
 
-      <ExpenseEditorValidationStatus
-        isOpen={isValidationDialogOpen}
-        onOpenChange={setIsValidationDialogOpen}
-        validation={validation}
-      />
+      <CurrencyContext value={currency}>
+        <ExpenseEditorValidationStatus
+          isOpen={isValidationDialogOpen}
+          onOpenChange={setIsValidationDialogOpen}
+          validation={validation}
+        />
+      </CurrencyContext>
 
       {/* oxlint-disable react-doctor/tanstack-form-on-submit-requires-prevent-default -- preventDefault runs before the duplicate-submit guard and handleSubmit. */}
       <form
@@ -329,7 +358,6 @@ export function ExpenseEditor({
           activeCalculatorId={activeCalculatorId}
           autoOpenCalculator={autoOpenCalculator}
           createFieldFocusHandlers={createFieldFocusHandlers}
-          focusedFieldRef={focusedFieldRef}
           form={form}
           onCloseCalculator={onCloseCalculator}
           onOpenCalculator={onOpenCalculator}
@@ -338,18 +366,20 @@ export function ExpenseEditor({
           photos={photos}
           shouldAutoFocus={autoFocus}
         />
-        <ExpenseParticipantsSection
-          activeCalculatorId={activeCalculatorId}
-          amount={amount}
-          autoOpenCalculator={autoOpenCalculator}
-          calculatorAttachmentPhotoIds={photos}
-          onCloseCalculator={onCloseCalculator}
-          onIncludeAllChange={handleIncludeAllChange}
-          onOpenCalculator={onOpenCalculator}
-          onSharesChange={(shares) => form.setFieldValue("shares", shares)}
-          participants={participants}
-          shares={shares}
-        />
+        <CurrencyContext value={currency}>
+          <ExpenseParticipantsSection
+            activeCalculatorId={activeCalculatorId}
+            amount={participantAmount}
+            autoOpenCalculator={autoOpenCalculator}
+            calculatorAttachmentPhotoIds={photos}
+            onCloseCalculator={onCloseCalculator}
+            onIncludeAllChange={handleIncludeAllChange}
+            onOpenCalculator={onOpenCalculator}
+            onSharesChange={(shares) => form.setFieldValue("shares", shares)}
+            participants={participants}
+            shares={shares}
+          />
+        </CurrencyContext>
 
         <div className="h-[calc(4rem+var(--calculator-mobile-scroll-allowance,0px))] shrink-0 transition-[height] duration-200 ease-out md:h-16" />
       </form>
@@ -410,7 +440,6 @@ function ExpenseDetailsFields({
   activeCalculatorId,
   autoOpenCalculator,
   createFieldFocusHandlers,
-  focusedFieldRef,
   form,
   onCloseCalculator,
   onOpenCalculator,
@@ -422,7 +451,6 @@ function ExpenseDetailsFields({
   activeCalculatorId?: string;
   autoOpenCalculator: boolean;
   createFieldFocusHandlers: FieldFocusHandlersFactory;
-  focusedFieldRef: React.RefObject<keyof ExpenseEditorFormValues | null>;
   form: ExpenseEditorFormApi;
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
@@ -432,7 +460,7 @@ function ExpenseDetailsFields({
   shouldAutoFocus: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-x-2 gap-y-4">
+    <div className="grid grid-cols-2 items-end gap-x-2 gap-y-4">
       <div className="col-span-2">
         <form.Field name="photos">
           {(field) => (
@@ -472,49 +500,15 @@ function ExpenseDetailsFields({
         )}
       </form.Field>
 
-      <form.Field
-        name="amount"
-        validators={{
-          onChange: ({ value }) => {
-            if (value <= 0) {
-              return t`Amount must be greater than 0`;
-            }
-          },
-        }}
-      >
-        {(field) => (
-          <CurrencyField
-            calculator
-            calculatorId="amount"
-            calculatorAttachmentPhotoIds={photos}
-            activeCalculatorId={activeCalculatorId}
-            autoOpenCalculator={autoOpenCalculator}
-            name={field.name}
-            label={t`Amount`}
-            onCloseCalculator={onCloseCalculator}
-            onOpenCalculator={onOpenCalculator}
-            value={field.state.value}
-            minValue={0}
-            onChange={(value) => {
-              field.handleChange(value || 0);
-            }}
-            onBlur={createFieldFocusHandlers(field).onBlur}
-            errorMessage={field.state.meta.errors?.join(", ")}
-            isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-            className="col-span-2"
-            onFocus={(event) => {
-              const input = event.currentTarget;
-              input.select();
-              // SAFETY: This TanStack field is a registered ExpenseEditorFormValues field.
-              focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
-            }}
-            inputMode="decimal"
-            data-presence-element-id="amount"
-            data-presence-offset-top={6}
-            data-presence-offset-left={-10}
-          />
-        )}
-      </form.Field>
+      <ExpenseCurrencyFields
+        form={form}
+        activeCalculatorId={activeCalculatorId}
+        autoOpenCalculator={autoOpenCalculator}
+        onCloseCalculator={onCloseCalculator}
+        onOpenCalculator={onOpenCalculator}
+        photos={photos}
+        createFieldFocusHandlers={createFieldFocusHandlers}
+      />
 
       <form.Field name="paidBy">
         {(field) => (
@@ -591,11 +585,12 @@ export function ExpenseParticipantsSection({
   shares: ParticipantItemProps["shares"];
 }) {
   const shareCount = Object.keys(shares).length;
+  const currency = use(CurrencyContext);
 
   return (
     <div className={cn("mt-4 flex flex-col gap-2", className)}>
       {onIncludeAllChange ? (
-        <div className="flex items-center justify-between border-l border-transparent pl-3">
+        <div className="flex items-center justify-between border-x border-transparent px-3">
           <Checkbox
             isSelected={shareCount === participants.length}
             isIndeterminate={shareCount > 0 && shareCount < participants.length}
@@ -603,6 +598,9 @@ export function ExpenseParticipantsSection({
           >
             {t`Include all`}
           </Checkbox>
+          <span className="text-accent-600 dark:text-accent-300 text-xs font-medium">
+            {currency}
+          </span>
         </div>
       ) : null}
 
@@ -630,16 +628,14 @@ export function ExpenseParticipantsSection({
 interface ParticipantItemProps {
   amount: number;
   participant: PartyParticipant;
-  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  shares: ExpenseEditorShares;
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
   calculatorAttachmentPhotoIds: MediaFile["id"][];
   enableCalculator?: boolean;
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
-  onSharesChange: (
-    shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
-  ) => void;
+  onSharesChange: (shares: ExpenseEditorShares) => void;
 }
 
 function ParticipantItem({
@@ -656,7 +652,7 @@ function ParticipantItem({
 }: ParticipantItemProps) {
   const participantShare = shares[participant.id];
 
-  function updateShares(shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>) {
+  function updateShares(shares: ExpenseEditorShares) {
     onSharesChange(shares);
   }
 
@@ -757,7 +753,7 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="border-accent-500 dark:border-accent-700 dark:bg-accent-900 grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border bg-white pr-3"
+      className="border-accent-500 dark:border-accent-700 dark:bg-accent-900 grid h-10 grid-cols-[minmax(0,1fr)_auto] items-center justify-between rounded-lg border bg-white pr-3"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
@@ -841,7 +837,7 @@ function ParticipantItem({
             )}
           </div>
 
-          <div>
+          <div className={enableCalculator ? "pl-8" : undefined}>
             <ParticipantSplitAmountField
               amount={amount}
               shares={shares}
@@ -864,7 +860,7 @@ function ParticipantItem({
 
 interface ParticipantSplitAmountFieldProps {
   amount: number;
-  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  shares: ExpenseEditorShares;
   participantId: ExpenseUser;
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;

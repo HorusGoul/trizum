@@ -11,6 +11,8 @@ import { premiumRoute } from "./routes/premium";
 import { spycatRoute } from "./routes/spycat";
 import { ANALYTICS_PROXY_PATH } from "../src/lib/api/analyticsConfig";
 
+import { exchangeRatesRoute } from "./routes/exchange-rates";
+
 const app = new OpenAPIHono<ApiHonoEnv>();
 
 app.use("*", async (c, next) => {
@@ -47,6 +49,8 @@ app.route("/", partySharePreviewRoute);
 app.on(["GET", "POST"], "/api/auth/*", (c) =>
   createAuth(c.env, c.executionCtx, c.req.raw).handler(c.req.raw),
 );
+
+app.route("/api/exchange-rates", exchangeRatesRoute);
 
 app.route("/api/cloud-sync", cloudSyncRoute);
 

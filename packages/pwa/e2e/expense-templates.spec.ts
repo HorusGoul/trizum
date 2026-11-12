@@ -22,7 +22,7 @@ async function createExpenseTemplate(
   await harness.navigate(`/party/${partyId}/settings/expense-templates`);
   await page.getByRole("link", { name: "Add", exact: true }).click();
   await expect(page.getByRole("heading", { name: "New template" })).toBeVisible();
-  await page.getByLabel("Name").fill(name);
+  await page.getByLabel("Name", { exact: true }).fill(name);
 
   if (expenseTitle) {
     await page.getByLabel("Title").fill(expenseTitle);
@@ -43,6 +43,8 @@ async function createExpenseTemplate(
 }
 
 async function openExpenseTemplatePicker(page: Page, partyId: string) {
+  // On narrow screens the creation toast overlaps the floating Add button.
+  await expect(page.getByText("Expense template created", { exact: true })).toBeHidden();
   await page.getByRole("button", { name: "Add an expense" }).click();
   const dialog = page.getByRole("dialog", { name: "Add an expense" });
 
@@ -363,7 +365,7 @@ test.describe("Expense templates", () => {
     await expect(page.getByRole("heading", { name: "Expense defaults", level: 2 })).toBeVisible();
     await expect(page.getByLabel("Template icon")).toHaveText("🧾");
 
-    const nameField = page.getByLabel("Name");
+    const nameField = page.getByLabel("Name", { exact: true });
     await expect(nameField).toHaveValue("Template 1");
     await nameField.clear();
     await expect(page.getByText("Please give this template a name")).toBeVisible();
@@ -388,8 +390,8 @@ test.describe("Expense templates", () => {
 
     await expect(page.getByText("Expense template created")).toBeVisible();
     await page.getByRole("link", { name: "Add" }).click();
-    await expect(page.getByLabel("Name")).toHaveValue("Template 2");
-    await page.getByLabel("Name").fill(" weekly GROCERIES ");
+    await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Template 2");
+    await page.getByLabel("Name", { exact: true }).fill(" weekly GROCERIES ");
     await expect(page.getByText("A template with this name already exists")).toBeVisible();
   });
 
@@ -404,7 +406,7 @@ test.describe("Expense templates", () => {
       name: "Shared dinner",
     });
     await page.getByRole("link", { name: /Shared dinner/ }).click();
-    await page.getByLabel("Name").fill("Team dinner");
+    await page.getByLabel("Name", { exact: true }).fill("Team dinner");
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page.getByText("Expense template saved").last()).toBeVisible();
@@ -422,7 +424,7 @@ test.describe("Expense templates", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates`);
     await page.getByRole("link", { name: "Add", exact: true }).click();
-    await page.getByLabel("Name").fill("Weekly groceries");
+    await page.getByLabel("Name", { exact: true }).fill("Weekly groceries");
     await page.getByLabel("Title").fill("Groceries");
     await page.getByLabel("Amount").fill("48.50");
 
@@ -673,13 +675,128 @@ test.describe("Expense templates", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates/new`);
     await expect(page.getByRole("heading", { name: "New template" })).toBeVisible();
-    await page.getByLabel("Name").fill("Fifth template");
+    await page.getByLabel("Name", { exact: true }).fill("Fifth template");
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page.getByText(limitMessage).last()).toBeVisible();
     await expect(page).toHaveURL(
       new RegExp(`/party/${seededParty.partyId}/settings/expense-templates/new(?:\\?.*)?$`),
     );
-    await expect(page.getByLabel("Name")).toHaveValue("Fifth template");
+    await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Fifth template");
   });
 });
+
+for (const mode of ["latest", "fixed", "latest-offline"] as const) {
+  test(`uses ${mode} currency rates from a saved expense template`, async ({ harness, page }) => {
+    await page.clock.setFixedTime(Date.now());
+    await page.setViewportSize({ width: 375, height: 844 });
+    let quote = 2;
+    await page.route("**/api/exchange-rates?base=EUR", (route) => {
+      return route.fulfill({
+        json: {
+          base: "EUR",
+          rates: { EUR: { rate: 1, date: "2099-01-02" }, USD: { rate: quote, date: "2099-01-02" } },
+        },
+      });
+    });
+
+    const { partyId } = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${partyId}/settings/expense-templates`);
+    await page.getByRole("link", { name: "Add", exact: true }).click();
+    const templateName = `USD breakfast ${mode}`;
+    await page.getByLabel("Name", { exact: true }).fill(templateName);
+    await page.getByLabel("Title", { exact: true }).fill("Foreign breakfast");
+    await page.getByLabel("Amount", { exact: true }).fill("40");
+    await page.getByRole("button", { name: /Currency$/ }).click();
+    await page.getByRole("option", { name: /^USD/ }).click();
+    await page.getByText("Always include everyone", { exact: true }).click();
+    await page.getByLabel("Amount for Alex", { exact: true }).fill("10");
+    await page.getByLabel("Amount for Alex", { exact: true }).blur();
+    const policy = page.getByRole("button", { name: /Exchange rate$/ });
+    await policy.click();
+    await page.getByRole("option", { name: "Fixed rate", exact: true }).click();
+    const rate = page.getByLabel("Exchange rate (EUR/USD)", { exact: true });
+
+    if (mode !== "fixed") {
+      await rate.fill("0");
+      await rate.blur();
+      await expect(
+        page.getByText("Exchange rate must be greater than 0", { exact: true }),
+      ).toBeVisible();
+      await policy.click();
+      await page.getByRole("option", { name: "Latest rate", exact: true }).click();
+    } else {
+      await rate.fill("0.75");
+      await rate.blur();
+    }
+
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "Expense templates", exact: true }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: new RegExp(templateName) }).click();
+    await expect(page.getByRole("button", { name: /USD.*Currency$/ })).toBeVisible();
+    await expect(page.getByLabel("Amount", { exact: true })).toHaveValue("40");
+    await expect(policy).toContainText(mode === "fixed" ? "Fixed rate" : "Latest rate");
+
+    if (mode === "fixed") await expect(rate).toHaveValue("0.75");
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            JSON.parse(localStorage.getItem("trizum.exchange-rates.v1.EUR") ?? "{}").rates?.USD
+              ?.rate,
+        ),
+      )
+      .toBe(2);
+    quote = 4;
+
+    if (mode === "latest-offline") {
+      await page.unroute("**/api/exchange-rates?base=EUR");
+      await page.route("**/api/exchange-rates?base=EUR", (route) =>
+        route.abort("internetdisconnected"),
+      );
+    }
+
+    // Expire the six-hour reference cache and exercise the normal online refresh path.
+    const nextRefresh = await page.evaluate(() => Date.now() + 6 * 60 * 60 * 1000 + 1000);
+    await page.clock.setFixedTime(nextRefresh);
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            JSON.parse(localStorage.getItem("trizum.exchange-rates.v1.EUR") ?? "{}").rates?.USD
+              ?.rate,
+        ),
+      )
+      .toBe(mode === "latest-offline" ? 2 : 4);
+
+    await harness.navigate(`/party/${partyId}`);
+    const picker = await openExpenseTemplatePicker(page, partyId);
+    await picker.getByRole("button", { name: new RegExp(templateName) }).click();
+    await expect(page.getByRole("heading", { name: "New expense", exact: true })).toBeVisible();
+    await expect(page.getByLabel("Original amount (USD)", { exact: true })).toHaveValue("40");
+    await expect(page.getByLabel("Amount for Alex", { exact: true })).toHaveValue("10");
+    await expect(rate).toHaveValue(
+      mode === "fixed" ? "0.75" : mode === "latest-offline" ? "0.5" : "0.25",
+    );
+    await expect(page.getByLabel("Converted amount (EUR)", { exact: true })).toHaveValue(
+      mode === "fixed" ? "30" : mode === "latest-offline" ? "20" : "10",
+    );
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "Foreign breakfast", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        mode === "fixed" ? /7,50\s*€/ : mode === "latest-offline" ? /5,00\s*€/ : /2,50\s*€/,
+        { exact: true },
+      ),
+    ).toBeVisible();
+  });
+}

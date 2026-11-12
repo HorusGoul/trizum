@@ -9,7 +9,8 @@ import {
 } from "motion/react";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "react-aria-components";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { use } from "react";
+import { CurrencyContext } from "./CurrencyContext";
 import type {
   ExpenseEditorValidationIssue,
   ExpenseEditorValidationResult,
@@ -221,7 +222,7 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
 }
 
 function ExpenseEditorValidationIssueItem({ issue }: { issue: ExpenseEditorValidationIssue }) {
-  const { party } = useCurrentParty();
+  const currency = use(CurrencyContext);
 
   switch (issue.code) {
     case "shares-total-mismatch":
@@ -235,14 +236,14 @@ function ExpenseEditorValidationIssueItem({ issue }: { issue: ExpenseEditorValid
               Shares sum up to{" "}
               <CurrencyText
                 amount={issue.sharesTotal}
-                currency={party.currency}
+                currency={currency}
                 className="font-semibold"
                 variant="inherit"
               />
               , while the expense amount is{" "}
               <CurrencyText
                 amount={issue.expenseAmount}
-                currency={party.currency}
+                currency={currency}
                 className="font-semibold"
                 variant="inherit"
               />

@@ -38,6 +38,26 @@ describe("getExpenseEditHash", () => {
 });
 
 describe("getExpenseEditValues", () => {
+  test("reopens saved foreign amounts and manual rates without recalculating the saved total", () => {
+    const expense = {
+      ...createExpense({ photos: [] }),
+      originalAmount: { amount: 1500, currency: "USD" as const },
+      exchangeRate: 0.8,
+    };
+
+    expect(getExpenseEditValues(expense)).toMatchObject({
+      amount: 12,
+      originalAmount: { amount: 1500, currency: "USD" },
+      exchangeRate: 0.8,
+    });
+    expense.__editCopy = { ...expense, originalAmount: undefined, exchangeRate: undefined };
+    expense.__editCopyLastUpdatedAt = NOW;
+    expect(getExpenseEditValues(expense, NOW.getTime())).toMatchObject({
+      originalAmount: null,
+      exchangeRate: null,
+    });
+  });
+
   test("includes an attachment added to an unsaved edit", () => {
     const expense = createExpense({ photos: [] });
     expense.__editCopy = createExpense({ photos: [UNSAVED_PHOTO] });

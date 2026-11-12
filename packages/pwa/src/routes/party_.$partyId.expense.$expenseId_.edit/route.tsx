@@ -1,3 +1,4 @@
+import { getExpenseConversionFields } from "#src/lib/currencyConversion.ts";
 import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
 import { getFailureMessage } from "#src/lib/failureMessage.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
@@ -133,6 +134,7 @@ function EditExpense() {
         name: values.name,
         paidAt: values.paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+        ...getExpenseConversionFields(values),
         shares: values.shares,
         photos: values.photos,
       };
@@ -170,6 +172,7 @@ function EditExpense() {
         name: values.name,
         paidAt: values.paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+        ...getExpenseConversionFields(values),
         shares,
         photos: values.photos,
       };

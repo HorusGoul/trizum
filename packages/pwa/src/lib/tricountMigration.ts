@@ -1,4 +1,6 @@
+import { isCurrencyCode } from "./money";
 import { getLogger } from "#src/lib/log.js";
+import type { Expense } from "#src/models/expense.js";
 import type {
   MigrationData,
   MigrationExpenseShare,
@@ -54,6 +56,8 @@ export interface TricountResponse {
             currency: string;
             value: string;
           };
+          amount_local?: { currency: string; value: string };
+          exchange_rate?: string | number;
           description: string;
           date: string;
           type_transaction: string;
@@ -234,6 +238,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
       shares,
       photos: expensePhotos,
       isTransfer,
+      ...getTricountConversion(transaction, registry.currency),
     };
 
     expenses.push(expense);
@@ -421,4 +426,24 @@ function getDateTimestamp(date: string) {
 
 function parseAmountInCents(value: string) {
   return Math.round(Math.abs(parseFloat(value)) * 100);
+}
+
+/** Tricount's amount and allocations are already in the registry currency. */
+function getTricountConversion(transaction: TricountEntry, partyCurrency: string) {
+  const original = transaction.amount_local;
+
+  if (!original || original.currency === partyCurrency) return {};
+
+  if (!isCurrencyCode(original.currency)) throw new Error("Unsupported original expense currency");
+  const amount = parseAmountInCents(original.value);
+  const converted = parseAmountInCents(transaction.amount.value);
+
+  const rate =
+    transaction.exchange_rate == null ? converted / amount : Number(transaction.exchange_rate);
+
+  if (!Number.isSafeInteger(amount) || amount <= 0 || !Number.isFinite(rate) || rate <= 0) {
+    throw new Error("Invalid foreign currency expense");
+  }
+
+  return { originalAmount: { amount, currency: original.currency }, exchangeRate: rate };
 }

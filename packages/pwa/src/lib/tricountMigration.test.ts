@@ -27,6 +27,35 @@ beforeEach(() => {
 });
 
 describe("parseTricountData", () => {
+  test.each(["0.9", undefined])(
+    "preserves foreign-currency metadata with rate %s without converting totals or exact shares again",
+    (rate) => {
+      const entry = createEntry({
+        id: 900,
+        amount: "-90",
+        description: "Abroad",
+        paidBy: "Alice",
+        allocations: [createAmountAllocation("Alice", "-90")],
+      });
+
+      entry.amount_local = { currency: "USD", value: "-100" };
+      entry.exchange_rate = rate;
+
+      const data = createTricountResponse({
+        memberships: [createMembership(1, "Alice")],
+        entries: [entry],
+      });
+
+      const expense = parseTricountData(data).expenses[0]!;
+      expect(expense).toMatchObject({
+        paidBy: { TCM_1: 9000 },
+        shares: { TCM_1: { type: "exact", value: 9000 } },
+        originalAmount: { amount: 10000, currency: "USD" },
+        exchangeRate: 0.9,
+      });
+    },
+  );
+
   afterEach(() => {
     warningRecords.length = 0;
     stopLogging();
