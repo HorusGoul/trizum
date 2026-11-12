@@ -9,6 +9,8 @@ import { analyzeReceiptRoute } from "../contracts/receipts";
 import { MAX_RECEIPT_REQUEST_BYTES } from "../../src/lib/api/receiptContract";
 import { prepareReceiptImage } from "../premium/receiptImage";
 import { extractReceipt } from "../premium/receiptExtraction";
+import { createReceiptTiming } from "../premium/receiptTiming";
+import { createReceiptExperiment, receiptExperimentSchema } from "../premium/receiptExperiments";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Context } from "hono";
 import { createAuth } from "../auth";
@@ -48,7 +50,11 @@ const premiumApp = $(
     )
     .use("*", async (c, next) => {
       const auth = createAuth(c.env, c.executionCtx, c.req.raw);
+      const startedAt = performance.now();
       const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+      if (c.req.path.endsWith("/receipts"))
+        c.header("Server-Timing", `session;dur=${(performance.now() - startedAt).toFixed(1)}`);
 
       if (!session) {
         return c.json({ error: { code: "unauthorized", message: "Sign in is required." } }, 401);
@@ -99,17 +105,20 @@ export const premiumRoute = premiumApp
     analyzeReceiptRoute,
     async (c) => {
       const { partyDocumentId, image, locale } = c.req.valid("json");
+      const timing = createReceiptTiming();
 
       try {
-        const status = await getPartyBoostStatus({
-          apiKey: c.env.REVENUECAT_SECRET_API_KEY,
-          db: getApiDb(c.env.DB),
-          documents: c.get("documents"),
-          partyDocumentId,
-          projectId: c.env.REVENUECAT_PROJECT_ID,
-          sandboxUserId: c.env.PARTY_BOOST_SANDBOX_USER_ID,
-          userId: c.get("user").id,
-        });
+        const status = await timing.measure("access", () =>
+          getPartyBoostStatus({
+            apiKey: c.env.REVENUECAT_SECRET_API_KEY,
+            db: getApiDb(c.env.DB),
+            documents: c.get("documents"),
+            partyDocumentId,
+            projectId: c.env.REVENUECAT_PROJECT_ID,
+            sandboxUserId: c.env.PARTY_BOOST_SANDBOX_USER_ID,
+            userId: c.get("user").id,
+          }),
+        );
 
         if (!status) {
           return c.json(
@@ -145,16 +154,37 @@ export const premiumRoute = premiumApp
         }
 
         // SAFETY: The request schema validates this Automerge document ID before reading.
-        const party = await c
-          .get("documents")
-          .read<Pick<Party, "currency">>(partyDocumentId as DocumentId);
+        const party = await timing.measure("party", () =>
+          c.get("documents").read<Pick<Party, "currency">>(partyDocumentId as DocumentId),
+        );
 
         const partyCurrency = exchangeRateCurrencySchema.parse(party.currency);
 
-        const preparedImage = await prepareReceiptImage(image, c.env.IMAGES);
+        const preparedImage = await timing.measure("image", () =>
+          prepareReceiptImage(image, c.env.IMAGES!),
+        );
+
+        const experiment =
+          c.env.SENTRY_ENVIRONMENT === "preview"
+            ? receiptExperimentSchema.parse(
+                c.req.header("X-Trizum-Receipt-Experiment") ?? "baseline",
+              )
+            : "baseline";
+
+        const ai = createReceiptExperiment(c.env.AI, experiment);
 
         return c.json(
-          await extractReceipt(preparedImage, c.env.AI, { locale, partyCurrency }),
+          await extractReceipt(
+            preparedImage,
+            {
+              run: (model, input, options) =>
+                timing.measure(
+                  model === "@cf/google/gemma-4-26b-a4b-it" ? "extraction" : "verification",
+                  () => ai.run(model, input, options),
+                ),
+            },
+            { locale, partyCurrency },
+          ),
           200,
         );
       } catch {
@@ -167,6 +197,11 @@ export const premiumRoute = premiumApp
             },
           },
           503,
+        );
+      } finally {
+        c.header(
+          "Server-Timing",
+          [c.res.headers.get("Server-Timing"), timing.toHeader()].filter(Boolean).join(", "),
         );
       }
     },

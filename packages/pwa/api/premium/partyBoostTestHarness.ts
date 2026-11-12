@@ -247,8 +247,9 @@ export async function createPartyBoostTestHarness() {
       image: string,
       cookie?: string,
       locale: "en" | "es" = "en",
+      extraHeaders: Record<string, string> = {},
     ) {
-      const headers = new Headers({ "Content-Type": "application/json" });
+      const headers = new Headers({ "Content-Type": "application/json", ...extraHeaders });
 
       if (cookie) headers.set("Cookie", cookie);
 
