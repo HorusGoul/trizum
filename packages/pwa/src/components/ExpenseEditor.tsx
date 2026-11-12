@@ -1037,7 +1037,6 @@ function ReceiptPhotosField({
         <ReceiptSuggestionsSheet
           key={result.photoId}
           receipt={result.receipt}
-          partyCurrency={partyCurrency}
           suggestions={suggestions}
           onDiscard={() => dismiss(false)}
           onAccept={(values) => {

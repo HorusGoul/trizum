@@ -24,13 +24,11 @@ import {
 export function ReceiptSuggestionsSheet({
   receipt,
   suggestions,
-  partyCurrency,
   onAccept,
   onDiscard,
 }: {
   receipt: Receipt;
   suggestions: ReceiptSuggestions;
-  partyCurrency: string;
   onAccept: (values: Partial<ReceiptDraftValues>) => void;
   onDiscard: () => void;
 }) {
@@ -40,7 +38,6 @@ export function ReceiptSuggestionsSheet({
   const [useCurrency, setUseCurrency] = useState(true);
   const [selectedTitle, setSelectedTitle] = useState(suggestions.name);
   const titleOptions = getReceiptTitleOptions(receipt);
-  const evidence = receipt.currencyEvidence;
 
   if (!hasReceiptSuggestions(suggestions)) return null;
 
@@ -121,25 +118,12 @@ export function ReceiptSuggestionsSheet({
             <ModalSheetChoices>
               <ModalSheetChoice
                 icon="lucide.coins"
-                label={<Trans>Expense currency</Trans>}
+                label={<Trans>Currency</Trans>}
                 isSelected={useCurrency}
                 onChange={setUseCurrency}
               >
                 <span className="block">
                   {suggestions.currency} · {currencyName}
-                </span>
-                <span className="text-accent-700 dark:text-accent-300 mt-1 block text-sm font-normal">
-                  {receipt.currencyEvidenceSource === "context" ? (
-                    <Trans>
-                      Currency inferred from {evidence}. Party currency: {partyCurrency}. Change
-                      this expense only and review the exchange rate in the editor.
-                    </Trans>
-                  ) : (
-                    <Trans>
-                      Receipt shows {evidence}. Party currency: {partyCurrency}. Change this expense
-                      only and review the exchange rate in the editor.
-                    </Trans>
-                  )}
                 </span>
               </ModalSheetChoice>
             </ModalSheetChoices>

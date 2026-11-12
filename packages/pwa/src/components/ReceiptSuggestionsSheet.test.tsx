@@ -54,7 +54,6 @@ async function render(
       <I18nProvider i18n={i18n}>
         <PwaUIProvider>
           <ReceiptSuggestionsSheet
-            partyCurrency="EUR"
             receipt={{
               merchantName: "Market",
               titleSuggestions,
@@ -182,7 +181,7 @@ test("preselects a verified currency and prevents applying its total when it is 
   expect(boxes[1].checked).toBe(true);
   expect(boxes[2].disabled).toBe(false);
   expect(boxes[2].checked).toBe(true);
-  expect(document.body.textContent).toContain("Receipt shows US$. Party currency: EUR.");
+  expect(document.body.textContent).toContain("CurrencyUSD · US Dollar");
   await act(async () => button("Accept suggestions").click());
   expect(onAccept).toHaveBeenLastCalledWith({ name: "Market", currency: "USD", amount: 12.34 });
   await act(async () => boxes[1].click());
@@ -218,9 +217,10 @@ test("shows a currency-only suggestion even without title or total edits", async
   expect(onAccept).toHaveBeenCalledExactlyOnceWith({ currency: "USD" });
 });
 
-test("makes contextual currency inference explicit in the sheet", async () => {
+test("accepts inferred currency using the same compact row", async () => {
   await render(true, [], true, true, true);
-  expect(document.body.textContent).toContain("Currency inferred from El Paso, TX 79925.");
+  expect(document.body.textContent).toContain("CurrencyUSD · US Dollar");
+  expect(document.body.textContent).not.toContain("El Paso");
   expect(document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')[1].checked).toBe(
     true,
   );

@@ -88,7 +88,6 @@ function ReceiptEditor() {
       <input aria-label="Expense draft" defaultValue="My handwritten title" />
       {isOpen ? (
         <ReceiptSuggestionsSheet
-          partyCurrency="EUR"
           receipt={{
             merchantName: "Café",
             titleSuggestions: ["Cafés", "Coffee"],

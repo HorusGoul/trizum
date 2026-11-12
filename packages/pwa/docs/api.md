@@ -112,13 +112,12 @@ version offers title, total, and an explicit expense-currency choice, preserving
 fields edited during processing. A currency change is offered only for a supported
 currency different from both the party and the current expense. Explicit printed
 codes and known markers are matched literally; contextual inferences carry their
-own source and evidence explanation. The sheet distinguishes an inferred currency
-from a printed one. Bare shared symbols are not treated as explicit currency,
+own source and evidence explanation in the API response. Bare shared symbols are not treated as explicit currency,
 and the app language and party currency are never evidence of the receipt's
 currency. Currency rejection still suppresses its associated total to avoid
 applying that number as a party-currency amount.
-The currency choice starts selected and identifies the receipt evidence, target
-currency, and party currency. Deselecting the currency disables its foreign total; applying that total
+The currency choice starts selected and shows a compact Currency label with the
+target currency code and name. Deselecting the currency disables its foreign total; applying that total
 requires accepting its currency too. Accepting the switch changes this expense only, using the
 same reference-rate lookup and conversion path as the editor currency selector.
 The user reviews the rate in the editor; a missing rate remains unset for manual

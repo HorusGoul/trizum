@@ -18,7 +18,7 @@ Browser and Android Back dismiss the top shared sheet before navigating, preserv
 
 Skip the suggestions sheet when neither the title, total, nor currency can be changed, including matching values, protected manual edits, or an inapplicable total. Empty results do not block other usable receipt suggestions or count as user discards.
 
-Offer an explicit, initially selected expense-currency choice when a different currency is supported by the receipt. Prefer printed codes and markers; otherwise combine address, region, phone, tax, domain and language clues generically, with independent image verification. Distinguish inferred currency from printed currency in the sheet. Applying a foreign total requires accepting its currency; use the editor's exchange-rate flow and keep the party currency unchanged.
+Offer an explicit, initially selected expense-currency choice when a different currency is supported by the receipt. Prefer printed codes and markers; otherwise combine address, region, phone, tax, domain and language clues generically, with independent image verification. Keep the currency choice compact with a Currency label and the currency code/name; retain printed or inferred evidence in the API response. Applying a foreign total requires accepting its currency; use the editor's exchange-rate flow and keep the party currency unchanged.
 
 Verify Gemma's candidates against the original image with Clef before offering suggestions. Check titles, merchant, final total, currency evidence, and items independently; omit uncertain fields and keep failures silent. Both models receive the party currency only as verification context, never as evidence of the receipt currency.
 
