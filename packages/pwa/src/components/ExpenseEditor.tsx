@@ -55,14 +55,16 @@ import type { ExpenseConversionValues } from "#src/lib/currencyConversion.ts";
 import { cn } from "@trizum/ui/utils";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
-import { getReceiptSuggestions, getReceiptTitleOptions } from "#src/lib/receiptSuggestions.ts";
+import { getReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
+import { applyReceiptSuggestions } from "#src/lib/receiptSuggestionEdits.ts";
+import { useExchangeRates } from "#src/hooks/useExchangeRates.ts";
+import type { CurrencyCode } from "#src/lib/money.ts";
 import { ReceiptSuggestionsSheet } from "./ReceiptSuggestionsSheet";
 import { useReceiptSuggestions, type ReceiptImage } from "./useReceiptSuggestions";
 
 import { CurrencyContext } from "./CurrencyContext";
 import {
   getExpenseEditorCurrencyAmount,
-  setExpenseEditorCurrencyAmount,
   getExpenseEditorDraftValues,
   getExpenseEditorStoredValues,
 } from "#src/lib/expenseEditorCurrency.ts";
@@ -948,13 +950,13 @@ function PhotosField({ form, value, onChange, onViewPhoto }: PhotosFieldProps) {
 
   return (
     <ReceiptPhotosField
-      key={JSON.stringify([party.id, userId, isBoosted, currency])}
+      key={JSON.stringify([party.id, userId, isBoosted, party.currency, currency])}
       form={form}
       value={value}
       onChange={onChange}
       onViewPhoto={onViewPhoto}
       partyId={party.id}
-      currency={currency}
+      partyCurrency={party.currency}
       userId={userId}
       isBoosted={isBoosted}
     />
@@ -967,31 +969,29 @@ function ReceiptPhotosField({
   onChange,
   onViewPhoto,
   partyId,
-  currency,
+  partyCurrency,
   userId,
   isBoosted,
 }: PhotosFieldProps & {
   partyId: string;
-  currency: string;
+  partyCurrency: CurrencyCode;
   userId: string | undefined;
   isBoosted: boolean;
 }) {
-  const current = useStore(form.store, (state) => ({
-    name: state.values.name,
-    amount: getExpenseEditorCurrencyAmount(state.values),
-  }));
+  const rates = useExchangeRates(partyCurrency);
+
+  const current = useStore(form.store, (state) =>
+    getReceiptDraftValues(state.values, partyCurrency),
+  );
 
   const { analyze, result, suggestions, dismiss, scanningPhotoIds } = useReceiptSuggestions({
     partyId,
     userId,
     isBoosted,
-    currency,
+    partyCurrency,
     current,
     photoIds: value,
-    getValues: () => ({
-      name: form.state.values.name,
-      amount: getExpenseEditorCurrencyAmount(form.state.values),
-    }),
+    getValues: () => getReceiptDraftValues(form.state.values, partyCurrency),
     getPhotoIds: () => form.state.values.photos,
   });
 
@@ -1044,35 +1044,17 @@ function ReceiptPhotosField({
         <ReceiptSuggestionsSheet
           key={result.photoId}
           receipt={result.receipt}
+          partyCurrency={partyCurrency}
           suggestions={suggestions}
           onDiscard={() => dismiss(false)}
           onAccept={(values) => {
-            // Recheck against live form values before applying any selected field.
-            const available = getReceiptSuggestions({
+            const applied = applyReceiptSuggestions(form, {
               receipt: result.receipt,
-              currency,
               baseline: result.baseline,
-              current: {
-                name: form.state.values.name,
-                amount: getExpenseEditorCurrencyAmount(form.state.values),
-              },
+              partyCurrency,
+              rates,
+              selected: values,
             });
-
-            let applied = false;
-
-            if (
-              available.name !== undefined &&
-              values.name !== undefined &&
-              getReceiptTitleOptions(result.receipt).includes(values.name)
-            ) {
-              form.setFieldValue("name", values.name);
-              applied = true;
-            }
-
-            if (values.amount !== undefined && values.amount === available.amount) {
-              setExpenseEditorCurrencyAmount(form, values.amount);
-              applied = true;
-            }
 
             dismiss(applied);
           }}

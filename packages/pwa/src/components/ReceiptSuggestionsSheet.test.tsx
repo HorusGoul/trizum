@@ -42,23 +42,31 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 
-async function render(currencyMismatch = false, titleSuggestions: string[] = [], hasEdits = true) {
+async function render(
+  currencyMismatch = false,
+  titleSuggestions: string[] = [],
+  hasEdits = true,
+  offerCurrency = false,
+) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
         <PwaUIProvider>
           <ReceiptSuggestionsSheet
+            partyCurrency="EUR"
             receipt={{
               merchantName: "Market",
               titleSuggestions,
               total: "12.34",
               currency: currencyMismatch ? "USD" : "EUR",
+              currencyEvidence: offerCurrency ? "US$" : null,
               items: [],
             }}
             suggestions={{
               name: hasEdits ? (titleSuggestions[0] ?? "Market") : undefined,
-              amount: hasEdits && !currencyMismatch ? 12.34 : undefined,
+              amount: hasEdits && (!currencyMismatch || offerCurrency) ? 12.34 : undefined,
               currencyMismatch,
+              currency: offerCurrency ? "USD" : undefined,
             }}
             onAccept={onAccept}
             onDiscard={onDiscard}
@@ -164,4 +172,46 @@ test("offers only the title when the receipt currency differs", async () => {
   expect(document.body.textContent).toContain("The receipt currency differs");
   await act(async () => button("Accept suggestions").click());
   expect(onAccept).toHaveBeenCalledExactlyOnceWith({ name: "Market" });
+});
+
+test("preselects a verified currency and prevents applying its total when it is deselected", async () => {
+  await render(true, [], true, true);
+  const boxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+  expect(boxes[1].checked).toBe(true);
+  expect(boxes[2].disabled).toBe(false);
+  expect(boxes[2].checked).toBe(true);
+  expect(document.body.textContent).toContain("Receipt shows US$. Party currency: EUR.");
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenLastCalledWith({ name: "Market", currency: "USD", amount: 12.34 });
+  await act(async () => boxes[1].click());
+  expect(boxes[2].disabled).toBe(true);
+  expect(document.body.textContent).toContain("Select the expense currency above");
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenLastCalledWith({ name: "Market" });
+  await act(async () => boxes[1].click());
+  expect(boxes[2].disabled).toBe(false);
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenLastCalledWith({ name: "Market", currency: "USD", amount: 12.34 });
+});
+
+test("can accept a currency change without replacing the amount or title", async () => {
+  await render(true, [], true, true);
+  const boxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+  await act(async () => boxes[0].click());
+  await act(async () => boxes[2].click());
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenCalledExactlyOnceWith({ currency: "USD" });
+});
+
+test("shows a currency-only suggestion even without title or total edits", async () => {
+  await render(true, [], false, true);
+  expect(document.body.textContent).toContain("Premium suggestions");
+  const box = document.querySelector<HTMLInputElement>('input[type="checkbox"]');
+  expect(box?.checked).toBe(true);
+  expect(button("Accept suggestions").disabled).toBe(false);
+  await act(async () => box?.click());
+  expect(button("Accept suggestions").disabled).toBe(true);
+  await act(async () => box?.click());
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenCalledExactlyOnceWith({ currency: "USD" });
 });

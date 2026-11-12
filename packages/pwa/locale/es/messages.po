@@ -288,7 +288,7 @@ msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o regi
 msgid "Accent color"
 msgstr "Color de acento"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:139
+#: src/components/ReceiptSuggestionsSheet.tsx:188
 msgid "Accept suggestions"
 msgstr "Aceptar sugerencias"
 
@@ -443,7 +443,7 @@ msgstr "Incluir siempre a todos"
 msgid "Always use default template"
 msgstr "Usar siempre la plantilla predeterminada"
 
-#: src/components/ExpenseCurrencyFields.tsx:90
+#: src/components/ExpenseCurrencyFields.tsx:91
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:324
 msgid "Amount"
 msgstr "Cantidad"
@@ -452,11 +452,11 @@ msgstr "Cantidad"
 msgid "Amount for {0}"
 msgstr "Cantidad para {0}"
 
-#: src/components/ExpenseEditor.tsx:860
+#: src/components/ExpenseEditor.tsx:862
 msgid "Amount for {participantName}"
 msgstr "Cantidad para {participantName}"
 
-#: src/components/ExpenseCurrencyFields.tsx:81
+#: src/components/ExpenseCurrencyFields.tsx:82
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
@@ -577,7 +577,7 @@ msgstr "Error de autenticación"
 msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
-#: src/components/ExpenseEditor.tsx:426
+#: src/components/ExpenseEditor.tsx:428
 #: src/routes/settings.tsx:257
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
@@ -1077,7 +1077,7 @@ msgstr "Continuar con Premium"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/components/ExpenseCurrencyFields.tsx:41
+#: src/components/ExpenseCurrencyFields.tsx:42
 msgid "Converted amount ({partyCurrency})"
 msgstr "Importe convertido ({partyCurrency})"
 
@@ -1279,7 +1279,7 @@ msgstr "Corona Checa"
 msgid "Danish Krone"
 msgstr "Corona Danesa"
 
-#: src/components/ExpenseEditor.tsx:549
+#: src/components/ExpenseEditor.tsx:551
 msgid "Date"
 msgstr "Fecha"
 
@@ -1312,7 +1312,7 @@ msgstr "Deuda transferida"
 msgid "Decimal point"
 msgstr "Punto decimal"
 
-#: src/components/ExpenseEditor.tsx:783
+#: src/components/ExpenseEditor.tsx:785
 msgid "Decrease shares for {participantName}"
 msgstr "Reducir las partes de {participantName}"
 
@@ -1385,7 +1385,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:142
+#: src/components/ReceiptSuggestionsSheet.tsx:191
 msgid "Discard"
 msgstr "Descartar"
 
@@ -1614,12 +1614,12 @@ msgstr "Por ahora todo está archivado. Puedes reabrir cualquier grupo desde la 
 msgid "Exchange rate"
 msgstr "Tipo de cambio"
 
-#: src/components/ExpenseCurrencyFields.tsx:42
+#: src/components/ExpenseCurrencyFields.tsx:43
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:390
 msgid "Exchange rate ({partyCurrency}/{currency})"
 msgstr "Tipo de cambio ({partyCurrency}/{currency})"
 
-#: src/components/ExpenseCurrencyFields.tsx:138
+#: src/components/ExpenseCurrencyFields.tsx:139
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:191
 msgid "Exchange rate must be greater than 0"
 msgstr "El tipo de cambio debe ser mayor que 0"
@@ -1636,6 +1636,10 @@ msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revis
 #: src/components/ExpenseEditorValidationStatus.tsx:204
 msgid "Expense checks"
 msgstr "Comprobaciones del gasto"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:124
+msgid "Expense currency"
+msgstr "Moneda del gasto"
 
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:295
 msgid "Expense defaults"
@@ -1696,7 +1700,7 @@ msgid "Explore Premium"
 msgstr "Descubre Premium"
 
 #: src/components/AvatarPicker.tsx:123
-#: src/components/ExpenseEditor.tsx:1158
+#: src/components/ExpenseEditor.tsx:1140
 #: src/components/QRCodeScanner.tsx:129
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
@@ -1741,7 +1745,7 @@ msgstr "Error al actualizar el gasto"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
-#: src/components/ExpenseEditor.tsx:1131
+#: src/components/ExpenseEditor.tsx:1113
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
@@ -2045,11 +2049,11 @@ msgstr "Importando adjuntos ({0} de {1})"
 msgid "Importing Tricount data..."
 msgstr "Importando datos de Tricount..."
 
-#: src/components/ExpenseEditor.tsx:607
+#: src/components/ExpenseEditor.tsx:609
 msgid "Include all"
 msgstr "Incluir todos"
 
-#: src/components/ExpenseEditor.tsx:819
+#: src/components/ExpenseEditor.tsx:821
 msgid "Increase shares for {participantName}"
 msgstr "Aumentar las partes de {participantName}"
 
@@ -2365,7 +2369,7 @@ msgstr "Rupia de Mauricio"
 msgid "Me"
 msgstr "Yo"
 
-#: src/components/ExpenseEditor.tsx:419
+#: src/components/ExpenseEditor.tsx:421
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:99
 #: src/routes/party.$partyId/route.tsx:191
 msgid "Menu"
@@ -2737,7 +2741,7 @@ msgstr "Abrir grupos archivados"
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
-#: src/components/ExpenseEditor.tsx:429
+#: src/components/ExpenseEditor.tsx:431
 msgid "Open calculator when focusing amount fields"
 msgstr "Abrir calculadora al enfocar campos de importe"
 
@@ -2797,7 +2801,7 @@ msgstr "o introduce código"
 msgid "or use email"
 msgstr "o usa el correo"
 
-#: src/components/ExpenseCurrencyFields.tsx:61
+#: src/components/ExpenseCurrencyFields.tsx:62
 msgid "Original amount ({currency})"
 msgstr "Importe original ({currency})"
 
@@ -2830,7 +2834,7 @@ msgstr "Pagado por {currentParticipantName}"
 msgid "Paid at"
 msgstr "Pagado el"
 
-#: src/components/ExpenseEditor.tsx:524
+#: src/components/ExpenseEditor.tsx:526
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:49
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:412
 msgid "Paid by"
@@ -3215,8 +3219,8 @@ msgstr "Se han restaurado las compras de Premium."
 msgid "Premium status could not be checked. Try again."
 msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:43
-#: src/components/ReceiptSuggestionsSheet.tsx:54
+#: src/components/ReceiptSuggestionsSheet.tsx:61
+#: src/components/ReceiptSuggestionsSheet.tsx:72
 msgid "Premium suggestions"
 msgstr "Sugerencias Premium"
 
@@ -3295,6 +3299,10 @@ msgstr "Listo en otro dispositivo"
 msgid "Real-Time Sync"
 msgstr "Sincronización en Tiempo Real"
 
+#: src/components/ReceiptSuggestionsSheet.tsx:132
+msgid "Receipt shows {evidence}. Party currency: {partyCurrency}. Change this expense only and review the exchange rate in the editor."
+msgstr "El recibo muestra {evidence}. Moneda del Grupo: {partyCurrency}. Cambia solo este gasto y revisa el tipo de cambio en el editor."
+
 #: src/routes/party_.$partyId.transfer-debt/-components/DestinationParticipantCard.tsx:32
 msgid "Recommended match"
 msgstr "Coincidencia recomendada"
@@ -3348,7 +3356,7 @@ msgstr "Eliminar avatar"
 msgid "Remove payment method"
 msgstr "Eliminar método de pago"
 
-#: src/components/ExpenseEditor.tsx:1251
+#: src/components/ExpenseEditor.tsx:1233
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -3422,7 +3430,7 @@ msgstr "Política de privacidad de RevenueCat"
 msgid "Review expense"
 msgstr "Revisar gasto"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:58
+#: src/components/ReceiptSuggestionsSheet.tsx:76
 msgid "Review the receipt details before applying them to your expense."
 msgstr "Revisa los datos del recibo antes de aplicarlos al gasto."
 
@@ -3462,7 +3470,7 @@ msgstr "Dobra de Santo Tomé y Príncipe"
 msgid "Saudi Riyal"
 msgstr "Riyal Saudí"
 
-#: src/components/ExpenseEditor.tsx:328
+#: src/components/ExpenseEditor.tsx:330
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
 #: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
@@ -3514,6 +3522,10 @@ msgstr "Seleccionar emoji"
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:440
 msgid "Select everyone now and automatically include new participants."
 msgstr "Selecciona a todos ahora e incluye automáticamente a los nuevos participantes."
+
+#: src/components/ReceiptSuggestionsSheet.tsx:160
+msgid "Select the expense currency above to apply this total."
+msgstr "Selecciona arriba la moneda del gasto para aplicar este total."
 
 #: src/components/CloudSyncSignInForm.tsx:106
 msgid "Send password link"
@@ -3607,7 +3619,7 @@ msgstr "Partes"
 msgid "Shares for {0}"
 msgstr "Partes para {0}"
 
-#: src/components/ExpenseEditor.tsx:815
+#: src/components/ExpenseEditor.tsx:817
 msgid "Shares for {participantName}"
 msgstr "Partes para {participantName}"
 
@@ -3868,7 +3880,7 @@ msgstr "Detener trizum cloud en este dispositivo"
 msgid "Submit a Request"
 msgstr "Enviar sugerencia"
 
-#: src/components/ExpenseEditor.tsx:328
+#: src/components/ExpenseEditor.tsx:330
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
 #: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
@@ -3921,12 +3933,12 @@ msgstr "Desliza entre las pestañas de gastos y balance."
 msgid "Swiss Franc"
 msgstr "Franco Suizo"
 
-#: src/components/ExpenseEditor.tsx:841
+#: src/components/ExpenseEditor.tsx:843
 msgid "Switch to a set amount"
 msgstr "Cambiar a una cantidad fija"
 
-#: src/components/ExpenseEditor.tsx:831
-#: src/components/ExpenseEditor.tsx:842
+#: src/components/ExpenseEditor.tsx:833
+#: src/components/ExpenseEditor.tsx:844
 msgid "Switch to fractional split"
 msgstr "Cambiar a división fraccional"
 
@@ -3965,8 +3977,8 @@ msgstr "Somoni Tayiko"
 
 #: src/components/AvatarPicker.tsx:171
 #: src/components/AvatarPicker.tsx:186
-#: src/components/ExpenseEditor.tsx:1179
-#: src/components/ExpenseEditor.tsx:1193
+#: src/components/ExpenseEditor.tsx:1161
+#: src/components/ExpenseEditor.tsx:1175
 msgid "Take photo"
 msgstr "Hacer foto"
 
@@ -4093,7 +4105,7 @@ msgstr "El grupo puede haber sido eliminado por otro miembro."
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "El grupo anterior perderá su impulso. No podrás volver a mover Party Boost durante siete días."
 
-#: src/components/ReceiptSuggestionsSheet.tsx:117
+#: src/components/ReceiptSuggestionsSheet.tsx:162
 msgid "The receipt currency differs from the selected expense currency. The total cannot be applied."
 msgstr "La moneda del recibo no coincide con la moneda seleccionada para el gasto. No se puede aplicar el total."
 
@@ -4204,9 +4216,9 @@ msgstr "Esto detiene trizum cloud en este dispositivo. Tus datos locales se qued
 msgid "Timeframe"
 msgstr "Período"
 
-#: src/components/ExpenseEditor.tsx:492
-#: src/components/ReceiptSuggestionsSheet.tsx:69
-#: src/components/ReceiptSuggestionsSheet.tsx:78
+#: src/components/ExpenseEditor.tsx:494
+#: src/components/ReceiptSuggestionsSheet.tsx:87
+#: src/components/ReceiptSuggestionsSheet.tsx:96
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:308
 msgid "Title"
 msgstr "Título"
@@ -4251,7 +4263,7 @@ msgstr "Paʻanga Tongano"
 msgid "Top spender"
 msgstr "Quién más ha pagado"
 
-#: src/components/ReceiptSuggestionsSheet.tsx:106
+#: src/components/ReceiptSuggestionsSheet.tsx:144
 msgid "Total"
 msgstr "Total"
 
@@ -4442,8 +4454,8 @@ msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:180
 #: src/components/AvatarPicker.tsx:198
-#: src/components/ExpenseEditor.tsx:1188
-#: src/components/ExpenseEditor.tsx:1205
+#: src/components/ExpenseEditor.tsx:1170
+#: src/components/ExpenseEditor.tsx:1187
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -4451,7 +4463,7 @@ msgstr "Subir foto"
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
-#: src/components/ExpenseEditor.tsx:1099
+#: src/components/ExpenseEditor.tsx:1081
 msgid "Uploading..."
 msgstr "Subiendo..."
 
@@ -4572,7 +4584,7 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:1240
+#: src/components/ExpenseEditor.tsx:1222
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "Ver foto"

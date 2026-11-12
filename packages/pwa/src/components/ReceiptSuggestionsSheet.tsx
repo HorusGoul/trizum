@@ -14,29 +14,47 @@ import {
   ModalSheetTitle,
 } from "@trizum/ui/ModalSheet";
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
-import { getReceiptTitleOptions, type ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
+import {
+  getReceiptTitleOptions,
+  hasReceiptSuggestions,
+  type ReceiptDraftValues,
+  type ReceiptSuggestions,
+} from "#src/lib/receiptSuggestions.ts";
 
 export function ReceiptSuggestionsSheet({
   receipt,
   suggestions,
+  partyCurrency,
   onAccept,
   onDiscard,
 }: {
   receipt: Receipt;
-  suggestions: { name?: string; amount?: number; currencyMismatch: boolean };
+  suggestions: ReceiptSuggestions;
+  partyCurrency: string;
   onAccept: (values: Partial<ReceiptDraftValues>) => void;
   onDiscard: () => void;
 }) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const [useTitle, setUseTitle] = useState(true);
   const [useTotal, setUseTotal] = useState(true);
+  const [useCurrency, setUseCurrency] = useState(true);
   const [selectedTitle, setSelectedTitle] = useState(suggestions.name);
   const titleOptions = getReceiptTitleOptions(receipt);
+  const evidence = receipt.currencyEvidence;
 
-  if (suggestions.name === undefined && suggestions.amount === undefined) return null;
+  if (!hasReceiptSuggestions(suggestions)) return null;
+
+  const totalEnabled =
+    !suggestions.currencyMismatch || (suggestions.currency !== undefined && useCurrency);
+
+  const currencyName = suggestions.currency
+    ? new Intl.DisplayNames([i18n.locale], { type: "currency" }).of(suggestions.currency)
+    : undefined;
 
   const hasSelection =
-    (useTitle && suggestions.name !== undefined) || (useTotal && suggestions.amount !== undefined);
+    (useTitle && suggestions.name !== undefined) ||
+    (useTotal && totalEnabled && suggestions.amount !== undefined) ||
+    (useCurrency && suggestions.currency !== undefined);
 
   return (
     <ModalSheet
@@ -99,12 +117,33 @@ export function ReceiptSuggestionsSheet({
               ) : null}
             </div>
           ) : null}
+          {suggestions.currency !== undefined ? (
+            <ModalSheetChoices>
+              <ModalSheetChoice
+                icon="lucide.coins"
+                label={<Trans>Expense currency</Trans>}
+                isSelected={useCurrency}
+                onChange={setUseCurrency}
+              >
+                <span className="block">
+                  {suggestions.currency} · {currencyName}
+                </span>
+                <span className="text-accent-700 dark:text-accent-300 mt-1 block text-sm font-normal">
+                  <Trans>
+                    Receipt shows {evidence}. Party currency: {partyCurrency}. Change this expense
+                    only and review the exchange rate in the editor.
+                  </Trans>
+                </span>
+              </ModalSheetChoice>
+            </ModalSheetChoices>
+          ) : null}
           {suggestions.amount !== undefined ? (
             <ModalSheetChoices>
               <ModalSheetChoice
                 icon="lucide.receipt-text"
                 label={<Trans>Total</Trans>}
-                isSelected={useTotal}
+                isSelected={useTotal && totalEnabled}
+                isDisabled={!totalEnabled}
                 onChange={setUseTotal}
               >
                 {receipt.total} {receipt.currency}
@@ -112,12 +151,19 @@ export function ReceiptSuggestionsSheet({
             </ModalSheetChoices>
           ) : null}
           <ModalSheetSection className="flex flex-col gap-2 pt-2">
-            {suggestions.currencyMismatch ? (
+            {suggestions.currencyMismatch &&
+            !totalEnabled &&
+            receipt.total !== null &&
+            (suggestions.currency === undefined || suggestions.amount !== undefined) ? (
               <p className="text-accent-700 dark:text-accent-300 text-sm">
-                <Trans>
-                  The receipt currency differs from the selected expense currency. The total cannot
-                  be applied.
-                </Trans>{" "}
+                {suggestions.currency ? (
+                  <Trans>Select the expense currency above to apply this total.</Trans>
+                ) : (
+                  <Trans>
+                    The receipt currency differs from the selected expense currency. The total
+                    cannot be applied.
+                  </Trans>
+                )}{" "}
                 <span className="font-semibold">
                   {receipt.total} {receipt.currency}
                 </span>
@@ -131,7 +177,10 @@ export function ReceiptSuggestionsSheet({
 
                 if (useTitle && suggestions.name !== undefined) values.name = selectedTitle;
 
-                if (useTotal && suggestions.amount !== undefined)
+                if (useCurrency && suggestions.currency !== undefined)
+                  values.currency = suggestions.currency;
+
+                if (useTotal && totalEnabled && suggestions.amount !== undefined)
                   values.amount = suggestions.amount;
                 onAccept(values);
               }}

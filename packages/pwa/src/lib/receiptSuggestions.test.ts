@@ -7,13 +7,19 @@ const receipt: Receipt = {
   titleSuggestions: [],
   total: "12.34",
   currency: "EUR",
+  currencyEvidence: null,
   items: [],
 };
 
-const baseline = { name: "", amount: 0 };
+const baseline = { name: "", amount: 0, currency: "EUR" };
 
 const suggest = (data: Partial<Receipt> = {}, current = baseline) =>
-  getReceiptSuggestions({ receipt: { ...receipt, ...data }, currency: "EUR", current, baseline });
+  getReceiptSuggestions({
+    receipt: { ...receipt, ...data },
+    partyCurrency: "EUR",
+    current,
+    baseline,
+  });
 
 describe("receipt draft suggestions", () => {
   test("offers distinct bounded titles in ranked order with the merchant last", () => {
@@ -36,20 +42,25 @@ describe("receipt draft suggestions", () => {
     expect(suggest({ merchantName: null, titleSuggestions: ["Cafés"] }).name).toBe("Cafés");
   });
   test("offers the merchant and printed total in editor units", () => {
-    expect(suggest()).toEqual({ name: "The market", amount: 12.34, currencyMismatch: false });
+    expect(suggest()).toEqual({
+      name: "The market",
+      amount: 12.34,
+      currencyMismatch: false,
+      currency: undefined,
+    });
   });
   test("preserves edits made during processing, independently for each field", () => {
-    expect(suggest({}, { name: "My title", amount: 0 })).toMatchObject({
+    expect(suggest({}, { name: "My title", amount: 0, currency: "EUR" })).toMatchObject({
       name: undefined,
       amount: 12.34,
     });
-    expect(suggest({}, { name: "", amount: 20 })).toMatchObject({
+    expect(suggest({}, { name: "", amount: 20, currency: "EUR" })).toMatchObject({
       name: "The market",
       amount: undefined,
     });
   });
   test("does not suggest changes already present", () => {
-    expect(suggest({}, { name: "The market", amount: 12.34 })).toMatchObject({
+    expect(suggest({}, { name: "The market", amount: 12.34, currency: "EUR" })).toMatchObject({
       name: undefined,
       amount: undefined,
     });
@@ -59,6 +70,7 @@ describe("receipt draft suggestions", () => {
       name: "The market",
       amount: undefined,
       currencyMismatch: true,
+      currency: undefined,
     });
   });
   test("allows totals without a printed currency using the selected expense currency", () => {
@@ -77,5 +89,55 @@ describe("receipt draft suggestions", () => {
   test("handles unreadable receipts and bounds merchant titles to the editor limit", () => {
     expect(suggest({ merchantName: null, titleSuggestions: [], total: null }).name).toBeUndefined();
     expect(suggest({ merchantName: "A".repeat(100) }).name).toHaveLength(50);
+  });
+});
+
+test("offers a confirmed foreign currency and its total even when the numeric value matches", () => {
+  const current = { ...baseline, amount: 12.34 };
+  expect(
+    getReceiptSuggestions({
+      receipt: { ...receipt, currency: "USD", currencyEvidence: "US$" },
+      partyCurrency: "EUR",
+      current,
+      baseline: current,
+    }),
+  ).toMatchObject({ currency: "USD", amount: 12.34, currencyMismatch: true });
+});
+
+test("does not suggest changing back to the party currency or an already selected currency", () => {
+  const current = { ...baseline, currency: "USD" };
+
+  for (const currency of ["EUR", "USD"]) {
+    expect(
+      getReceiptSuggestions({
+        receipt: { ...receipt, currency, currencyEvidence: currency },
+        partyCurrency: "EUR",
+        current,
+        baseline: current,
+      }).currency,
+    ).toBeUndefined();
+  }
+});
+
+test("preserves currency and amount edits made during analysis", () => {
+  for (const current of [
+    { ...baseline, currency: "GBP" },
+    { ...baseline, amount: 20 },
+  ]) {
+    expect(
+      getReceiptSuggestions({
+        receipt: { ...receipt, currency: "USD", currencyEvidence: "USD" },
+        partyCurrency: "EUR",
+        current,
+        baseline,
+      }),
+    ).toMatchObject({ currency: undefined, amount: undefined });
+  }
+});
+
+test("offers only a currency change when the foreign total cannot be represented", () => {
+  expect(suggest({ currency: "USD", currencyEvidence: "USD", total: "1.005" })).toMatchObject({
+    currency: "USD",
+    amount: undefined,
   });
 });

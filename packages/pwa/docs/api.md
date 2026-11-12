@@ -41,13 +41,30 @@ signed-in party member and an authoritative active Party Boost, including a fres
 check of the boost owner's Premium and membership. The shared Automerge boost
 cache cannot authorize the request. Other party members do not need Premium.
 
-The response has `merchantName`, `titleSuggestions`, `total`, `currency`, and `items`. Each item has
+The response has `merchantName`, `titleSuggestions`, `total`, `currency`, `currencyEvidence`, and `items`. Each item has
 `name`, `quantity`, `unitPrice`, and `lineTotal`. Monetary values are decimal
 strings in major currency units. Quantities preserve the printed text and units;
 missing fields are `null`, and unreadable items produce an empty array. The
 extraction prompt requests the final printed total including tax and discounts,
 never tendered cash, change, or an inferred sum. Currency is an ISO code only
 when visibly identified; ambiguous symbols remain unknown.
+
+Gemma extracts the candidates, then `@cf/cloudflare/clef` compares them with the
+same original image. The verifier scores the merchant, each proposed title, the
+final total, currency plus printed evidence, and the item lines independently
+as supported, unsupported, or unclear. General fields require a supported-option
+score of at least 0.95; currency requires 0.98 and still needs the deterministic
+marker check. These are conservative policy thresholds pending receipt-specific
+accuracy evaluation, not calibrated accuracy percentages. Unverified fields are
+removed; rejecting an extracted currency also removes its total to prevent
+falling back to a party-currency amount. If verification fails or times out, the
+whole request fails quietly through the existing sanitized error path. Clef has
+an eight-second timeout after the bounded extraction pass. Empty extraction
+results skip verification. Neither image contents nor verifier scores are logged.
+
+Both models receive the party currency read from the already authorized party
+document. Their prompts explicitly use it only for verification and prohibit
+defaulting, guessing, or converting to that currency.
 
 `titleSuggestions` contains up to three short activity titles grounded in the
 receipt's items or clear context. The prompt requests the first title in the
@@ -71,16 +88,31 @@ and the app language do not establish when or where the purchase happened.
 New attachments are analyzed from their locally prepared image while Automerge
 sync continues. Suggestions stay local to the editor. Accepting selected fields
 updates the draft; saving the expense uses the existing write path. The first
-version offers title and total only, preserves fields edited during processing,
-and disables totals with a known currency mismatch or precision the editor
-cannot represent. Totals use the selected expense currency. Accepting a foreign-currency
-total updates `originalAmount` and recalculates the party total with the existing
-exchange rate; it does not select a currency or refresh the rate. Removing a receipt or leaving the editor discards late results.
+version offers title, total, and an explicit expense-currency choice, preserving
+fields edited during processing. A currency change is offered only for a supported
+currency different from both the party and the current expense, with matching
+printed evidence: an ISO code or a conservatively allowlisted marker such as
+`US$` or `€`. Shared markers such as `$`, `¥`, `£`, `₩`, `kr`, and `Rs`, missing
+or conflicting evidence, and language/location guesses cannot authorize a switch.
+The prompt requires evidence associated with the final bill total, and abstains
+when multiple currency totals cannot be distinguished. The API clears invalid
+evidence; the client checks it again. This is grounded extraction, not a calibrated
+model confidence percentage.
+
+The currency choice starts selected and identifies the receipt marker, target
+currency, and party currency. Deselecting the currency disables its foreign total; applying that total
+requires accepting its currency too. Accepting the switch changes this expense only, using the
+same reference-rate lookup and conversion path as the editor currency selector.
+The user reviews the rate in the editor; a missing rate remains unset for manual
+entry. Totals in an already selected foreign currency retain its existing rate.
+Declining the switch cannot apply the foreign total as a party-currency amount.
+Unrepresentable precision remains blocked. Removing a receipt, changing currency,
+or leaving the editor discards late results.
 Analysis runs without loading or error toasts. Each photo has an inset gradient
 border with a circling highlight until its request finishes or times out;
 reduced motion uses a static border. The animation rotates only the gradient
 behind a fixed border mask, so it stays inside the thumbnail bounds.
-Failures and receipts with no applicable title or total change produce no sheet
+Failures and receipts with no applicable title, total, or currency change produce no sheet
 and leave attachments and manual expense entry usable. Matching values, manual
 edits protected since upload, and totals that cannot be applied are filtered
 before display. Unusable queued results do not prevent later useful suggestions

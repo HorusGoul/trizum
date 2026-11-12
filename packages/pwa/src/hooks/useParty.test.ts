@@ -12,13 +12,15 @@ import {
 import {
   getExpenseEditorDraftValues,
   setExpenseEditorCurrencyAmount,
+  setExpenseEditorCurrency,
   getExpenseEditorCurrencyAmount,
   getExpenseEditorStoredValues,
 } from "#src/lib/expenseEditorCurrency.ts";
 import { FormApi } from "@tanstack/react-form";
 import type { ExpenseEditorFormValues } from "#src/components/ExpenseEditor.tsx";
 import { getExpenseEditValues } from "#src/routes/party_.$partyId.expense.$expenseId_.edit/-expenseEditValues.ts";
-import { getReceiptSuggestions } from "#src/lib/receiptSuggestions.ts";
+import { applyReceiptSuggestions } from "#src/lib/receiptSuggestionEdits.ts";
+import { getReceiptDraftValues, getReceiptSuggestions } from "#src/lib/receiptSuggestions.ts";
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { getExpenseConversionFields } from "#src/lib/currencyConversion.ts";
@@ -371,6 +373,150 @@ describe("getPartyHelpers", () => {
     }
   });
 
+  test.each([
+    "legacy",
+    "foreign",
+    "missing-rate",
+    "currency-only",
+    "declined",
+    "unconfirmed",
+    "stale",
+  ] as const)(
+    "round-trips an explicit receipt currency decision for a %s expense",
+    async (kind) => {
+      const { helpers, repo } = createPartyHelpers();
+      appWorkerMock.recalculateBalances.mockResolvedValue(true);
+
+      try {
+        const input = createExpenseInput();
+
+        if (kind === "foreign") {
+          input.originalAmount = { amount: 1000, currency: "GBP" };
+          input.exchangeRate = 0.8;
+          input.paidBy = { alice: 800 };
+        }
+
+        const expense = await helpers.addExpenseToParty(input);
+        const chunk = await repo.find<PartyExpenseChunk>(decodeExpenseId(expense.id).chunkId);
+        const saved = chunk.doc().expenses.find((entry) => entry.id === expense.id)!;
+        const defaults: ExpenseEditorFormValues = getExpenseEditValues(saved);
+        const form = new FormApi({ defaultValues: getExpenseEditorDraftValues(defaults) });
+        const unmount = form.mount();
+
+        try {
+          const receipt: Receipt = {
+            merchantName: "Cafe",
+            titleSuggestions: ["Coffee"],
+            total: "12.34",
+            currency: "USD",
+            currencyEvidence: kind === "unconfirmed" ? "$" : "US$",
+            items: [],
+          };
+
+          const selected: Partial<ReturnType<typeof getReceiptDraftValues>> = {};
+
+          if (kind !== "declined") selected.currency = "USD";
+
+          if (kind !== "currency-only") selected.amount = 12.34;
+          const rates = { base: "EUR" as const, rates: { EUR: { rate: 1, date: "2026-11-12" } } };
+
+          const foreignRates = {
+            ...rates,
+            rates: { ...rates.rates, USD: { rate: 2, date: "2026-11-12" } },
+          };
+
+          const baseline = getReceiptDraftValues(form.state.values, "EUR");
+
+          if (kind === "stale") setExpenseEditorCurrency(form, "EUR", "GBP", 0.8);
+          expect(
+            applyReceiptSuggestions(form, {
+              receipt,
+              baseline,
+              partyCurrency: "EUR",
+              rates: kind === "missing-rate" ? rates : foreignRates,
+              selected,
+            }),
+          ).toBe(!["declined", "unconfirmed", "stale"].includes(kind));
+          const values = getExpenseEditorStoredValues(form.state.values, defaults);
+          await helpers.updateExpense({
+            ...saved,
+            paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+            shares: values.shares,
+            ...getExpenseConversionFields(values),
+          });
+          const updated = chunk.doc().expenses.find((entry) => entry.id === expense.id)!;
+          expect(updated.name).toBe(saved.name);
+          expect(updated.photos).toEqual(saved.photos);
+          expect(updated.paidAt).toEqual(saved.paidAt);
+
+          const expected = {
+            legacy: {
+              originalAmount: { amount: 1234, currency: "USD" },
+              exchangeRate: 0.5,
+              paid: 617,
+            },
+            foreign: {
+              originalAmount: { amount: 1234, currency: "USD" },
+              exchangeRate: 0.5,
+              paid: 617,
+            },
+            "missing-rate": {
+              originalAmount: { amount: 1234, currency: "USD" },
+              exchangeRate: undefined,
+              paid: 0,
+            },
+            "currency-only": {
+              originalAmount: { amount: 1000, currency: "USD" },
+              exchangeRate: 0.5,
+              paid: 500,
+            },
+            declined: { originalAmount: undefined, exchangeRate: undefined, paid: 1000 },
+            unconfirmed: { originalAmount: undefined, exchangeRate: undefined, paid: 1000 },
+            stale: {
+              originalAmount: { amount: 1000, currency: "GBP" },
+              exchangeRate: 0.8,
+              paid: 800,
+            },
+          }[kind];
+
+          expect(updated.originalAmount).toEqual(expected.originalAmount);
+          expect(updated.exchangeRate).toBe(expected.exchangeRate);
+          expect(updated.paidBy.alice).toBe(expected.paid);
+
+          // Reopen and apply a title alone without changing the newly saved money metadata.
+          const reopenedDefaults: ExpenseEditorFormValues = getExpenseEditValues(updated);
+          form.reset(getExpenseEditorDraftValues(reopenedDefaults));
+          expect(
+            applyReceiptSuggestions(form, {
+              receipt,
+              baseline: getReceiptDraftValues(form.state.values, "EUR"),
+              partyCurrency: "EUR",
+              rates: foreignRates,
+              selected: { name: "Coffee" },
+            }),
+          ).toBe(true);
+          const renamed = getExpenseEditorStoredValues(form.state.values, reopenedDefaults);
+          await helpers.updateExpense({
+            ...updated,
+            name: renamed.name,
+            shares: renamed.shares,
+            ...getExpenseConversionFields(renamed),
+          });
+          const final = chunk.doc().expenses.find((entry) => entry.id === expense.id)!;
+          expect(final.name).toBe("Coffee");
+          expect(final.originalAmount).toEqual(updated.originalAmount);
+          expect(final.exchangeRate).toBe(updated.exchangeRate);
+          expect(final.paidBy).toEqual(updated.paidBy);
+          expect(final.shares).toEqual(updated.shares);
+        } finally {
+          unmount();
+        }
+      } finally {
+        await repo.shutdown();
+      }
+    },
+  );
+
   test.each(["legacy", "foreign", "missing-rate"] as const)(
     "persists accepted receipt totals in the selected currency for %s expenses",
     async (kind) => {
@@ -393,6 +539,7 @@ describe("getPartyHelpers", () => {
           merchantName: "Cafe",
           total: "15.70",
           currency: kind === "legacy" ? "EUR" : "USD",
+          currencyEvidence: null,
           items: [],
         };
 
@@ -406,11 +553,12 @@ describe("getPartyHelpers", () => {
             const baseline = {
               name: form.state.values.name,
               amount: getExpenseEditorCurrencyAmount(form.state.values),
+              currency: form.state.values.originalAmount?.currency ?? "EUR",
             };
 
             const suggestions = getReceiptSuggestions({
               receipt: { ...receipt, total },
-              currency: form.state.values.originalAmount?.currency ?? "EUR",
+              partyCurrency: "EUR",
               current: baseline,
               baseline,
             });

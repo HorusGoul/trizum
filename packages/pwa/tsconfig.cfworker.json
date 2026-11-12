@@ -16,6 +16,7 @@
     "./src/lib/partySharePreviewMessages.ts",
     "./src/lib/api/*.ts",
     "./src/lib/money.ts",
+    "./src/lib/receiptCurrency.ts",
     "./src/lib/exchangeRatesSnapshot.json",
     "./src/lib/exchangeRateTables.ts",
     "./src/lib/tricountMigration.ts",

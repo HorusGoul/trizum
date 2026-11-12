@@ -9,6 +9,7 @@ import { CurrencyField } from "./CurrencyField";
 import type { CurrencyFieldProps } from "./CurrencyField";
 import { CurrencySelect } from "./CurrencySelect";
 import { useExchangeRates } from "../hooks/useExchangeRates";
+import { setExpenseEditorCurrency } from "../lib/expenseEditorCurrency";
 import { getExchangeRate } from "../lib/exchangeRateTables";
 import { convertExpenseAmount } from "../lib/currencyConversion";
 import { convertToUnits } from "../lib/expenses";
@@ -150,23 +151,12 @@ export function ExpenseCurrencyFields({
         className="min-w-0"
         onChange={(key) => {
           calculatorProps.onCloseCalculator?.();
-          // Currency selection relabels the entered amount, rather than converting it again.
-          const enteredAmount = original?.amount ?? convertToUnits(form.state.values.amount);
-
-          if (key === partyCurrency) {
-            form.setFieldValue("amount", enteredAmount / 100);
-            form.setFieldValue("originalAmount", null);
-            form.setFieldValue("exchangeRate", null);
-          } else {
-            const rate = getExchangeRate(table, key)?.rate ?? null;
-            updateConversion(
-              {
-                currency: key,
-                amount: enteredAmount,
-              },
-              rate,
-            );
-          }
+          setExpenseEditorCurrency(
+            form,
+            partyCurrency,
+            key,
+            getExchangeRate(table, key)?.rate ?? null,
+          );
         }}
       />
     </>

@@ -88,14 +88,21 @@ function ReceiptEditor() {
       <input aria-label="Expense draft" defaultValue="My handwritten title" />
       {isOpen ? (
         <ReceiptSuggestionsSheet
+          partyCurrency="EUR"
           receipt={{
             merchantName: "Café",
             titleSuggestions: ["Cafés", "Coffee"],
             total: "15.70",
             currency: "EUR",
+            currencyEvidence: null,
             items: [],
           }}
-          suggestions={{ name: "Cafés", amount: 15.7, currencyMismatch: false }}
+          suggestions={{
+            name: "Cafés",
+            amount: 15.7,
+            currencyMismatch: false,
+            currency: undefined,
+          }}
           onAccept={onAccept}
           onDiscard={() => {
             onDiscard();

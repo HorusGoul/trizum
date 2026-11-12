@@ -4,7 +4,7 @@
 "@trizum/ui": minor
 ---
 
-Add receipt suggestions for Boosted parties. Receipt photos are analyzed by a protected Cloudflare endpoint that returns the merchant, final total, printed currency, and item lines. Review and accept title or total suggestions in the expense editor while attachments continue syncing.
+Add receipt suggestions for Boosted parties. Receipt photos are analyzed by a protected Cloudflare endpoint that returns the merchant, final total, printed currency, and item lines. Review and accept title, total, or currency suggestions in the expense editor while attachments continue syncing.
 
 Expense titles describe the purchased items or activity, preferring the receipt's language and offering an app-language alternative when useful, with the merchant name as a fallback. Analysis stays quiet until suggestions are ready; failures keep the receipt and manual editor usable without notifications.
 
@@ -16,4 +16,8 @@ Receipt titles consider the printed transaction time and local context before su
 
 Browser and Android Back dismiss the top shared sheet before navigating, preserving the underlying expense draft. Sheet registration is automatic through the app's UI provider, respects non-dismissible sheets, and leaves no extra history entries after closing.
 
-Skip the suggestions sheet when neither the title nor total can be changed, including matching values, protected manual edits, or an inapplicable total. Empty results do not block other usable receipt suggestions or count as user discards.
+Skip the suggestions sheet when neither the title, total, nor currency can be changed, including matching values, protected manual edits, or an inapplicable total. Empty results do not block other usable receipt suggestions or count as user discards.
+
+Offer an explicit, initially selected expense-currency choice only when a different currency is supported by a matching printed ISO code or unambiguous marker. Ambiguous symbols and location or language guesses cannot trigger a switch. Applying a foreign total requires accepting its currency; use the editor's exchange-rate flow and keep the party currency unchanged.
+
+Verify Gemma's candidates against the original image with Clef before offering suggestions. Check titles, merchant, final total, currency evidence, and items independently; omit uncertain fields and keep failures silent. Both models receive the party currency only as verification context, never as evidence of the receipt currency.

@@ -9,6 +9,7 @@ const receipt = {
   titleSuggestions: [],
   total: "12.34",
   currency: "EUR",
+  currencyEvidence: "EUR",
   items: [{ name: "Apples", quantity: "0,750 kg", unitPrice: "2.490", lineTotal: "1.87" }],
 };
 
@@ -18,7 +19,26 @@ describe("receipt analysis authorization and contract", () => {
   const limit = vi.fn<RateLimit["limit"]>();
   beforeEach(async () => {
     harness = await createPartyBoostTestHarness();
-    run.mockReset().mockResolvedValue(completion(JSON.stringify(receipt)));
+    run.mockReset().mockImplementation(async (model, input) => {
+      if (model === "@cf/cloudflare/clef" && "questions" in input) {
+        return {
+          model: "clef",
+          answers: Object.fromEntries(
+            Object.keys(input.questions).map((field) => [
+              field,
+              {
+                type: "choice" as const,
+                choice: "supported" as const,
+                probabilities: { supported: 0.999, unsupported: 0.0005, unclear: 0.0005 },
+                confidence: 0.999,
+              },
+            ]),
+          ),
+        };
+      }
+
+      return completion(JSON.stringify(receipt));
+    });
     limit.mockReset().mockResolvedValue({ success: true });
     harness.env.AI = { run };
     harness.env.RECEIPT_RATE_LIMITER = { limit };
@@ -26,6 +46,14 @@ describe("receipt analysis authorization and contract", () => {
   afterEach(async () => {
     await harness.dispose();
   });
+
+  function gemmaInput() {
+    const input = run.mock.calls[0][1];
+
+    if (!("messages" in input)) throw new Error("Expected Gemma input");
+
+    return input;
+  }
 
   async function boostedParty() {
     const partyId = harness.createParty();
@@ -68,7 +96,7 @@ describe("receipt analysis authorization and contract", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     await expect(response.json()).resolves.toEqual(receipt);
-    expect(run).toHaveBeenCalledOnce();
+    expect(run).toHaveBeenCalledTimes(2);
   });
   test("preserves multilingual receipt fields from Gemma chat completions", async () => {
     const { partyId, owner } = await boostedParty();
@@ -78,12 +106,13 @@ describe("receipt analysis authorization and contract", () => {
       titleSuggestions: [],
       total: "12.34",
       currency: "JPY",
+      currencyEvidence: null,
       items: [
         { name: "りんご / تفاح", quantity: "0,750 kg", unitPrice: "2.490", lineTotal: "1.87" },
       ],
     };
 
-    run.mockResolvedValue(completion(JSON.stringify(multilingualReceipt)));
+    run.mockResolvedValueOnce(completion(JSON.stringify(multilingualReceipt)));
     const response = await harness.requestReceipt(partyId, image, owner.cookie);
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual(multilingualReceipt);
@@ -123,11 +152,11 @@ describe("receipt analysis authorization and contract", () => {
           locale === "en" ? ["Cafetería", "Coffee", "Cafés"] : ["コーヒー", "Café", "喫茶店"],
       };
 
-      run.mockResolvedValue(completion(JSON.stringify(titledReceipt)));
+      run.mockResolvedValueOnce(completion(JSON.stringify(titledReceipt)));
       const response = await harness.requestReceipt(partyId, image, owner.cookie, locale);
       expect(response.status).toBe(200);
       await expect(response.json()).resolves.toEqual(titledReceipt);
-      expect(run.mock.calls[0][1].messages).toEqual(
+      expect(gemmaInput().messages).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             role: "system",
@@ -155,18 +184,73 @@ describe("receipt analysis authorization and contract", () => {
       );
     },
   );
+  test("returns literal foreign-currency evidence and prompts conservatively", async () => {
+    const { partyId, owner } = await boostedParty();
+    harness.documents.get(partyId)!.currency = "GBP";
+    const foreign = { ...receipt, currency: "USD", currencyEvidence: "US$" };
+    run.mockResolvedValueOnce(completion(JSON.stringify(foreign)));
+    const response = await harness.requestReceipt(partyId, image, owner.cookie);
+    await expect(response.json()).resolves.toEqual(foreign);
+    const system = gemmaInput().messages?.[0];
+    expect(system).toMatchObject({
+      content: expect.stringContaining("The party currency is GBP. Use it only to verify"),
+    });
+    expect(run).toHaveBeenLastCalledWith(
+      "@cf/cloudflare/clef",
+      expect.objectContaining({
+        images: [image],
+        state: expect.objectContaining({ partyCurrency: "GBP", receipt: foreign }),
+      }),
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+    expect(system).toMatchObject({
+      role: "system",
+      content: expect.stringContaining("associated with the final bill total"),
+    });
+    expect(system).toMatchObject({
+      content: expect.stringContaining("Bare $, ¥, kr or Rs are ambiguous and insufficient"),
+    });
+    expect(system).toMatchObject({
+      content: expect.stringContaining("If multiple currencies appear"),
+    });
+    expect(system).toMatchObject({
+      content: expect.stringContaining("Never infer currency from language, location, merchant"),
+    });
+  });
+  test("does not expose ambiguous evidence as a confident currency marker", async () => {
+    const { partyId, owner } = await boostedParty();
+    run.mockResolvedValueOnce(
+      completion(JSON.stringify({ ...receipt, currency: "USD", currencyEvidence: "$" })),
+    );
+    const response = await harness.requestReceipt(partyId, image, owner.cookie);
+    await expect(response.json()).resolves.toMatchObject({
+      currency: "USD",
+      currencyEvidence: null,
+    });
+  });
+  test("returns a sanitized failure when Clef is unavailable", async () => {
+    const { partyId, owner } = await boostedParty();
+    run
+      .mockResolvedValueOnce(completion(JSON.stringify(receipt)))
+      .mockRejectedValueOnce(new Error("Private image and provider diagnostics"));
+    const response = await harness.requestReceipt(partyId, image, owner.cookie);
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({
+      error: { code: "unavailable", message: "Receipt analysis could not be completed." },
+    });
+  });
   test.each(["length", "content_filter", "tool_calls"])(
     "rejects a Gemma completion stopped by %s",
     async (finishReason) => {
       const { partyId, owner } = await boostedParty();
-      run.mockResolvedValue(completion(JSON.stringify(receipt), finishReason));
+      run.mockResolvedValueOnce(completion(JSON.stringify(receipt), finishReason));
       const response = await harness.requestReceipt(partyId, image, owner.cookie);
       expect(response.status).toBe(503);
     },
   );
   test("rejects refusals without exposing provider content", async () => {
     const { partyId, owner } = await boostedParty();
-    run.mockResolvedValue({
+    run.mockResolvedValueOnce({
       choices: [
         { finish_reason: "stop", message: { content: null, refusal: "Private provider response" } },
       ],
@@ -226,10 +310,11 @@ describe("receipt analysis authorization and contract", () => {
     "bad json",
     JSON.stringify({ ...receipt, total: 12.34 }),
     JSON.stringify({ ...receipt, total: "NaN" }),
+    JSON.stringify({ ...receipt, currencyEvidence: { confidence: 0.99 } }),
     JSON.stringify({ ...receipt, titleSuggestions: ["Cafetería", "Coffee", "Cafés", "Café"] }),
   ])("sanitizes invalid provider responses", async (response) => {
     const { partyId, owner } = await boostedParty();
-    run.mockResolvedValue(completion(response));
+    run.mockResolvedValueOnce(completion(response));
     const result = await harness.requestReceipt(partyId, image, owner.cookie);
     expect(result.status).toBe(503);
     await expect(result.json()).resolves.toEqual({

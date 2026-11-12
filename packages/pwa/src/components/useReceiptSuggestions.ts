@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { trizumApiClient } from "#src/lib/trizumApiClient.ts";
 import type { Receipt } from "#src/lib/api/receiptContract.ts";
-import { getReceiptSuggestions, type ReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
+import {
+  getReceiptSuggestions,
+  hasReceiptSuggestions,
+  type ReceiptDraftValues,
+} from "#src/lib/receiptSuggestions.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 
 export interface ReceiptImage {
@@ -26,7 +30,7 @@ export function useReceiptSuggestions({
   partyId,
   userId,
   isBoosted,
-  currency,
+  partyCurrency,
   current,
   photoIds,
   getValues,
@@ -36,7 +40,7 @@ export function useReceiptSuggestions({
   partyId: string;
   userId: string | undefined;
   isBoosted: boolean;
-  currency: string;
+  partyCurrency: string;
   current: ReceiptDraftValues;
   photoIds: string[];
   getValues: () => ReceiptDraftValues;
@@ -46,7 +50,7 @@ export function useReceiptSuggestions({
     trackEvent: typeof trackEvent;
   };
 }) {
-  const context = JSON.stringify([partyId, userId, isBoosted, currency]);
+  const context = JSON.stringify([partyId, userId, isBoosted, partyCurrency, current.currency]);
   const [results, setResults] = useState<ReceiptResult[]>([]);
   const [scanning, setScanning] = useState<ScanningReceipt[]>([]);
   const [requests] = useState(() => new Map<AbortController, ReturnType<typeof setTimeout>>());
@@ -97,7 +101,8 @@ export function useReceiptSuggestions({
             receipt === null ||
             (receipt.titleSuggestions.length === 0 &&
               receipt.merchantName === null &&
-              receipt.total === null) ||
+              receipt.total === null &&
+              receipt.currency === null) ||
             controller.signal.aborted ||
             activeContext.current !== requestContext ||
             !getPhotoIds().includes(photoId)
@@ -106,12 +111,12 @@ export function useReceiptSuggestions({
 
           const suggestions = getReceiptSuggestions({
             receipt,
-            currency,
+            partyCurrency,
             current: getValues(),
             baseline,
           });
 
-          if (suggestions.name === undefined && suggestions.amount === undefined) return;
+          if (!hasReceiptSuggestions(suggestions)) return;
           setResults((current) => [...current, { context, photoId, receipt, baseline }]);
         })
         .finally(() => {
@@ -127,18 +132,18 @@ export function useReceiptSuggestions({
 
     const suggestions = getReceiptSuggestions({
       receipt: entry.receipt,
-      currency,
+      partyCurrency,
       current,
       baseline: entry.baseline,
     });
 
-    return suggestions.name !== undefined || suggestions.amount !== undefined;
+    return hasReceiptSuggestions(suggestions);
   });
 
   const suggestions = result
     ? getReceiptSuggestions({
         receipt: result.receipt,
-        currency,
+        partyCurrency,
         current,
         baseline: result.baseline,
       })

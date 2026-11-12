@@ -1,8 +1,12 @@
+import type { CurrencyCode } from "./money";
+import type { ExpenseConversionValues } from "./currencyConversion";
+import { getConfirmedReceiptCurrency } from "./receiptCurrency";
 import type { Receipt } from "./api/receiptContract";
 
 export interface ReceiptDraftValues {
   name: string;
   amount: number;
+  currency: string;
 }
 
 export function getReceiptTitleOptions(receipt: Receipt): string[] {
@@ -17,16 +21,27 @@ export function getReceiptTitleOptions(receipt: Receipt): string[] {
 
 export function getReceiptSuggestions({
   receipt,
-  currency,
+  partyCurrency,
   current,
   baseline,
 }: {
   receipt: Receipt;
-  currency: string;
+  partyCurrency: string;
   current: ReceiptDraftValues;
   baseline: ReceiptDraftValues;
 }) {
-  const currencyMismatch = receipt.currency !== null && receipt.currency !== currency;
+  const currencyMismatch = receipt.currency !== null && receipt.currency !== current.currency;
+  const confirmedCurrency = getConfirmedReceiptCurrency(receipt);
+
+  const currency: CurrencyCode | undefined =
+    confirmedCurrency &&
+    confirmedCurrency !== partyCurrency &&
+    confirmedCurrency !== current.currency &&
+    current.currency === baseline.currency &&
+    current.amount === baseline.amount
+      ? confirmedCurrency
+      : undefined;
+
   const title = getReceiptTitleOptions(receipt)[0];
 
   // The editor stores major units with two decimal places for every currency.
@@ -39,13 +54,36 @@ export function getReceiptSuggestions({
   return {
     name: title && title !== current.name && current.name === baseline.name ? title : undefined,
     amount:
-      !currencyMismatch &&
+      (!currencyMismatch || currency !== undefined) &&
+      current.currency === baseline.currency &&
       amount !== null &&
       amount > 0 &&
-      amount !== current.amount &&
+      (amount !== current.amount || currency !== undefined) &&
       current.amount === baseline.amount
         ? amount
         : undefined,
+    currency,
     currencyMismatch,
+  };
+}
+
+export type ReceiptSuggestions = ReturnType<typeof getReceiptSuggestions>;
+
+export function hasReceiptSuggestions(suggestions: ReceiptSuggestions) {
+  return (
+    suggestions.name !== undefined ||
+    suggestions.amount !== undefined ||
+    suggestions.currency !== undefined
+  );
+}
+
+export function getReceiptDraftValues(
+  values: { name: string; amount: number } & ExpenseConversionValues,
+  partyCurrency: CurrencyCode,
+): ReceiptDraftValues {
+  return {
+    name: values.name,
+    amount: values.originalAmount ? values.originalAmount.amount / 100 : values.amount,
+    currency: values.originalAmount?.currency ?? partyCurrency,
   };
 }

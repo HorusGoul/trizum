@@ -16,6 +16,7 @@ export const receiptSchema = z.strictObject({
     .string()
     .regex(/^[A-Z]{3}$/)
     .nullable(),
+  currencyEvidence: z.string().trim().min(1).max(32).nullable(),
   items: z
     .array(
       z.strictObject({

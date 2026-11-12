@@ -13,6 +13,7 @@ const receipt: Receipt = {
   titleSuggestions: [],
   total: "12.34",
   currency: "EUR",
+  currencyEvidence: null,
   items: [],
 };
 
@@ -33,20 +34,22 @@ function Harness({
   userId = "member",
   isBoosted = true,
   currency = "EUR",
+  partyCurrency = "EUR",
 }: {
   userId?: string;
   isBoosted?: boolean;
   currency?: string;
+  partyCurrency?: string;
 }) {
   const suggestions = useReceiptSuggestions({
     partyId: "party",
     userId,
     isBoosted,
-    currency,
-    current: draft,
+    partyCurrency,
+    current: { ...draft, currency },
     photoIds,
     getPhotoIds: () => photoIds,
-    getValues: () => draft,
+    getValues: () => ({ ...draft, currency }),
     services,
   });
 
@@ -60,7 +63,10 @@ function Harness({
 async function render(props: ComponentProps<typeof Harness> = {}) {
   await act(async () =>
     root.render(
-      <Harness key={JSON.stringify([props.userId, props.isBoosted, props.currency])} {...props} />,
+      <Harness
+        key={JSON.stringify([props.userId, props.isBoosted, props.currency, props.partyCurrency])}
+        {...props}
+      />,
     ),
   );
 }
@@ -76,7 +82,7 @@ beforeEach(() => {
   // SAFETY: React's test-only act flag is not part of the production global type.
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   photoIds = ["photo"];
-  draft = { name: "", amount: 0 };
+  draft = { name: "", amount: 0, currency: "EUR" };
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
@@ -91,8 +97,40 @@ afterEach(async () => {
 });
 
 describe("receipt suggestion lifecycle", () => {
+  test("offers a currency-only result when its printed evidence is explicit", async () => {
+    analyzeReceipt.mockResolvedValue({
+      ...receipt,
+      merchantName: null,
+      total: null,
+      currency: "USD",
+      currencyEvidence: "USD",
+    });
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.suggestions).toMatchObject({
+      name: undefined,
+      amount: undefined,
+      currency: "USD",
+    });
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
+  test("does not show a currency-only result for an ambiguous symbol", async () => {
+    analyzeReceipt.mockResolvedValue({
+      ...receipt,
+      merchantName: null,
+      total: null,
+      currency: "USD",
+      currencyEvidence: "$",
+    });
+    await render();
+    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(controller.result).toBeUndefined();
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
   test("stays silent when the extracted values already match the draft", async () => {
-    draft = { name: "Market", amount: 12.34 };
+    draft = { name: "Market", amount: 12.34, currency: "EUR" };
     analyzeReceipt.mockResolvedValue(receipt);
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
@@ -120,11 +158,11 @@ describe("receipt suggestion lifecycle", () => {
     analyzeReceipt.mockReturnValue(pending.promise);
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
-    draft = { name: "My title", amount: 20 };
+    draft = { name: "My title", amount: 20, currency: "EUR" };
     await render();
     await act(async () => pending.resolve(receipt));
     expect(controller.result).toBeUndefined();
-    expect(draft).toEqual({ name: "My title", amount: 20 });
+    expect(draft).toEqual({ name: "My title", amount: 20, currency: "EUR" });
     expect(trackEvent).not.toHaveBeenCalled();
   });
 
@@ -141,11 +179,11 @@ describe("receipt suggestion lifecycle", () => {
       ]),
     );
     expect(controller.result?.photoId).toBe("photo");
-    draft = { name: "", amount: 20 };
+    draft = { name: "", amount: 20, currency: "EUR" };
     await render();
     expect(controller.result?.photoId).toBe("other-photo");
     expect(controller.suggestions).toMatchObject({ name: "Coffee", amount: undefined });
-    draft = { name: "My title", amount: 20 };
+    draft = { name: "My title", amount: 20, currency: "EUR" };
     await render();
     expect(controller.result).toBeUndefined();
     expect(trackEvent).not.toHaveBeenCalled();
@@ -198,6 +236,7 @@ describe("receipt suggestion lifecycle", () => {
       titleSuggestions: [],
       total: null,
       currency: null,
+      currencyEvidence: null,
       items: [],
     });
     await render();
@@ -212,6 +251,7 @@ describe("receipt suggestion lifecycle", () => {
       titleSuggestions: ["Coffee"],
       total: null,
       currency: null,
+      currencyEvidence: null,
       items: [],
     });
     await render();
@@ -246,7 +286,7 @@ describe("receipt suggestion lifecycle", () => {
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
     expect(controller.result?.receipt).toEqual(receipt);
-    expect(draft).toEqual({ name: "", amount: 0 });
+    expect(draft).toEqual({ name: "", amount: 0, currency: "EUR" });
     expect(trackEvent).not.toHaveBeenCalled();
     await act(async () => controller.dismiss(true));
     expect(controller.result).toBeUndefined();
@@ -254,7 +294,7 @@ describe("receipt suggestion lifecycle", () => {
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
     await act(async () => controller.dismiss(false));
     expect(trackEvent).toHaveBeenLastCalledWith("receipt_suggestions_discarded");
-    expect(draft).toEqual({ name: "", amount: 0 });
+    expect(draft).toEqual({ name: "", amount: 0, currency: "EUR" });
   });
   test("does not request analysis for a party without Boost", async () => {
     await render({ isBoosted: false });
@@ -288,19 +328,22 @@ describe("receipt suggestion lifecycle", () => {
     expect(controller.result).toBeUndefined();
   });
 
-  test("does not restore old scans after changing the party currency and returning", async () => {
-    const pending = deferred<Receipt>();
-    analyzeReceipt.mockReturnValue(pending.promise);
-    await render();
-    await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
-    const signal = analyzeReceipt.mock.calls[0][2];
-    await render({ currency: "USD" });
-    expect(signal?.aborted).toBe(true);
-    await render();
-    await act(async () => pending.resolve(receipt));
-    expect(controller.scanningPhotoIds).toEqual([]);
-    expect(controller.result).toBeUndefined();
-  });
+  test.each([{ currency: "USD" }, { partyCurrency: "USD" }])(
+    "does not restore scans after currency context changes (%j)",
+    async (context) => {
+      const pending = deferred<Receipt>();
+      analyzeReceipt.mockReturnValue(pending.promise);
+      await render();
+      await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+      const signal = analyzeReceipt.mock.calls[0][2];
+      await render(context);
+      expect(signal?.aborted).toBe(true);
+      await render();
+      await act(async () => pending.resolve(receipt));
+      expect(controller.scanningPhotoIds).toEqual([]);
+      expect(controller.result).toBeUndefined();
+    },
+  );
   test("does not restore a completed suggestion after leaving and returning to the account", async () => {
     analyzeReceipt.mockResolvedValue(receipt);
     await render();
@@ -327,7 +370,7 @@ describe("receipt suggestion lifecycle", () => {
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
     expect(photoIds).toEqual(["photo"]);
-    expect(draft).toEqual({ name: "", amount: 0 });
+    expect(draft).toEqual({ name: "", amount: 0, currency: "EUR" });
     expect(toast.error).not.toHaveBeenCalled();
     expect(trackEvent).not.toHaveBeenCalled();
     expect(controller.scanningPhotoIds).toEqual([]);

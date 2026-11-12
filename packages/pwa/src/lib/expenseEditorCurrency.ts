@@ -1,4 +1,5 @@
 import type { ExpenseEditorFormValues } from "../components/ExpenseEditor";
+import type { CurrencyCode } from "./money";
 import type { AppFormApi } from "./reactFormTypes";
 import {
   convertExpenseAmount,
@@ -30,6 +31,26 @@ export function setExpenseEditorCurrencyAmount(
     form.setFieldValue("amount", (convertExpenseAmount(units, exchangeRate ?? 0) ?? 0) / 100);
   } else {
     form.setFieldValue("amount", amount);
+  }
+}
+
+/** Relabel the entered amount exactly as the editor's currency selector does. */
+export function setExpenseEditorCurrency(
+  form: Pick<AppFormApi<ExpenseEditorFormValues>, "state" | "setFieldValue">,
+  partyCurrency: CurrencyCode,
+  currency: CurrencyCode,
+  rate: number | null,
+) {
+  const amount = getExpenseEditorCurrencyAmount(form.state.values);
+
+  if (currency === partyCurrency) {
+    form.setFieldValue("amount", amount);
+    form.setFieldValue("originalAmount", null);
+    form.setFieldValue("exchangeRate", null);
+  } else {
+    form.setFieldValue("originalAmount", { currency, amount: convertToUnits(amount) });
+    form.setFieldValue("exchangeRate", rate);
+    setExpenseEditorCurrencyAmount(form, amount);
   }
 }
 

@@ -1,3 +1,6 @@
+import type { DocumentId } from "@automerge/automerge-repo/slim";
+import type { Party } from "../../src/models/party";
+import { exchangeRateCurrencySchema } from "../../src/lib/api/exchangeRatesContract";
 import type { AutomergeDocuments } from "../automergeDocuments";
 import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { $, OpenAPIHono } from "@hono/zod-openapi";
@@ -140,7 +143,14 @@ export const premiumRoute = premiumApp
           );
         }
 
-        return c.json(await extractReceipt(image, c.env.AI, locale), 200);
+        // SAFETY: The request schema validates this Automerge document ID before reading.
+        const party = await c
+          .get("documents")
+          .read<Pick<Party, "currency">>(partyDocumentId as DocumentId);
+
+        const partyCurrency = exchangeRateCurrencySchema.parse(party.currency);
+
+        return c.json(await extractReceipt(image, c.env.AI, { locale, partyCurrency }), 200);
       } catch {
         // Provider errors can contain the image or extracted data; never log them.
         return c.json(

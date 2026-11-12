@@ -22,6 +22,7 @@ interface TestSyncDocument {
   parties?: Record<DocumentId, true>;
   participantInParties?: Record<DocumentId, PartyParticipant["id"]>;
   boost?: Party["boost"];
+  currency?: Party["currency"];
 }
 
 export type TestCustomerAccess =
@@ -159,7 +160,7 @@ export async function createPartyBoostTestHarness() {
     },
     createParty() {
       const id = createDocumentId();
-      documents.set(id, { type: "party", id, participants: {} });
+      documents.set(id, { type: "party", id, participants: {}, currency: "EUR" });
 
       return id;
     },
