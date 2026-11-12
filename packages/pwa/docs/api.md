@@ -64,10 +64,11 @@ when visibly identified; ambiguous symbols remain unknown.
 Gemma extracts the candidates, then `@cf/cloudflare/clef` compares them with the
 same prepared image. The verifier scores the merchant, each proposed title, the
 final total, currency plus printed evidence, and the item lines independently
-as supported, unsupported, or unclear. General fields require a supported-option
-score of at least 0.95; currency requires 0.98 and still needs the deterministic
-marker check. These are conservative policy thresholds pending receipt-specific
-accuracy evaluation, not calibrated accuracy percentages. Unverified fields are
+as supported, unsupported, or unclear. Ordinary suggestions retain a strictly
+winning supported decision; the score is not interpreted as a calibrated accuracy
+percentage or compared to an arbitrary 0.95 cutoff. Currency additionally requires
+a supported-option score of 0.98 and the deterministic printed-marker check.
+These policies still need receipt-specific accuracy evaluation. Unverified fields are
 removed; rejecting an extracted currency also removes its total to prevent
 falling back to a party-currency amount. If verification fails or times out, the
 whole request fails quietly through the existing sanitized error path. Clef has

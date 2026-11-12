@@ -114,14 +114,53 @@ test.each([0, 0.8, 0.979])(
   },
 );
 
-test("requires a stronger currency score than the general field threshold", async () => {
+test("keeps a stricter threshold for currency than ordinary supported decisions", async () => {
   run.mockResolvedValue(
     response({ total: answer(0.95), currency: answer(0.98), title_0: answer(0.949) }),
   );
   await expect(verifyReceipt(image, receipt, ai, context)).resolves.toMatchObject({
     total: "15.70",
     currency: "USD",
-    titleSuggestions: ["Coffee", "Cafetería"],
+    titleSuggestions: receipt.titleSuggestions,
+  });
+});
+
+test("retains supported decisions from the live receipt regression without treating scores as accuracy", async () => {
+  run.mockResolvedValue(
+    response({
+      merchant: answer(0.885),
+      title_0: answer(0.7485),
+      title_1: answer(0.8614),
+      total: {
+        type: "choice",
+        choice: "supported",
+        probabilities: { supported: 0.4331, unsupported: 0.2473, unclear: 0.3196 },
+        confidence: 0.0263,
+      },
+      items: {
+        type: "choice",
+        choice: "unsupported",
+        probabilities: { supported: 0.0561, unsupported: 0.6072, unclear: 0.3367 },
+        confidence: 0.2279,
+      },
+    }),
+  );
+  await expect(verifyReceipt(image, receipt, ai, context)).resolves.toEqual({
+    ...receipt,
+    items: [],
+  });
+});
+
+test("rejects tied or inconsistent supported choices", async () => {
+  run.mockResolvedValue(
+    response({
+      total: answer(0.5),
+      merchant: answer(0.4),
+    }),
+  );
+  await expect(verifyReceipt(image, receipt, ai, context)).resolves.toMatchObject({
+    total: null,
+    merchantName: null,
   });
 });
 

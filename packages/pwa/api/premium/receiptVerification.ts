@@ -141,13 +141,19 @@ export async function verifyReceipt(
   inspect?.(receipt, verified);
   const { answers } = verified;
 
-  function supported(field: string, threshold = 0.95) {
+  function supported(field: string) {
     const answer = answers[field];
 
-    return answer?.choice === "supported" && answer.probabilities.supported >= threshold;
+    return (
+      answer?.choice === "supported" &&
+      answer.probabilities.supported >
+        Math.max(answer.probabilities.unsupported, answer.probabilities.unclear)
+    );
   }
 
-  const currencySupported = receipt.currency === null || supported("currency", 0.98);
+  const currencySupported =
+    receipt.currency === null ||
+    (supported("currency") && answers.currency!.probabilities.supported >= 0.98);
 
   return {
     merchantName: supported("merchant") ? receipt.merchantName : null,

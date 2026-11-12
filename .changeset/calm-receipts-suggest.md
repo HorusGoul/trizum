@@ -23,3 +23,5 @@ Offer an explicit, initially selected expense-currency choice only when a differ
 Verify Gemma's candidates against the original image with Clef before offering suggestions. Check titles, merchant, final total, currency evidence, and items independently; omit uncertain fields and keep failures silent. Both models receive the party currency only as verification context, never as evidence of the receipt currency.
 
 Prepare receipt analysis images in the Worker using the private Images binding. Accept uploads up to 8 MiB, preserve aspect ratio, and enforce image dimensions and a 4 MiB encoded limit before either model runs. Keep the saved attachment unchanged and processing failures silent.
+
+Keep ordinary receipt suggestions when Clef selects a strictly winning supported decision, rather than rejecting clear receipts through an uncalibrated 0.95 cutoff. Currency changes retain their stricter score threshold and printed-evidence checks.
