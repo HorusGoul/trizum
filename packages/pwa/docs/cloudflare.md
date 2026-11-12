@@ -43,6 +43,9 @@ preview when testing the integration. See [`api/routes/spycat.ts`](../api/routes
 [`@cf/google/gemma-4-26b-a4b-it`](https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/)
 vision model, high-detail image input, and strict JSON schema output. The extractor
 reads Gemma's chat-completion response and rejects truncated or refused output.
+The expense editor requests suggestions without item transcription; full receipt
+extraction remains the endpoint default. Both paths verify their proposed fields
+with Clef. See the [receipt API contract](./api.md#receipt-extraction).
 Thinking is disabled for direct extraction within the request timeout, and
 `store: false` disables optional output storage for distillation or evaluations.
 `wrangler.jsonc` supplies the binding; no

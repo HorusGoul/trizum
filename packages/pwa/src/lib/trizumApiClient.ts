@@ -65,6 +65,7 @@ export interface TrizumApiClient {
       partyDocumentId: string,
       image: string,
       signal?: AbortSignal,
+      options?: { includeItems?: boolean },
     ) => Promise<Receipt>;
     activatePartyBoost: (partyDocumentId: string) => Promise<PartyBoostStatus>;
     getPartyBoostStatus: (partyDocumentId: string) => Promise<PartyBoostStatus>;
@@ -183,11 +184,12 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
       },
     },
     premium: {
-      async analyzeReceipt(partyDocumentId, image, signal) {
+      async analyzeReceipt(partyDocumentId, image, signal, receiptOptions) {
         const json = receiptRequestSchema.parse({
           partyDocumentId,
           image,
           locale: getSupportedLocale(i18n.locale),
+          includeItems: receiptOptions?.includeItems,
         });
 
         const response = await getTransport().receipts.$post({ json }, { init: { signal } });

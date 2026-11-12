@@ -109,6 +109,7 @@ describe("receipt suggestion lifecycle", () => {
     });
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
+    expect(analyzeReceipt.mock.calls[0][3]).toEqual({ includeItems: false });
     expect(controller.suggestions).toMatchObject({
       name: undefined,
       amount: undefined,

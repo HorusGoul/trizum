@@ -109,29 +109,48 @@ describe("receipt analysis authorization and contract", () => {
     await expect(response.json()).resolves.toEqual(receipt);
     expect(run).toHaveBeenCalledTimes(2);
   });
-  test("keeps the suggestions-only comparison preview-only and verifies its result", async () => {
+  test("can omit item transcription while still verifying every suggested field", async () => {
     const { partyId, owner } = await boostedParty();
-    const headers = { "X-Trizum-Receipt-Experiment": "suggestions-only" };
-    await harness.requestReceipt(partyId, image, owner.cookie, "en", headers);
-    expect(gemmaInput().response_format).toMatchObject({
-      json_schema: { schema: { properties: { items: { maxItems: 300 } } } },
+    const suggestions = { ...receipt, items: [] };
+    run.mockResolvedValueOnce(completion(JSON.stringify(suggestions)));
+
+    const response = await harness.requestReceipt(partyId, image, owner.cookie, "en", {
+      includeItems: false,
     });
-    harness.env.SENTRY_ENVIRONMENT = "preview";
-    run.mockClear();
-    run.mockResolvedValueOnce(completion(JSON.stringify({ ...receipt, items: [] })));
-    const response = await harness.requestReceipt(partyId, image, owner.cookie, "en", headers);
+
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ ...receipt, items: [] });
+    await expect(response.json()).resolves.toEqual(suggestions);
     expect(gemmaInput().response_format).toMatchObject({
       json_schema: { schema: { properties: { items: { maxItems: 0 } } } },
     });
     expect(run).toHaveBeenLastCalledWith(
       "@cf/cloudflare/clef",
       expect.objectContaining({
-        state: expect.objectContaining({ receipt: { ...receipt, items: [] } }),
+        state: expect.objectContaining({ receipt: suggestions }),
+        questions: expect.objectContaining({
+          merchant: expect.any(Object),
+          total: expect.any(Object),
+          currency: expect.any(Object),
+        }),
       }),
       expect.any(Object),
     );
+    const verification = run.mock.calls[1][1];
+
+    if (!("questions" in verification)) throw new Error("Expected receipt verification");
+    expect(verification.questions).not.toHaveProperty("items");
+  });
+
+  test("rejects item output that violates the requested suggestions-only schema", async () => {
+    const { partyId, owner } = await boostedParty();
+    run.mockResolvedValueOnce(completion(JSON.stringify(receipt)));
+
+    const response = await harness.requestReceipt(partyId, image, owner.cookie, "en", {
+      includeItems: false,
+    });
+
+    expect(response.status).toBe(503);
+    expect(run).toHaveBeenCalledOnce();
   });
 
   test("prepares a 5 MiB receipt before either AI model sees it", async () => {

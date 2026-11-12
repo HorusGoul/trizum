@@ -247,9 +247,9 @@ export async function createPartyBoostTestHarness() {
       image: string,
       cookie?: string,
       locale: "en" | "es" = "en",
-      extraHeaders: Record<string, string> = {},
+      options: { includeItems?: boolean } = {},
     ) {
-      const headers = new Headers({ "Content-Type": "application/json", ...extraHeaders });
+      const headers = new Headers({ "Content-Type": "application/json" });
 
       if (cookie) headers.set("Cookie", cookie);
 
@@ -257,7 +257,12 @@ export async function createPartyBoostTestHarness() {
         new Request("http://localhost:8787/receipts", {
           method: "POST",
           headers,
-          body: JSON.stringify({ partyDocumentId, image, locale }),
+          body: JSON.stringify({
+            partyDocumentId,
+            image,
+            locale,
+            includeItems: options.includeItems,
+          }),
         }),
         env,
         platform.ctx,

@@ -53,6 +53,14 @@ above 12,000 pixels on either side or 100 megapixels are rejected. The normalize
 analysis image is not uploaded to hosted Images, cached, or written to Automerge;
 the stored attachment keeps its existing processing and sync behavior.
 
+`includeItems` is optional and defaults to `true`, preserving full item extraction.
+The expense editor sends `includeItems: false` because the suggestions sheet uses
+only the title, total, and currency. This mode still reads purchased items to
+ground titles but requires an empty `items` array instead of transcribing line
+quantities and prices. The other extraction rules and independent image
+verification remain unchanged. Callers that need item details can omit the flag
+or set it to `true`.
+
 The response has `merchantName`, `titleSuggestions`, `total`, `currency`, `currencyEvidence`, `currencyEvidenceSource`, and `items`. Each item has
 `name`, `quantity`, `unitPrice`, and `lineTotal`. Monetary values are decimal
 strings in major currency units. Quantities preserve the printed text and units;
@@ -84,7 +92,8 @@ results skip verification. Neither image contents nor verifier scores are logged
 
 `Server-Timing` reports numeric durations in milliseconds for session lookup,
 access checks, party reads, image preparation, extraction, and verification.
-Failed stages still report elapsed time; stages not reached are omitted. The
+Timed analysis stages report elapsed time even on failure; stages not reached
+are omitted. The
 header contains fixed stage names and durations only, without receipt data,
 identifiers, or provider errors. It can be inspected in browser developer tools
 to distinguish inference latency from authorization and image preparation.

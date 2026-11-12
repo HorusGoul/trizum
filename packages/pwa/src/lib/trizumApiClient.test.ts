@@ -4,36 +4,46 @@ import type { PartyBoostStatus } from "./api/premiumContract.ts";
 import { createTrizumApiClient, PartyBoostApiError } from "./trizumApiClient.ts";
 
 describe("TrizumApiClient", () => {
-  test("posts receipt images and validates extracted information", async () => {
-    const partyDocumentId = createDocumentId();
-    const image = "data:image/jpeg;base64,/9j/AA==";
+  test.each([undefined, true, false])(
+    "posts receipt images with includeItems=%s and validates extracted information",
+    async (includeItems) => {
+      const partyDocumentId = createDocumentId();
+      const image = "data:image/jpeg;base64,/9j/AA==";
 
-    const receipt = {
-      merchantName: "Market",
-      titleSuggestions: [],
-      total: "1.23",
-      currency: null,
-      currencyEvidence: null,
-      currencyEvidenceSource: null,
-      items: [],
-    };
+      const receipt = {
+        merchantName: "Market",
+        titleSuggestions: [],
+        total: "1.23",
+        currency: null,
+        currencyEvidence: null,
+        currencyEvidenceSource: null,
+        items: [],
+      };
 
-    const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
-      const request = new Request(input, init);
-      expect(request.method).toBe("POST");
-      expect(new URL(request.url).pathname).toBe("/api/premium/receipts");
-      await expect(request.json()).resolves.toEqual({ partyDocumentId, image, locale: "en" });
+      const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+        const request = new Request(input, init);
+        expect(request.method).toBe("POST");
+        expect(new URL(request.url).pathname).toBe("/api/premium/receipts");
+        await expect(request.json()).resolves.toEqual({
+          partyDocumentId,
+          image,
+          locale: "en",
+          includeItems: includeItems ?? true,
+        });
 
-      return Response.json(receipt);
-    });
+        return Response.json(receipt);
+      });
 
-    const client = createTestClient(fetch);
-    await expect(client.premium.analyzeReceipt(partyDocumentId, image)).resolves.toEqual(receipt);
-    fetch.mockResolvedValueOnce(Response.json({ ...receipt, total: 1.23 }));
-    await expect(client.premium.analyzeReceipt(partyDocumentId, image)).rejects.toThrow(
-      "Invalid input",
-    );
-  });
+      const client = createTestClient(fetch);
+      await expect(
+        client.premium.analyzeReceipt(partyDocumentId, image, undefined, { includeItems }),
+      ).resolves.toEqual(receipt);
+      fetch.mockResolvedValueOnce(Response.json({ ...receipt, total: 1.23 }));
+      await expect(client.premium.analyzeReceipt(partyDocumentId, image)).rejects.toThrow(
+        "Invalid input",
+      );
+    },
+  );
   test("gets Party Boost status through the typed transport", async () => {
     const partyDocumentId = createDocumentId();
     const status = createPartyBoostStatus(partyDocumentId);

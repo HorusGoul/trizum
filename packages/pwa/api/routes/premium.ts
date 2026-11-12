@@ -10,7 +10,6 @@ import { MAX_RECEIPT_REQUEST_BYTES } from "../../src/lib/api/receiptContract";
 import { prepareReceiptImage } from "../premium/receiptImage";
 import { extractReceipt } from "../premium/receiptExtraction";
 import { createReceiptTiming } from "../premium/receiptTiming";
-import { createReceiptExperiment, receiptExperimentSchema } from "../premium/receiptExperiments";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Context } from "hono";
 import { createAuth } from "../auth";
@@ -104,7 +103,7 @@ export const premiumRoute = premiumApp
   .openapi(
     analyzeReceiptRoute,
     async (c) => {
-      const { partyDocumentId, image, locale } = c.req.valid("json");
+      const { partyDocumentId, image, locale, includeItems } = c.req.valid("json");
       const timing = createReceiptTiming();
 
       try {
@@ -166,15 +165,6 @@ export const premiumRoute = premiumApp
           prepareReceiptImage(image, images),
         );
 
-        const experiment =
-          c.env.SENTRY_ENVIRONMENT === "preview"
-            ? receiptExperimentSchema.parse(
-                c.req.header("X-Trizum-Receipt-Experiment") ?? "baseline",
-              )
-            : "baseline";
-
-        const measuredAI = createReceiptExperiment(ai, experiment);
-
         return c.json(
           await extractReceipt(
             preparedImage,
@@ -182,10 +172,10 @@ export const premiumRoute = premiumApp
               run: (model, input, options) =>
                 timing.measure(
                   model === "@cf/google/gemma-4-26b-a4b-it" ? "extraction" : "verification",
-                  () => measuredAI.run(model, input, options),
+                  () => ai.run(model, input, options),
                 ),
             },
-            { locale, partyCurrency },
+            { locale, partyCurrency, includeItems },
           ),
           200,
         );

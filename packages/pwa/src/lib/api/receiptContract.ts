@@ -53,6 +53,7 @@ export function isReceiptImage(value: string) {
 export const receiptRequestSchema = z.strictObject({
   partyDocumentId: partyDocumentIdSchema,
   locale: z.enum(SUPPORTED_LOCALES).default(DEFAULT_LOCALE),
+  includeItems: z.boolean().default(true),
   image: z
     .string()
     .max(MAX_RECEIPT_REQUEST_BYTES - 1024)

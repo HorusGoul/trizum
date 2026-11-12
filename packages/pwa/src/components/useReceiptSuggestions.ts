@@ -94,7 +94,7 @@ export function useReceiptSuggestions({
       requests.set(controller, timeoutId);
       setScanning((current) => [...current, { context, photoId, controller }]);
       void services
-        .analyzeReceipt(partyId, image, controller.signal)
+        .analyzeReceipt(partyId, image, controller.signal, { includeItems: false })
         .catch(() => null)
         .then((receipt) => {
           if (

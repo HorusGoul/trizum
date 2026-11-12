@@ -27,3 +27,5 @@ Prepare receipt analysis images in the Worker using the private Images binding. 
 Keep ordinary receipt suggestions when Clef selects a strictly winning supported decision, rather than rejecting clear receipts through an uncalibrated 0.95 cutoff. Printed markers remain checked literally, while contextual currency inferences retain their source and supporting clues.
 
 Handle browser Back at the first app entry as well as SPA entries, preserving the open editor and draft. Consume the temporary guard on ordinary close, unmount, and route navigation; recover an orphaned guard after a document reload; cover cross-document navigation in Chromium and WebKit.
+
+Let the expense editor skip item transcription it does not use, so suggestions can appear sooner. Full endpoint requests still include item details by default, and every proposed title, total and currency keeps independent image verification. Expose numeric stage timings to distinguish inference, access checks and image preparation without receipt data.
