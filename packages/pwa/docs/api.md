@@ -36,10 +36,22 @@ and third-party requests such as Tricount's upstream API and attachment download
 ## Receipt extraction
 
 `POST /api/premium/receipts` takes `{ partyDocumentId, image, locale }`, where `image`
-is a base64 JPEG, PNG, or WebP data URL (at most 4 MiB decoded). It requires a
+is a base64 JPEG, PNG, or WebP data URL (at most 8 MiB decoded). It requires a
 signed-in party member and an authoritative active Party Boost, including a fresh
 check of the boost owner's Premium and membership. The shared Automerge boost
 cache cannot authorize the request. Other party members do not need Premium.
+
+After authorization and rate limiting, the Worker uses the private `IMAGES`
+binding to validate the raster dimensions and prepare one JPEG for both models,
+with a five-second preparation deadline.
+The first pass preserves aspect ratio without cropping or upscaling, limits the
+long edge to 3072 pixels, and uses quality 85 with a white background and a single
+frame. If its encoded output exceeds 4 MiB, one retry uses a 2048-pixel edge and
+quality 80, starting from the original source again. Output is read with a byte
+limit and its actual dimensions/format are checked before inference. Sources
+above 12,000 pixels on either side or 100 megapixels are rejected. The normalized
+analysis image is not uploaded to hosted Images, cached, or written to Automerge;
+the stored attachment keeps its existing processing and sync behavior.
 
 The response has `merchantName`, `titleSuggestions`, `total`, `currency`, `currencyEvidence`, and `items`. Each item has
 `name`, `quantity`, `unitPrice`, and `lineTotal`. Monetary values are decimal
@@ -50,7 +62,7 @@ never tendered cash, change, or an inferred sum. Currency is an ISO code only
 when visibly identified; ambiguous symbols remain unknown.
 
 Gemma extracts the candidates, then `@cf/cloudflare/clef` compares them with the
-same original image. The verifier scores the merchant, each proposed title, the
+same prepared image. The verifier scores the merchant, each proposed title, the
 final total, currency plus printed evidence, and the item lines independently
 as supported, unsupported, or unclear. General fields require a supported-option
 score of at least 0.95; currency requires 0.98 and still needs the deterministic

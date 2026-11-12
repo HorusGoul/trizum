@@ -21,3 +21,5 @@ Skip the suggestions sheet when neither the title, total, nor currency can be ch
 Offer an explicit, initially selected expense-currency choice only when a different currency is supported by a matching printed ISO code or unambiguous marker. Ambiguous symbols and location or language guesses cannot trigger a switch. Applying a foreign total requires accepting its currency; use the editor's exchange-rate flow and keep the party currency unchanged.
 
 Verify Gemma's candidates against the original image with Clef before offering suggestions. Check titles, merchant, final total, currency evidence, and items independently; omit uncertain fields and keep failures silent. Both models receive the party currency only as verification context, never as evidence of the receipt currency.
+
+Prepare receipt analysis images in the Worker using the private Images binding. Accept uploads up to 8 MiB, preserve aspect ratio, and enforce image dimensions and a 4 MiB encoded limit before either model runs. Keep the saved attachment unchanged and processing failures silent.

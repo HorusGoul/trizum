@@ -7,6 +7,7 @@ import { $, OpenAPIHono } from "@hono/zod-openapi";
 import { bodyLimit } from "hono/body-limit";
 import { analyzeReceiptRoute } from "../contracts/receipts";
 import { MAX_RECEIPT_REQUEST_BYTES } from "../../src/lib/api/receiptContract";
+import { prepareReceiptImage } from "../premium/receiptImage";
 import { extractReceipt } from "../premium/receiptExtraction";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Context } from "hono";
@@ -71,7 +72,7 @@ const premiumApp = $(
     .use("/receipts", async (c, next) => {
       c.header("Cache-Control", "no-store");
 
-      if (!c.env.RECEIPT_RATE_LIMITER || !c.env.AI) {
+      if (!c.env.RECEIPT_RATE_LIMITER || !c.env.AI || !c.env.IMAGES) {
         return c.json(
           { error: { code: "unavailable" as const, message: "Receipt analysis is unavailable." } },
           503,
@@ -134,7 +135,7 @@ export const premiumRoute = premiumApp
           );
         }
 
-        if (!c.env.AI) {
+        if (!c.env.AI || !c.env.IMAGES) {
           return c.json(
             {
               error: { code: "unavailable" as const, message: "Receipt analysis is unavailable." },
@@ -150,7 +151,12 @@ export const premiumRoute = premiumApp
 
         const partyCurrency = exchangeRateCurrencySchema.parse(party.currency);
 
-        return c.json(await extractReceipt(image, c.env.AI, { locale, partyCurrency }), 200);
+        const preparedImage = await prepareReceiptImage(image, c.env.IMAGES);
+
+        return c.json(
+          await extractReceipt(preparedImage, c.env.AI, { locale, partyCurrency }),
+          200,
+        );
       } catch {
         // Provider errors can contain the image or extracted data; never log them.
         return c.json(

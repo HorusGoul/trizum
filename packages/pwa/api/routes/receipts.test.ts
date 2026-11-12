@@ -1,3 +1,6 @@
+import { Buffer } from "node:buffer";
+import { MAX_RECEIPT_REQUEST_BYTES } from "../../src/lib/api/receiptContract";
+import { createReceiptImageTestHarness } from "../premium/receiptImageTestHarness";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { createPartyBoostTestHarness } from "../premium/partyBoostTestHarness";
 import type { ReceiptAI } from "../premium/receiptExtraction";
@@ -17,6 +20,7 @@ describe("receipt analysis authorization and contract", () => {
   let harness: Awaited<ReturnType<typeof createPartyBoostTestHarness>>;
   const run = vi.fn<ReceiptAI["run"]>();
   const limit = vi.fn<RateLimit["limit"]>();
+  let images: ReturnType<typeof createReceiptImageTestHarness>;
   beforeEach(async () => {
     harness = await createPartyBoostTestHarness();
     run.mockReset().mockImplementation(async (model, input) => {
@@ -40,6 +44,8 @@ describe("receipt analysis authorization and contract", () => {
       return completion(JSON.stringify(receipt));
     });
     limit.mockReset().mockResolvedValue({ success: true });
+    images = createReceiptImageTestHarness();
+    harness.env.IMAGES = images.images;
     harness.env.AI = { run };
     harness.env.RECEIPT_RATE_LIMITER = { limit };
   }, 30_000);
@@ -68,6 +74,7 @@ describe("receipt analysis authorization and contract", () => {
   test("requires sign-in before invoking AI", async () => {
     expect((await harness.requestReceipt(harness.createParty(), image)).status).toBe(401);
     expect(run).not.toHaveBeenCalled();
+    expect(images.info).not.toHaveBeenCalled();
   });
   test("requires party membership and a server-verified Boost", async () => {
     const user = await harness.createUser();
@@ -98,6 +105,49 @@ describe("receipt analysis authorization and contract", () => {
     await expect(response.json()).resolves.toEqual(receipt);
     expect(run).toHaveBeenCalledTimes(2);
   });
+  test("prepares a 5 MiB receipt before either AI model sees it", async () => {
+    const { partyId, owner } = await boostedParty();
+    const bytes = Buffer.alloc(5 * 1024 * 1024);
+    bytes.set([0xff, 0xd8, 0xff]);
+    const large = `data:image/jpeg;base64,${bytes.toString("base64")}`;
+    const response = await harness.requestReceipt(partyId, large, owner.cookie);
+    expect(response.status).toBe(200);
+    expect(images.input).toHaveBeenCalledOnce();
+    expect(gemmaInput().messages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          role: "user",
+          content: [
+            { type: "image_url", image_url: { url: images.preparedImage, detail: "high" } },
+          ],
+        }),
+      ]),
+    );
+    expect(run).toHaveBeenLastCalledWith(
+      "@cf/cloudflare/clef",
+      expect.objectContaining({ images: [images.preparedImage] }),
+      expect.any(Object),
+    );
+  });
+
+  test("keeps image processing failures private and never invokes AI", async () => {
+    const { partyId, owner } = await boostedParty();
+    images.info.mockRejectedValue(new Error("Private image processing diagnostics"));
+    const response = await harness.requestReceipt(partyId, image, owner.cookie);
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({
+      error: { code: "unavailable", message: "Receipt analysis could not be completed." },
+    });
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  test("fails closed when the Images binding is unavailable", async () => {
+    const { partyId, owner } = await boostedParty();
+    delete harness.env.IMAGES;
+    expect((await harness.requestReceipt(partyId, image, owner.cookie)).status).toBe(503);
+    expect(run).not.toHaveBeenCalled();
+  });
+
   test("preserves multilingual receipt fields from Gemma chat completions", async () => {
     const { partyId, owner } = await boostedParty();
 
@@ -122,7 +172,9 @@ describe("receipt analysis authorization and contract", () => {
         messages: expect.arrayContaining([
           {
             role: "user",
-            content: [{ type: "image_url", image_url: { url: image, detail: "high" } }],
+            content: [
+              { type: "image_url", image_url: { url: images.preparedImage, detail: "high" } },
+            ],
           },
         ]),
         response_format: {
@@ -198,7 +250,7 @@ describe("receipt analysis authorization and contract", () => {
     expect(run).toHaveBeenLastCalledWith(
       "@cf/cloudflare/clef",
       expect.objectContaining({
-        images: [image],
+        images: [images.preparedImage],
         state: expect.objectContaining({ partyCurrency: "GBP", receipt: foreign }),
       }),
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
@@ -293,7 +345,13 @@ describe("receipt analysis authorization and contract", () => {
         .status,
     ).toBe(400);
     expect(
-      (await harness.requestReceipt(partyId, "x".repeat(6 * 1024 * 1024), user.cookie)).status,
+      (
+        await harness.requestReceipt(
+          partyId,
+          "x".repeat(MAX_RECEIPT_REQUEST_BYTES + 1),
+          user.cookie,
+        )
+      ).status,
     ).toBe(413);
     expect(run).not.toHaveBeenCalled();
   });

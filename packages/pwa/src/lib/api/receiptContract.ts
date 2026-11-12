@@ -2,7 +2,7 @@ import { z } from "zod";
 import { partyDocumentIdSchema } from "./premiumContract";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../locales";
 
-export const MAX_RECEIPT_IMAGE_BYTES = 4 * 1024 * 1024;
+export const MAX_RECEIPT_IMAGE_BYTES = 8 * 1024 * 1024;
 export const MAX_RECEIPT_REQUEST_BYTES = Math.ceil(MAX_RECEIPT_IMAGE_BYTES / 3) * 4 + 1024;
 
 // Decimal strings preserve printed precision, including weighted item prices.
