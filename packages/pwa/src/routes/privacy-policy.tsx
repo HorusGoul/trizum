@@ -77,8 +77,12 @@ function renderPrivacyPolicyContent() {
                 <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Participant Information:
                 </strong>{" "}
-                Names of participants in your expense groups, and optionally phone numbers (if you
-                choose to share them in your settings) and profile pictures
+                <Trans>
+                  Names of participants in your expense groups, and optionally payment receiving
+                  details (such as phone numbers, bank account details, and payment service
+                  usernames or links) if you choose to share them in your settings, and profile
+                  pictures
+                </Trans>
               </li>
               <li>
                 <strong className="text-accent-900 dark:text-accent-100 font-semibold">
@@ -174,8 +178,9 @@ function renderPrivacyPolicyContent() {
               <Trans>
                 We do not intentionally provide Google AdMob with group names, participant names,
                 expense descriptions or amounts, currencies, receipts or other attached media, phone
-                numbers, email addresses, trizum account IDs, authentication data, or synced
-                document contents for advertising, targeting, or content mapping.
+                numbers, payment receiving details, email addresses, trizum account IDs,
+                authentication data, or synced document contents for advertising, targeting, or
+                content mapping.
               </Trans>
             </p>
           </div>
@@ -346,12 +351,14 @@ function renderPrivacyPolicyContent() {
               4.1 Sharing with Other Users
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
-              trizum uses a peer-to-peer sharing model. When you create an expense group (party), it
-              is accessible to anyone who has the link to that group. This means that anyone with
-              access to the link can view and modify all information in that expense group,
-              including participant names, expenses, media files, and any optional phone numbers if
-              shared. Please keep your expense group links secure and only share them with people
-              you trust.
+              <Trans>
+                trizum uses a peer-to-peer sharing model. When you create an expense group (party),
+                it is accessible to anyone who has the link to that group. This means that anyone
+                with access to the link can view and modify all information in that expense group,
+                including participant names, expenses, media files, and any optional payment
+                receiving details if shared. Please keep your expense group links secure and only
+                share them with people you trust.
+              </Trans>
             </p>
             <p className="text-accent-700 dark:text-accent-300">
               <strong className="text-accent-900 dark:text-accent-100 font-semibold">

@@ -182,3 +182,15 @@ describe("expense editor validation status", () => {
     });
   });
 });
+
+test.each([null, 0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+  "blocks a foreign expense with invalid rate %s",
+  (exchangeRate) => {
+    expect(
+      getExpenseEditorValidationResult(
+        { ...completeExpense, originalAmount: { amount: 10000, currency: "USD" }, exchangeRate },
+        { isDirty: true, mode: "create" },
+      ).status,
+    ).toBe("incomplete");
+  },
+);

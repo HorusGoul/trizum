@@ -34,7 +34,7 @@ const SelectValue = <T extends object>({ className, ...props }: AriaSelectValueP
   <AriaSelectValue
     className={composeRenderProps(className, (className) =>
       cn(
-        "line-clamp-1 data-[placeholder]:text-accent-700 dark:placeholder:text-accent-50",
+        "min-w-0 flex-1 line-clamp-1 data-[placeholder]:text-accent-700 dark:placeholder:text-accent-50",
         /* Description */
         "[&>[slot=description]]:hidden",
         className,
@@ -48,7 +48,7 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
   <AriaButton
     className={composeRenderProps(className, (className) =>
       cn(
-        "flex h-10 w-full items-center justify-between rounded-md border border-accent-500 bg-white px-3 py-2 text-sm ring-offset-accent-900 dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
+        "flex h-10 w-full items-center justify-between gap-2 rounded-md border border-accent-500 bg-white px-3 py-2 text-start text-sm ring-offset-accent-900 dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
         /* Disabled */
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         /* Focused */
@@ -63,7 +63,7 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
     {composeRenderProps(children, (children) => (
       <>
         {children}
-        <Icon icon="lucide.chevron-down" className="size-4 opacity-50" />
+        <Icon icon="lucide.chevron-down" className="size-4 shrink-0 opacity-50" />
       </>
     ))}
   </AriaButton>
@@ -71,7 +71,9 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
 
 const SelectPopover = ({ className, ...props }: AriaPopoverProps) => (
   <Popover
-    className={composeRenderProps(className, (className) => cn("w-[--trigger-width]", className))}
+    className={composeRenderProps(className, (className) =>
+      cn("w-[var(--trigger-width)]", className),
+    )}
     {...props}
   />
 );

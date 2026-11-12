@@ -121,7 +121,7 @@ test.describe("Settings forms", () => {
   });
 
   test("keeps user settings draft values when validation fails", async ({ harness, page }) => {
-    const draftPhoneNumber = "612345678";
+    const draftPhoneNumber = "+34612345678";
 
     await harness.seedPartyList({
       username: "Harness User",
@@ -131,14 +131,18 @@ test.describe("Settings forms", () => {
     await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
 
     const usernameField = page.getByLabel("Username");
-    const phoneField = page.getByLabel("Phone number");
+    await page.getByRole("button", { name: /Add payment method/ }).click();
+    await page.getByRole("menuitem", { name: "Bizum", exact: true }).click();
+    const phoneField = page.getByRole("textbox", { name: "Bizum", exact: true });
 
     await phoneField.fill(draftPhoneNumber);
     await usernameField.fill("");
     await usernameField.evaluate((input: HTMLInputElement) => input.form?.requestSubmit());
 
     await expect(page).toHaveURL(/\/settings(?:\?.*)?$/);
-    await expect(phoneField).toHaveValue(draftPhoneNumber);
+    await expect(page.getByRole("button", { name: "Bizum actions", exact: true })).toContainText(
+      draftPhoneNumber,
+    );
     await expect(page.getByText("A name for the participant is required")).toBeVisible();
   });
 });

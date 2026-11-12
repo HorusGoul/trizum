@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { safeJoin, type Breadcrumb, type Integration } from "@sentry/core";
 
+import type { TrizumLoggerConfig } from "./index.js";
 import { redactValue } from "./redaction.js";
 
 function redactSentryPayload<T extends object>(payload: T): T {
@@ -81,3 +82,10 @@ export const sentryDocumentIdRedaction = {
 };
 
 const consoleFormatSchema = z.string();
+
+/** Route warning and higher records to the runtime-owned Sentry sink. */
+export const sentryLoggerConfig: TrizumLoggerConfig<"sentry"> = {
+  category: [],
+  lowestLevel: "warning",
+  sinks: ["sentry"],
+};

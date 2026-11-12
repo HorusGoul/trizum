@@ -49,6 +49,9 @@ in-memory Automerge documents. Native SDKs, worker connections, process runners,
 and other external I/O are supplied through their owning service interfaces or
 factories. Module mocking is rejected by `anti-slop/no-module-mocking`.
 
+When changing persisted models, forms, serializers, or mutation helpers, follow
+the [Automerge persistence test rules](../../docs/agents/coding.md#automerge-persistence-tests).
+
 `src/lib/testing/profileRuntime.ts` supplies HTTP responses and real local
 profiles for account flows. `api/routes/cloud-sync.integration.test.ts` exercises
 real authentication and D1 storage alongside the route's focused contract tests.

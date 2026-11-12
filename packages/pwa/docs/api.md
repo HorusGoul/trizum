@@ -73,7 +73,9 @@ sync continues. Suggestions stay local to the editor. Accepting selected fields
 updates the draft; saving the expense uses the existing write path. The first
 version offers title and total only, preserves fields edited during processing,
 and disables totals with a known currency mismatch or precision the editor
-cannot represent. Removing a receipt or leaving the editor discards late results.
+cannot represent. Totals use the selected expense currency. Accepting a foreign-currency
+total updates `originalAmount` and recalculates the party total with the existing
+exchange rate; it does not select a currency or refresh the rate. Removing a receipt or leaving the editor discards late results.
 Analysis runs without loading or error toasts. Each photo has an inset gradient
 border with a circling highlight until its request finishes or times out;
 reduced motion uses a static border. The animation rotates only the gradient
@@ -83,3 +85,33 @@ and leave attachments and manual expense entry usable. Matching values, manual
 edits protected since upload, and totals that cannot be applied are filtered
 before display. Unusable queued results do not prevent later useful suggestions
 and do not emit a user-discard event.
+
+## Exchange rates
+
+`GET /api/exchange-rates?base=<party currency>` is public and returns daily reference rates quoted per unit of the party currency
+from [Frankfurter](https://frankfurter.dev/), including each quote's publication
+date. The Worker validates upstream data, uses one Cloudflare Cache API key per validated base currency
+for six hours, and falls back to the bundled snapshot for five minutes when the
+upstream request fails. It needs no API key or KV binding. The typed client's
+`exchangeRates.get(partyCurrency)` method uses the public transport, including on mobile.
+
+The expense editor rebases the compact seed in `src/lib/exchangeRatesSnapshot.json` to the
+party currency, overlays validated rates from `trizum.exchange-rates.v1.<currency>`
+in local storage, and refreshes
+on mount, reconnect, and every six hours while open. Newer publication dates win
+per currency, so a fallback response cannot replace newer stored rates. Missing
+pairs require a manual rate. These are daily reference rates, not card settlement
+rates; the editor prefills an editable rate. For foreign expenses, the original amount
+and a styled read-only converted total share the first row, with the rate and
+currency selector below. The total updates while typing in the calculator.
+
+An expense's optional `originalAmount` stores `{ amount, currency }`, and
+`exchangeRate` stores party-currency units per original-currency unit. Both
+amounts use the app's existing hundredths convention, including currencies such
+as JPY. Conversion uses scaled integer arithmetic and half-even rounding. The
+converted total remains in `paidBy`, and exact shares remain in party currency.
+Rate refreshes never recalculate saved expenses or replace an editor's chosen
+rate. Tables and refreshes are isolated by party currency; responses for another
+base are rejected. The editor inverts a quote to convert a foreign amount into
+the party currency. Tricount imports preserve `amount_local` and `exchange_rate` as metadata;
+the already-converted `amount` and allocations remain authoritative.

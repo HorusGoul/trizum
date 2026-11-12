@@ -242,6 +242,7 @@ jobs:
           docker run --detach --name trizum-server-smoke \
             --publish 127.0.0.1:3000:3000 \
             --env DB_FILE_NAME=file:/tmp/trizum.db \
+            --env SENTRY_DSN=http://public@127.0.0.1:9/1 \
             trizum-server-smoke
           curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 1 \
             --max-time 5 --retry-max-time 60 \
@@ -254,6 +255,7 @@ jobs:
             assert.equal(health.automerge.ok, true);
           ' < /tmp/server-health.json
           docker exec trizum-server-smoke node -e 'require("@sentry/node-cpu-profiler")'
+          docker logs trizum-server-smoke 2>&1 | grep --fixed-strings 'Sentry initialized'
 
       - name: Show server logs and remove container
         if: always()

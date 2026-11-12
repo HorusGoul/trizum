@@ -27,6 +27,7 @@ import { useState } from "react";
 import { markExpenseEditOpenedFromDetailState } from "../party_.$partyId.expense.$expenseId_.edit/-expenseEditRouteState.ts";
 import { Amount } from "./-components/Amount.js";
 import { PaidAt } from "./-components/PaidAt.js";
+import { ExchangeRate } from "./-components/ExchangeRate";
 import { PaidBy } from "./-components/PaidBy.js";
 import { Photos } from "./-components/Photos.js";
 import { Shares } from "./-components/Shares.js";
@@ -125,9 +126,10 @@ function ExpenseById() {
         </div>
 
         <div className="container flex flex-col gap-4 px-4 pt-4">
-          <Amount amount={getExpenseTotalAmount(expense)} />
+          <Amount amount={getExpenseTotalAmount(expense)} originalAmount={expense.originalAmount} />
           <PaidBy {...expense} />
           <PaidAt {...expense} />
+          <ExchangeRate {...expense} />
           <Photos photos={expense.photos} onOpenGallery={openGallery} />
           <Shares {...expense} />
         </div>

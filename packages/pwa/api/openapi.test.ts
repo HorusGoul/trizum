@@ -58,6 +58,8 @@ describe("trizum OpenAPI contract", () => {
       "500",
     ]);
 
+    expect(document.paths?.["/api/exchange-rates"]?.get?.operationId).toBe("getExchangeRates");
+
     const migration = document.paths?.["/api/migrate"];
     expect(migration?.get?.operationId).toBe("migrateTricount");
     expect(Object.keys(migration?.get?.responses ?? {})).toEqual(["200", "400", "500"]);

@@ -49,7 +49,7 @@ const ListBoxItem = <T extends object>({
           /* Hovered */
           "data-[hovered]:bg-accent-500 data-[hovered]:text-accent-50",
           /* Selection */
-          "data-[selection-mode]:pl-8",
+          "data-[selection-mode]:pr-12",
           className,
         ),
       )}
@@ -58,7 +58,7 @@ const ListBoxItem = <T extends object>({
       {composeRenderProps(children, (children, renderProps) => (
         <>
           {renderProps.isSelected && (
-            <span className="absolute left-2 flex size-4 items-center justify-center">
+            <span className="absolute right-2 flex size-4 items-center justify-center">
               <Icon icon="lucide.check" className="size-4" />
             </span>
           )}
@@ -70,9 +70,7 @@ const ListBoxItem = <T extends object>({
 };
 
 function ListBoxHeader({ className, ...props }: React.ComponentProps<typeof AriaHeader>) {
-  return (
-    <AriaHeader className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)} {...props} />
-  );
+  return <AriaHeader className={cn("px-2 py-1.5 text-sm font-semibold", className)} {...props} />;
 }
 
 export { ListBox, ListBoxItem, ListBoxHeader, ListBoxSection, ListBoxCollection };

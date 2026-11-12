@@ -16,6 +16,148 @@ function formatAmountText(amount: number) {
 }
 
 test.describe("Expense log", () => {
+  test("keeps virtualized cards evenly spaced as content and viewport sizes change", async ({
+    harness,
+    page,
+  }) => {
+    test.slow();
+
+    const fixture = createExpenseLogFixture(80);
+
+    for (const [index, expense] of fixture.expenses.entries()) {
+      if (index % 2 === 0) {
+        Object.assign(expense, {
+          originalAmount: { amount: 2000, currency: "USD" },
+          exchangeRate: 0.617,
+        });
+      }
+
+      if (index % 5 === 0) expense.name = `Weekend groceries for everyone, purchase ${index}`;
+    }
+
+    const { partyId } = await harness.seedJoinedParty({
+      fixture,
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await page.setViewportSize({ width: 375, height: 844 });
+    await harness.navigate(`/party/${partyId}?tab=expenses`);
+    const list = page.getByTestId("expense-log-list");
+    await expect(list.getByRole("link").first()).toBeVisible();
+
+    for (const width of [375, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      await expect
+        .poll(() =>
+          list.evaluate((element) => {
+            const boxes = [...element.querySelectorAll('a[href*="/expense/"]')].map((card) =>
+              card.getBoundingClientRect(),
+            );
+
+            return (
+              boxes.length > 1 &&
+              boxes
+                .slice(1)
+                .every((box, index) => Math.abs(box.top - boxes[index].bottom - 16) <= 1)
+            );
+          }),
+        )
+        .toBe(true);
+      expect(await list.getByRole("link").count()).toBeLessThan(fixture.expenses.length);
+    }
+
+    const partyPage = new PartyPage(page);
+    const oldestTitle = fixture.expenses[0]!.name;
+    await partyPage.scrollExpenseLogUntilVisible(oldestTitle);
+    await partyPage.openExpenseInLog(oldestTitle);
+    const detail = new ExpenseDetailPage(page);
+    await expect(detail.heading(oldestTitle)).toBeVisible();
+    await detail.goBack();
+
+    await expect(list.getByRole("link", { name: new RegExp(oldestTitle) })).toBeVisible();
+  });
+
+  for (const width of [375, 1280]) {
+    test(`restores a mixed-height expense in the middle of the list at ${width}px`, async ({
+      harness,
+      page,
+    }) => {
+      test.slow();
+      const fixture = createExpenseLogFixture(180);
+
+      for (const [index, expense] of fixture.expenses.entries()) {
+        if (index % 2 === 0)
+          Object.assign(expense, {
+            originalAmount: { amount: 2000, currency: "USD" },
+            exchangeRate: 0.617,
+          });
+      }
+
+      const { partyId } = await harness.seedJoinedParty({
+        fixture,
+        memberParticipantId: defaultParticipants.blair.id,
+      });
+
+      await page.setViewportSize({ width, height: 844 });
+      await harness.navigate(`/party/${partyId}?tab=expenses`);
+      const list = page.getByTestId("expense-log-list");
+      await expect(list.getByRole("link").first()).toBeVisible();
+
+      for (let step = 0; step < 12; step++) {
+        await list.evaluate((element) => {
+          element.scrollTop += 600;
+        });
+        // Let the virtualizer measure each newly rendered group before scrolling further.
+        await expect
+          .poll(() =>
+            list.evaluate(async (element) => {
+              const before = element
+                .querySelector('[role="listitem"]')
+                ?.getBoundingClientRect().height;
+
+              await new Promise<void>((resolve) =>
+                requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+              );
+
+              return (
+                before ===
+                element.querySelector('[role="listitem"]')?.getBoundingClientRect().height
+              );
+            }),
+          )
+          .toBe(true);
+      }
+
+      const anchor = await list.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+
+        const visible = [
+          ...element.querySelectorAll<HTMLAnchorElement>('a[href*="/expense/"]'),
+        ].filter((card) => {
+          const box = card.getBoundingClientRect();
+
+          return box.top >= bounds.top && box.bottom <= bounds.bottom;
+        });
+
+        const card = visible[Math.floor(visible.length / 2)];
+
+        if (!card) throw new Error("Expected a fully visible expense in the middle of the list");
+
+        return { href: card.getAttribute("href")!, top: card.getBoundingClientRect().top };
+      });
+
+      const row = list.locator(`a[href="${anchor.href}"]`);
+      await row.click();
+      await expect(page).toHaveURL(/\/expense\//);
+      await expect(list).toBeHidden();
+      await new ExpenseDetailPage(page).goBack();
+      await expect(row).toBeInViewport({ ratio: 1 });
+      await expect
+        .poll(async () => Math.abs((await row.boundingBox())!.y - anchor.top))
+        .toBeLessThanOrEqual(1);
+    });
+  }
+
   test("renders newest expenses first and paginates into older chunks @slow", async ({
     harness,
     page,

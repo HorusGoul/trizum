@@ -137,10 +137,15 @@ Sentry on import.
 
 In general:
 
-- `error` logs are the main candidates for Sentry,
-- `warning` logs may go to Sentry only when they represent a serious operational
-  risk,
-- and `debug` or routine `info` logs should stay out of Sentry.
+- Send `warning`, `error`, and `fatal` records to Sentry wherever its SDK is enabled.
+- Warnings appear in Sentry Logs; errors and fatal records also create Sentry issues.
+- Keep `debug` and `info` records out of the Sentry sink. Console thresholds remain
+  runtime-specific.
+
+The PWA (including native wrappers), Cloudflare Worker, and sync server use `sentryLoggerConfig`
+from `@trizum/logging/sentry` for this routing policy. Runtime entry points still
+own SDK initialization and environment gates; console-only runtimes do not
+initialize Sentry.
 
 ## Ownership And Configuration
 
@@ -161,6 +166,9 @@ nested properties, error causes, aggregate errors, and stacks. It keeps error
 classification and stack locations and does not mutate application errors.
 Circular values are marked, and custom serializers/accessors are not invoked.
 
+Password-reset tokens in `/api/auth/reset-password/<token>` paths are also
+redacted across these sinks and Sentry payload hooks.
+
 This boundary also covers the PWA browser and sync server. The Worker logging
 audit includes share-preview load/shutdown errors, Party Boost membership
 shutdown errors and nested failures, request errors, migration errors, and
@@ -168,7 +176,7 @@ cloud-sync settings logs. Avoid recording identifiers at the call site even
 with this protection; the cloud-sync success log deliberately omits its
 party-list document ID. Redaction is separate from JSON console formatting.
 
-The browser and sync server also spread `sentryDocumentIdRedaction` from
+The browser, Cloudflare Worker, and sync server also spread `sentryDocumentIdRedaction` from
 `@trizum/logging/sentry` into `Sentry.init()`. Its `beforeSend`, `beforeBreadcrumb`,
 `beforeSendSpan`, and `beforeSendTransaction` hooks apply the same sanitizer to
 direct and automatically captured SDK payloads. Its integration sanitizes log

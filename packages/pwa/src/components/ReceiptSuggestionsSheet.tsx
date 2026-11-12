@@ -115,8 +115,8 @@ export function ReceiptSuggestionsSheet({
             {suggestions.currencyMismatch ? (
               <p className="text-accent-700 dark:text-accent-300 text-sm">
                 <Trans>
-                  The receipt currency differs from this party’s currency. The total cannot be
-                  applied.
+                  The receipt currency differs from the selected expense currency. The total cannot
+                  be applied.
                 </Trans>{" "}
                 <span className="font-semibold">
                   {receipt.total} {receipt.currency}

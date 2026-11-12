@@ -61,7 +61,7 @@ describe("receipt draft suggestions", () => {
       currencyMismatch: true,
     });
   });
-  test("allows totals without a printed currency using the party currency", () => {
+  test("allows totals without a printed currency using the selected expense currency", () => {
     expect(suggest({ currency: null }).amount).toBe(12.34);
   });
   test.each([null, "0", "-1.00", "1.005", "1.234567"])(

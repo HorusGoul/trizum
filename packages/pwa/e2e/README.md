@@ -108,11 +108,13 @@ flags directly, without a literal `--` separator. See the
 
 ## Visual parity against main
 
-The separate `test:visual` suite compares nine screens in English and Spanish,
-using mobile and desktop viewports in Chromium and WebKit (72 comparisons).
+The separate `test:visual` suite compares ten screens in English and Spanish,
+using mobile and desktop viewports in Chromium and WebKit (80 comparisons).
 It checks home, party creation, user settings, expenses, balances, party settings,
-expense details, the expense form, and the party actions sheet. Spanish uses a
-second accent hue. Both versions use the same fixture data, clock, fonts,
+expense details, the expense form, the payment screen, and the party actions sheet.
+The payment fixture includes legacy Bizum details and configured receiving methods;
+user settings includes a Bizum row so inline editing is visible in the report.
+Spanish uses a second accent hue. Both versions use the same fixture data, clock, fonts,
 viewport, locale, and signed-out account response. Both images must stabilize
 before comparison, using identical capture settings. CSS transitions are disabled
 before opening menus so popover positioning measures the settled trigger. No

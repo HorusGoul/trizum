@@ -37,7 +37,7 @@ export const toastTheme = "dark" satisfies NonNullable<ToasterProps["theme"]>;
 
 export const toastClassNames = {
   toast: cn(
-    "pointer-events-auto flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-sm",
+    "pointer-events-auto flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-sm select-none",
     "border-white/10 bg-black text-white shadow-lg shadow-black/30 backdrop-blur-sm",
     "outline-hidden ring-offset-black",
     "dark:border-white/10 dark:bg-black dark:text-white dark:shadow-none dark:ring-offset-black",

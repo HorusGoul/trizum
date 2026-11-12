@@ -140,7 +140,7 @@ EXTERNAL SOURCES:
     :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.7.6_@capacitor+core@8.5.3_@revenuecat+purchases-c_38ffea0f6cc7f67989844c25b772113a/node_modules/@revenuecat/purchases-capacitor-ui"
 
 SPEC CHECKSUMS:
-  AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
+  AppAuth: 58e37c546bb9bf2073c1392ccba8cef35ff283cb
   AppCheckCore: be8fce5469f68d7f6a29aa94b25f097409ff7fdc
   Capacitor: 2f67eaeb8ed79909cd35b5e7439a5c2a9ca58e0f
   CapacitorApp: 7b7e43debe505bc61beedb83796aa1368c86078b
@@ -154,10 +154,10 @@ SPEC CHECKSUMS:
   CapawesomeCapacitorAppUpdate: c952614bc2c82c43ec3c12c06cd8a07b60da6d53
   CapawesomeCapacitorGoogleSignIn: e344503ac9a37afc8dc2651757ede5143dc0c3a9
   Google-Mobile-Ads-SDK: 09d0868abe43b9f851b7b340a245679f0eafc96c
-  GoogleSignIn: ce8c89bb9b37fb624b92e7514cc67335d1e277e4
+  GoogleSignIn: e6b83a7093495f8ba4b7547460485f1e308c8df5
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   GoogleUtilities: 7dc09b3fa9ecb5c2298b952313d14628b61b9da3
-  GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
+  GTMAppAuth: 4a3fbbb34098b327feaa51cfbf98b0b12f6892e7
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   IONCameraLib: 729cae576e1a952602ce750a9790b6dc7d7e2e95
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273

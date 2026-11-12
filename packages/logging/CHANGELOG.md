@@ -1,5 +1,11 @@
 # @trizum/logging
 
+## 1.1.2
+
+### Patch Changes
+
+- [#626](https://github.com/HorusGoul/trizum/pull/626) [`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Send warning and higher log records to Sentry in the PWA and sync server. Preserve severity and document-ID redaction; warnings appear in Sentry Logs, while errors and fatal records also create issues.
+
 ## 1.1.1
 
 ### Patch Changes

@@ -2,6 +2,7 @@ import { env } from "#src/env.ts";
 import { automergeWasmBase64 } from "@automerge/automerge/automerge.wasm.base64";
 import { initializeBase64Wasm, Repo, type PeerId } from "@automerge/automerge-repo/slim";
 import { DrizzleSqliteStorageAdapter } from "./repo/DrizzleSqliteStorageAdapter.ts";
+import { observeSync } from "./diagnostics.ts";
 import { db } from "./db.ts";
 import { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket";
 import * as os from "node:os";
@@ -33,15 +34,19 @@ export async function startServer() {
 
   const hostname = os.hostname();
 
+  const networkAdapter = new NodeWSServerAdapter(webSocketServer);
+
   // SAFETY: Automerge peer IDs are opaque strings; the server prefix and hostname form the configured server identity.
   const repo = new Repo({
     storage: new DrizzleSqliteStorageAdapter(db),
-    network: [new NodeWSServerAdapter(webSocketServer)],
+    network: [networkAdapter],
 
     // TODO: supporting multiple servers or processes isn't supported yet
     peerId: `server:${hostname}` as PeerId,
     sharePolicy: () => Promise.resolve(false),
   });
+
+  observeSync(webSocketServer, networkAdapter, repo);
 
   const storageId = await repo.storageId().catch(() => {
     logger.error(
@@ -107,12 +112,6 @@ export async function startServer() {
   app.get(
     "/sync",
     upgradeWebSocket(() => ({
-      onOpen: () => {
-        logger.info("WebSocket connection opened");
-      },
-      onClose: () => {
-        logger.info("WebSocket connection closed");
-      },
       onError: (error) => {
         logger.error("WebSocket connection error", { error });
       },

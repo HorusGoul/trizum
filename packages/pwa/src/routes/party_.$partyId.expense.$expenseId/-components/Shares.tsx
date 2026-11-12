@@ -6,7 +6,7 @@ import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { getExpenseUnitShares, type Expense } from "#src/models/expense.js";
 import { Icon } from "@trizum/ui/Icon";
 
-export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
+export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmount">) {
   const { i18n } = useLingui();
   const unitAmounts = getExpenseUnitShares(expense);
   const { party } = useCurrentParty();
@@ -28,6 +28,14 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
             .map(([userId, amount]) => {
               const isMe = userId === currentParticipant.id;
 
+              const original =
+                expense.originalAmount && expense.shares[userId].originalAmount != null
+                  ? {
+                      amount: expense.shares[userId].originalAmount,
+                      currency: expense.originalAmount.currency,
+                    }
+                  : undefined;
+
               return (
                 <li
                   key={userId}
@@ -42,11 +50,21 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
                       </span>
                     ) : null}
                   </span>
-                  <CurrencyText
-                    amount={amount}
-                    currency={party.currency}
-                    className="font-semibold"
-                  />
+                  <span className="flex flex-col items-end">
+                    <CurrencyText
+                      amount={original?.amount ?? amount}
+                      currency={original?.currency ?? party.currency}
+                      className="font-semibold"
+                    />
+                    {original ? (
+                      <CurrencyText
+                        amount={amount}
+                        currency={party.currency}
+                        className="text-accent-600 dark:text-accent-300 text-xs"
+                        variant="inherit"
+                      />
+                    ) : null}
+                  </span>
                 </li>
               );
             })}

@@ -1,6 +1,6 @@
 {
   "name": "@trizum/pwa",
-  "version": "1.13.3",
+  "version": "1.13.6",
   "private": true,
   "description": "Split bills with friends and family. Track, calculate, and settle expenses together.",
   "type": "module",
@@ -38,6 +38,7 @@
     "@opentf/std": "jsr:0.12.0",
     "@revenuecat/purchases-capacitor": "catalog:",
     "@revenuecat/purchases-capacitor-ui": "catalog:",
+    "@sentry/cloudflare": "10.76.2",
     "@sentry/react": "catalog:",
     "@sentry/vite-plugin": "catalog:",
     "@takker/md5": "jsr:^0.1.0",
