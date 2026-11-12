@@ -8,6 +8,7 @@ const receipt: Receipt = {
   total: "12.34",
   currency: "EUR",
   currencyEvidence: null,
+  currencyEvidenceSource: null,
   items: [],
 };
 
@@ -140,4 +141,14 @@ test("offers only a currency change when the foreign total cannot be represented
     currency: "USD",
     amount: undefined,
   });
+});
+
+test("offers a different currency inferred from receipt context", () => {
+  expect(
+    suggest({
+      currency: "USD",
+      currencyEvidence: "El Paso, TX 79925",
+      currencyEvidenceSource: "context",
+    }),
+  ).toMatchObject({ currency: "USD", amount: 12.34 });
 });

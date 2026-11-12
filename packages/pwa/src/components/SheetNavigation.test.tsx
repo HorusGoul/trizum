@@ -41,10 +41,10 @@ beforeEach(() => {
   onDiscard.mockReset();
   onAccept.mockReset();
   window.history.replaceState(null, "", "/party");
-  history = createBrowserHistory();
+  navigation = createSheetNavigation(() => createBrowserHistory());
+  history = navigation.history;
   history.push("/expense?calculator=amount");
   history.flush();
-  navigation = createSheetNavigation(history);
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
@@ -53,7 +53,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   await act(async () => vi.runAllTimersAsync());
-  history.destroy();
+  await navigation.destroy();
   container.remove();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -95,6 +95,7 @@ function ReceiptEditor() {
             total: "15.70",
             currency: "EUR",
             currencyEvidence: null,
+            currencyEvidenceSource: null,
             items: [],
           }}
           suggestions={{
@@ -239,4 +240,19 @@ test("changing dismissibility keeps a locked top sheet ahead of its parent", asy
   await settle(() => window.history.back());
   expect(container.querySelector("output")?.textContent).toBe("parent open;child closed");
   expect(onParentClose).not.toHaveBeenCalled();
+});
+
+test("direct-entry receipt sheets survive StrictMode registration and close on Back", async () => {
+  await settle(() => window.history.back());
+  expect(history.location.state.__TSR_index).toBe(0);
+  await render(<ReceiptEditor />);
+  expect(onDiscard).not.toHaveBeenCalled();
+  expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+  await settle(() => window.history.back());
+  await settle();
+  expect(onDiscard).toHaveBeenCalledOnce();
+  expect(document.querySelector('[role="dialog"]')).toBeNull();
+  expect(document.querySelector<HTMLInputElement>('input[aria-label="Expense draft"]')?.value).toBe(
+    "My handwritten title",
+  );
 });

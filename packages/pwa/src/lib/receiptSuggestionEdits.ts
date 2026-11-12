@@ -1,4 +1,4 @@
-import type { ExpenseEditorFormValues } from "../components/ExpenseEditor";
+import type { ExpenseEditorFormValues } from "./expenseEditor";
 import type { Receipt } from "./api/receiptContract";
 import type { ExchangeRates } from "./api/exchangeRatesContract";
 import type { CurrencyCode } from "./money";

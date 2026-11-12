@@ -9,15 +9,15 @@ const cleanups: (() => void)[] = [];
 
 beforeEach(() => {
   window.history.replaceState(null, "", "/party");
-  history = createBrowserHistory();
+  navigation = createSheetNavigation(() => createBrowserHistory());
+  history = navigation.history;
   history.push("/expense?calculator=amount");
   history.flush();
-  navigation = createSheetNavigation(history);
 });
 
-afterEach(() => {
+afterEach(async () => {
   for (const cleanup of cleanups.splice(0)) cleanup();
-  history.destroy();
+  await navigation.destroy();
 });
 
 function register(dismiss = vi.fn<() => boolean>(() => true)) {

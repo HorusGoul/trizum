@@ -13,6 +13,7 @@ const receipt = {
   total: "12.34",
   currency: "EUR",
   currencyEvidence: "EUR",
+  currencyEvidenceSource: null,
   items: [{ name: "Apples", quantity: "0,750 kg", unitPrice: "2.490", lineTotal: "1.87" }],
 };
 
@@ -157,6 +158,7 @@ describe("receipt analysis authorization and contract", () => {
       total: "12.34",
       currency: "JPY",
       currencyEvidence: null,
+      currencyEvidenceSource: null,
       items: [
         { name: "りんご / تفاح", quantity: "0,750 kg", unitPrice: "2.490", lineTotal: "1.87" },
       ],
@@ -245,7 +247,7 @@ describe("receipt analysis authorization and contract", () => {
     await expect(response.json()).resolves.toEqual(foreign);
     const system = gemmaInput().messages?.[0];
     expect(system).toMatchObject({
-      content: expect.stringContaining("The party currency is GBP. Use it only to verify"),
+      content: expect.stringContaining("The party currency is GBP. Use it only to compare"),
     });
     expect(run).toHaveBeenLastCalledWith(
       "@cf/cloudflare/clef",
@@ -257,18 +259,48 @@ describe("receipt analysis authorization and contract", () => {
     );
     expect(system).toMatchObject({
       role: "system",
-      content: expect.stringContaining("associated with the final bill total"),
+      content: expect.stringContaining(
+        "A clear printed code or unambiguous currency marker takes priority",
+      ),
     });
     expect(system).toMatchObject({
-      content: expect.stringContaining("Bare $, ¥, kr or Rs are ambiguous and insufficient"),
+      content: expect.stringContaining("combining the address, city/region/country"),
     });
     expect(system).toMatchObject({
-      content: expect.stringContaining("If multiple currencies appear"),
+      content: expect.stringContaining("a language used across many countries needs other hints"),
     });
     expect(system).toMatchObject({
-      content: expect.stringContaining("Never infer currency from language, location, merchant"),
+      content: expect.stringContaining("Do not hardcode a language-to-currency rule"),
     });
   });
+  test("returns a contextual currency with its supporting receipt clues", async () => {
+    const { partyId, owner } = await boostedParty();
+
+    const inferred = {
+      ...receipt,
+      currency: "USD",
+      currencyEvidence: "El Paso, TX 79925",
+      currencyEvidenceSource: "context",
+    };
+
+    run.mockResolvedValueOnce(completion(JSON.stringify(inferred)));
+    const response = await harness.requestReceipt(partyId, image, owner.cookie);
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual(inferred);
+    expect(run).toHaveBeenLastCalledWith(
+      "@cf/cloudflare/clef",
+      expect.objectContaining({
+        state: expect.objectContaining({ receipt: inferred }),
+        questions: expect.objectContaining({
+          currency: expect.objectContaining({
+            instructions: expect.stringContaining("distinguish plausible alternatives"),
+          }),
+        }),
+      }),
+      expect.any(Object),
+    );
+  });
+
   test("does not expose ambiguous evidence as a confident currency marker", async () => {
     const { partyId, owner } = await boostedParty();
     run.mockResolvedValueOnce(
@@ -278,6 +310,7 @@ describe("receipt analysis authorization and contract", () => {
     await expect(response.json()).resolves.toMatchObject({
       currency: "USD",
       currencyEvidence: null,
+      currencyEvidenceSource: null,
     });
   });
   test("returns a sanitized failure when Clef is unavailable", async () => {

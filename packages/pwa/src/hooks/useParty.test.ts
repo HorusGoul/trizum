@@ -410,6 +410,7 @@ describe("getPartyHelpers", () => {
             total: "12.34",
             currency: "USD",
             currencyEvidence: kind === "unconfirmed" ? "$" : "US$",
+            currencyEvidenceSource: null,
             items: [],
           };
 
@@ -540,6 +541,7 @@ describe("getPartyHelpers", () => {
           total: "15.70",
           currency: kind === "legacy" ? "EUR" : "USD",
           currencyEvidence: null,
+          currencyEvidenceSource: null,
           items: [],
         };
 

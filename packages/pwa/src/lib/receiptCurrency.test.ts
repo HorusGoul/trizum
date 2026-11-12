@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { getConfirmedReceiptCurrency } from "./receiptCurrency";
+import { getSupportedReceiptCurrency } from "./receiptCurrency";
 
 test.each([
   ["USD", "USD"],
@@ -11,7 +11,7 @@ test.each([
   ["JPY", "JPY"],
   ["INR", "₹"],
 ])("accepts a matching explicit marker for %s: %s", (currency, currencyEvidence) => {
-  expect(getConfirmedReceiptCurrency({ currency, currencyEvidence })).toBe(currency);
+  expect(getSupportedReceiptCurrency({ currency, currencyEvidence })).toBe(currency);
 });
 
 test.each([
@@ -33,6 +33,30 @@ test.each([
 ])(
   "rejects ambiguous, unsupported or inconsistent evidence %s: %s",
   (currency, currencyEvidence) => {
-    expect(getConfirmedReceiptCurrency({ currency, currencyEvidence })).toBeUndefined();
+    expect(getSupportedReceiptCurrency({ currency, currencyEvidence })).toBeUndefined();
   },
 );
+
+test("allows contextual evidence without a hardcoded country or language mapping", () => {
+  for (const [currency, currencyEvidence] of [
+    ["USD", "El Paso, TX 79925"],
+    ["MXN", "Guadalajara, Jalisco"],
+    ["EUR", "Language and receipt context support this currency"],
+  ]) {
+    expect(
+      getSupportedReceiptCurrency({
+        currency,
+        currencyEvidence,
+        currencyEvidenceSource: "context",
+      }),
+    ).toBe(currency);
+  }
+
+  expect(
+    getSupportedReceiptCurrency({
+      currency: "ZZZ",
+      currencyEvidence: "Somewhere",
+      currencyEvidenceSource: "context",
+    }),
+  ).toBeUndefined();
+});

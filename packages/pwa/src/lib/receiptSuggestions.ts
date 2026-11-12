@@ -1,6 +1,6 @@
 import type { CurrencyCode } from "./money";
 import type { ExpenseConversionValues } from "./currencyConversion";
-import { getConfirmedReceiptCurrency } from "./receiptCurrency";
+import { getSupportedReceiptCurrency } from "./receiptCurrency";
 import type { Receipt } from "./api/receiptContract";
 
 export interface ReceiptDraftValues {
@@ -31,7 +31,7 @@ export function getReceiptSuggestions({
   baseline: ReceiptDraftValues;
 }) {
   const currencyMismatch = receipt.currency !== null && receipt.currency !== current.currency;
-  const confirmedCurrency = getConfirmedReceiptCurrency(receipt);
+  const confirmedCurrency = getSupportedReceiptCurrency(receipt);
 
   const currency: CurrencyCode | undefined =
     confirmedCurrency &&

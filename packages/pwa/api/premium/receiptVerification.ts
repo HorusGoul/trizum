@@ -71,7 +71,6 @@ export async function verifyReceipt(
   receipt: Receipt,
   ai: ReceiptAI,
   context: { locale: SupportedLocale; partyCurrency: CurrencyCode },
-  inspect?: (receipt: Receipt, response: ReceiptVerificationResponse | null) => void,
 ): Promise<Receipt> {
   const fields: Array<[string, ReceiptVerificationQuestion]> = [];
 
@@ -103,7 +102,7 @@ export async function verifyReceipt(
     fields.push([
       "currency",
       question(
-        "Are currency AND currencyEvidence clearly supported by a matching readable printed code or unambiguous marker associated with this final bill total? The party currency is context only, never evidence. Reject language/location guesses, bare $, ¥, £, ₩, kr or Rs, unclear characters, and conflicting or alternative/card-converted totals whose bill currency cannot be distinguished.",
+        "Is currency the best-supported currency of this original bill, and is currencyEvidenceSource accurate? Prefer a matching printed code or unambiguous marker over all context. If inferred, independently weigh the visible address, city/region/country, postal code, phone prefix, tax identifiers, web domain and language together, checking that they distinguish plausible alternatives. Shared languages and bare currency symbols can be ambiguous; look for corroborating clues. A strong language/locale association may support a likely default when no contrary clue exists. Reject invented evidence, contradictions, and an alternative/card-converted currency mistaken for the bill currency. The party currency and app language are never receipt evidence.",
       ),
     ]);
 
@@ -115,11 +114,7 @@ export async function verifyReceipt(
       ),
     ]);
 
-  if (fields.length === 0) {
-    inspect?.(receipt, null);
-
-    return receipt;
-  }
+  if (fields.length === 0) return receipt;
 
   const response: unknown = await ai.run(
     "@cf/cloudflare/clef",
@@ -138,7 +133,6 @@ export async function verifyReceipt(
   );
 
   const verified = verificationSchema.parse(response);
-  inspect?.(receipt, verified);
   const { answers } = verified;
 
   function supported(field: string) {
@@ -151,9 +145,7 @@ export async function verifyReceipt(
     );
   }
 
-  const currencySupported =
-    receipt.currency === null ||
-    (supported("currency") && answers.currency!.probabilities.supported >= 0.98);
+  const currencySupported = receipt.currency === null || supported("currency");
 
   return {
     merchantName: supported("merchant") ? receipt.merchantName : null,
@@ -161,6 +153,7 @@ export async function verifyReceipt(
     total: supported("total") && currencySupported ? receipt.total : null,
     currency: currencySupported ? receipt.currency : null,
     currencyEvidence: currencySupported ? receipt.currencyEvidence : null,
+    currencyEvidenceSource: currencySupported ? receipt.currencyEvidenceSource : null,
     items: supported("items") ? receipt.items : [],
   };
 }

@@ -9,6 +9,7 @@ const receipt: Receipt = {
   total: "15.70",
   currency: "USD",
   currencyEvidence: "US$",
+  currencyEvidenceSource: null,
   items: [{ name: "Coffee", quantity: "2", unitPrice: "3.00", lineTotal: "6.00" }],
 };
 
@@ -101,28 +102,29 @@ test.each(["unsupported", "unclear"] as const)(
   },
 );
 
-test.each([0, 0.8, 0.979])(
-  "suppresses currency and its total when currency support is only %s",
-  async (probability) => {
-    run.mockResolvedValue(response({ currency: answer(probability) }));
+test.each(["unsupported", "unclear"] as const)(
+  "suppresses currency and total for a %s currency decision",
+  async (choice) => {
+    run.mockResolvedValue(response({ currency: answer(0.7, choice) }));
     await expect(verifyReceipt(image, receipt, ai, context)).resolves.toMatchObject({
       currency: null,
       currencyEvidence: null,
+      currencyEvidenceSource: null,
       total: null,
-      titleSuggestions: receipt.titleSuggestions,
     });
   },
 );
 
-test("keeps a stricter threshold for currency than ordinary supported decisions", async () => {
-  run.mockResolvedValue(
-    response({ total: answer(0.95), currency: answer(0.98), title_0: answer(0.949) }),
-  );
-  await expect(verifyReceipt(image, receipt, ai, context)).resolves.toMatchObject({
-    total: "15.70",
+test("accepts best-supported contextual currency without a near-certainty score cutoff", async () => {
+  const contextual: Receipt = {
+    ...receipt,
     currency: "USD",
-    titleSuggestions: receipt.titleSuggestions,
-  });
+    currencyEvidence: "El Paso, TX 79925",
+    currencyEvidenceSource: "context",
+  };
+
+  run.mockResolvedValue(response({ currency: answer(0.82), total: answer(0.8) }));
+  await expect(verifyReceipt(image, contextual, ai, context)).resolves.toEqual(contextual);
 });
 
 test("retains supported decisions from the live receipt regression without treating scores as accuracy", async () => {
@@ -153,14 +155,12 @@ test("retains supported decisions from the live receipt regression without treat
 
 test("rejects tied or inconsistent supported choices", async () => {
   run.mockResolvedValue(
-    response({
-      total: answer(0.5),
-      merchant: answer(0.4),
-    }),
+    response({ total: answer(0.5), merchant: answer(0.4), currency: answer(0.5) }),
   );
   await expect(verifyReceipt(image, receipt, ai, context)).resolves.toMatchObject({
     total: null,
     merchantName: null,
+    currency: null,
   });
 });
 
@@ -187,6 +187,7 @@ test("skips verification when no values were extracted", async () => {
     total: null,
     currency: null,
     currencyEvidence: null,
+    currencyEvidenceSource: null,
     items: [],
   };
 
@@ -202,6 +203,7 @@ test("returns an empty receipt when no candidate can be verified", async () => {
     total: null,
     currency: null,
     currencyEvidence: null,
+    currencyEvidenceSource: null,
     items: [],
   });
 });

@@ -153,29 +153,8 @@ export const premiumRoute = premiumApp
 
         const preparedImage = await prepareReceiptImage(image, c.env.IMAGES);
 
-        const inspect: Parameters<typeof extractReceipt>[3] =
-          c.env.SENTRY_ENVIRONMENT === "preview" &&
-          c.req.header("X-Trizum-Receipt-Diagnostics") === "1"
-            ? (receipt, verification) => {
-                c.header(
-                  "X-Trizum-Receipt-Diagnostics",
-                  JSON.stringify({
-                    extracted: {
-                      merchant: receipt.merchantName !== null,
-                      titles: receipt.titleSuggestions.length,
-                      total: receipt.total !== null,
-                      currency: receipt.currency,
-                      evidence: receipt.currencyEvidence !== null,
-                      items: receipt.items.length,
-                    },
-                    answers: verification?.answers ?? null,
-                  }),
-                );
-              }
-            : undefined;
-
         return c.json(
-          await extractReceipt(preparedImage, c.env.AI, { locale, partyCurrency }, inspect),
+          await extractReceipt(preparedImage, c.env.AI, { locale, partyCurrency }),
           200,
         );
       } catch {

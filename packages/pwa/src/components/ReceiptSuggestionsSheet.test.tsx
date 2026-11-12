@@ -47,6 +47,7 @@ async function render(
   titleSuggestions: string[] = [],
   hasEdits = true,
   offerCurrency = false,
+  contextual = false,
 ) {
   await act(async () =>
     root.render(
@@ -59,7 +60,8 @@ async function render(
               titleSuggestions,
               total: "12.34",
               currency: currencyMismatch ? "USD" : "EUR",
-              currencyEvidence: offerCurrency ? "US$" : null,
+              currencyEvidence: offerCurrency ? (contextual ? "El Paso, TX 79925" : "US$") : null,
+              currencyEvidenceSource: contextual ? "context" : "printed",
               items: [],
             }}
             suggestions={{
@@ -214,4 +216,18 @@ test("shows a currency-only suggestion even without title or total edits", async
   await act(async () => box?.click());
   await act(async () => button("Accept suggestions").click());
   expect(onAccept).toHaveBeenCalledExactlyOnceWith({ currency: "USD" });
+});
+
+test("makes contextual currency inference explicit in the sheet", async () => {
+  await render(true, [], true, true, true);
+  expect(document.body.textContent).toContain("Currency inferred from El Paso, TX 79925.");
+  expect(document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')[1].checked).toBe(
+    true,
+  );
+  await act(async () => button("Accept suggestions").click());
+  expect(onAccept).toHaveBeenCalledExactlyOnceWith({
+    name: "Market",
+    currency: "USD",
+    amount: 12.34,
+  });
 });

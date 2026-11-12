@@ -14,6 +14,7 @@ const receipt: Receipt = {
   total: "12.34",
   currency: "EUR",
   currencyEvidence: null,
+  currencyEvidenceSource: null,
   items: [],
 };
 
@@ -104,6 +105,7 @@ describe("receipt suggestion lifecycle", () => {
       total: null,
       currency: "USD",
       currencyEvidence: "USD",
+      currencyEvidenceSource: null,
     });
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
@@ -122,6 +124,7 @@ describe("receipt suggestion lifecycle", () => {
       total: null,
       currency: "USD",
       currencyEvidence: "$",
+      currencyEvidenceSource: null,
     });
     await render();
     await act(async () => controller.analyze([{ photoId: "photo", image: "receipt" }]));
@@ -237,6 +240,7 @@ describe("receipt suggestion lifecycle", () => {
       total: null,
       currency: null,
       currencyEvidence: null,
+      currencyEvidenceSource: null,
       items: [],
     });
     await render();
@@ -252,6 +256,7 @@ describe("receipt suggestion lifecycle", () => {
       total: null,
       currency: null,
       currencyEvidence: null,
+      currencyEvidenceSource: null,
       items: [],
     });
     await render();

@@ -1,6 +1,6 @@
 import { isCurrencyCode, type CurrencyCode } from "./money";
 
-// Deliberately small: shared symbols such as $, ¥, £, ₩, kr and Rs are insufficient.
+// Printed markers only: shared symbols need contextual evidence instead.
 const currencyMarkers = new Map<string, CurrencyCode>([
   ["€", "EUR"],
   ["₹", "INR"],
@@ -17,12 +17,13 @@ const currencyMarkers = new Map<string, CurrencyCode>([
   ["SG$", "SGD"],
 ]);
 
-/** Evidence must be a literal, clearly readable marker associated with the bill total. */
-export function getConfirmedReceiptCurrency(receipt: {
+/** Printed markers are checked literally; contextual evidence is independently verified against the photo. */
+export function getSupportedReceiptCurrency(receipt: {
   currency: string | null;
   currencyEvidence: string | null;
+  currencyEvidenceSource?: "printed" | "context" | null;
 }): CurrencyCode | undefined {
-  const { currency, currencyEvidence } = receipt;
+  const { currency, currencyEvidence, currencyEvidenceSource } = receipt;
 
   if (
     !currency ||
@@ -32,6 +33,8 @@ export function getConfirmedReceiptCurrency(receipt: {
     !currencyEvidence
   )
     return undefined;
+
+  if (currencyEvidenceSource === "context") return currency;
   const marker = currencyEvidence.trim().toUpperCase();
 
   return marker === currency || currencyMarkers.get(marker) === currency ? currency : undefined;

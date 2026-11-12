@@ -53,22 +53,29 @@ above 12,000 pixels on either side or 100 megapixels are rejected. The normalize
 analysis image is not uploaded to hosted Images, cached, or written to Automerge;
 the stored attachment keeps its existing processing and sync behavior.
 
-The response has `merchantName`, `titleSuggestions`, `total`, `currency`, `currencyEvidence`, and `items`. Each item has
+The response has `merchantName`, `titleSuggestions`, `total`, `currency`, `currencyEvidence`, `currencyEvidenceSource`, and `items`. Each item has
 `name`, `quantity`, `unitPrice`, and `lineTotal`. Monetary values are decimal
 strings in major currency units. Quantities preserve the printed text and units;
 missing fields are `null`, and unreadable items produce an empty array. The
 extraction prompt requests the final printed total including tax and discounts,
-never tendered cash, change, or an inferred sum. Currency is an ISO code only
-when visibly identified; ambiguous symbols remain unknown.
+never tendered cash, change, or an inferred sum. Currency is a best-effort ISO code.
+Printed codes and unambiguous markers take priority. Otherwise, the models combine
+visible address, country/region, postcode, phone prefix, tax identifiers, web
+domain and language clues to distinguish plausible currencies. Shared languages
+need corroborating clues; a strong locale association can support a likely
+default when nothing contradicts it. There is no hardcoded country/language
+mapping. `currencyEvidenceSource` distinguishes `printed` from `context`, and
+`currencyEvidence` explains the decisive receipt cues. Unsupported or conflicting
+inferences remain null.
 
 Gemma extracts the candidates, then `@cf/cloudflare/clef` compares them with the
 same prepared image. The verifier scores the merchant, each proposed title, the
-final total, currency plus printed evidence, and the item lines independently
-as supported, unsupported, or unclear. Ordinary suggestions retain a strictly
-winning supported decision; the score is not interpreted as a calibrated accuracy
-percentage or compared to an arbitrary 0.95 cutoff. Currency additionally requires
-a supported-option score of 0.98 and the deterministic printed-marker check.
-These policies still need receipt-specific accuracy evaluation. Unverified fields are
+final total, currency plus its printed or contextual evidence, and the item lines independently
+as supported, unsupported, or unclear. Suggestions retain a strictly winning supported decision; model scores are not
+interpreted as calibrated accuracy percentages or compared to a near-certainty
+cutoff. Printed markers still undergo deterministic matching; contextual
+inferences must be supported independently by Clef against the image. These
+policies still need receipt-specific accuracy evaluation. Unverified fields are
 removed; rejecting an extracted currency also removes its total to prevent
 falling back to a party-currency amount. If verification fails or times out, the
 whole request fails quietly through the existing sanitized error path. Clef has
@@ -103,16 +110,14 @@ sync continues. Suggestions stay local to the editor. Accepting selected fields
 updates the draft; saving the expense uses the existing write path. The first
 version offers title, total, and an explicit expense-currency choice, preserving
 fields edited during processing. A currency change is offered only for a supported
-currency different from both the party and the current expense, with matching
-printed evidence: an ISO code or a conservatively allowlisted marker such as
-`US$` or `€`. Shared markers such as `$`, `¥`, `£`, `₩`, `kr`, and `Rs`, missing
-or conflicting evidence, and language/location guesses cannot authorize a switch.
-The prompt requires evidence associated with the final bill total, and abstains
-when multiple currency totals cannot be distinguished. The API clears invalid
-evidence; the client checks it again. This is grounded extraction, not a calibrated
-model confidence percentage.
-
-The currency choice starts selected and identifies the receipt marker, target
+currency different from both the party and the current expense. Explicit printed
+codes and known markers are matched literally; contextual inferences carry their
+own source and evidence explanation. The sheet distinguishes an inferred currency
+from a printed one. Bare shared symbols are not treated as explicit currency,
+and the app language and party currency are never evidence of the receipt's
+currency. Currency rejection still suppresses its associated total to avoid
+applying that number as a party-currency amount.
+The currency choice starts selected and identifies the receipt evidence, target
 currency, and party currency. Deselecting the currency disables its foreign total; applying that total
 requires accepting its currency too. Accepting the switch changes this expense only, using the
 same reference-rate lookup and conversion path as the editor currency selector.

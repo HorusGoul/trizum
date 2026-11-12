@@ -14,6 +14,7 @@ describe("TrizumApiClient", () => {
       total: "1.23",
       currency: null,
       currencyEvidence: null,
+      currencyEvidenceSource: null,
       items: [],
     };
 

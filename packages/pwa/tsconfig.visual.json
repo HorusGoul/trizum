@@ -1,5 +1,7 @@
 {
   "extends": "@trizum/tsconfig/vite.json",
-  "compilerOptions": { "types": ["node"] },
-  "include": ["playwright.visual.config.ts", "e2e/visual/**/*.ts"]
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["playwright.visual.config.ts", "e2e/visual/**/*.ts", "src/vite-env.d.ts"]
 }

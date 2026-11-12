@@ -232,8 +232,11 @@ window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
 };
 
 // Create a new router instance
-const history = preventDuplicateHistoryEntries(createBrowserHistory());
-const sheetNavigation = createSheetNavigation(history);
+const sheetNavigation = createSheetNavigation(() =>
+  preventDuplicateHistoryEntries(createBrowserHistory()),
+);
+
+const history = sheetNavigation.history;
 
 const router = createRouter({
   parseSearch: parseAppSearch,

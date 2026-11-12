@@ -44,6 +44,7 @@ import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "@trizum/ui/MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
+  type ExpenseEditorFormValues,
   type ExpenseEditorMode,
   getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
@@ -51,7 +52,6 @@ import {
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
 import { ExpenseCurrencyFields } from "./ExpenseCurrencyFields";
-import type { ExpenseConversionValues } from "#src/lib/currencyConversion.ts";
 import { cn } from "@trizum/ui/utils";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
@@ -69,14 +69,7 @@ import {
   getExpenseEditorStoredValues,
 } from "#src/lib/expenseEditorCurrency.ts";
 
-export interface ExpenseEditorFormValues extends ExpenseConversionValues {
-  name: string;
-  amount: number;
-  paidAt: Date;
-  paidBy: ExpenseUser;
-  shares: ExpenseEditorShares;
-  photos: MediaFile["id"][];
-}
+export type { ExpenseEditorFormValues };
 
 export interface ExpenseEditorRef {
   setValues: (values: ExpenseEditorFormValues) => void;

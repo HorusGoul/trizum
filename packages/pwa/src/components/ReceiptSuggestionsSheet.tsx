@@ -129,10 +129,17 @@ export function ReceiptSuggestionsSheet({
                   {suggestions.currency} · {currencyName}
                 </span>
                 <span className="text-accent-700 dark:text-accent-300 mt-1 block text-sm font-normal">
-                  <Trans>
-                    Receipt shows {evidence}. Party currency: {partyCurrency}. Change this expense
-                    only and review the exchange rate in the editor.
-                  </Trans>
+                  {receipt.currencyEvidenceSource === "context" ? (
+                    <Trans>
+                      Currency inferred from {evidence}. Party currency: {partyCurrency}. Change
+                      this expense only and review the exchange rate in the editor.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Receipt shows {evidence}. Party currency: {partyCurrency}. Change this expense
+                      only and review the exchange rate in the editor.
+                    </Trans>
+                  )}
                 </span>
               </ModalSheetChoice>
             </ModalSheetChoices>

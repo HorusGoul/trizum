@@ -1,4 +1,4 @@
-import type { ExpenseEditorFormValues } from "../components/ExpenseEditor";
+import type { ExpenseEditorFormValues } from "./expenseEditor";
 import type { CurrencyCode } from "./money";
 import type { AppFormApi } from "./reactFormTypes";
 import {
