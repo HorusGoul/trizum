@@ -1,5 +1,13 @@
 # @trizum/logging
 
+## 1.1.3
+
+### Patch Changes
+
+- [#631](https://github.com/HorusGoul/trizum/pull/631) [`79ba6d5`](https://github.com/HorusGoul/trizum/commit/79ba6d50fa38f8474289354a5daa361f2b3a0ed7) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Capture Cloudflare Worker errors, warning logs, and request traces in Sentry with privacy filtering and source maps.
+
+  Redact password-reset credentials from telemetry paths, including automatic request spans and breadcrumbs.
+
 ## 1.1.2
 
 ### Patch Changes
