@@ -1,3 +1,6 @@
+import type { ExpenseEditorFormValues } from "./expenseEditor";
+import type { CurrencyCode } from "./money";
+import type { AppFormApi } from "./reactFormTypes";
 import {
   convertExpenseAmount,
   convertExpenseAmountToOriginal,
@@ -13,6 +16,42 @@ interface CurrencyValues extends ExpenseConversionValues {
 
 export function getExpenseEditorCurrencyAmount(values: CurrencyValues) {
   return values.originalAmount ? values.originalAmount.amount / 100 : values.amount;
+}
+
+/** Apply an entered total in the selected currency, preserving the current rate. */
+export function setExpenseEditorCurrencyAmount(
+  form: Pick<AppFormApi<ExpenseEditorFormValues>, "state" | "setFieldValue">,
+  amount: number,
+) {
+  const { originalAmount, exchangeRate } = form.state.values;
+
+  if (originalAmount) {
+    const units = convertToUnits(amount);
+    form.setFieldValue("originalAmount", { currency: originalAmount.currency, amount: units });
+    form.setFieldValue("amount", (convertExpenseAmount(units, exchangeRate ?? 0) ?? 0) / 100);
+  } else {
+    form.setFieldValue("amount", amount);
+  }
+}
+
+/** Relabel the entered amount exactly as the editor's currency selector does. */
+export function setExpenseEditorCurrency(
+  form: Pick<AppFormApi<ExpenseEditorFormValues>, "state" | "setFieldValue">,
+  partyCurrency: CurrencyCode,
+  currency: CurrencyCode,
+  rate: number | null,
+) {
+  const amount = getExpenseEditorCurrencyAmount(form.state.values);
+
+  if (currency === partyCurrency) {
+    form.setFieldValue("amount", amount);
+    form.setFieldValue("originalAmount", null);
+    form.setFieldValue("exchangeRate", null);
+  } else {
+    form.setFieldValue("originalAmount", { currency, amount: convertToUnits(amount) });
+    form.setFieldValue("exchangeRate", rate);
+    setExpenseEditorCurrencyAmount(form, amount);
+  }
 }
 
 /** Only the editor draft uses exact shares in the selected expense currency. */

@@ -181,6 +181,10 @@ msgstr "1.3 Mobile Advertising Data"
 msgid "1.4 Purchase and Premium Data"
 msgstr "1.4 Purchase and Premium Data"
 
+#: src/routes/privacy-policy.tsx:211
+msgid "1.5 Receipt Suggestions"
+msgstr "1.5 Receipt Suggestions"
+
 #: src/routes/terms/-components/ServiceTerms.tsx:41
 msgid "10. Third-Party Services"
 msgstr "10. Third-Party Services"
@@ -213,7 +217,7 @@ msgstr "16. Contact Us"
 msgid "2. What trizum Does"
 msgstr "2. What trizum Does"
 
-#: src/routes/privacy-policy.tsx:246
+#: src/routes/privacy-policy.tsx:261
 msgid "2.1 Legal Bases for Advertising"
 msgstr "2.1 Legal Bases for Advertising"
 
@@ -229,7 +233,7 @@ msgstr "4. Your Content and Responsibilities"
 msgid "5. Acceptable Use"
 msgstr "5. Acceptable Use"
 
-#: src/routes/privacy-policy.tsx:533
+#: src/routes/privacy-policy.tsx:548
 msgid "5.4 Advertising and Tracking Choices"
 msgstr "5.4 Advertising and Tracking Choices"
 
@@ -287,6 +291,10 @@ msgstr "Absolutely! trizum works without requiring any account or sign-up. Just 
 #: src/routes/settings.tsx:270
 msgid "Accent color"
 msgstr "Accent color"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:179
+msgid "Accept suggestions"
+msgstr "Accept suggestions"
 
 #: src/routes/settings_.cloud-sync.tsx:137
 msgid "Account created"
@@ -443,7 +451,7 @@ msgstr "Always include everyone"
 msgid "Always use default template"
 msgstr "Always use default template"
 
-#: src/components/ExpenseCurrencyFields.tsx:90
+#: src/components/ExpenseCurrencyFields.tsx:91
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:324
 msgid "Amount"
 msgstr "Amount"
@@ -452,19 +460,19 @@ msgstr "Amount"
 msgid "Amount for {0}"
 msgstr "Amount for {0}"
 
-#: src/components/ExpenseEditor.tsx:852
+#: src/components/ExpenseEditor.tsx:855
 msgid "Amount for {participantName}"
 msgstr "Amount for {participantName}"
 
-#: src/components/ExpenseCurrencyFields.tsx:81
+#: src/components/ExpenseCurrencyFields.tsx:82
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
-#: src/routes/privacy-policy.tsx:425
+#: src/routes/privacy-policy.tsx:440
 msgid "and"
 msgstr "and"
 
-#: src/routes/privacy-policy.tsx:434
+#: src/routes/privacy-policy.tsx:449
 msgid "and its"
 msgstr "and its"
 
@@ -581,7 +589,7 @@ msgstr "Authentication error"
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
-#: src/components/ExpenseEditor.tsx:419
+#: src/components/ExpenseEditor.tsx:421
 #: src/routes/settings.tsx:257
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
@@ -740,7 +748,7 @@ msgstr "Bulgarian Lev"
 msgid "Burundian Franc"
 msgstr "Burundian Franc"
 
-#: src/routes/privacy-policy.tsx:441
+#: src/routes/privacy-policy.tsx:456
 msgid "Business Data Responsibility information"
 msgstr "Business Data Responsibility information"
 
@@ -1093,7 +1101,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/components/ExpenseCurrencyFields.tsx:41
+#: src/components/ExpenseCurrencyFields.tsx:42
 msgid "Converted amount ({partyCurrency})"
 msgstr "Converted amount ({partyCurrency})"
 
@@ -1182,6 +1190,10 @@ msgstr "Could not load trizum cloud state"
 msgid "Could not open Premium. Please try again."
 msgstr "Could not open Premium. Please try again."
 
+#: src/components/useReceiptSuggestions.ts:90
+msgid "Could not read this receipt. You can still enter the expense yourself."
+msgstr "Could not read this receipt. You can still enter the expense yourself."
+
 #: src/routes/reset-password.tsx:62
 msgid "Could not reset password"
 msgstr "Could not reset password"
@@ -1260,9 +1272,14 @@ msgid "Cuban Peso"
 msgstr "Cuban Peso"
 
 #: src/components/CurrencySelect.tsx:29
+#: src/components/ReceiptSuggestionsSheet.tsx:121
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:91
 msgid "Currency"
 msgstr "Currency"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:133
+msgid "Currency inferred from {evidence}. Party currency: {partyCurrency}. Change this expense only and review the exchange rate in the editor."
+msgstr "Currency inferred from {evidence}. Party currency: {partyCurrency}. Change this expense only and review the exchange rate in the editor."
 
 #: src/components/PartyStatsView.tsx:189
 msgid "Current month"
@@ -1295,7 +1312,7 @@ msgstr "Czech Koruna"
 msgid "Danish Krone"
 msgstr "Danish Krone"
 
-#: src/components/ExpenseEditor.tsx:541
+#: src/components/ExpenseEditor.tsx:544
 msgid "Date"
 msgstr "Date"
 
@@ -1328,7 +1345,7 @@ msgstr "Debt transferred"
 msgid "Decimal point"
 msgstr "Decimal point"
 
-#: src/components/ExpenseEditor.tsx:775
+#: src/components/ExpenseEditor.tsx:778
 msgid "Decrease shares for {participantName}"
 msgstr "Decrease shares for {participantName}"
 
@@ -1372,7 +1389,7 @@ msgstr "Delete expense?"
 msgid "Delete template"
 msgstr "Delete template"
 
-#: src/routes/privacy-policy.tsx:237
+#: src/routes/privacy-policy.tsx:252
 msgid "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 msgstr "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 
@@ -1400,6 +1417,10 @@ msgstr "Destructive actions"
 #: src/components/PartyPendingComponent.tsx:105
 msgid "Did you know?"
 msgstr "Did you know?"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:182
+msgid "Discard"
+msgstr "Discard"
 
 #: src/routes/index/-components/HomeBanner.tsx:84
 msgid "Dismiss Premium banner"
@@ -1634,12 +1655,12 @@ msgstr "Exact"
 msgid "Exchange rate"
 msgstr "Exchange rate"
 
-#: src/components/ExpenseCurrencyFields.tsx:42
+#: src/components/ExpenseCurrencyFields.tsx:43
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:390
 msgid "Exchange rate ({partyCurrency}/{currency})"
 msgstr "Exchange rate ({partyCurrency}/{currency})"
 
-#: src/components/ExpenseCurrencyFields.tsx:138
+#: src/components/ExpenseCurrencyFields.tsx:139
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:191
 msgid "Exchange rate must be greater than 0"
 msgstr "Exchange rate must be greater than 0"
@@ -1656,6 +1677,10 @@ msgstr "Expense amounts don't match total. Please check your split configuration
 #: src/components/ExpenseEditorValidationStatus.tsx:204
 msgid "Expense checks"
 msgstr "Expense checks"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:124
+msgid "Expense currency"
+msgstr "Expense currency"
 
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:295
 msgid "Expense defaults"
@@ -1720,7 +1745,7 @@ msgid "Explore Premium"
 msgstr "Explore Premium"
 
 #: src/components/AvatarPicker.tsx:123
-#: src/components/ExpenseEditor.tsx:1031
+#: src/components/ExpenseEditor.tsx:1132
 #: src/components/QRCodeScanner.tsx:129
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
@@ -1769,7 +1794,7 @@ msgstr "Failed to update expense"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Failed to upload avatar. Please try again."
 
-#: src/components/ExpenseEditor.tsx:1004
+#: src/components/ExpenseEditor.tsx:1105
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
@@ -1884,7 +1909,7 @@ msgstr "Gold (troy ounce)"
 msgid "Google"
 msgstr "Google"
 
-#: src/routes/privacy-policy.tsx:409
+#: src/routes/privacy-policy.tsx:424
 msgid "Google AdMob:"
 msgstr "Google AdMob:"
 
@@ -1900,7 +1925,7 @@ msgstr "Google is connected to this account"
 msgid "Google Play"
 msgstr "Google Play"
 
-#: src/routes/privacy-policy.tsx:432
+#: src/routes/privacy-policy.tsx:447
 msgid "Google's Privacy Policy"
 msgstr "Google's Privacy Policy"
 
@@ -2005,7 +2030,7 @@ msgstr "How do you want to call this party?"
 msgid "How does offline sync work?"
 msgstr "How does offline sync work?"
 
-#: src/routes/privacy-policy.tsx:423
+#: src/routes/privacy-policy.tsx:438
 msgid "How Google uses information from partner apps"
 msgstr "How Google uses information from partner apps"
 
@@ -2077,11 +2102,11 @@ msgstr "Importing attachments ({0} of {1})"
 msgid "Importing Tricount data..."
 msgstr "Importing Tricount data..."
 
-#: src/components/ExpenseEditor.tsx:599
+#: src/components/ExpenseEditor.tsx:602
 msgid "Include all"
 msgstr "Include all"
 
-#: src/components/ExpenseEditor.tsx:811
+#: src/components/ExpenseEditor.tsx:814
 msgid "Increase shares for {participantName}"
 msgstr "Increase shares for {participantName}"
 
@@ -2238,6 +2263,10 @@ msgstr "Last updated: July 25, 2026"
 #: src/routes/terms/route.tsx:26
 msgid "Last updated: July 27, 2026"
 msgstr "Last updated: July 27, 2026"
+
+#: src/routes/privacy-policy.tsx:26
+msgid "Last updated: November 9, 2026"
+msgstr "Last updated: November 9, 2026"
 
 #: src/routes/privacy-policy.tsx:26
 msgid "Last updated: October 3, 2026"
@@ -2397,7 +2426,7 @@ msgstr "Mauritian Rupee"
 msgid "Me"
 msgstr "Me"
 
-#: src/components/ExpenseEditor.tsx:412
+#: src/components/ExpenseEditor.tsx:414
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:99
 #: src/routes/party.$partyId/route.tsx:191
 msgid "Menu"
@@ -2614,6 +2643,10 @@ msgstr "No emoji found"
 msgid "No expense templates yet"
 msgstr "No expense templates yet"
 
+#: src/components/ReceiptSuggestionsSheet.tsx:126
+msgid "No new title or total could be suggested. Your edits are kept."
+msgstr "No new title or total could be suggested. Your edits are kept."
+
 #: src/components/PremiumPaywall.tsx:543
 msgid "No Premium purchase was found for this account."
 msgstr "No Premium purchase was found for this account."
@@ -2683,7 +2716,7 @@ msgstr "Not signed in"
 msgid "of total spending"
 msgstr "of total spending"
 
-#: src/routes/privacy-policy.tsx:230
+#: src/routes/privacy-policy.tsx:245
 msgid "Offer purchases, restore purchases, verify Premium access across your signed-in devices and for Party Boost, provide subscription management, and analyze purchase performance"
 msgstr "Offer purchases, restore purchases, verify Premium access across your signed-in devices and for Party Boost, provide subscription management, and analyze purchase performance"
 
@@ -2769,7 +2802,7 @@ msgstr "Open archived parties"
 msgid "Open calculator"
 msgstr "Open calculator"
 
-#: src/components/ExpenseEditor.tsx:422
+#: src/components/ExpenseEditor.tsx:424
 msgid "Open calculator when focusing amount fields"
 msgstr "Open calculator when focusing amount fields"
 
@@ -2833,7 +2866,7 @@ msgstr "or enter code"
 msgid "or use email"
 msgstr "or use email"
 
-#: src/components/ExpenseCurrencyFields.tsx:61
+#: src/components/ExpenseCurrencyFields.tsx:62
 msgid "Original amount ({currency})"
 msgstr "Original amount ({currency})"
 
@@ -2849,7 +2882,7 @@ msgstr "Other operations"
 msgid "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
-#: src/routes/privacy-policy.tsx:607
+#: src/routes/privacy-policy.tsx:622
 msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
@@ -2866,7 +2899,7 @@ msgstr "Paid as {currentParticipantName}"
 msgid "Paid at"
 msgstr "Paid at"
 
-#: src/components/ExpenseEditor.tsx:516
+#: src/components/ExpenseEditor.tsx:519
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:49
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:412
 msgid "Paid by"
@@ -3259,6 +3292,11 @@ msgstr "Premium purchases restored."
 msgid "Premium status could not be checked. Try again."
 msgstr "Premium status could not be checked. Try again."
 
+#: src/components/ReceiptSuggestionsSheet.tsx:58
+#: src/components/ReceiptSuggestionsSheet.tsx:69
+msgid "Premium suggestions"
+msgstr "Premium suggestions"
+
 #: src/components/PremiumPaywall.tsx:172
 msgid "Premium, made for sharing."
 msgstr "Premium, made for sharing."
@@ -3322,6 +3360,10 @@ msgstr "QR code frame capture"
 msgid "Ranking based on how much each participant paid in the selected timeframe."
 msgstr "Ranking based on how much each participant paid in the selected timeframe."
 
+#: src/components/useReceiptSuggestions.ts:74
+msgid "Reading receipt for Premium suggestions…"
+msgstr "Reading receipt for Premium suggestions…"
+
 #: src/routes/settings.tsx:498
 msgid "Ready on another device"
 msgstr "Ready on another device"
@@ -3333,6 +3375,10 @@ msgstr "Real-Time Sync"
 #: src/routes/about.tsx:79
 msgid "Receipt Attachments"
 msgstr "Receipt Attachments"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:138
+msgid "Receipt shows {evidence}. Party currency: {partyCurrency}. Change this expense only and review the exchange rate in the editor."
+msgstr "Receipt shows {evidence}. Party currency: {partyCurrency}. Change this expense only and review the exchange rate in the editor."
 
 #: src/routes/party_.$partyId.transfer-debt/-components/DestinationParticipantCard.tsx:32
 msgid "Recommended match"
@@ -3387,7 +3433,7 @@ msgstr "Remove avatar"
 msgid "Remove payment method"
 msgstr "Remove payment method"
 
-#: src/components/ExpenseEditor.tsx:1124
+#: src/components/ExpenseEditor.tsx:1225
 msgid "Remove photo"
 msgstr "Remove photo"
 
@@ -3445,21 +3491,25 @@ msgstr "Return to trizum on your phone. Open <0>Premium settings</0> and use Res
 msgid "Return to trizum. If Premium has not appeared yet, use Restore purchases."
 msgstr "Return to trizum. If Premium has not appeared yet, use Restore purchases."
 
-#: src/routes/privacy-policy.tsx:582
+#: src/routes/privacy-policy.tsx:597
 msgid "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
 msgstr "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
 
-#: src/routes/privacy-policy.tsx:447
+#: src/routes/privacy-policy.tsx:462
 msgid "RevenueCat:"
 msgstr "RevenueCat:"
 
-#: src/routes/privacy-policy.tsx:462
+#: src/routes/privacy-policy.tsx:477
 msgid "RevenueCat's Privacy Policy"
 msgstr "RevenueCat's Privacy Policy"
 
 #: src/components/ExpenseEditorValidationStatus.tsx:215
 msgid "Review expense"
 msgstr "Review expense"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:73
+msgid "Review the receipt details before applying them to your expense."
+msgstr "Review the receipt details before applying them to your expense."
 
 #: src/lib/paymentMethods.ts:13
 msgid "Revolut"
@@ -3497,7 +3547,7 @@ msgstr "São Tomé and Príncipe Dobra"
 msgid "Saudi Riyal"
 msgstr "Saudi Riyal"
 
-#: src/components/ExpenseEditor.tsx:321
+#: src/components/ExpenseEditor.tsx:323
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
 #: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
@@ -3549,6 +3599,10 @@ msgstr "Select emoji"
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:440
 msgid "Select everyone now and automatically include new participants."
 msgstr "Select everyone now and automatically include new participants."
+
+#: src/components/ReceiptSuggestionsSheet.tsx:151
+msgid "Select the expense currency above to apply this total."
+msgstr "Select the expense currency above to apply this total."
 
 #: src/components/CloudSyncSignInForm.tsx:106
 msgid "Send password link"
@@ -3642,7 +3696,7 @@ msgstr "Shares"
 msgid "Shares for {0}"
 msgstr "Shares for {0}"
 
-#: src/components/ExpenseEditor.tsx:807
+#: src/components/ExpenseEditor.tsx:810
 msgid "Shares for {participantName}"
 msgstr "Shares for {participantName}"
 
@@ -3907,7 +3961,7 @@ msgstr "Stop trizum cloud on this device"
 msgid "Submit a Request"
 msgstr "Submit a Request"
 
-#: src/components/ExpenseEditor.tsx:321
+#: src/components/ExpenseEditor.tsx:323
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
 #: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
@@ -3930,6 +3984,10 @@ msgstr "Sucre"
 #: src/routes/new/route.tsx:300
 msgid "Sudanese Pound"
 msgstr "Sudanese Pound"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:97
+msgid "Suggestions can contain mistakes. Check them against your receipt."
+msgstr "Suggestions can contain mistakes. Check them against your receipt."
 
 #: src/routes/about/route.tsx:105
 #: src/routes/support/route.tsx:20
@@ -3956,12 +4014,12 @@ msgstr "Swipe between expenses and balances tabs."
 msgid "Swiss Franc"
 msgstr "Swiss Franc"
 
-#: src/components/ExpenseEditor.tsx:833
+#: src/components/ExpenseEditor.tsx:836
 msgid "Switch to a set amount"
 msgstr "Switch to a set amount"
 
-#: src/components/ExpenseEditor.tsx:823
-#: src/components/ExpenseEditor.tsx:834
+#: src/components/ExpenseEditor.tsx:826
+#: src/components/ExpenseEditor.tsx:837
 msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
@@ -4000,8 +4058,8 @@ msgstr "Tajikistani Somoni"
 
 #: src/components/AvatarPicker.tsx:171
 #: src/components/AvatarPicker.tsx:186
-#: src/components/ExpenseEditor.tsx:1052
-#: src/components/ExpenseEditor.tsx:1066
+#: src/components/ExpenseEditor.tsx:1153
+#: src/components/ExpenseEditor.tsx:1167
 msgid "Take photo"
 msgstr "Take photo"
 
@@ -4088,7 +4146,7 @@ msgstr "The free installed Android and iOS apps may display advertising. Premium
 msgid "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 msgstr "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 
-#: src/routes/privacy-policy.tsx:411
+#: src/routes/privacy-policy.tsx:426
 msgid "The installed mobile apps use Google AdMob to request, display, personalize where permitted, measure, and protect advertising. Google and authorized buyers or advertising partners may receive ad-request data for these purposes even though trizum does not integrate separate third-party mediation SDKs. See"
 msgstr "The installed mobile apps use Google AdMob to request, display, personalize where permitted, measure, and protect advertising. Google and authorized buyers or advertising partners may receive ad-request data for these purposes even though trizum does not integrate separate third-party mediation SDKs. See"
 
@@ -4096,7 +4154,7 @@ msgstr "The installed mobile apps use Google AdMob to request, display, personal
 msgid "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
 msgstr "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
 
-#: src/routes/privacy-policy.tsx:449
+#: src/routes/privacy-policy.tsx:464
 msgid "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. trizum's servers also use RevenueCat to verify Premium access for Party Boost. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
 msgstr "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. trizum's servers also use RevenueCat to verify Premium access for Party Boost. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
 
@@ -4104,7 +4162,7 @@ msgstr "The installed mobile apps use RevenueCat to present Premium offers, proc
 msgid "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
 msgstr "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
 
-#: src/routes/privacy-policy.tsx:573
+#: src/routes/privacy-policy.tsx:588
 msgid "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 msgstr "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 
@@ -4127,6 +4185,14 @@ msgstr "The party may have been deleted by another member."
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:146
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
+
+#: src/components/ReceiptSuggestionsSheet.tsx:153
+msgid "The receipt currency differs from the selected expense currency. The total cannot be applied."
+msgstr "The receipt currency differs from the selected expense currency. The total cannot be applied."
+
+#: src/components/ReceiptSuggestionsSheet.tsx:117
+msgid "The receipt currency differs from this party’s currency. The total cannot be applied."
+msgstr "The receipt currency differs from this party’s currency. The total cannot be applied."
 
 #: src/routes/terms/-components/ServiceTerms.tsx:44
 msgid "The Service relies on or links to third-party services, including Apple, Google, RevenueCat, authentication providers, hosting providers, and error monitoring services. Their own terms and policies govern your use of their services. We are not responsible for third-party services that we do not control."
@@ -4231,7 +4297,9 @@ msgstr "This stops trizum cloud on this device. Your local data stays on this de
 msgid "Timeframe"
 msgstr "Timeframe"
 
-#: src/components/ExpenseEditor.tsx:484
+#: src/components/ExpenseEditor.tsx:487
+#: src/components/ReceiptSuggestionsSheet.tsx:84
+#: src/components/ReceiptSuggestionsSheet.tsx:93
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:308
 msgid "Title"
 msgstr "Title"
@@ -4276,6 +4344,10 @@ msgstr "Tongan Paʻanga"
 msgid "Top spender"
 msgstr "Top spender"
 
+#: src/components/ReceiptSuggestionsSheet.tsx:135
+msgid "Total"
+msgstr "Total"
+
 #: src/components/PartyStatsView.tsx:262
 msgid "Total paid by each participant in the selected timeframe."
 msgstr "Total paid by each participant in the selected timeframe."
@@ -4287,6 +4359,10 @@ msgstr "Total spent"
 #: src/components/ExpenseEditor.tsx:673
 msgid "Total split:"
 msgstr "Total split:"
+
+#: src/components/ReceiptSuggestionsSheet.tsx:112
+msgid "Total, including tax and discounts"
+msgstr "Total, including tax and discounts"
 
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:309
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:320
@@ -4363,7 +4439,7 @@ msgstr "trizum Premium"
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 
-#: src/routes/privacy-policy.tsx:339
+#: src/routes/privacy-policy.tsx:354
 msgid "trizum uses a peer-to-peer sharing model. When you create an expense group (party), it is accessible to anyone who has the link to that group. This means that anyone with access to the link can view and modify all information in that expense group, including participant names, expenses, media files, and any optional payment receiving details if shared. Please keep your expense group links secure and only share them with people you trust."
 msgstr "trizum uses a peer-to-peer sharing model. When you create an expense group (party), it is accessible to anyone who has the link to that group. This means that anyone with access to the link can view and modify all information in that expense group, including participant names, expenses, media files, and any optional payment receiving details if shared. Please keep your expense group links secure and only share them with people you trust."
 
@@ -4465,14 +4541,14 @@ msgstr "Updating trizum..."
 msgid "Upload malware or content designed to disrupt or damage the Service"
 msgstr "Upload malware or content designed to disrupt or damage the Service"
 
-#: src/components/ExpenseEditor.tsx:943
+#: src/components/ExpenseEditor.tsx:1003
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
 #: src/components/AvatarPicker.tsx:180
 #: src/components/AvatarPicker.tsx:198
-#: src/components/ExpenseEditor.tsx:1061
-#: src/components/ExpenseEditor.tsx:1078
+#: src/components/ExpenseEditor.tsx:1162
+#: src/components/ExpenseEditor.tsx:1179
 msgid "Upload photo"
 msgstr "Upload photo"
 
@@ -4485,7 +4561,7 @@ msgstr "Uploading avatar..."
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
-#: src/components/ExpenseEditor.tsx:984
+#: src/components/ExpenseEditor.tsx:1073
 msgid "Uploading..."
 msgstr "Uploading..."
 
@@ -4610,7 +4686,7 @@ msgstr "View on GitHub"
 msgid "View party"
 msgstr "View party"
 
-#: src/components/ExpenseEditor.tsx:1113
+#: src/components/ExpenseEditor.tsx:1214
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "View photo"
@@ -4705,9 +4781,13 @@ msgstr "When an eligible annual subscription includes a seven-day free trial, th
 msgid "When analytics are enabled, a random identifier links usage across your synced devices and connects it with diagnostic logs and error reports sent to Sentry. Turning off analytics or enabling browser privacy signals stops this linking. Error reporting can continue without this identifier."
 msgstr "When analytics are enabled, a random identifier links usage across your synced devices and connects it with diagnostic logs and error reports sent to Sentry. Turning off analytics or enabling browser privacy signals stops this linking. Error reporting can continue without this identifier."
 
-#: src/routes/privacy-policy.tsx:536
+#: src/routes/privacy-policy.tsx:551
 msgid "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
 msgstr "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
+
+#: src/routes/privacy-policy.tsx:214
+msgid "When you attach a receipt while signed in to a Boosted party, we send the prepared image to Cloudflare Workers AI to extract the business name, total, currency, and item lines. Suggestions are returned to your editor and only update the expense when you accept and save them. This analysis runs separately from your attachment's normal storage and sync. We do not include receipt contents in analytics events or application logs."
+msgstr "When you attach a receipt while signed in to a Boosted party, we send the prepared image to Cloudflare Workers AI to extract the business name, total, currency, and item lines. Suggestions are returned to your editor and only update the expense when you accept and save them. This analysis runs separately from your attachment's normal storage and sync. We do not include receipt contents in analytics events or application logs."
 
 #: src/routes/privacy-policy.tsx:193
 msgid "When you sign in to the installed Android or iOS app, purchase, restore, or manage Premium, or use Party Boost, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
@@ -4717,7 +4797,7 @@ msgstr "When you sign in to the installed Android or iOS app, purchase, restore,
 msgid "When you use Premium in the installed Android or iOS app, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
 msgstr "When you use Premium in the installed Android or iOS app, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
 
-#: src/routes/privacy-policy.tsx:249
+#: src/routes/privacy-policy.tsx:264
 msgid "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 msgstr "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 

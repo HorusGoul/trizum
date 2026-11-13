@@ -27,8 +27,10 @@ The main React application, with offline-first Automerge state and a Cloudflare 
 
 ## Shared UI setup
 
-- `src/components/PwaUIProvider.tsx` bridges the active Lingui locale and generated
-  icon sprite into `@trizum/ui`. Shared fonts, resets, tokens, and animations come
+- `src/components/PwaUIProvider.tsx` bridges the active Lingui locale, generated
+  icon sprite, and shared sheet navigation into `@trizum/ui`. Browser and native
+  Back close the top shared sheet before leaving its page. Shared fonts, resets,
+  tokens, and animations come
   from `@trizum/ui/styles.css`; `src/index.css` owns the app root sizing.
 - `src/lib/i18n.ts` merges the package's compiled catalogs with PWA catalogs.
   Extract PWA messages only from this package's source; shared UI catalogs are

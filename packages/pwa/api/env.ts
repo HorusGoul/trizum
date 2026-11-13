@@ -1,4 +1,6 @@
 import type { AutomergeDocuments } from "./automergeDocuments";
+import type { ReceiptImages } from "./premium/receiptImage";
+import type { ReceiptAI } from "./premium/receiptExtraction";
 import type { I18n } from "@lingui/core";
 import type { SupportedLocale } from "../src/lib/locales.js";
 
@@ -10,6 +12,9 @@ export interface ApiEnv {
   DB: D1Database;
   EMAIL: SendEmail;
   SPYCAT?: Pick<Fetcher, "fetch">;
+  AI?: ReceiptAI;
+  IMAGES?: ReceiptImages;
+  RECEIPT_RATE_LIMITER?: RateLimit;
   APPLE_APP_BUNDLE_IDENTIFIER?: string;
   APPLE_CLIENT_SECRET?: string;
   APPLE_KEY_ID?: string;

@@ -20,6 +20,7 @@ import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
 import "./index.css";
 import { I18nProvider } from "@lingui/react";
 import { PwaUIProvider } from "./components/PwaUIProvider.js";
+import { createSheetNavigation } from "./lib/sheetNavigation.ts";
 import { Toaster } from "@trizum/ui/Toaster";
 import { initializeI18n } from "./lib/i18n.js";
 // Import the generated route tree
@@ -231,7 +232,11 @@ window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
 };
 
 // Create a new router instance
-const history = preventDuplicateHistoryEntries(createBrowserHistory());
+const sheetNavigation = createSheetNavigation(() =>
+  preventDuplicateHistoryEntries(createBrowserHistory()),
+);
+
+const history = sheetNavigation.history;
 
 const router = createRouter({
   parseSearch: parseAppSearch,
@@ -288,6 +293,8 @@ if (Capacitor.isNativePlatform()) {
   });
 
   void App.addListener("backButton", ({ canGoBack }) => {
+    if (sheetNavigation.handleBack()) return;
+
     if (canGoBack) {
       router.history.go(-1);
     } else if (
@@ -320,7 +327,7 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <I18nProvider i18n={i18n}>
-      <PwaUIProvider>
+      <PwaUIProvider modalSheetNavigation={sheetNavigation}>
         <UpdateControllerComponent>
           <RepoContext value={repo}>
             <MediaGalleryController>

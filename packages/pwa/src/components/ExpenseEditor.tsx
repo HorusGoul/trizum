@@ -44,6 +44,7 @@ import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "@trizum/ui/MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
+  type ExpenseEditorFormValues,
   type ExpenseEditorMode,
   getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
@@ -51,8 +52,16 @@ import {
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
 import { ExpenseCurrencyFields } from "./ExpenseCurrencyFields";
-import type { ExpenseConversionValues } from "#src/lib/currencyConversion.ts";
 import { cn } from "@trizum/ui/utils";
+import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
+import { getReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
+import { applyReceiptSuggestions } from "#src/lib/receiptSuggestionEdits.ts";
+import { useExchangeRates } from "#src/hooks/useExchangeRates.ts";
+import type { CurrencyCode } from "#src/lib/money.ts";
+import { ReceiptSuggestionsSheet } from "./ReceiptSuggestionsSheet";
+import { useReceiptSuggestions, type ReceiptImage } from "./useReceiptSuggestions";
+
 import { CurrencyContext } from "./CurrencyContext";
 import {
   getExpenseEditorCurrencyAmount,
@@ -60,14 +69,7 @@ import {
   getExpenseEditorStoredValues,
 } from "#src/lib/expenseEditorCurrency.ts";
 
-export interface ExpenseEditorFormValues extends ExpenseConversionValues {
-  name: string;
-  amount: number;
-  paidAt: Date;
-  paidBy: ExpenseUser;
-  shares: ExpenseEditorShares;
-  photos: MediaFile["id"][];
-}
+export type { ExpenseEditorFormValues };
 
 export interface ExpenseEditorRef {
   setValues: (values: ExpenseEditorFormValues) => void;
@@ -465,6 +467,7 @@ function ExpenseDetailsFields({
         <form.Field name="photos">
           {(field) => (
             <PhotosField
+              form={form}
               value={field.state.value}
               onChange={field.handleChange}
               onViewPhoto={onViewPhoto}
@@ -923,52 +926,138 @@ function calculateParticipantUnitAmounts(
 }
 
 interface PhotosFieldProps {
+  form: ExpenseEditorFormApi;
   value: MediaFile["id"][];
   onChange: (updater: Updater<MediaFile["id"][]>) => void;
   onViewPhoto?: (index: number) => void;
 }
 
-function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
-  return (
-    <div
-      className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
-      onWheel={(e) => {
-        // Translate scroll Y to X smoothly
-        e.currentTarget.scrollLeft += e.deltaY;
-      }}
-    >
-      {value.length === 0 ? (
-        <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
-          <span className="text-center text-sm">
-            <Trans>Upload or capture an image of your receipt</Trans>
-          </span>
-        </div>
-      ) : null}
+function PhotosField({ form, value, onChange, onViewPhoto }: PhotosFieldProps) {
+  const { party } = useCurrentParty();
+  const session = useAppSession();
+  const userId = session.data?.user.id;
+  const isBoosted = Object.keys(party.boost ?? {}).length > 0;
 
-      {value.map((photoId, index) => (
-        <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
-          <CurrentPhoto
-            key={photoId}
-            photoId={photoId}
-            onRemove={() => {
-              onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
-              trackEvent("receipt_attachment_removed");
-            }}
-            onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
-          />
-        </Suspense>
-      ))}
-      <AddPhotoButton
-        onPhoto={(photo) => {
-          onChange((prevPhotos) => [...prevPhotos, ...photo]);
+  const currency =
+    useStore(form.store, (state) => state.values.originalAmount?.currency) ?? party.currency;
+
+  return (
+    <ReceiptPhotosField
+      key={JSON.stringify([party.id, userId, isBoosted, party.currency, currency])}
+      form={form}
+      value={value}
+      onChange={onChange}
+      onViewPhoto={onViewPhoto}
+      partyId={party.id}
+      partyCurrency={party.currency}
+      userId={userId}
+      isBoosted={isBoosted}
+    />
+  );
+}
+
+function ReceiptPhotosField({
+  form,
+  value,
+  onChange,
+  onViewPhoto,
+  partyId,
+  partyCurrency,
+  userId,
+  isBoosted,
+}: PhotosFieldProps & {
+  partyId: string;
+  partyCurrency: CurrencyCode;
+  userId: string | undefined;
+  isBoosted: boolean;
+}) {
+  const rates = useExchangeRates(partyCurrency);
+
+  const current = useStore(form.store, (state) =>
+    getReceiptDraftValues(state.values, partyCurrency),
+  );
+
+  const { analyze, result, suggestions, dismiss, scanningPhotoIds } = useReceiptSuggestions({
+    partyId,
+    userId,
+    isBoosted,
+    partyCurrency,
+    current,
+    photoIds: value,
+    getValues: () => getReceiptDraftValues(form.state.values, partyCurrency),
+    getPhotoIds: () => form.state.values.photos,
+  });
+
+  return (
+    <>
+      <div
+        className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
+        onWheel={(e) => {
+          // Translate scroll Y to X smoothly
+          e.currentTarget.scrollLeft += e.deltaY;
         }}
-      />
-    </div>
+      >
+        {value.length === 0 ? (
+          <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
+            <span className="text-center text-sm">
+              <Trans>Upload or capture an image of your receipt</Trans>
+            </span>
+          </div>
+        ) : null}
+
+        {value.map((photoId, index) => (
+          <div key={photoId} className="relative isolate shrink-0">
+            <Suspense fallback={<Skeleton className="h-32 w-32" />}>
+              <CurrentPhoto
+                key={photoId}
+                photoId={photoId}
+                onRemove={() => {
+                  onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
+                  trackEvent("receipt_attachment_removed");
+                }}
+                onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
+              />
+            </Suspense>
+            {scanningPhotoIds.includes(photoId) ? (
+              <div
+                aria-hidden="true"
+                className="receipt-scan-border pointer-events-none absolute inset-0 overflow-hidden rounded-xl"
+              />
+            ) : null}
+          </div>
+        ))}
+        <AddPhotoButton
+          onPhoto={(photo, images) => {
+            onChange((prevPhotos) => [...prevPhotos, ...photo]);
+            analyze(images);
+          }}
+        />
+      </div>
+      {result && suggestions ? (
+        <ReceiptSuggestionsSheet
+          key={result.photoId}
+          receipt={result.receipt}
+          suggestions={suggestions}
+          onDiscard={() => dismiss(false)}
+          onAccept={(values) => {
+            const applied = applyReceiptSuggestions(form, {
+              receipt: result.receipt,
+              baseline: result.baseline,
+              partyCurrency,
+              rates,
+              selected: values,
+            });
+
+            dismiss(applied);
+          }}
+        />
+      ) : null}
+    </>
   );
 }
 
 interface AddPhotoButtonProps {
-  onPhoto: (photos: MediaFile["id"][]) => void;
+  onPhoto: (photos: MediaFile["id"][], images: ReceiptImage[]) => void;
 }
 
 function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
@@ -984,15 +1073,27 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
     const toastId: string | number = toast.loading(t`Uploading...`);
 
     try {
-      const photoIds = await Promise.all(
+      const photos = await Promise.all(
         files.map(async (blob) => {
-          const [mediaFileId] = await createMediaFile(blob, {}, compressionPresets.balanced);
+          const [mediaFileId, handle] = await createMediaFile(
+            blob,
+            {},
+            compressionPresets.balanced,
+          );
 
-          return mediaFileId;
+          const media = handle.doc();
+
+          return {
+            photoId: mediaFileId,
+            image: `data:${media.metadata.mimeType ?? blob.type};base64,${media.encodedBlob.toString()}`,
+          };
         }),
       );
 
-      onPhoto(photoIds);
+      onPhoto(
+        photos.map((photo) => photo.photoId),
+        photos,
+      );
       trackEvent("receipt_attachments_added");
 
       toast.dismiss(toastId);
@@ -1119,7 +1220,7 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
       </Button>
       <Button
         color="input-like"
-        className="absolute -top-2 -right-2 h-auto w-auto rounded-full p-1"
+        className="absolute -top-2 -right-2 z-10 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
         aria-label={t`Remove photo`}
       >

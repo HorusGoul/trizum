@@ -20,7 +20,7 @@
   first-party client. UI code should call its domain methods instead of issuing
   raw requests to Worker routes.
 
-The first-party contract covers Party Boost, Cloud Sync settings and Tricount
+The first-party contract covers Party Boost, receipt extraction, Cloud Sync settings and Tricount
 imports. Shared runtime schemas live in `src/lib/api`; route definitions live in
 `api/contracts`. Cloud Sync's cache helpers retain the v1 local storage format
 and signed-out read behavior while delegating HTTP to the client. Tricount keeps
@@ -32,6 +32,124 @@ Sync failures use the documented JSON 500 response.
 The endpoint audit excludes Better Auth (owned by its auth client), health and
 OpenAPI discovery (not consumed by app code), static assets, HTML/social previews,
 and third-party requests such as Tricount's upstream API and attachment downloads.
+
+## Receipt extraction
+
+`POST /api/premium/receipts` takes `{ partyDocumentId, image, locale }`, where `image`
+is a base64 JPEG, PNG, or WebP data URL (at most 8 MiB decoded). It requires a
+signed-in party member and an authoritative active Party Boost, including a fresh
+check of the boost owner's Premium and membership. The shared Automerge boost
+cache cannot authorize the request. Other party members do not need Premium.
+
+After authorization and rate limiting, the Worker uses the private `IMAGES`
+binding to validate the raster dimensions and prepare one JPEG for both models,
+with a five-second preparation deadline.
+The first pass preserves aspect ratio without cropping or upscaling, limits the
+long edge to 3072 pixels, and uses quality 85 with a white background and a single
+frame. If its encoded output exceeds 4 MiB, one retry uses a 2048-pixel edge and
+quality 80, starting from the original source again. Output is read with a byte
+limit and its actual dimensions/format are checked before inference. Sources
+above 12,000 pixels on either side or 100 megapixels are rejected. The normalized
+analysis image is not uploaded to hosted Images, cached, or written to Automerge;
+the stored attachment keeps its existing processing and sync behavior.
+
+`includeItems` is optional and defaults to `true`, preserving full item extraction.
+The expense editor sends `includeItems: false` because the suggestions sheet uses
+only the title, total, and currency. This mode still reads purchased items to
+ground titles but requires an empty `items` array instead of transcribing line
+quantities and prices. The other extraction rules and independent image
+verification remain unchanged. Callers that need item details can omit the flag
+or set it to `true`.
+
+The response has `merchantName`, `titleSuggestions`, `total`, `currency`, `currencyEvidence`, `currencyEvidenceSource`, and `items`. Each item has
+`name`, `quantity`, `unitPrice`, and `lineTotal`. Monetary values are decimal
+strings in major currency units. Quantities preserve the printed text and units;
+missing fields are `null`, and unreadable items produce an empty array. The
+extraction prompt requests the final printed total including tax and discounts,
+never tendered cash, change, or an inferred sum. Currency is a best-effort ISO code.
+Printed codes and unambiguous markers take priority. Otherwise, the models combine
+visible address, country/region, postcode, phone prefix, tax identifiers, web
+domain and language clues to distinguish plausible currencies. Shared languages
+need corroborating clues; a strong locale association can support a likely
+default when nothing contradicts it. There is no hardcoded country/language
+mapping. `currencyEvidenceSource` distinguishes `printed` from `context`, and
+`currencyEvidence` explains the decisive receipt cues. Unsupported or conflicting
+inferences remain null.
+
+Gemma extracts the candidates, then `@cf/cloudflare/clef` compares them with the
+same prepared image. The verifier scores the merchant, each proposed title, the
+final total, currency plus its printed or contextual evidence, and the item lines independently
+as supported, unsupported, or unclear. Suggestions retain a strictly winning supported decision; model scores are not
+interpreted as calibrated accuracy percentages or compared to a near-certainty
+cutoff. Printed markers still undergo deterministic matching; contextual
+inferences must be supported independently by Clef against the image. These
+policies still need receipt-specific accuracy evaluation. Unverified fields are
+removed; rejecting an extracted currency also removes its total to prevent
+falling back to a party-currency amount. If verification fails or times out, the
+whole request fails quietly through the existing sanitized error path. Clef has
+an eight-second timeout after the bounded extraction pass. Empty extraction
+results skip verification. Neither image contents nor verifier scores are logged.
+
+`Server-Timing` reports numeric durations in milliseconds for session lookup,
+access checks, party reads, image preparation, extraction, and verification.
+Timed analysis stages report elapsed time even on failure; stages not reached
+are omitted. The
+header contains fixed stage names and durations only, without receipt data,
+identifiers, or provider errors. It can be inspected in browser developer tools
+to distinguish inference latency from authorization and image preparation.
+
+Both models receive the party currency read from the already authorized party
+document. Their prompts explicitly use it only for verification and prohibit
+defaulting, guessing, or converting to that currency.
+
+`titleSuggestions` contains up to three short activity titles grounded in the
+receipt's items or clear context. The prompt requests the first title in the
+receipt's predominant language when identifiable, followed by an app-language
+alternative if different (`en` or `es`; omitted locale defaults to English).
+For a Spanish coffee receipt in an English app, choices can be “Cafetería”,
+“Coffee”, and “Cafés”. An unclear receipt language falls back to the app language.
+The model should offer multiple useful choices when supported, without padding
+with duplicates or invented context. The first title is the default suggestion;
+the original merchant is retained separately as the last fallback. Unsupported
+activity titles are omitted, and no model confidence percentages are shown.
+The sheet offers distinct activity titles and the merchant as horizontally
+scrollable choices. The chosen title is read-only until accepted into the draft.
+
+For meal titles, the prompt considers the printed transaction time and location
+alongside the purchased items. It prefers neutral item or category titles when
+context is unclear or the meal would be implausible locally; a Spanish receipt
+for coffees at 18:00 should suggest coffee rather than breakfast. Upload time
+and the app language do not establish when or where the purchase happened.
+
+New attachments are analyzed from their locally prepared image while Automerge
+sync continues. Suggestions stay local to the editor. Accepting selected fields
+updates the draft; saving the expense uses the existing write path. The first
+version offers title, total, and an explicit expense-currency choice, preserving
+fields edited during processing. A currency change is offered only for a supported
+currency different from both the party and the current expense. Explicit printed
+codes and known markers are matched literally; contextual inferences carry their
+own source and evidence explanation in the API response. Bare shared symbols are not treated as explicit currency,
+and the app language and party currency are never evidence of the receipt's
+currency. Currency rejection still suppresses its associated total to avoid
+applying that number as a party-currency amount.
+The currency choice starts selected and shows a compact Currency label with the
+target currency code and name. Deselecting the currency disables its foreign total; applying that total
+requires accepting its currency too. Accepting the switch changes this expense only, using the
+same reference-rate lookup and conversion path as the editor currency selector.
+The user reviews the rate in the editor; a missing rate remains unset for manual
+entry. Totals in an already selected foreign currency retain its existing rate.
+Declining the switch cannot apply the foreign total as a party-currency amount.
+Unrepresentable precision remains blocked. Removing a receipt, changing currency,
+or leaving the editor discards late results.
+Analysis runs without loading or error toasts. Each photo has an inset gradient
+border with a circling highlight until its request finishes or times out;
+reduced motion uses a static border. The animation rotates only the gradient
+behind a fixed border mask, so it stays inside the thumbnail bounds.
+Failures and receipts with no applicable title, total, or currency change produce no sheet
+and leave attachments and manual expense entry usable. Matching values, manual
+edits protected since upload, and totals that cannot be applied are filtered
+before display. Unusable queued results do not prevent later useful suggestions
+and do not emit a user-discard event.
 
 ## Exchange rates
 

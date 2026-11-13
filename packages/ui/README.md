@@ -103,6 +103,20 @@ import spriteHref from "./generated/iconSprite.svg?url";
 required for components that render icons; it also sets React Aria's locale.
 Storybook uses the same generator and provider, independently of the PWA.
 
+### Sheets and navigation
+
+`ModalSheet` registers open sheets through the optional
+`UIProvider.modalSheetNavigation` adapter. The app owns browser/native Back
+handling; the design system owns registration and calls `onOpenChange(false)`
+when dismissal is accepted. The adapter invokes a registered dismiss callback
+to request closure. A `true` result means the sheet accepted closing. A `false`
+result means the sheet is locked, so the adapter should consume Back without
+navigating or closing a sheet underneath it.
+
+Registration follows sheet open/close and unmount, uses the latest callback,
+and orders nested sheets from parent to child. Consumers without a navigation
+adapter, including Storybook, keep the normal controlled sheet API.
+
 ### Localization
 
 The package owns built-in messages such as gallery navigation and avatar alt text.

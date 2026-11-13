@@ -6,6 +6,8 @@ import {
   type ExchangeRates,
 } from "./api/exchangeRatesContract";
 import { hc } from "hono/client";
+import { i18n } from "@lingui/core";
+import { getSupportedLocale } from "./locales";
 import type { PremiumRoute } from "../../api/routes/premium";
 import type { CloudSyncRoute } from "../../api/routes/cloud-sync";
 import type { MigrateRoute } from "../../api/routes/migrate";
@@ -35,6 +37,12 @@ import {
 import { getAuthBaseURL } from "./authBaseUrl.ts";
 import { fetchWithNativeAuth } from "./nativeAuthSession.ts";
 import { getAppLink } from "./link";
+import {
+  receiptRequestSchema,
+  receiptSchema,
+  receiptErrorResponseSchema,
+  type Receipt,
+} from "./api/receiptContract";
 
 interface TrizumApiClientOptions {
   baseUrl: () => string;
@@ -53,6 +61,12 @@ export interface TrizumApiClient {
     importTricount: (key: string) => Promise<MigrationData>;
   };
   premium: {
+    analyzeReceipt: (
+      partyDocumentId: string,
+      image: string,
+      signal?: AbortSignal,
+      options?: { includeItems?: boolean },
+    ) => Promise<Receipt>;
     activatePartyBoost: (partyDocumentId: string) => Promise<PartyBoostStatus>;
     getPartyBoostStatus: (partyDocumentId: string) => Promise<PartyBoostStatus>;
   };
@@ -170,6 +184,25 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
       },
     },
     premium: {
+      async analyzeReceipt(partyDocumentId, image, signal, receiptOptions) {
+        const json = receiptRequestSchema.parse({
+          partyDocumentId,
+          image,
+          locale: getSupportedLocale(i18n.locale),
+          includeItems: receiptOptions?.includeItems,
+        });
+
+        const response = await getTransport().receipts.$post({ json }, { init: { signal } });
+        const body: unknown = await response.json().catch(() => null);
+
+        if (response.ok) return receiptSchema.parse(body);
+        const error = receiptErrorResponseSchema.safeParse(body);
+        throw new Error(
+          error.success
+            ? error.data.error.message
+            : "Receipt analysis returned an invalid response.",
+        );
+      },
       async activatePartyBoost(partyDocumentId) {
         const response = await getTransport()["party-boost"].$put({
           json: { partyDocumentId },

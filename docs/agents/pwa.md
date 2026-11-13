@@ -11,6 +11,23 @@ commands.
 - Use Automerge for persisted or shared collaborative state; use normal React
   state for local UI state.
 
+## Sheets and Back navigation
+
+Use `ModalSheet` from `@trizum/ui/ModalSheet` for local modal sheets, with
+controlled `isOpen` and `onOpenChange`. The app's `PwaUIProvider` connects these
+automatically to [sheet navigation](../../packages/pwa/src/lib/sheetNavigation.ts).
+Browser and Android Back dismiss the top open sheet before changing routes;
+`isDismissable={false}` consumes Back while the sheet is locked. Normal close
+and unmount release registration. At the first app entry, where browser Back
+would leave the document, the adapter uses a temporary same-URL guard and consumes
+it on close; it adds no residual Back step. Initialization recovers and consumes
+a guard left by a document reload. SPA entries use the router blocker. Keep
+feature state and discard/accept behavior in the sheet's existing callbacks.
+
+Sheets already represented by route/search state, such as the calculator,
+keep their route-driven navigation. Avoid per-feature `popstate` listeners or
+manual browser history entries for shared modal sheets.
+
 ## Copy and appearance
 
 - User-facing strings must use Lingui. Run `vp run lingui:extract` from the

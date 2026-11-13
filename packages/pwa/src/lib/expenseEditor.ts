@@ -7,6 +7,15 @@ import { add, equal } from "dinero.js";
 
 export type ExpenseEditorShares = Expense["shares"];
 
+export interface ExpenseEditorFormValues extends ExpenseConversionValues {
+  name: string;
+  amount: number;
+  paidAt: Date;
+  paidBy: ExpenseUser;
+  shares: ExpenseEditorShares;
+  photos: Expense["photos"];
+}
+
 export interface ExpenseEditorValidationValues extends ExpenseConversionValues {
   amount: number;
   name: string;

@@ -264,7 +264,7 @@ export default defineConfig(({ mode }) => {
       ...(isTest
         ? []
         : [
-            cloudflare(),
+            cloudflare({ remoteBindings: !process.env.CI }),
             sentryCloudflareVitePlugin({
               _experimental: {
                 autoInstrumentation: true,

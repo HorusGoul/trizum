@@ -1,5 +1,48 @@
 @import "@trizum/ui/styles.css";
 
+.receipt-scan-border {
+  padding: 2px;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.receipt-scan-border::before {
+  position: absolute;
+  inset: -50%;
+  content: "";
+  background: conic-gradient(
+    var(--color-accent-500) 0deg 240deg,
+    var(--color-accent-100) 300deg,
+    var(--color-accent-500) 360deg
+  );
+}
+
+.dark .receipt-scan-border::before {
+  background: conic-gradient(
+    var(--color-accent-600) 0deg 240deg,
+    var(--color-accent-100) 300deg,
+    var(--color-accent-600) 360deg
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .receipt-scan-border::before {
+    animation: receipt-scan-orbit 2s linear infinite;
+  }
+}
+
+@keyframes receipt-scan-orbit {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
 html,
 body,
 #root {
