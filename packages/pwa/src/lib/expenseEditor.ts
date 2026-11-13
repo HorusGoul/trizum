@@ -1,12 +1,22 @@
+import { convertExpenseAmount, type ExpenseConversionValues } from "./currencyConversion";
 import type { ExpenseUser } from "#src/lib/expenses.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { createMoney, getMoneyAmount } from "#src/lib/money.ts";
-import { getExpenseUnitShares } from "#src/models/expense.ts";
+import { getExpenseUnitShares, type Expense } from "#src/models/expense.ts";
 import { add, equal } from "dinero.js";
 
-export type ExpenseEditorShares = Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+export type ExpenseEditorShares = Expense["shares"];
 
-export interface ExpenseEditorValidationValues {
+export interface ExpenseEditorFormValues extends ExpenseConversionValues {
+  name: string;
+  amount: number;
+  paidAt: Date;
+  paidBy: ExpenseUser;
+  shares: ExpenseEditorShares;
+  photos: Expense["photos"];
+}
+
+export interface ExpenseEditorValidationValues extends ExpenseConversionValues {
   amount: number;
   name: string;
   paidBy: ExpenseUser;
@@ -115,7 +125,12 @@ function isExpenseEditorComplete(values: ExpenseEditorValidationValues) {
   return (
     title.length > 0 &&
     title.length <= 50 &&
+    Number.isSafeInteger(convertToUnits(values.amount)) &&
     values.amount > 0 &&
+    (!values.originalAmount ||
+      (values.exchangeRate != null &&
+        values.originalAmount.amount > 0 &&
+        (convertExpenseAmount(values.originalAmount.amount, values.exchangeRate) ?? 0) > 0)) &&
     Boolean(values.paidBy) &&
     Object.keys(values.shares).length > 0
   );

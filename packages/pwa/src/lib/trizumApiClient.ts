@@ -1,4 +1,13 @@
+import type { CurrencyCode } from "./money";
+import type { ExchangeRatesRoute } from "../../api/routes/exchange-rates";
+import {
+  exchangeRatesSchema,
+  exchangeRatesQuerySchema,
+  type ExchangeRates,
+} from "./api/exchangeRatesContract";
 import { hc } from "hono/client";
+import { i18n } from "@lingui/core";
+import { getSupportedLocale } from "./locales";
 import type { PremiumRoute } from "../../api/routes/premium";
 import type { CloudSyncRoute } from "../../api/routes/cloud-sync";
 import type { MigrateRoute } from "../../api/routes/migrate";
@@ -28,6 +37,12 @@ import {
 import { getAuthBaseURL } from "./authBaseUrl.ts";
 import { fetchWithNativeAuth } from "./nativeAuthSession.ts";
 import { getAppLink } from "./link";
+import {
+  receiptRequestSchema,
+  receiptSchema,
+  receiptErrorResponseSchema,
+  type Receipt,
+} from "./api/receiptContract";
 
 interface TrizumApiClientOptions {
   baseUrl: () => string;
@@ -37,6 +52,7 @@ interface TrizumApiClientOptions {
 }
 
 export interface TrizumApiClient {
+  exchangeRates: { get: (base: CurrencyCode) => Promise<ExchangeRates> };
   cloudSync: {
     getSettings: () => Promise<GetCloudUserSettingsResponse>;
     saveSettings: (settings: CloudUserSettingsInput) => Promise<SaveCloudUserSettingsResponse>;
@@ -45,6 +61,12 @@ export interface TrizumApiClient {
     importTricount: (key: string) => Promise<MigrationData>;
   };
   premium: {
+    analyzeReceipt: (
+      partyDocumentId: string,
+      image: string,
+      signal?: AbortSignal,
+      options?: { includeItems?: boolean },
+    ) => Promise<Receipt>;
     activatePartyBoost: (partyDocumentId: string) => Promise<PartyBoostStatus>;
     getPartyBoostStatus: (partyDocumentId: string) => Promise<PartyBoostStatus>;
   };
@@ -111,6 +133,29 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
   }
 
   return {
+    exchangeRates: {
+      async get(base) {
+        const query = exchangeRatesQuerySchema.parse({ base });
+
+        const transport = hc<ExchangeRatesRoute>(
+          new URL("/api/exchange-rates/", options.baseUrl()).toString(),
+          {
+            fetch: options.publicFetch ?? options.fetch,
+          },
+        );
+
+        const response = await transport.index.$get({ query });
+
+        if (!response.ok) throw new Error("Exchange rates are unavailable");
+
+        const table = exchangeRatesSchema.parse(await response.json());
+
+        if (table.base !== base)
+          throw new Error("Exchange rate base does not match the party currency");
+
+        return table;
+      },
+    },
     cloudSync: {
       async getSettings() {
         return parseCloudSyncResponse(
@@ -139,6 +184,25 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
       },
     },
     premium: {
+      async analyzeReceipt(partyDocumentId, image, signal, receiptOptions) {
+        const json = receiptRequestSchema.parse({
+          partyDocumentId,
+          image,
+          locale: getSupportedLocale(i18n.locale),
+          includeItems: receiptOptions?.includeItems,
+        });
+
+        const response = await getTransport().receipts.$post({ json }, { init: { signal } });
+        const body: unknown = await response.json().catch(() => null);
+
+        if (response.ok) return receiptSchema.parse(body);
+        const error = receiptErrorResponseSchema.safeParse(body);
+        throw new Error(
+          error.success
+            ? error.data.error.message
+            : "Receipt analysis returned an invalid response.",
+        );
+      },
       async activatePartyBoost(partyDocumentId) {
         const response = await getTransport()["party-boost"].$put({
           json: { partyDocumentId },

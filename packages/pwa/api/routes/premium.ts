@@ -1,6 +1,15 @@
+import type { DocumentId } from "@automerge/automerge-repo/slim";
+import type { Party } from "../../src/models/party";
+import { exchangeRateCurrencySchema } from "../../src/lib/api/exchangeRatesContract";
 import type { AutomergeDocuments } from "../automergeDocuments";
 import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { $, OpenAPIHono } from "@hono/zod-openapi";
+import { bodyLimit } from "hono/body-limit";
+import { analyzeReceiptRoute } from "../contracts/receipts";
+import { MAX_RECEIPT_REQUEST_BYTES } from "../../src/lib/api/receiptContract";
+import { prepareReceiptImage } from "../premium/receiptImage";
+import { extractReceipt } from "../premium/receiptExtraction";
+import { createReceiptTiming } from "../premium/receiptTiming";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Context } from "hono";
 import { createAuth } from "../auth";
@@ -40,7 +49,11 @@ const premiumApp = $(
     )
     .use("*", async (c, next) => {
       const auth = createAuth(c.env, c.executionCtx, c.req.raw);
+      const startedAt = performance.now();
       const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+      if (c.req.path.endsWith("/receipts"))
+        c.header("Server-Timing", `session;dur=${(performance.now() - startedAt).toFixed(1)}`);
 
       if (!session) {
         return c.json({ error: { code: "unauthorized", message: "Sign in is required." } }, 401);
@@ -49,10 +62,154 @@ const premiumApp = $(
       c.set("session", session.session);
       c.set("user", session.user);
       await next();
+    })
+    .use(
+      "/receipts",
+      bodyLimit({
+        maxSize: MAX_RECEIPT_REQUEST_BYTES,
+        onError: (c) =>
+          c.json(
+            { error: { code: "invalid_receipt" as const, message: "Receipt image is too large." } },
+            413,
+          ),
+      }),
+    )
+    .use("/receipts", async (c, next) => {
+      c.header("Cache-Control", "no-store");
+
+      if (!c.env.RECEIPT_RATE_LIMITER || !c.env.AI || !c.env.IMAGES) {
+        return c.json(
+          { error: { code: "unavailable" as const, message: "Receipt analysis is unavailable." } },
+          503,
+        );
+      }
+
+      const { success } = await c.env.RECEIPT_RATE_LIMITER.limit({ key: c.get("user").id });
+
+      if (!success) {
+        c.header("Retry-After", "60");
+
+        return c.json(
+          { error: { code: "rate_limited" as const, message: "Please try again in a minute." } },
+          429,
+        );
+      }
+
+      await next();
     }),
 );
 
 export const premiumRoute = premiumApp
+  .openapi(
+    analyzeReceiptRoute,
+    async (c) => {
+      const { partyDocumentId, image, locale, includeItems } = c.req.valid("json");
+      const timing = createReceiptTiming();
+
+      try {
+        const status = await timing.measure("access", () =>
+          getPartyBoostStatus({
+            apiKey: c.env.REVENUECAT_SECRET_API_KEY,
+            db: getApiDb(c.env.DB),
+            documents: c.get("documents"),
+            partyDocumentId,
+            projectId: c.env.REVENUECAT_PROJECT_ID,
+            sandboxUserId: c.env.PARTY_BOOST_SANDBOX_USER_ID,
+            userId: c.get("user").id,
+          }),
+        );
+
+        if (!status) {
+          return c.json(
+            {
+              error: {
+                code: "membership_required" as const,
+                message: "Party membership is required.",
+              },
+            },
+            403,
+          );
+        }
+
+        if (!status.party.isBoosted) {
+          return c.json(
+            {
+              error: {
+                code: "boost_required" as const,
+                message: "An active Party Boost is required.",
+              },
+            },
+            403,
+          );
+        }
+
+        const { AI: ai, IMAGES: images } = c.env;
+
+        if (!ai || !images) {
+          return c.json(
+            {
+              error: { code: "unavailable" as const, message: "Receipt analysis is unavailable." },
+            },
+            503,
+          );
+        }
+
+        // SAFETY: The request schema validates this Automerge document ID before reading.
+        const party = await timing.measure("party", () =>
+          c.get("documents").read<Pick<Party, "currency">>(partyDocumentId as DocumentId),
+        );
+
+        const partyCurrency = exchangeRateCurrencySchema.parse(party.currency);
+
+        const preparedImage = await timing.measure("image", () =>
+          prepareReceiptImage(image, images),
+        );
+
+        return c.json(
+          await extractReceipt(
+            preparedImage,
+            {
+              run: (model, input, options) =>
+                timing.measure(
+                  model === "@cf/google/gemma-4-26b-a4b-it" ? "extraction" : "verification",
+                  () => ai.run(model, input, options),
+                ),
+            },
+            { locale, partyCurrency, includeItems },
+          ),
+          200,
+        );
+      } catch {
+        // Provider errors can contain the image or extracted data; never log them.
+        return c.json(
+          {
+            error: {
+              code: "unavailable" as const,
+              message: "Receipt analysis could not be completed.",
+            },
+          },
+          503,
+        );
+      } finally {
+        c.header(
+          "Server-Timing",
+          [c.res.headers.get("Server-Timing"), timing.toHeader()].filter(Boolean).join(", "),
+        );
+      }
+    },
+    (result, c) => {
+      if (!result.success)
+        return c.json(
+          {
+            error: {
+              code: "invalid_receipt" as const,
+              message: "A valid receipt image and party are required.",
+            },
+          },
+          400,
+        );
+    },
+  )
   .openapi(
     getPartyBoostRoute,
     async (c) => {

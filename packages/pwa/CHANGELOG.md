@@ -1,5 +1,53 @@
 # @trizum/pwa
 
+## 1.13.6
+
+### Patch Changes
+
+- [#625](https://github.com/HorusGoul/trizum/pull/625) [`df7cdb3`](https://github.com/HorusGoul/trizum/commit/df7cdb34ade209895b5d3734d64b789677b1698f) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Improve image upload diagnostics with the processing stage, MIME type, and file size. Warn at the image-processing boundary and report failed uploads once with a stable error title.
+
+- [#617](https://github.com/HorusGoul/trizum/pull/617) [`e6b0fb3`](https://github.com/HorusGoul/trizum/commit/e6b0fb334ae9db26f862228fe5aaf274f0c65583) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Recover local document storage after the browser closes its IndexedDB connection. Retry the interrupted operation once on a new connection while continuing to report persistent storage failures.
+
+- [#618](https://github.com/HorusGoul/trizum/pull/618) [`b737e97`](https://github.com/HorusGoul/trizum/commit/b737e971131b2957839fb3030f4a5514dadcfe03) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Handle failed service worker update checks without an unhandled rejection, retaining the active version and allowing later checks to retry.
+
+- [#619](https://github.com/HorusGoul/trizum/pull/619) [`d6119eb`](https://github.com/HorusGoul/trizum/commit/d6119ebb7cc0959763cd8bbeef26d4d32c61d11e) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Restore app worker initialization on older WebViews without Promise.withResolvers.
+
+- [#626](https://github.com/HorusGoul/trizum/pull/626) [`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Send warning and higher log records to Sentry in the PWA and sync server. Preserve severity and document-ID redaction; warnings appear in Sentry Logs, while errors and fatal records also create issues.
+- Updated dependencies [[`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604)]:
+  - @trizum/logging@1.1.2
+  - @trizum/react-suspense-cache@0.1.3
+
+## 1.13.5
+
+No changes in this release.
+
+## 1.13.4
+
+### Patch Changes
+
+- [#604](https://github.com/HorusGoul/trizum/pull/604) [`e202bf9`](https://github.com/HorusGoul/trizum/commit/e202bf9672a61a245d91af4d2c4a050c3209fc95) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Improve gallery flick dismissal and backdrop tracking, pull-to-refresh resistance and cancellation, calculator cursor dragging, and toast swipe direction. Respect reduced motion when gallery and refresh gestures settle.
+
+  Allow shared and calculator sheets to stretch above their highest snap point with resistance and spring back on release.
+
+  Stretch one continuous sheet surface, including its background, border, and shadow, to the screen edge during upward overdrag and spring-back. Keep the content and snap-point measurements unchanged.
+
+  Align the calculator sheet and bottom fill across mobile widths, and restore the gallery backdrop when reopening during its exit animation.
+
+  Start cold sheet openings from their measured height, synchronize backdrop visibility and progress, and use a gentler shared iOS-style opening curve.
+
+  Keep repeated sheet openings animated, reverse interrupted closes without resetting position, and discard superseded transition completions.
+
+  Continue gallery dismissals off-screen with release momentum, retain photos through exit fades, and let refresh pulls continue beyond the threshold with increasing resistance.
+
+- [#598](https://github.com/HorusGoul/trizum/pull/598) [`6e9afc7`](https://github.com/HorusGoul/trizum/commit/6e9afc755599322bbbacddd9d3f380d767eb595c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use the internal design system for PWA components, theme styles, fonts, and shared
+  UI utilities. Merge the package's translations into the app catalogs and supply
+  the app-generated icon sprite through the shared UI provider. Remove the PWA's
+  duplicated design-system sources and assets.
+
+- [#610](https://github.com/HorusGoul/trizum/pull/610) [`e523fd6`](https://github.com/HorusGoul/trizum/commit/e523fd6c19207184372ecd90c01c1b273f9e1839) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Restore left, right, and downward toast swipe dismissal and prevent toast text selection from interfering with gestures. Require deliberate travel or a clear flick to dismiss; small nudges and short slow drags snap back.
+- Updated dependencies [[`e202bf9`](https://github.com/HorusGoul/trizum/commit/e202bf9672a61a245d91af4d2c4a050c3209fc95), [`6f6f7fc`](https://github.com/HorusGoul/trizum/commit/6f6f7fcfe8792b065ea0868e5754a040ab2d0119), [`a497628`](https://github.com/HorusGoul/trizum/commit/a497628071993570116cf18d876b0c1ddc2e2949), [`e523fd6`](https://github.com/HorusGoul/trizum/commit/e523fd6c19207184372ecd90c01c1b273f9e1839)]:
+  - @trizum/ui@0.1.0
+
 ## 1.13.3
 
 ### Patch Changes

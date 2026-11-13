@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+import { createRecoveringStorage } from "./lib/recoveringStorage.ts";
 import {
   RouterProvider,
   createBrowserHistory,
@@ -25,6 +25,7 @@ import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
 import "./index.css";
 import { I18nProvider } from "@lingui/react";
 import { PwaUIProvider } from "./components/PwaUIProvider.js";
+import { createSheetNavigation } from "./lib/sheetNavigation.ts";
 import { Toaster } from "@trizum/ui/Toaster";
 import { initializeI18n } from "./lib/i18n.js";
 // Import the generated route tree
@@ -42,7 +43,7 @@ import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
-import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
+import { sentryDocumentIdRedaction, sentryLoggerConfig } from "@trizum/logging/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging, getLogger } from "./lib/log.ts";
 import { appWorker, initializeAppWorker } from "./lib/appWorker/client.ts";
@@ -92,7 +93,7 @@ if (shouldInitializeSentry) {
     extraSinks: {
       sentry: getSentrySink(),
     },
-    extraLoggers: [{ category: [], lowestLevel: "error", sinks: ["sentry"] }],
+    extraLoggers: [sentryLoggerConfig],
   });
 } else {
   configurePwaLogging({
@@ -156,7 +157,7 @@ function shouldPreserveCalculatorSearchScroll({
 
 // Create automerge repository
 const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("trizum"),
+  storage: createRecoveringStorage(),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
 });
 
@@ -236,7 +237,11 @@ window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
 };
 
 // Create a new router instance
-const history = preventDuplicateHistoryEntries(createBrowserHistory());
+const sheetNavigation = createSheetNavigation(() =>
+  preventDuplicateHistoryEntries(createBrowserHistory()),
+);
+
+const history = sheetNavigation.history;
 
 const router = createRouter({
   parseSearch: parseAppSearch,
@@ -294,6 +299,8 @@ if (Capacitor.isNativePlatform()) {
   });
 
   void App.addListener("backButton", ({ canGoBack }) => {
+    if (sheetNavigation.handleBack()) return;
+
     if (canGoBack) {
       router.history.go(-1);
     } else if (
@@ -326,7 +333,7 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <I18nProvider i18n={i18n}>
-      <PwaUIProvider>
+      <PwaUIProvider modalSheetNavigation={sheetNavigation}>
         <UpdateControllerComponent>
           <RepoContext value={repo}>
             <MediaGalleryController>

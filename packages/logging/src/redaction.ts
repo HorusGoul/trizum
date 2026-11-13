@@ -93,6 +93,12 @@ function redactErrorField(
 }
 
 function redactString(value: string): string {
+  // Reset credentials live in the path, so disabling query collection is insufficient.
+  value = value.replace(
+    /(\/api\/auth\/reset-password\/)[^/?#\s"'<>\\]+/gi,
+    "$1[REDACTED_RESET_TOKEN]",
+  );
+
   // Automerge document IDs are Base58Check-encoded 16-byte UUIDs. Checking the
   // checksum avoids masking unrelated identifiers and stack function names.
   return value.replace(/[1-9A-HJ-NP-Za-km-z]{20,}/g, (candidate) =>

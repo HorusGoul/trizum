@@ -4,7 +4,7 @@ set -e
 
 LITESTREAM_CONFIG_PATH="/app/litestream.yml"
 DATABASE_PATH="/mnt/data/trizum.db"
-SERVER_MODULE="/app/server.mjs"
+SERVER_MODULE="/app/build/cli.mjs"
 START_COMMAND="node $SERVER_MODULE serve"
 
 run_migrations() {

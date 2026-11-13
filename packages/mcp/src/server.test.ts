@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { CallToolResultSchema } from "@modelcontextprotocol/sdk/types.js";
 import { afterEach, expect, it, vi } from "vite-plus/test";
 import { createMcpServer, handleMcpRequest, type McpAppOptions } from "./server.js";
 import { McpToolError, type PartyService, type PartyView } from "./contracts.js";
@@ -113,6 +114,32 @@ it.each([2, 3, 4, 5, 6, 7])(
     });
   },
 );
+
+it("returns saved conversion details to agents through the standard expense result", async () => {
+  const { client, service } = await connect();
+
+  const converted = {
+    ...expenseView,
+    originalAmount: { amount: "8.00", currency: "USD" },
+    exchangeRate: 1.25,
+    shares: [{ ...expenseView.shares[0], originalAmount: 800 }],
+  };
+
+  service.getExpense.mockResolvedValueOnce(converted);
+
+  const result = await client.callTool({
+    name: "get_expense",
+    arguments: { partyId: "party", expenseId: "expense" },
+  });
+
+  expect(result.isError).not.toBe(true);
+  expect(result.structuredContent).toEqual(converted);
+  expect(result.content).toEqual([{ type: "text", text: expect.any(String) }]);
+  const content = CallToolResultSchema.parse(result).content[0];
+
+  if (content.type !== "text") throw new Error("Expected a text result");
+  expect(JSON.parse(content.text)).toEqual(converted);
+});
 
 it("validates write arguments before touching the service and returns structured party data", async () => {
   const { client, service } = await connect();

@@ -16,12 +16,28 @@ export const migrationExpenseShareSchema = z.discriminatedUnion("type", [
     type: z.literal("divide"),
     value: z.number(),
     calculatedExact: z.number().optional(),
+    originalAmount: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).optional(),
   }),
-  z.object({ type: z.literal("exact"), value: z.number() }),
+  z.object({
+    type: z.literal("exact"),
+    value: z.number(),
+    originalAmount: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).optional(),
+  }),
 ]);
+
+export const originalExpenseAmountSchema = z.object({
+  amount: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+  // SAFETY: The preceding refine validates this string against supported currency codes.
+  currency: z
+    .string()
+    .refine(isCurrencyCode)
+    .transform((value) => value as CurrencyCode),
+});
 
 export const migrationExpenseSchema = z.object({
   isTransfer: z.boolean().optional(),
+  originalAmount: originalExpenseAmountSchema.optional(),
+  exchangeRate: z.number().positive().optional(),
   name: z.string(),
   paidAt: z.iso.datetime(),
   paidBy: z.record(z.string(), z.number()),

@@ -2,7 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { apiMigrateRoute } from "./routes/migrate";
 import { createAuth } from "./auth";
 import { cloudSyncRoute } from "./routes/cloud-sync";
-import type { ApiEnv, ApiHonoEnv } from "./env";
+import type { ApiHonoEnv } from "./env";
 import { getRedactedPath, workerLogger } from "./log";
 import { createApiCorsMiddleware } from "./cors";
 import { partySharePreviewRoute } from "./routes/party-share-preview";
@@ -11,6 +11,7 @@ import { premiumRoute } from "./routes/premium";
 import { spycatRoute } from "./routes/spycat";
 import { ANALYTICS_PROXY_PATH } from "../src/lib/api/analyticsConfig";
 import { mcpRoute } from "./routes/mcp";
+import { exchangeRatesRoute } from "./routes/exchange-rates";
 
 export const app = new OpenAPIHono<ApiHonoEnv>();
 
@@ -52,6 +53,8 @@ app.on(["GET", "POST"], "/api/auth/*", (c) =>
   createAuth(c.env, c.executionCtx, c.req.raw).handler(c.req.raw),
 );
 
+app.route("/api/exchange-rates", exchangeRatesRoute);
+
 app.route("/api/cloud-sync", cloudSyncRoute);
 
 app.route("/api/migrate", apiMigrateRoute);
@@ -69,6 +72,4 @@ app.doc31("/api/openapi.json", {
   openapi: "3.1.0",
 });
 
-export default {
-  fetch: app.fetch,
-} satisfies ExportedHandler<ApiEnv>;
+export default app;

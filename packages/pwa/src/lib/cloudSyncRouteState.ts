@@ -21,6 +21,7 @@ export function hasLocalPartyListData(partyList: PartyList) {
     Boolean(partyList.lastOpenedPartyId) ||
     Boolean(partyList.username.trim()) ||
     Boolean(partyList.phone.trim()) ||
+    Object.values(partyList.paymentMethods ?? {}).some((details) => details?.trim()) ||
     Boolean(partyList.avatarId) ||
     Boolean(partyList.locale) ||
     partyList.openLastPartyOnLaunch === true ||

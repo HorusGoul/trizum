@@ -82,6 +82,10 @@ Use [the analytics-events skill](../.agents/skills/analytics-events/SKILL.md) wh
 adding or changing product flows; approved names and trigger meanings live in
 [`packages/analytics/src/events.ts`](../packages/analytics/src/events.ts).
 
+Use the [automerge-testing skill](../.agents/skills/automerge-testing/SKILL.md)
+when changing persisted document shapes or form/serializer/mutation write paths;
+the required coverage lives in [coding conventions](./agents/coding.md#automerge-persistence-tests).
+
 ## What Belongs Where
 
 ### Root `AGENTS.md`

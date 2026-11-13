@@ -28,8 +28,10 @@ The main React application, with offline-first Automerge state and a Cloudflare 
 
 ## Shared UI setup
 
-- `src/components/PwaUIProvider.tsx` bridges the active Lingui locale and generated
-  icon sprite into `@trizum/ui`. Shared fonts, resets, tokens, and animations come
+- `src/components/PwaUIProvider.tsx` bridges the active Lingui locale, generated
+  icon sprite, and shared sheet navigation into `@trizum/ui`. Browser and native
+  Back close the top shared sheet before leaving its page. Shared fonts, resets,
+  tokens, and animations come
   from `@trizum/ui/styles.css`; `src/index.css` owns the app root sizing.
 - `src/lib/i18n.ts` merges the package's compiled catalogs with PWA catalogs.
   Extract PWA messages only from this package's source; shared UI catalogs are
@@ -47,6 +49,9 @@ Tests use the real router, React Aria controls, auth state, logging sinks, and
 in-memory Automerge documents. Native SDKs, worker connections, process runners,
 and other external I/O are supplied through their owning service interfaces or
 factories. Module mocking is rejected by `anti-slop/no-module-mocking`.
+
+When changing persisted models, forms, serializers, or mutation helpers, follow
+the [Automerge persistence test rules](../../docs/agents/coding.md#automerge-persistence-tests).
 
 `src/lib/testing/profileRuntime.ts` supplies HTTP responses and real local
 profiles for account flows. `api/routes/cloud-sync.integration.test.ts` exercises

@@ -1,5 +1,29 @@
 # @trizum/mobile
 
+## 1.13.6
+
+### Patch Changes
+
+- Updated dependencies [[`df7cdb3`](https://github.com/HorusGoul/trizum/commit/df7cdb34ade209895b5d3734d64b789677b1698f), [`e6b0fb3`](https://github.com/HorusGoul/trizum/commit/e6b0fb334ae9db26f862228fe5aaf274f0c65583), [`b737e97`](https://github.com/HorusGoul/trizum/commit/b737e971131b2957839fb3030f4a5514dadcfe03), [`d6119eb`](https://github.com/HorusGoul/trizum/commit/d6119ebb7cc0959763cd8bbeef26d4d32c61d11e), [`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604)]:
+  - @trizum/pwa@1.13.6
+  - @trizum/logging@1.1.2
+
+## 1.13.5
+
+### Patch Changes
+
+- [#615](https://github.com/HorusGoul/trizum/pull/615) [`a9f2269`](https://github.com/HorusGoul/trizum/commit/a9f22695da66ba1d4c673a10c0b79a7dd0111c96) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Retry App Store screenshots that stall during processing so iOS releases can recover without re-uploading completed screenshots.
+- Updated dependencies []:
+  - @trizum/pwa@1.13.5
+
+## 1.13.4
+
+### Patch Changes
+
+- [#613](https://github.com/HorusGoul/trizum/pull/613) [`e3acbab`](https://github.com/HorusGoul/trizum/commit/e3acbabbffbf5b615d24695e10c7b24ad42c2ae8) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add editable App Store header and search artwork generators with preview, validation, and explicit release asset selection. Upload the approved localized headers with the next normal App Store release, and support future selected image/video creatives through the same Fastlane workflow.
+- Updated dependencies [[`e202bf9`](https://github.com/HorusGoul/trizum/commit/e202bf9672a61a245d91af4d2c4a050c3209fc95), [`6e9afc7`](https://github.com/HorusGoul/trizum/commit/6e9afc755599322bbbacddd9d3f380d767eb595c), [`e523fd6`](https://github.com/HorusGoul/trizum/commit/e523fd6c19207184372ecd90c01c1b273f9e1839)]:
+  - @trizum/pwa@1.13.4
+
 ## 1.13.3
 
 ### Patch Changes

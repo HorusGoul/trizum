@@ -1,3 +1,4 @@
+import { getExpenseConversionFields } from "../lib/currencyConversion";
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 import type { Party } from "./party";
 import { getPartyHelpers } from "#src/hooks/useParty.ts";
@@ -122,6 +123,8 @@ export async function createPartyFromMigrationData({
     await waitIdleCallback(async () => {
       await helpers.addExpenseToParty({
         name: expense.name,
+        isTransfer: expense.isTransfer ?? false,
+        ...getExpenseConversionFields(expense),
         paidAt: new Date(expense.paidAt),
         shares: expense.shares,
         paidBy: expense.paidBy,

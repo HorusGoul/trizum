@@ -38,10 +38,18 @@ export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Ex
 
       <div className="flex shrink-0 flex-col text-end">
         <CurrencyText
-          amount={getExpenseTotalAmount(expense)}
-          currency={party.currency}
+          amount={expense.originalAmount?.amount ?? getExpenseTotalAmount(expense)}
+          currency={expense.originalAmount?.currency ?? party.currency}
           className="font-medium"
         />
+        {expense.originalAmount ? (
+          <CurrencyText
+            amount={getExpenseTotalAmount(expense)}
+            currency={party.currency}
+            className="text-accent-600 dark:text-accent-300 text-sm"
+            variant="inherit"
+          />
+        ) : null}
         <span className="text-sm">{expense.paidAt.toLocaleDateString()}</span>
         <span className="text-sm">
           <Trans>

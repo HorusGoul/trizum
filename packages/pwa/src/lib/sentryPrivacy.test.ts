@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { configureTrizumLogging, getTrizumLogger } from "@trizum/logging";
-import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
+import { sentryDocumentIdRedaction, sentryLoggerConfig } from "@trizum/logging/sentry";
 import { afterEach, expect, test, vi } from "vite-plus/test";
 import { setTelemetryIdentity, sentryTelemetryIntegration } from "./telemetry.ts";
 
@@ -44,6 +44,37 @@ test("captures the AdMob console message and diagnostic as its own Sentry event"
     logentry: { message: "AdMob operation failed" },
     extra: { platform: "ios", stage: "consent", code: "unknown" },
   });
+});
+
+test("routes warning and higher records to Sentry with redaction and original severity", async () => {
+  const envelopes = initializeRecordingClient();
+  configureTrizumLogging({
+    surface: "pwa",
+    lowestLevel: "debug",
+    reset: true,
+    extraSinks: { sentry: getSentrySink() },
+    extraLoggers: [sentryLoggerConfig],
+  });
+  const logger = getTrizumLogger("pwa", "test");
+  logger.debug("Debug stays local");
+  logger.info("Info stays local");
+  logger.warning("Image fallback {documentId}", { documentId });
+  logger.error("Upload failed");
+  logger.fatal("Storage unavailable");
+  expect(await Sentry.flush(2000)).toBe(true);
+  const items = envelopes.flatMap(([, envelopeItems]) => envelopeItems);
+  expect(JSON.stringify(envelopes)).not.toContain(documentId);
+  expect(JSON.stringify(envelopes)).not.toContain("stays local");
+  expect(items.find(([header]) => header.type === "log")?.[1]).toMatchObject({
+    items: [
+      { level: "warn", body: expect.stringContaining("[REDACTED_DOCUMENT_ID]") },
+      { level: "error", body: "Upload failed" },
+      { level: "fatal", body: "Storage unavailable" },
+    ],
+  });
+  expect(
+    items.flatMap(([header, payload]) => (header.type === "event" ? [payload] : [])),
+  ).toMatchObject([{ level: "error" }, { level: "fatal" }]);
 });
 
 function initializeRecordingClient() {
@@ -218,4 +249,47 @@ test("preserves formatted log text and template attributes while redacting param
     ],
   });
   expect(String(message)).toBe(`Document ${documentId} unavailable`);
+});
+
+test("removes password-reset credentials from outgoing request telemetry", async () => {
+  const envelopes = initializeRecordingClient();
+  const token = "synthetic-reset-credential%2Fprivate";
+  const request = new Request(`https://trizum.app/api/auth/reset-password/${token}`);
+  const path = new URL(request.url).pathname;
+  const name = `GET ${path}`;
+  Sentry.addBreadcrumb({ category: "navigation", data: { to: request.url } });
+  Sentry.captureEvent({
+    message: "Reset failed",
+    transaction: name,
+    request: { url: request.url },
+  });
+  Sentry.logger.warn("Reset callback failed", { url: request.url });
+  Sentry.startSpan({ name, op: "http.server", forceTransaction: true }, () => {
+    Sentry.startSpan({ name, op: "http.client" }, (span) => {
+      span.setAttribute("url.full", request.url);
+      span.setAttribute("url.path", path);
+    });
+  });
+  expect(await Sentry.flush(2000)).toBe(true);
+
+  const output = JSON.stringify(envelopes);
+  const items = envelopes.flatMap(([, payloads]) => payloads);
+  expect(items.map(([header]) => header.type)).toEqual(
+    expect.arrayContaining(["event", "log", "transaction"]),
+  );
+  expect(output).not.toContain(token);
+  expect(output).not.toContain("synthetic-reset-credential");
+  expect(output).toContain("/api/auth/reset-password/[REDACTED_RESET_TOKEN]");
+  expect(items.find(([header]) => header.type === "transaction")?.[1]).toMatchObject({
+    transaction: "GET /api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+    spans: [
+      {
+        description: "GET /api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+        data: {
+          "url.full": "https://trizum.app/api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+          "url.path": "/api/auth/reset-password/[REDACTED_RESET_TOKEN]",
+        },
+      },
+    ],
+  });
 });

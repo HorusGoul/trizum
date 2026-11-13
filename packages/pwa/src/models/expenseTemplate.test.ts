@@ -4,9 +4,114 @@ import type { Party } from "./party.ts";
 import type { ExpenseTemplate } from "./expenseTemplate.ts";
 import {
   getExpenseTemplateEditorValues,
+  getExpenseTemplateFromEditorValues,
   resolveExpenseTemplateValues,
   shouldOpenExpenseTemplatePicker,
 } from "./expenseTemplate.ts";
+import type { ExchangeRates } from "#src/lib/api/exchangeRatesContract.ts";
+
+const referenceRates: ExchangeRates = {
+  base: "EUR",
+  rates: { EUR: { rate: 1, date: "2099-01-01" }, USD: { rate: 2, date: "2099-01-01" } },
+};
+
+function createForeignTemplate(): ExpenseTemplate {
+  return {
+    id: "abroad",
+    name: "Abroad",
+    symbol: "🧾",
+    amount: 10000,
+    currency: "USD",
+    exchangeRateMode: "fixed",
+    exchangeRate: 0.75,
+    paidBy: { type: "current-participant" },
+    participantSelection: "all",
+    shares: { alex: { type: "exact", value: 3000 }, blair: { type: "divide", value: 1 } },
+  };
+}
+
+test("fixed foreign templates preserve their rate and original shares", () => {
+  const template = createForeignTemplate();
+
+  const values = resolveExpenseTemplateValues({
+    currentParticipantId: "alex",
+    now: new Date(),
+    party: createParty(template),
+    templateId: template.id,
+    exchangeRates: referenceRates,
+  });
+
+  expect(values).toMatchObject({
+    amount: 75,
+    exchangeRate: 0.75,
+    originalAmount: { amount: 10000, currency: "USD" },
+    shares: {
+      alex: { type: "exact", value: 2250, originalAmount: 3000 },
+      blair: { type: "divide", value: 1, originalAmount: 7000 },
+    },
+  });
+});
+
+test("latest foreign templates resolve each expense from the supplied reference table", () => {
+  const template = { ...createForeignTemplate(), exchangeRateMode: "latest" as const };
+
+  const options = {
+    currentParticipantId: "alex",
+    now: new Date(),
+    party: createParty(template),
+    templateId: template.id,
+  };
+
+  expect(resolveExpenseTemplateValues({ ...options, exchangeRates: referenceRates })).toMatchObject(
+    { amount: 50, exchangeRate: 0.5 },
+  );
+
+  const updated: ExchangeRates = {
+    ...referenceRates,
+    rates: { ...referenceRates.rates, USD: { rate: 4, date: "2099-01-02" } },
+  };
+
+  expect(resolveExpenseTemplateValues({ ...options, exchangeRates: updated })).toMatchObject({
+    amount: 25,
+    exchangeRate: 0.25,
+  });
+  expect(template.amount).toBe(10000);
+});
+
+test("currency-only templates still preselect the foreign currency", () => {
+  const template = createForeignTemplate();
+  delete template.amount;
+
+  const values = resolveExpenseTemplateValues({
+    currentParticipantId: "alex",
+    now: new Date(),
+    party: createParty(template),
+    templateId: template.id,
+  });
+
+  expect(values).toMatchObject({
+    amount: 0,
+    originalAmount: { amount: 0, currency: "USD" },
+    exchangeRate: 0.75,
+  });
+});
+
+test("switching rate policies and returning to party currency clears obsolete defaults", () => {
+  const values = getExpenseTemplateEditorValues(createForeignTemplate());
+
+  const latest = getExpenseTemplateFromEditorValues("abroad", {
+    ...values,
+    exchangeRateMode: "latest",
+  });
+
+  expect(latest.exchangeRateMode).toBe("latest");
+  expect(latest.exchangeRate).toBeUndefined();
+  const local = getExpenseTemplateFromEditorValues("abroad", { ...values, currency: null });
+  expect(local.currency).toBeUndefined();
+  expect(local.exchangeRateMode).toBeUndefined();
+  expect(local.exchangeRate).toBeUndefined();
+  expect(local.amount).toBe(10000);
+});
 
 function createParty(template?: ExpenseTemplate): Party {
   // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.

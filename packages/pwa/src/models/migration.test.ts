@@ -1,5 +1,6 @@
 import { Repo, type DocHandle } from "@automerge/automerge-repo";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
+import type { PartyExpenseChunk } from "./party";
 import type { Party } from "./party";
 import { i18n } from "@lingui/core";
 
@@ -107,4 +108,43 @@ describe("createPartyFromMigrationData", () => {
       symbol: "🏕️",
     });
   });
+});
+
+test("persists original currency metadata through a real Automerge import", async () => {
+  i18n.load("en", {});
+  i18n.activate("en");
+  const repo = new Repo({ network: [] });
+
+  try {
+    const partyId = await createPartyFromMigrationData({
+      repo,
+      data: createMigrationData(
+        { participants: { alice: { id: "alice", name: "Alice" } } },
+        {
+          expenses: [
+            {
+              name: "Dinner",
+              paidAt: "2026-01-01T00:00:00.000Z",
+              paidBy: { alice: 9000 },
+              shares: { alice: { type: "divide", value: 1, originalAmount: 10000 } },
+              photos: [],
+              originalAmount: { amount: 10000, currency: "USD" },
+              exchangeRate: 0.9,
+            },
+          ],
+        },
+      ),
+    });
+
+    const party = (await repo.find<Party>(partyId)).doc();
+    const chunk = (await repo.find<PartyExpenseChunk>(party.chunkRefs[0]!.chunkId)).doc();
+    expect(chunk.expenses[0]).toMatchObject({
+      paidBy: { alice: 9000 },
+      shares: { alice: { type: "divide", value: 1, originalAmount: 10000 } },
+      originalAmount: { amount: 10000, currency: "USD" },
+      exchangeRate: 0.9,
+    });
+  } finally {
+    await repo.shutdown();
+  }
 });

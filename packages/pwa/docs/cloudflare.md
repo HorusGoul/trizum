@@ -53,6 +53,51 @@ Local development does not contact it unless a local service is supplied;
 analytics remains disabled by default. Verify the binding through a deployed
 preview when testing the integration. See [`api/routes/spycat.ts`](../api/routes/spycat.ts).
 
+## Receipt analysis bindings
+
+`AI` runs receipt extraction with Cloudflare's
+[`@cf/google/gemma-4-26b-a4b-it`](https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/)
+vision model, high-detail image input, and strict JSON schema output. The extractor
+reads Gemma's chat-completion response and rejects truncated or refused output.
+The expense editor requests suggestions without item transcription; full receipt
+extraction remains the endpoint default. Both paths verify their proposed fields
+with Clef. See the [receipt API contract](./api.md#receipt-extraction).
+Thinking is disabled for direct extraction within the request timeout, and
+`store: false` disables optional output storage for distillation or evaluations.
+`wrangler.jsonc` supplies the binding; no
+client API key is needed. Local Workers AI inference uses Cloudflare resources
+and requires a signed-in Wrangler account. Automated tests inject the provider
+and never send real receipts to AI.
+
+`IMAGES` prepares the analysis copy from private bytes through the
+[Images binding](https://developers.cloudflare.com/images/optimization/binding/).
+The Worker accepts an 8 MiB decoded upload, then supplies the same JPEG to Gemma
+and Clef, capped at 3072 pixels per side and 4 MiB. One smaller encoding is allowed
+if needed. The attachment in Automerge is unchanged. This uses transformations,
+not hosted Images uploads or public image URLs. Image preparation happens only
+after authorization and the existing rate limit. Missing or failed bindings keep
+analysis silent through the existing sanitized error path.
+
+`AI` also runs [`@cf/cloudflare/clef`](https://developers.cloudflare.com/workers-ai/models/clef/)
+to verify extracted values against the prepared photo. Clef has an eight-second
+timeout after the 45-second extraction pass. See the [receipt API contract](./api.md#receipt-extraction)
+for per-field filtering and currency evidence rules. Native local Images tests
+exercise the codec offline with synthetic images; model calls remain injected.
+
+CI disables remote binding connections for local Vite development and preview
+servers, so browser and visual tests can boot without Cloudflare credentials.
+This local-server option does not remove AI from deployed PR previews or
+production Workers.
+
+`RECEIPT_RATE_LIMITER` allows ten analysis requests per signed-in account per
+minute in each Cloudflare location. This is an approximate abuse limit, not a
+global billing quota; see [Cloudflare's rate limiting semantics](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
+Missing bindings, entitlement verification failures, malformed model output, or
+inference timeouts fail closed. Gemma extraction has a 45-second timeout. Receipt
+responses use `Cache-Control: no-store`; image contents and provider errors are
+not logged or stored by this endpoint. The original attachment still follows
+the normal Automerge storage and sync path.
+
 ## D1
 
 The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party
@@ -175,3 +220,39 @@ category, and request method, redacted path, status, and duration properties.
 There should be no formatter-generated `%c`/`%o`, CSS styles, or ANSI escapes.
 Formatting does not itself redact sensitive values; see the
 [logging policy](../../../docs/logging.md).
+
+### Sentry
+
+[`api/sentryWorker.ts`](../api/sentryWorker.ts) configures LogTape for the Worker. The Cloudflare Sentry Vite plugin wraps the
+Hono app using options from [`api/instrument.server.ts`](../api/instrument.server.ts) with
+[`@sentry/cloudflare`](https://docs.sentry.io/platforms/javascript/guides/cloudflare/).
+It captures unhandled Hono errors (excluding expected 3xx/4xx HTTP exceptions),
+request traces, and outbound fetch/D1 spans. The SDK flushes through `waitUntil`.
+LogTape warnings go to Sentry Logs; errors also create issues. Info request
+completion logs remain in Cloudflare. Shared document-ID redaction covers SDK
+payloads and the LogTape sink. User identity, headers, bodies, and query
+parameters are excluded from SDK data collection.
+
+Production builds use the dedicated `trizum-worker` Sentry project with
+`runtime:cloudflare-worker`. Local development disables delivery. Builds also
+honor `VITE_APP_DISABLE_SENTRY=true`, keeping CI browser journeys out of Sentry. Worker bindings
+configure `SENTRY_DSN` (a public DSN stored in `vars`) and `SENTRY_ENVIRONMENT`; `SENTRY_ENABLED=false` disables
+delivery. Set the environment binding to `preview` for preview deployments that
+should be distinguished from production. `CF_VERSION_METADATA` identifies the
+Worker release. Builds inject debug IDs into both client and Worker output and
+upload their source maps when `SENTRY_AUTH_TOKEN` is available.
+
+After deployment, verify traces for `/api/health` in Sentry with the runtime tag.
+Exercise a failing dependency on a disposable preview and verify its error issue
+and structured log, with document IDs redacted. Local tests do not prove remote
+ingestion or source-map upload.
+
+The installed SDK requires `_experimental.autoInstrumentation` and
+`_experimental.useDiagnosticsChannelInjection` to enable the Vite plugin
+features. Both are enabled explicitly; the plugin is excluded from tests.
+`SENTRY_AUTH_TOKEN` remains a CI secret and is never deployed to the Worker.
+
+PR preview deployments set `SENTRY_ENVIRONMENT=preview` and upload source maps
+using the CI token. `POST /api/observability-check` emits a warning and throws a
+fixed test error in that environment, exercising Hono error capture without
+accessing user data or external services. It returns 404 in other environments.

@@ -58,9 +58,23 @@ describe("trizum OpenAPI contract", () => {
       "500",
     ]);
 
+    expect(document.paths?.["/api/exchange-rates"]?.get?.operationId).toBe("getExchangeRates");
+
     const migration = document.paths?.["/api/migrate"];
     expect(migration?.get?.operationId).toBe("migrateTricount");
     expect(Object.keys(migration?.get?.responses ?? {})).toEqual(["200", "400", "500"]);
+    const receipts = document.paths?.["/api/premium/receipts"];
+    expect(receipts?.post?.operationId).toBe("analyzeReceipt");
+    expect(receipts?.post?.requestBody?.required).toBe(true);
+    expect(Object.keys(receipts?.post?.responses ?? {})).toEqual([
+      "200",
+      "400",
+      "401",
+      "403",
+      "413",
+      "429",
+      "503",
+    ]);
   });
 
   test("rejects malformed Party Boost response bodies", () => {

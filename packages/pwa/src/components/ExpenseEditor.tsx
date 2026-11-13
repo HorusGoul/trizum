@@ -31,6 +31,7 @@ import type { MediaFile } from "#src/models/media.ts";
 import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 import {
   compressionPresets,
+  ImageProcessingError,
   imageCaptureAccept,
   imageUploadAccept,
 } from "#src/lib/imageCompression.ts";
@@ -43,21 +44,32 @@ import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "@trizum/ui/MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
+  type ExpenseEditorFormValues,
   type ExpenseEditorMode,
   getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
+  type ExpenseEditorShares,
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
+import { ExpenseCurrencyFields } from "./ExpenseCurrencyFields";
 import { cn } from "@trizum/ui/utils";
+import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
+import { getReceiptDraftValues } from "#src/lib/receiptSuggestions.ts";
+import { applyReceiptSuggestions } from "#src/lib/receiptSuggestionEdits.ts";
+import { useExchangeRates } from "#src/hooks/useExchangeRates.ts";
+import type { CurrencyCode } from "#src/lib/money.ts";
+import { ReceiptSuggestionsSheet } from "./ReceiptSuggestionsSheet";
+import { useReceiptSuggestions, type ReceiptImage } from "./useReceiptSuggestions";
 
-export interface ExpenseEditorFormValues {
-  name: string;
-  amount: number;
-  paidAt: Date;
-  paidBy: ExpenseUser;
-  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
-  photos: MediaFile["id"][];
-}
+import { CurrencyContext } from "./CurrencyContext";
+import {
+  getExpenseEditorCurrencyAmount,
+  getExpenseEditorDraftValues,
+  getExpenseEditorStoredValues,
+} from "#src/lib/expenseEditorCurrency.ts";
+
+export type { ExpenseEditorFormValues };
 
 export interface ExpenseEditorRef {
   setValues: (values: ExpenseEditorFormValues) => void;
@@ -108,9 +120,11 @@ export function ExpenseEditor({
   onCloseCalculator,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
+  const partyCurrency = use(CurrencyContext);
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
+  const savedValuesRef = useRef(defaultValues);
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
 
   const unsortedParticipants = useExpenseParticipants({
@@ -123,29 +137,36 @@ export function ExpenseEditor({
   const participants = unsortedParticipants.slice();
   participants.sort((a, b) => a.name.localeCompare(b.name, i18n.locale));
 
-  const form = useForm({
-    defaultValues: {
-      ...defaultValues,
-      shares:
-        defaultValues.shares ||
-        participants.reduce<Record<ExpenseUser, { type: "divide" | "exact"; value: number }>>(
-          (acc, { id }) => {
-            acc[id] = { type: "divide" as const, value: 1 };
+  const formDefaultValues: ExpenseEditorFormValues = getExpenseEditorDraftValues({
+    ...defaultValues,
+    originalAmount: defaultValues.originalAmount ?? null,
+    exchangeRate: defaultValues.exchangeRate ?? null,
+    shares:
+      defaultValues.shares ||
+      participants.reduce<Record<ExpenseUser, { type: "divide" | "exact"; value: number }>>(
+        (acc, { id }) => {
+          acc[id] = { type: "divide" as const, value: 1 };
 
-            return acc;
-          },
-          {},
-        ),
-    },
+          return acc;
+        },
+        {},
+      ),
+  });
+
+  const form = useForm({
+    defaultValues: formDefaultValues,
     onSubmit: async ({ value }) => {
       if (saveInFlightRef.current) {
         return;
       }
 
-      const submissionValidation = getExpenseEditorValidationResult(value, {
-        isDirty: true,
-        mode,
-      });
+      const submissionValidation = getExpenseEditorValidationResult(
+        { ...value, amount: getExpenseEditorCurrencyAmount(value) },
+        {
+          isDirty: true,
+          mode,
+        },
+      );
 
       if (submissionValidation.status === "error") {
         setIsValidationDialogOpen(true);
@@ -160,7 +181,7 @@ export function ExpenseEditor({
       saveInFlightRef.current = true;
 
       await Promise.resolve()
-        .then(() => onSubmit(value))
+        .then(() => onSubmit(getExpenseEditorStoredValues(value, savedValuesRef.current)))
         .finally(() => {
           saveInFlightRef.current = false;
         });
@@ -188,13 +209,17 @@ export function ExpenseEditor({
 
   const shares = useStore(form.store, (state) => state.values.shares);
   const amount = useStore(form.store, (state) => state.values.amount);
+  const originalAmount = useStore(form.store, (state) => state.values.originalAmount);
+  const exchangeRate = useStore(form.store, (state) => state.values.exchangeRate);
+  const currency = originalAmount?.currency ?? partyCurrency;
+  const participantAmount = getExpenseEditorCurrencyAmount({ amount, shares, originalAmount });
   const name = useStore(form.store, (state) => state.values.name);
   const paidBy = useStore(form.store, (state) => state.values.paidBy);
   const photos = useStore(form.store, (state) => state.values.photos);
   const isDirty = useStore(form.store, (state) => state.isDirty);
 
   const validation = getExpenseEditorValidationResult(
-    { amount, name, paidBy, shares },
+    { amount: participantAmount, name, paidBy, shares, originalAmount, exchangeRate },
     { isDirty, isPrefilled, mode },
   );
 
@@ -219,6 +244,8 @@ export function ExpenseEditor({
     ref,
     () => ({
       setValues: (values) => {
+        savedValuesRef.current = values;
+        values = getExpenseEditorDraftValues(values);
         isReceivingUpdatesRef.current = true;
         const currentFocusedField = focusedFieldRef.current;
 
@@ -265,7 +292,10 @@ export function ExpenseEditor({
         return;
       }
 
-      onChange(previousValues, currentState.values);
+      onChange(
+        getExpenseEditorStoredValues(previousValues, savedValuesRef.current),
+        getExpenseEditorStoredValues(currentState.values, savedValuesRef.current),
+      );
     });
 
     return () => subscription.unsubscribe();
@@ -304,11 +334,13 @@ export function ExpenseEditor({
         title={title}
       />
 
-      <ExpenseEditorValidationStatus
-        isOpen={isValidationDialogOpen}
-        onOpenChange={setIsValidationDialogOpen}
-        validation={validation}
-      />
+      <CurrencyContext value={currency}>
+        <ExpenseEditorValidationStatus
+          isOpen={isValidationDialogOpen}
+          onOpenChange={setIsValidationDialogOpen}
+          validation={validation}
+        />
+      </CurrencyContext>
 
       {/* oxlint-disable react-doctor/tanstack-form-on-submit-requires-prevent-default -- preventDefault runs before the duplicate-submit guard and handleSubmit. */}
       <form
@@ -328,7 +360,6 @@ export function ExpenseEditor({
           activeCalculatorId={activeCalculatorId}
           autoOpenCalculator={autoOpenCalculator}
           createFieldFocusHandlers={createFieldFocusHandlers}
-          focusedFieldRef={focusedFieldRef}
           form={form}
           onCloseCalculator={onCloseCalculator}
           onOpenCalculator={onOpenCalculator}
@@ -337,18 +368,20 @@ export function ExpenseEditor({
           photos={photos}
           shouldAutoFocus={autoFocus}
         />
-        <ExpenseParticipantsSection
-          activeCalculatorId={activeCalculatorId}
-          amount={amount}
-          autoOpenCalculator={autoOpenCalculator}
-          calculatorAttachmentPhotoIds={photos}
-          onCloseCalculator={onCloseCalculator}
-          onIncludeAllChange={handleIncludeAllChange}
-          onOpenCalculator={onOpenCalculator}
-          onSharesChange={(shares) => form.setFieldValue("shares", shares)}
-          participants={participants}
-          shares={shares}
-        />
+        <CurrencyContext value={currency}>
+          <ExpenseParticipantsSection
+            activeCalculatorId={activeCalculatorId}
+            amount={participantAmount}
+            autoOpenCalculator={autoOpenCalculator}
+            calculatorAttachmentPhotoIds={photos}
+            onCloseCalculator={onCloseCalculator}
+            onIncludeAllChange={handleIncludeAllChange}
+            onOpenCalculator={onOpenCalculator}
+            onSharesChange={(shares) => form.setFieldValue("shares", shares)}
+            participants={participants}
+            shares={shares}
+          />
+        </CurrencyContext>
 
         <div className="h-[calc(4rem+var(--calculator-mobile-scroll-allowance,0px))] shrink-0 transition-[height] duration-200 ease-out md:h-16" />
       </form>
@@ -409,7 +442,6 @@ function ExpenseDetailsFields({
   activeCalculatorId,
   autoOpenCalculator,
   createFieldFocusHandlers,
-  focusedFieldRef,
   form,
   onCloseCalculator,
   onOpenCalculator,
@@ -421,7 +453,6 @@ function ExpenseDetailsFields({
   activeCalculatorId?: string;
   autoOpenCalculator: boolean;
   createFieldFocusHandlers: FieldFocusHandlersFactory;
-  focusedFieldRef: React.RefObject<keyof ExpenseEditorFormValues | null>;
   form: ExpenseEditorFormApi;
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
@@ -431,11 +462,12 @@ function ExpenseDetailsFields({
   shouldAutoFocus: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-x-2 gap-y-4">
+    <div className="grid grid-cols-2 items-end gap-x-2 gap-y-4">
       <div className="col-span-2">
         <form.Field name="photos">
           {(field) => (
             <PhotosField
+              form={form}
               value={field.state.value}
               onChange={field.handleChange}
               onViewPhoto={onViewPhoto}
@@ -471,49 +503,15 @@ function ExpenseDetailsFields({
         )}
       </form.Field>
 
-      <form.Field
-        name="amount"
-        validators={{
-          onChange: ({ value }) => {
-            if (value <= 0) {
-              return t`Amount must be greater than 0`;
-            }
-          },
-        }}
-      >
-        {(field) => (
-          <CurrencyField
-            calculator
-            calculatorId="amount"
-            calculatorAttachmentPhotoIds={photos}
-            activeCalculatorId={activeCalculatorId}
-            autoOpenCalculator={autoOpenCalculator}
-            name={field.name}
-            label={t`Amount`}
-            onCloseCalculator={onCloseCalculator}
-            onOpenCalculator={onOpenCalculator}
-            value={field.state.value}
-            minValue={0}
-            onChange={(value) => {
-              field.handleChange(value || 0);
-            }}
-            onBlur={createFieldFocusHandlers(field).onBlur}
-            errorMessage={field.state.meta.errors?.join(", ")}
-            isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-            className="col-span-2"
-            onFocus={(event) => {
-              const input = event.currentTarget;
-              input.select();
-              // SAFETY: This TanStack field is a registered ExpenseEditorFormValues field.
-              focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
-            }}
-            inputMode="decimal"
-            data-presence-element-id="amount"
-            data-presence-offset-top={6}
-            data-presence-offset-left={-10}
-          />
-        )}
-      </form.Field>
+      <ExpenseCurrencyFields
+        form={form}
+        activeCalculatorId={activeCalculatorId}
+        autoOpenCalculator={autoOpenCalculator}
+        onCloseCalculator={onCloseCalculator}
+        onOpenCalculator={onOpenCalculator}
+        photos={photos}
+        createFieldFocusHandlers={createFieldFocusHandlers}
+      />
 
       <form.Field name="paidBy">
         {(field) => (
@@ -590,11 +588,12 @@ export function ExpenseParticipantsSection({
   shares: ParticipantItemProps["shares"];
 }) {
   const shareCount = Object.keys(shares).length;
+  const currency = use(CurrencyContext);
 
   return (
     <div className={cn("mt-4 flex flex-col gap-2", className)}>
       {onIncludeAllChange ? (
-        <div className="flex items-center justify-between border-l border-transparent pl-3">
+        <div className="flex items-center justify-between border-x border-transparent px-3">
           <Checkbox
             isSelected={shareCount === participants.length}
             isIndeterminate={shareCount > 0 && shareCount < participants.length}
@@ -602,6 +601,9 @@ export function ExpenseParticipantsSection({
           >
             {t`Include all`}
           </Checkbox>
+          <span className="text-accent-600 dark:text-accent-300 text-xs font-medium">
+            {currency}
+          </span>
         </div>
       ) : null}
 
@@ -629,16 +631,14 @@ export function ExpenseParticipantsSection({
 interface ParticipantItemProps {
   amount: number;
   participant: PartyParticipant;
-  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  shares: ExpenseEditorShares;
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
   calculatorAttachmentPhotoIds: MediaFile["id"][];
   enableCalculator?: boolean;
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
-  onSharesChange: (
-    shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
-  ) => void;
+  onSharesChange: (shares: ExpenseEditorShares) => void;
 }
 
 function ParticipantItem({
@@ -655,7 +655,7 @@ function ParticipantItem({
 }: ParticipantItemProps) {
   const participantShare = shares[participant.id];
 
-  function updateShares(shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>) {
+  function updateShares(shares: ExpenseEditorShares) {
     onSharesChange(shares);
   }
 
@@ -756,7 +756,7 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="border-accent-500 dark:border-accent-700 dark:bg-accent-900 grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border bg-white pr-3"
+      className="border-accent-500 dark:border-accent-700 dark:bg-accent-900 grid h-10 grid-cols-[minmax(0,1fr)_auto] items-center justify-between rounded-lg border bg-white pr-3"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
@@ -840,7 +840,7 @@ function ParticipantItem({
             )}
           </div>
 
-          <div>
+          <div className={enableCalculator ? "pl-8" : undefined}>
             <ParticipantSplitAmountField
               amount={amount}
               shares={shares}
@@ -863,7 +863,7 @@ function ParticipantItem({
 
 interface ParticipantSplitAmountFieldProps {
   amount: number;
-  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  shares: ExpenseEditorShares;
   participantId: ExpenseUser;
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
@@ -926,52 +926,138 @@ function calculateParticipantUnitAmounts(
 }
 
 interface PhotosFieldProps {
+  form: ExpenseEditorFormApi;
   value: MediaFile["id"][];
   onChange: (updater: Updater<MediaFile["id"][]>) => void;
   onViewPhoto?: (index: number) => void;
 }
 
-function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
-  return (
-    <div
-      className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
-      onWheel={(e) => {
-        // Translate scroll Y to X smoothly
-        e.currentTarget.scrollLeft += e.deltaY;
-      }}
-    >
-      {value.length === 0 ? (
-        <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
-          <span className="text-center text-sm">
-            <Trans>Upload or capture an image of your receipt</Trans>
-          </span>
-        </div>
-      ) : null}
+function PhotosField({ form, value, onChange, onViewPhoto }: PhotosFieldProps) {
+  const { party } = useCurrentParty();
+  const session = useAppSession();
+  const userId = session.data?.user.id;
+  const isBoosted = Object.keys(party.boost ?? {}).length > 0;
 
-      {value.map((photoId, index) => (
-        <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
-          <CurrentPhoto
-            key={photoId}
-            photoId={photoId}
-            onRemove={() => {
-              onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
-              trackEvent("receipt_attachment_removed");
-            }}
-            onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
-          />
-        </Suspense>
-      ))}
-      <AddPhotoButton
-        onPhoto={(photo) => {
-          onChange((prevPhotos) => [...prevPhotos, ...photo]);
+  const currency =
+    useStore(form.store, (state) => state.values.originalAmount?.currency) ?? party.currency;
+
+  return (
+    <ReceiptPhotosField
+      key={JSON.stringify([party.id, userId, isBoosted, party.currency, currency])}
+      form={form}
+      value={value}
+      onChange={onChange}
+      onViewPhoto={onViewPhoto}
+      partyId={party.id}
+      partyCurrency={party.currency}
+      userId={userId}
+      isBoosted={isBoosted}
+    />
+  );
+}
+
+function ReceiptPhotosField({
+  form,
+  value,
+  onChange,
+  onViewPhoto,
+  partyId,
+  partyCurrency,
+  userId,
+  isBoosted,
+}: PhotosFieldProps & {
+  partyId: string;
+  partyCurrency: CurrencyCode;
+  userId: string | undefined;
+  isBoosted: boolean;
+}) {
+  const rates = useExchangeRates(partyCurrency);
+
+  const current = useStore(form.store, (state) =>
+    getReceiptDraftValues(state.values, partyCurrency),
+  );
+
+  const { analyze, result, suggestions, dismiss, scanningPhotoIds } = useReceiptSuggestions({
+    partyId,
+    userId,
+    isBoosted,
+    partyCurrency,
+    current,
+    photoIds: value,
+    getValues: () => getReceiptDraftValues(form.state.values, partyCurrency),
+    getPhotoIds: () => form.state.values.photos,
+  });
+
+  return (
+    <>
+      <div
+        className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
+        onWheel={(e) => {
+          // Translate scroll Y to X smoothly
+          e.currentTarget.scrollLeft += e.deltaY;
         }}
-      />
-    </div>
+      >
+        {value.length === 0 ? (
+          <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
+            <span className="text-center text-sm">
+              <Trans>Upload or capture an image of your receipt</Trans>
+            </span>
+          </div>
+        ) : null}
+
+        {value.map((photoId, index) => (
+          <div key={photoId} className="relative isolate shrink-0">
+            <Suspense fallback={<Skeleton className="h-32 w-32" />}>
+              <CurrentPhoto
+                key={photoId}
+                photoId={photoId}
+                onRemove={() => {
+                  onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
+                  trackEvent("receipt_attachment_removed");
+                }}
+                onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
+              />
+            </Suspense>
+            {scanningPhotoIds.includes(photoId) ? (
+              <div
+                aria-hidden="true"
+                className="receipt-scan-border pointer-events-none absolute inset-0 overflow-hidden rounded-xl"
+              />
+            ) : null}
+          </div>
+        ))}
+        <AddPhotoButton
+          onPhoto={(photo, images) => {
+            onChange((prevPhotos) => [...prevPhotos, ...photo]);
+            analyze(images);
+          }}
+        />
+      </div>
+      {result && suggestions ? (
+        <ReceiptSuggestionsSheet
+          key={result.photoId}
+          receipt={result.receipt}
+          suggestions={suggestions}
+          onDiscard={() => dismiss(false)}
+          onAccept={(values) => {
+            const applied = applyReceiptSuggestions(form, {
+              receipt: result.receipt,
+              baseline: result.baseline,
+              partyCurrency,
+              rates,
+              selected: values,
+            });
+
+            dismiss(applied);
+          }}
+        />
+      ) : null}
+    </>
   );
 }
 
 interface AddPhotoButtonProps {
-  onPhoto: (photos: MediaFile["id"][]) => void;
+  onPhoto: (photos: MediaFile["id"][], images: ReceiptImage[]) => void;
 }
 
 function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
@@ -987,20 +1073,35 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
     const toastId: string | number = toast.loading(t`Uploading...`);
 
     try {
-      const photoIds = await Promise.all(
+      const photos = await Promise.all(
         files.map(async (blob) => {
-          const [mediaFileId] = await createMediaFile(blob, {}, compressionPresets.balanced);
+          const [mediaFileId, handle] = await createMediaFile(
+            blob,
+            {},
+            compressionPresets.balanced,
+          );
 
-          return mediaFileId;
+          const media = handle.doc();
+
+          return {
+            photoId: mediaFileId,
+            image: `data:${media.metadata.mimeType ?? blob.type};base64,${media.encodedBlob.toString()}`,
+          };
         }),
       );
 
-      onPhoto(photoIds);
+      onPhoto(
+        photos.map((photo) => photo.photoId),
+        photos,
+      );
       trackEvent("receipt_attachments_added");
 
       toast.dismiss(toastId);
     } catch (error) {
-      logger.error("Failed to upload expense attachment", { error });
+      logger.error("Failed to upload expense attachment", {
+        error,
+        ...(error instanceof ImageProcessingError ? error.diagnostics : undefined),
+      });
       toast.error(getImageUploadErrorMessage(error) ?? t`Failed to upload, please try again`, {
         id: toastId,
       });
@@ -1119,7 +1220,7 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
       </Button>
       <Button
         color="input-like"
-        className="absolute -top-2 -right-2 h-auto w-auto rounded-full p-1"
+        className="absolute -top-2 -right-2 z-10 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
         aria-label={t`Remove photo`}
       >

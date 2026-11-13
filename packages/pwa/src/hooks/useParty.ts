@@ -146,6 +146,7 @@ export function createPartyHelperFactory(
         Pick<
           PartyParticipant,
           | "phone"
+          | "paymentMethods"
           | "personalMode"
           | "avatarId"
           | "balancesSortedBy"

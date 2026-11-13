@@ -78,6 +78,16 @@ Only used icon symbols are emitted. Keep icon names as string literals so the
 scanner can discover them; a dynamically constructed name needs explicit literal
 usage elsewhere in the target.
 
+Payment brand symbols in `icons/brand/` use `currentColor` for light and dark
+surfaces. PayPal, Revolut, and Cash App come from
+[Simple Icons](https://github.com/simple-icons/simple-icons/tree/1bb2f6e6ea50f920de8d2f3d273ae48564a5eaee/icons)
+under its [CC0 license](https://github.com/simple-icons/simple-icons/blob/1bb2f6e6ea50f920de8d2f3d273ae48564a5eaee/LICENSE.md).
+Bizum and Venmo use the symbols from Adyen's
+[Bizum](https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/bizum.svg)
+and [Venmo](https://checkoutshopper-live.adyen.com/checkoutshopper/images/logos/venmo.svg)
+payment logos, with wordmarks and backgrounds removed and view boxes fitted to
+the symbols.
+
 Pass the generated SVG URL to `UIProvider`:
 
 ```tsx
@@ -92,6 +102,20 @@ import spriteHref from "./generated/iconSprite.svg?url";
 `Icon` retains its `icon` prop and catalog-wide typed names. `UIProvider` is
 required for components that render icons; it also sets React Aria's locale.
 Storybook uses the same generator and provider, independently of the PWA.
+
+### Sheets and navigation
+
+`ModalSheet` registers open sheets through the optional
+`UIProvider.modalSheetNavigation` adapter. The app owns browser/native Back
+handling; the design system owns registration and calls `onOpenChange(false)`
+when dismissal is accepted. The adapter invokes a registered dismiss callback
+to request closure. A `true` result means the sheet accepted closing. A `false`
+result means the sheet is locked, so the adapter should consume Back without
+navigating or closing a sheet underneath it.
+
+Registration follows sheet open/close and unmount, uses the latest callback,
+and orders nested sheets from parent to child. Consumers without a navigation
+adapter, including Storybook, keep the normal controlled sheet API.
 
 ### Localization
 

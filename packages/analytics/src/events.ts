@@ -53,7 +53,9 @@ export const analyticsEvents = {
   settlement_recorded:
     "A debt payment was recorded, not confirmation of an external money transfer.",
   payment_contact_copied:
-    "A Bizum payment contact was copied; neither the contact nor a payment confirmation is sent.",
+    "Payment receiving details were copied; neither the details nor a payment confirmation is sent.",
+  payment_link_requested:
+    "The user followed an external payment profile link; no payment completion is inferred or details sent.",
   debt_transferred: "Both sides of a debt transfer between groups were successfully recorded.",
   tricount_import_started: "The user started a Tricount import.",
   tricount_import_completed: "A Tricount import created the destination group.",
@@ -68,6 +70,10 @@ export const analyticsEvents = {
   receipt_attachments_added:
     "One batch of receipt attachments was prepared and added to the expense draft.",
   receipt_attachment_removed: "A receipt attachment was removed from the expense draft.",
+  receipt_suggestions_accepted:
+    "At least one selected receipt suggestion was applied to the expense draft, not yet saved.",
+  receipt_suggestions_discarded:
+    "Receipt suggestions were dismissed without applying any draft fields.",
   receipt_gallery_opened:
     "The receipt gallery was opened; changing slides does not emit another event.",
   join_qr_scanned: "A validated group QR code was received; joining is recorded separately.",

@@ -1,5 +1,21 @@
 # @trizum/server
 
+## 2.0.2
+
+### Patch Changes
+
+- [#620](https://github.com/HorusGoul/trizum/pull/620) [`ac0c591`](https://github.com/HorusGoul/trizum/commit/ac0c59160b41b78feb4b8b7655fd4b678c6a7abb) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Preserve Sentry initialization in production server bundles so error reporting is enabled when SENTRY_DSN is configured.
+
+- [#626](https://github.com/HorusGoul/trizum/pull/626) [`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Send warning and higher log records to Sentry in the PWA and sync server. Preserve severity and document-ID redaction; warnings appear in Sentry Logs, while errors and fatal records also create issues.
+- Updated dependencies [[`e8acda9`](https://github.com/HorusGoul/trizum/commit/e8acda963d9cc5e6f3c9cec6032a83cf73f83604)]:
+  - @trizum/logging@1.1.2
+
+## 2.0.1
+
+### Patch Changes
+
+- [#614](https://github.com/HorusGoul/trizum/pull/614) [`7f7eed0`](https://github.com/HorusGoul/trizum/commit/7f7eed0ed2b6d02bb18d84588c85ea2d01fb1c4e) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent incomplete receipt syncs from crashing the server after a document readiness timeout. Add structured diagnostics for sync connections, large messages, and slow or failed storage operations to investigate interrupted uploads without logging receipt contents.
+
 ## 2.0.0
 
 ### Major Changes

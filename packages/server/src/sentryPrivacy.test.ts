@@ -1,10 +1,14 @@
 import * as Sentry from "@sentry/node";
 import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
-import { afterEach, expect, test } from "vite-plus/test";
+import { resetSync } from "@logtape/logtape";
+import { configureServerLogging, rootLogger } from "./log.ts";
+import { afterEach, expect, test, vi } from "vite-plus/test";
 
 type CapturedEnvelope = [header: unknown, items: [header: { type: string }, payload: unknown][]];
 
 afterEach(async () => {
+  resetSync();
+  vi.unstubAllEnvs();
   await Sentry.close();
   Sentry.getCurrentScope().clear();
   Sentry.getIsolationScope().clear();
@@ -76,4 +80,47 @@ test("redacts server exceptions, causes, scope attributes, and formatted logs be
   expect(Sentry.getIsolationScope().getScopeData().attributes?.partyDocumentId).toBe(documentId);
   expect(error.cause).toBe(cause);
   expect(cause.message).toContain(documentId);
+});
+
+test("routes server warnings and higher to Sentry while keeping lower levels local", async () => {
+  const envelopes: CapturedEnvelope[] = [];
+  Sentry.init({
+    ...sentryDocumentIdRedaction,
+    dsn: "https://public@example.com/1",
+    defaultIntegrations: false,
+    enableLogs: true,
+    skipOpenTelemetrySetup: true,
+    sendClientReports: false,
+    transport: () => ({
+      send: async (envelope) => {
+        envelopes.push(envelope);
+
+        return { statusCode: 200 };
+      },
+      flush: async () => true,
+    }),
+  });
+  resetSync();
+  vi.stubEnv("NODE_ENV", "production");
+  configureServerLogging();
+  rootLogger.debug("Debug stays local");
+  rootLogger.info("Info stays local");
+  const documentId = "p3u5PhN9wrNpsGCwfkeef2LzF9";
+  rootLogger.warning("Sync fallback {documentId}", { documentId });
+  rootLogger.error("Sync failed");
+  rootLogger.fatal("Storage unavailable");
+  expect(await Sentry.flush(2000)).toBe(true);
+  const items = envelopes.flatMap(([, envelopeItems]) => envelopeItems);
+  expect(JSON.stringify(envelopes)).not.toContain(documentId);
+  expect(JSON.stringify(envelopes)).not.toContain("stays local");
+  expect(items.find(([header]) => header.type === "log")?.[1]).toMatchObject({
+    items: [
+      { level: "warn", body: expect.stringContaining("[REDACTED_DOCUMENT_ID]") },
+      { level: "error", body: "Sync failed" },
+      { level: "fatal", body: "Storage unavailable" },
+    ],
+  });
+  expect(
+    items.flatMap(([header, payload]) => (header.type === "event" ? [payload] : [])),
+  ).toMatchObject([{ level: "error" }, { level: "fatal" }]);
 });

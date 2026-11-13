@@ -121,6 +121,88 @@ async function fixture(amounts = [1000, 2000]) {
   return { api, docs, partyId, alice, bob, chunk, summary };
 }
 
+async function foreignCurrencyFixture(exchangeRate?: number) {
+  const f = await fixture([1000]);
+  await f.docs.change<PartyExpenseChunk>(f.chunk.id, (doc) => {
+    const expense = doc.expenses[0];
+    expense.originalAmount = { amount: 800, currency: "USD" };
+
+    if (exchangeRate !== undefined) expense.exchangeRate = exchangeRate;
+    expense.shares[f.alice].originalAmount = 400;
+    expense.shares[f.bob].originalAmount = 400;
+    expense.__hash = calculateExpenseHash(expense);
+  });
+
+  return f;
+}
+
+it.each([undefined, 1.25])(
+  "reads and preserves foreign-currency metadata through repeated edits with rate %s",
+  async (exchangeRate) => {
+    const f = await foreignCurrencyFixture(exchangeRate);
+    const input = { partyId: f.partyId, expenseId: f.chunk.expenses[0].id };
+    const read = await f.api.getExpense(input);
+    expect(read).toMatchObject({
+      currency: "EUR",
+      amount: "10.00",
+      originalAmount: { currency: "USD", amount: "8.00" },
+      shares: expect.arrayContaining([
+        { participantId: f.alice, type: "divide", value: 1, originalAmount: 400 },
+        { participantId: f.bob, type: "divide", value: 1, originalAmount: 400 },
+      ]),
+    });
+
+    expect(read.exchangeRate).toBe(exchangeRate);
+    expect(Object.hasOwn(read, "exchangeRate")).toBe(exchangeRate !== undefined);
+
+    await f.api.updateExpense({ ...input, version: read.version, name: "Lunch" });
+    const renamed = await service().getExpense(input);
+    await service().updateExpense({
+      ...input,
+      version: renamed.version,
+      paidAt: "2026-11-08T12:00:00Z",
+    });
+    const fresh = documents();
+    const updated = await service(fresh).getExpense(input);
+    const persisted = (await fresh.read<PartyExpenseChunk>(f.chunk.id)).expenses[0];
+    expect(updated).toMatchObject({
+      name: "Lunch",
+      paidAt: "2026-11-08T12:00:00.000Z",
+      amount: read.amount,
+      originalAmount: { currency: "USD", amount: "8.00" },
+      shares: read.shares,
+    });
+    expect(persisted.originalAmount).toEqual({ currency: "USD", amount: 800 });
+    expect(persisted.exchangeRate).toBe(exchangeRate);
+    expect(persisted.__hash).toBe(calculateExpenseHash(persisted));
+    expect(updated.version).toBe(persisted.__hash);
+    expect(balances(await service().getParty(f.partyId))).toEqual({ Alice: "5.00", Bob: "-5.00" });
+  },
+);
+
+it.each(["amount", "paidBy", "splitBetween"] as const)(
+  "refuses foreign-currency %s edits without changing the saved expense",
+  async (field) => {
+    const f = await foreignCurrencyFixture(1.25);
+    const input = { partyId: f.partyId, expenseId: f.chunk.expenses[0].id };
+    const read = await f.api.getExpense(input);
+    const changes = { amount: "12.00", paidBy: f.bob, splitBetween: [f.bob] };
+    await expect(
+      f.api.updateExpense({
+        ...input,
+        version: read.version,
+        name: "Must not be saved",
+        [field]: changes[field],
+      }),
+    ).rejects.toThrow("foreign-currency");
+    expect(await service().getExpense(input)).toEqual(read);
+
+    const removed = await service().deleteExpense({ ...input, version: read.version });
+    expect(removed.expenses).toEqual([]);
+    expect(balances(removed)).toEqual({ Alice: "0.00", Bob: "0.00" });
+  },
+);
+
 it("edits metadata without changing custom splits or attachments and rejects stale versions", async () => {
   const f = await fixture([1000]);
   const photo = parseAutomergeUrl(generateAutomergeUrl()).documentId;
@@ -257,73 +339,82 @@ it("requires explicit custom-split conversion, rejects transfers, and scopes exp
   );
 });
 
-it("updates party details and archives/restores people while preserving IDs, history, and profile fields", async () => {
-  const f = await fixture([1000]);
-  await f.docs.change<Party>(f.partyId, (doc) => {
-    doc.participants[f.bob].phone = "test-contact";
-  });
+it.each([undefined, {}, { paypal: "test-paypal", "bank-transfer": "test-account" }])(
+  "updates party details and archives/restores people while preserving profile fields including payment methods %j",
+  async (paymentMethods) => {
+    const f = await fixture([1000]);
+    await f.docs.change<Party>(f.partyId, (doc) => {
+      doc.participants[f.bob].phone = "test-contact";
 
-  await expect(
-    f.api.updateParticipant({
+      if (paymentMethods !== undefined) doc.participants[f.bob].paymentMethods = paymentMethods;
+    });
+
+    await expect(
+      f.api.updateParticipant({
+        partyId: f.partyId,
+        participantId: "constructor",
+        name: "Other",
+      }),
+    ).rejects.toThrow("participant ID");
+
+    const updated = await f.api.updateParty({
       partyId: f.partyId,
-      participantId: "constructor",
-      name: "Other",
-    }),
-  ).rejects.toThrow("participant ID");
+      name: "Trip",
+      description: "Shared trip",
+      symbol: "",
+    });
 
-  const updated = await f.api.updateParty({
-    partyId: f.partyId,
-    name: "Trip",
-    description: "Shared trip",
-    symbol: "",
-  });
+    expect(updated).toMatchObject({
+      name: "Trip",
+      description: "Shared trip",
+      symbol: "",
+      currency: "EUR",
+    });
 
-  expect(updated).toMatchObject({
-    name: "Trip",
-    description: "Shared trip",
-    symbol: "",
-    currency: "EUR",
-  });
-
-  const archived = await f.api.updateParticipant({
-    partyId: f.partyId,
-    participantId: f.bob,
-    name: "Robert",
-    archived: true,
-  });
-
-  expect(archived.participants.find((person) => person.id === f.bob)).toMatchObject({
-    name: "Robert",
-    archived: true,
-    balance: "-5.00",
-  });
-  expect((await f.docs.read<Party>(f.partyId)).participants[f.bob].phone).toBe("test-contact");
-  await expect(
-    f.api.updateParticipant({
-      partyId: f.partyId,
-      participantId: f.alice,
-      archived: true,
-    }),
-  ).rejects.toThrow("at least one");
-  await expect(
-    f.api.updateParticipant({
+    const archived = await f.api.updateParticipant({
       partyId: f.partyId,
       participantId: f.bob,
-      name: "alice",
-    }),
-  ).rejects.toThrow("already exists");
-  await f.api.updateParticipant({
-    partyId: f.partyId,
-    participantId: f.bob,
-    archived: false,
-  });
-  const fresh = await service().getParty(f.partyId);
-  expect(fresh.participants.find((person) => person.id === f.bob)).toMatchObject({
-    archived: false,
-    balance: "-5.00",
-  });
-  expect(fresh.expenses).toHaveLength(1);
-});
+      name: "Robert",
+      archived: true,
+    });
+
+    expect(archived.participants.find((person) => person.id === f.bob)).toMatchObject({
+      name: "Robert",
+      archived: true,
+      balance: "-5.00",
+    });
+    expect((await f.docs.read<Party>(f.partyId)).participants[f.bob].phone).toBe("test-contact");
+    await expect(
+      f.api.updateParticipant({
+        partyId: f.partyId,
+        participantId: f.alice,
+        archived: true,
+      }),
+    ).rejects.toThrow("at least one");
+    await expect(
+      f.api.updateParticipant({
+        partyId: f.partyId,
+        participantId: f.bob,
+        name: "alice",
+      }),
+    ).rejects.toThrow("already exists");
+    await f.api.updateParticipant({
+      partyId: f.partyId,
+      participantId: f.bob,
+      archived: false,
+    });
+    const freshDocs = documents();
+    const fresh = await service(freshDocs).getParty(f.partyId);
+    expect((await freshDocs.read<Party>(f.partyId)).participants[f.bob].paymentMethods).toEqual(
+      paymentMethods,
+    );
+    expect(fresh.participants.find((person) => person.id === f.bob)).toMatchObject({
+      archived: false,
+      balance: "-5.00",
+    });
+    expect(fresh.expenses).toHaveLength(1);
+  },
+);
 
 it.each(["update", "delete"] as const)(
   "reconciles a delayed %s projection after another writer edits the same chunk",

@@ -141,11 +141,28 @@ export const expenseViewSchema = z.object({
   name: z.string(),
   paidAt: z.string(),
   amount: z.string(),
+  originalAmount: z
+    .object({ amount: z.string(), currency: z.string() })
+    .optional()
+    .describe("Saved original amount as a decimal string in its original currency."),
+  exchangeRate: z
+    .number()
+    .positive()
+    .optional()
+    .describe("Saved party-currency units per original-currency unit; never refreshed on read."),
   isTransfer: z.boolean(),
   paidBy: z.array(z.object({ participantId: z.string(), amount: z.string() })),
   shares: z
     .array(
-      z.object({ participantId: z.string(), type: z.enum(["divide", "exact"]), value: z.number() }),
+      z.object({
+        participantId: z.string(),
+        type: z.enum(["divide", "exact"]),
+        value: z.number(),
+        originalAmount: z
+          .number()
+          .optional()
+          .describe("Saved share amount in integer hundredths of the original currency."),
+      }),
     )
     .describe(
       "Divide values are relative weights; exact values are integer hundredths of the party currency.",

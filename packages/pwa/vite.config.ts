@@ -17,6 +17,7 @@ import { lingui } from "@lingui/vite-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import license from "rollup-plugin-license";
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { sentryCloudflareVitePlugin } from "@sentry/cloudflare/vite";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { createIconSpritePlugin } from "@trizum/icon-sprite/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
@@ -266,7 +267,17 @@ export default defineConfig(({ mode }) => {
       name: "pwa",
     },
     plugins: [
-      ...(isTest ? [] : [cloudflare()]),
+      ...(isTest
+        ? []
+        : [
+            cloudflare({ remoteBindings: !process.env.CI }),
+            sentryCloudflareVitePlugin({
+              _experimental: {
+                autoInstrumentation: true,
+                useDiagnosticsChannelInjection: true,
+              },
+            }),
+          ]),
       tanstackRouter(),
       tailwindcss(),
       react(),
@@ -380,6 +391,7 @@ export default defineConfig(({ mode }) => {
           ]
         : []),
       sentrySourcemapsPlugin(),
+      sentrySourcemapsPlugin("trizum", "trizum-worker"),
     ],
   };
 });
@@ -475,32 +487,32 @@ function automergeRepoImportMethodPlugin(): Plugin {
   };
 }
 
-function sentrySourcemapsPlugin(): Plugin {
-  const clientDist = path.resolve(packageRoot, "dist/client");
-  let sawClientBundle = false;
+function sentrySourcemapsPlugin(output = "client", project = sentryProject): Plugin {
+  const outputDist = path.resolve(packageRoot, "dist", output);
+  let sawBundle = false;
   let processed = false;
 
   return {
-    name: "trizum-sentry-sourcemaps",
+    name: `trizum-sentry-sourcemaps-${output}`,
     apply: "build",
     enforce: "post",
     writeBundle(options) {
-      if (options.dir && path.resolve(packageRoot, options.dir) === clientDist) {
-        sawClientBundle = true;
+      if (options.dir && path.resolve(packageRoot, options.dir) === outputDist) {
+        sawBundle = true;
       }
     },
     closeBundle() {
-      if (!sawClientBundle || processed) {
+      if (!sawBundle || processed) {
         return;
       }
 
       processed = true;
 
-      if (!existsSync(clientDist)) {
-        throw new Error(`Expected client build output at ${clientDist}`);
+      if (!existsSync(outputDist)) {
+        throw new Error(`Expected build output at ${outputDist}`);
       }
 
-      runSentryCli(["sourcemaps", "inject", clientDist]);
+      runSentryCli(["sourcemaps", "inject", outputDist]);
 
       if (!process.env.SENTRY_AUTH_TOKEN?.trim()) {
         process.stdout.write("SENTRY_AUTH_TOKEN is not set, skipping sourcemaps upload\n");
@@ -509,31 +521,34 @@ function sentrySourcemapsPlugin(): Plugin {
       }
 
       process.stdout.write(
-        `Uploading sourcemaps to Sentry for release ${fullVersion}. Org: ${sentryOrg}, Project: ${sentryProject}\n`,
+        `Uploading sourcemaps to Sentry for release ${fullVersion}. Org: ${sentryOrg}, Project: ${project}\n`,
       );
 
-      runSentryCli([
-        "sourcemaps",
-        "upload",
-        "--release",
-        fullVersion,
-        "--org",
-        sentryOrg,
-        "--project",
-        sentryProject,
-        clientDist,
-      ]);
+      runSentryCli(
+        [
+          "sourcemaps",
+          "upload",
+          "--release",
+          fullVersion,
+          "--org",
+          sentryOrg,
+          "--project",
+          project,
+          outputDist,
+        ],
+        project,
+      );
     },
   };
 }
 
-function runSentryCli(args: string[]) {
+function runSentryCli(args: string[], project = sentryProject) {
   execFileSync(process.execPath, [sentryCliBin, ...args], {
     cwd: packageRoot,
     env: {
       ...process.env,
       SENTRY_ORG: sentryOrg,
-      SENTRY_PROJECT: sentryProject,
+      SENTRY_PROJECT: project,
     },
     stdio: "inherit",
   });

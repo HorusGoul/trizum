@@ -21,6 +21,11 @@ Publish independent expense and balance documents before linking them to the
 group, preserving concurrent additions. Patch existing records without replacing
 identities, attachments, custom splits or unspecified fields. Return a known group
 link when a new party's sync acknowledgement cannot be confirmed.
+Expose saved foreign-currency amounts and conversion rates on expense reads.
+Preserve conversion metadata during name/date edits and direct financial edits
+of converted expenses to trizum. Preserve participant payment methods during
+renaming and archival/restoration. Integrate with the shared Worker telemetry
+entry point while retaining independent receipt and MCP rate limits.
 
 Build the embedded widget with shared trizum UI components, fonts, icons and theme
 colors. Follow host light/dark themes, keep previously published widget URLs

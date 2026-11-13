@@ -1,0 +1,40 @@
+diff --git a/dist/synchronizer/DocSynchronizer.js b/dist/synchronizer/DocSynchronizer.js
+index 30dce21ea6e6d02a921f1b0dfa83f0d1c727ce1c..f1a09cf4ab849904bc183d75bb442efca27ad644 100644
+--- a/dist/synchronizer/DocSynchronizer.js
++++ b/dist/synchronizer/DocSynchronizer.js
+@@ -181,7 +181,14 @@ export class DocSynchronizer extends Synchronizer {
+             return this.#peerDocumentStatuses[peerId] == "has";
+         });
+         if (peersWithDocument) {
+-            await this.#handle.whenReady();
++            try {
++                await this.#handle.whenReady();
++            } catch (error) {
++                // Incoming documents may never become ready if their sender disconnects.
++                // beginSync is called in the background, so do not leak this rejection.
++                this.#log(`Error waiting for document before sync: ${error}`);
++                return;
++            }
+         }
+         peerIds.forEach(peerId => {
+             this.#withSyncState(peerId, syncState => {
+diff --git a/src/synchronizer/DocSynchronizer.ts b/src/synchronizer/DocSynchronizer.ts
+index 8cc7d32328cd72e6e67b376b25ecd8baa3a07ad6..a3b4154a116d2982734c5b3565c7352ad0151114 100644
+--- a/src/synchronizer/DocSynchronizer.ts
++++ b/src/synchronizer/DocSynchronizer.ts
+@@ -263,7 +263,14 @@ export class DocSynchronizer extends Synchronizer {
+     })
+ 
+     if (peersWithDocument) {
+-      await this.#handle.whenReady()
++      try {
++        await this.#handle.whenReady()
++      } catch (error) {
++        // Incoming documents may never become ready if their sender disconnects.
++        // beginSync is called in the background, so do not leak this rejection.
++        this.#log(`Error waiting for document before sync: ${error}`)
++        return
++      }
+     }
+ 
+     peerIds.forEach(peerId => {

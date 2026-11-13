@@ -108,7 +108,7 @@ export class PartyExpenses {
   async get(party: Party, input: GetExpenseInput): Promise<ExpenseView> {
     const { expense } = await this.find(party, input.expenseId);
 
-    return {
+    const view: ExpenseView = {
       partyId: party.id,
       expenseId: expense.id,
       version: calculateExpenseHash(expense),
@@ -121,12 +121,28 @@ export class PartyExpenses {
         participantId,
         amount: formatAmount(amount),
       })),
-      shares: Object.entries(expense.shares).map(([participantId, share]) => ({
-        participantId,
-        type: share.type,
-        value: share.value,
-      })),
+      shares: Object.entries(expense.shares).map(([participantId, share]) => {
+        const result: ExpenseView["shares"][number] = {
+          participantId,
+          type: share.type,
+          value: share.value,
+        };
+
+        if (share.originalAmount !== undefined) result.originalAmount = share.originalAmount;
+
+        return result;
+      }),
     };
+
+    if (expense.originalAmount)
+      view.originalAmount = {
+        amount: formatAmount(expense.originalAmount.amount),
+        currency: expense.originalAmount.currency,
+      };
+
+    if (expense.exchangeRate !== undefined) view.exchangeRate = expense.exchangeRate;
+
+    return view;
   }
 
   async update(party: Party, input: UpdateExpenseInput) {
@@ -144,6 +160,11 @@ export class PartyExpenses {
         input.paidBy !== undefined ||
         input.splitBetween !== undefined
       ) {
+        if (current.originalAmount || current.exchangeRate !== undefined)
+          throw new McpToolError(
+            "Change foreign-currency amounts, payers, or splits in trizum to preserve the saved conversion. Only name and date edits are supported here.",
+          );
+
         const payers = Object.keys(current.paidBy);
 
         const equal = Object.values(current.shares).every(

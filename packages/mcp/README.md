@@ -82,7 +82,13 @@ this is not a global compare-and-swap lock.
 
 `update_expense` patches only supplied fields using the PWA's expense diff/hash
 helpers, retaining the ID, photos, and unspecified fields. Names and dates can
-be changed on custom-split or multi-payer expenses. Financial edits support one
+be changed on custom-split, multi-payer, or foreign-currency expenses.
+`get_expense` also returns saved original amounts, conversion rates when present,
+and original-currency share amounts. Totals and payer amounts remain in the party
+currency; original share amounts are integer hundredths. Reads never fetch a new
+rate. Financial edits to converted expenses must be made in trizum to preserve
+their conversion; metadata edits and deletion remain available through MCP.
+Financial edits to party-currency expenses support one
 payer and equal sharing: an existing custom split or multiple payers require
 explicit user instructions and both the replacement payer and split list. No
 split is silently converted. Transfers stay in trizum so paired settlement

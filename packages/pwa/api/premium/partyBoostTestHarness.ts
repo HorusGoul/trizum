@@ -22,6 +22,7 @@ interface TestSyncDocument {
   parties?: Record<DocumentId, true>;
   participantInParties?: Record<DocumentId, PartyParticipant["id"]>;
   boost?: Party["boost"];
+  currency?: Party["currency"];
 }
 
 export type TestCustomerAccess =
@@ -159,7 +160,7 @@ export async function createPartyBoostTestHarness() {
     },
     createParty() {
       const id = createDocumentId();
-      documents.set(id, { type: "party", id, participants: {} });
+      documents.set(id, { type: "party", id, participants: {}, currency: "EUR" });
 
       return id;
     },
@@ -240,6 +241,32 @@ export async function createPartyBoostTestHarness() {
       if (method === "PUT") init.body = JSON.stringify({ partyDocumentId: partyId });
 
       return premiumRoute.fetch(new Request(url, init), env, platform.ctx);
+    },
+    async requestReceipt(
+      partyDocumentId: string,
+      image: string,
+      cookie?: string,
+      locale: "en" | "es" = "en",
+      options: { includeItems?: boolean } = {},
+    ) {
+      const headers = new Headers({ "Content-Type": "application/json" });
+
+      if (cookie) headers.set("Cookie", cookie);
+
+      return premiumRoute.fetch(
+        new Request("http://localhost:8787/receipts", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            partyDocumentId,
+            image,
+            locale,
+            includeItems: options.includeItems,
+          }),
+        }),
+        env,
+        platform.ctx,
+      );
     },
     async assignment(userId: string) {
       return env.DB.prepare("SELECT * FROM party_boost WHERE ownerUserId = ?").bind(userId).first<{
