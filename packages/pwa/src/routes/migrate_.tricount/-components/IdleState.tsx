@@ -10,12 +10,15 @@ import { AppTextField } from "@trizum/ui/fields/TextField";
 import type { MigrateParams } from "./types.js";
 import { validateTricountKey } from "./validation.js";
 
-export function IdleState({ onSubmit }: { onSubmit: (values: MigrateParams) => void }) {
+export function IdleState({
+  onSubmit,
+  defaultValues = { key: "", importAttachments: true },
+}: {
+  onSubmit: (values: MigrateParams) => void;
+  defaultValues?: MigrateParams;
+}) {
   const form = useForm({
-    defaultValues: {
-      key: "",
-      importAttachments: true,
-    },
+    defaultValues,
     onSubmit: ({ value }) => {
       const key = extractTricountId(value.key);
 
@@ -23,10 +26,7 @@ export function IdleState({ onSubmit }: { onSubmit: (values: MigrateParams) => v
         throw new Error(t`Invalid tricount URL or key`);
       }
 
-      onSubmit({
-        key,
-        importAttachments: value.importAttachments,
-      });
+      onSubmit(value);
     },
   });
 
