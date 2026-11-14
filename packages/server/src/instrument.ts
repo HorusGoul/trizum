@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/node";
 import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import { serverMetricsIntegration } from "./metrics.ts";
 import packageJson from "#package.json" with { type: "json" };
 import { configureServerLogging, rootLogger } from "./log.ts";
 
@@ -11,7 +12,11 @@ if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
     ...sentryDocumentIdRedaction,
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV ?? "development",
-    integrations: [nodeProfilingIntegration(), ...sentryDocumentIdRedaction.integrations],
+    integrations: [
+      nodeProfilingIntegration(),
+      ...sentryDocumentIdRedaction.integrations,
+      serverMetricsIntegration,
+    ],
     sampleRate: 1,
     // Tracing
     tracesSampleRate: 1,
@@ -19,6 +24,7 @@ if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
     // Trace lifecycle automatically enables profiling during active traces
     profileLifecycle: "trace",
     enableLogs: true,
+    enableMetrics: true,
     release: `${packageJson.version}-${process.env.COMMIT_HASH}`,
   });
   rootLogger.info("Sentry initialized");

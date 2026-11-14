@@ -1,15 +1,22 @@
+import * as Sentry from "@sentry/node";
+import { captureTestMetrics } from "./testingMetrics.ts";
 import { configureTrizumLogging } from "@trizum/logging";
 import { resetSync, type LogRecord } from "@logtape/logtape";
 import { Repo } from "@automerge/automerge-repo";
 import { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket";
 import WebSocket from "isomorphic-ws";
 import { once } from "node:events";
-import { afterEach, expect, test } from "vite-plus/test";
+import { afterEach, expect, test, vi } from "vite-plus/test";
 import { diagnosticRef, observeSync } from "./diagnostics.ts";
 
-afterEach(() => resetSync());
+afterEach(async () => {
+  await Sentry.close();
+  resetSync();
+  vi.restoreAllMocks();
+});
 
 test("records socket sizes and close codes without recording payloads or document tokens", async () => {
+  const captured = captureTestMetrics();
   const records: LogRecord[] = [];
   configureTrizumLogging({
     surface: "server",
@@ -53,6 +60,17 @@ test("records socket sizes and close codes without recording payloads or documen
     const closed = once(socket, "close");
     client.close(1000, "private close reason");
     await closed;
+    expect(captured).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "server.sync.connections.opened", value: 1 }),
+        expect.objectContaining({ name: "server.sync.messages.received", value: 1 }),
+        expect.objectContaining({
+          name: "server.sync.connections.closed",
+          attributes: expect.objectContaining({ closeCategory: "normal" }),
+        }),
+        expect.objectContaining({ name: "server.sync.message.size", value: 70_000, unit: "byte" }),
+      ]),
+    );
     const closeRecord = records.find((record) => record.properties.closeCode === 1000);
     expect(closeRecord?.properties).toMatchObject({
       messageCount: 1,
@@ -76,5 +94,39 @@ test("records socket sizes and close codes without recording payloads or documen
     await new Promise<void>((resolve, reject) =>
       server.close((error) => (error ? reject(error) : resolve())),
     );
+  }
+});
+
+test("samples idle runtime gauges and stops sampling after the server closes", async () => {
+  const captured = captureTestMetrics();
+  const gauges = () => captured.filter((metric) => metric.type === "gauge");
+  const server = new WebSocket.Server({ port: 0, host: "127.0.0.1" });
+  const adapter = new NodeWSServerAdapter(server);
+  const repo = new Repo();
+  await once(server, "listening");
+  vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+
+  try {
+    observeSync(server, adapter, repo);
+    expect(gauges()).toContainEqual(
+      expect.objectContaining({ name: "server.sync.connections.active", value: 0 }),
+    );
+    expect(gauges()).toContainEqual(
+      expect.objectContaining({
+        name: "server.memory.rss",
+        value: expect.any(Number),
+        unit: "byte",
+      }),
+    );
+    const initialCount = gauges().length;
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(gauges().length).toBe(initialCount * 2);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const closedCount = gauges().length;
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(gauges().length).toBe(closedCount);
+  } finally {
+    vi.useRealTimers();
+    await repo.shutdown();
   }
 });
