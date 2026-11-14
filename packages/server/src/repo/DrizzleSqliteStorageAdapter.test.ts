@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+import { captureTestMetrics } from "../testingMetrics.ts";
 import { createClient, type Client } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
@@ -29,6 +31,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  await Sentry.close();
   client.close();
   await rm(directory, { recursive: true, force: true });
 });
@@ -102,4 +105,54 @@ test("persists receipt-sized and larger chunks without truncation", async () => 
     expect(chunks[0].key).toEqual(key);
     expect(chunks[0].data && Buffer.from(chunks[0].data).equals(bytes)).toBe(true);
   }
+});
+
+test("measures successful and failed operations without storage keys in metric attributes", async () => {
+  const captured = captureTestMetrics();
+  await storage.save(["private-document", "snapshot", "private-chunk"], new Uint8Array([1, 2]));
+  expect(captured).toContainEqual(
+    expect.objectContaining({
+      name: "server.storage.operations",
+      value: 1,
+      attributes: expect.objectContaining({
+        operation: "save",
+        chunkType: "snapshot",
+        outcome: "success",
+      }),
+    }),
+  );
+  expect(captured).toContainEqual(
+    expect.objectContaining({
+      name: "server.storage.operation.bytes",
+      value: 2,
+      unit: "byte",
+      attributes: expect.objectContaining({ operation: "save", chunkType: "snapshot" }),
+    }),
+  );
+  client.close();
+  await expect(storage.load(["private-document"])).rejects.toThrow(/Failed query/);
+  expect(captured).toContainEqual(
+    expect.objectContaining({
+      name: "server.storage.operations",
+      value: 1,
+      attributes: expect.objectContaining({
+        operation: "load",
+        chunkType: "metadata",
+        outcome: "error",
+      }),
+    }),
+  );
+  expect(captured).toContainEqual(
+    expect.objectContaining({
+      name: "server.storage.operation.duration",
+      value: expect.any(Number),
+      unit: "millisecond",
+      attributes: expect.objectContaining({
+        operation: "load",
+        chunkType: "metadata",
+        outcome: "error",
+      }),
+    }),
+  );
+  expect(JSON.stringify(captured)).not.toContain("private");
 });
