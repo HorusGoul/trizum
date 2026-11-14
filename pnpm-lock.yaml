@@ -146,8 +146,8 @@ catalogs:
       specifier: 13.7.6
       version: 13.7.6
     '@revenuecat/purchases-capacitor-ui':
-      specifier: 13.7.6
-      version: 13.7.6
+      specifier: 14.1.0
+      version: 14.1.0
     '@rolldown/plugin-babel':
       specifier: 0.3.0
       version: 0.3.0
@@ -649,7 +649,7 @@ importers:
         version: 13.7.6(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 14.1.0(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -758,7 +758,7 @@ importers:
         version: 13.7.6(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 14.1.0(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
       '@sentry/cloudflare':
         specifier: 10.76.2
         version: 10.76.2(wrangler@4.156.1(@types/node@26.6.5))
@@ -4527,11 +4527,11 @@ packages:
     resolution: {integrity: sha512-C7c51Nn4yTxXFKvgh2txJFNweaVcfUPQxwEUFw4aWsCmfiBDJsTSwviIF8EcwjQ6k8bPyMWCl1vw4BdxE569Cg==}
     engines: {node: '>= 10'}
 
-  '@revenuecat/purchases-capacitor-ui@13.7.6':
-    resolution: {integrity: sha512-6COG8051ihbM+vbBw39abeiU6JnsgPHZ67b1C2OTHXxBwX4qArlYw82BTCZZiT9d51h0KXjttbfzu2ubZtQSbw==}
+  '@revenuecat/purchases-capacitor-ui@14.1.0':
+    resolution: {integrity: sha512-fvAOyFI6LzrED+guJ9lO7S8pPrlbakpoLjQvZbmieVDH9mY3ag+TkRmDhzhGeTmsnVoWYZXBL9JoyI5w8ywCHg==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
-      '@revenuecat/purchases-capacitor': 13.7.6
+      '@revenuecat/purchases-capacitor': 14.1.0
 
   '@revenuecat/purchases-capacitor@13.7.6':
     resolution: {integrity: sha512-Ynwsno3yhW1QbfICVlx8jXwmnVV933ADSl+d0kCV56tENxb4kwT7lXLReCc7HmrbVs2cfGaLYLEAVF8zYzREnw==}
@@ -4540,6 +4540,9 @@ packages:
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0':
     resolution: {integrity: sha512-OUTgB/sqKKr4Wu/u1MT9dYWjc2mw1FRgwes4y/xyboQb781rDZ3yy7ICb8u+B/6bMDG7s0EzcUPLRLNdRz1bJw==}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.1.0':
+    resolution: {integrity: sha512-v5m80eNfQ1mnDJJoR12+CwKyyvH/gaUQnd7QbqpCWEt+VsNlfaNvNxACyaaVlYH+5MTz47xmqrsnnOEBqq5z0Q==}
 
   '@robingenz/zli@0.2.0':
     resolution: {integrity: sha512-LME7G4xkEFuqyVg/MYTB3xoJnvWb955aEfZ7J7yRstzyULs3HBdxz0l5QiP8gmMMMZ434cb8Wn/DdHqeNTT2fA==}
@@ -13473,11 +13476,11 @@ snapshots:
 
   '@resvg/resvg-wasm@2.4.0': {}
 
-  '@revenuecat/purchases-capacitor-ui@13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))':
+  '@revenuecat/purchases-capacitor-ui@14.1.0(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))':
     dependencies:
       '@capacitor/core': 8.5.3
       '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
-      '@revenuecat/purchases-typescript-internal-esm': 19.15.0
+      '@revenuecat/purchases-typescript-internal-esm': 20.1.0
 
   '@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3)':
     dependencies:
@@ -13485,6 +13488,8 @@ snapshots:
       '@revenuecat/purchases-typescript-internal-esm': 19.15.0
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0': {}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.1.0': {}
 
   '@robingenz/zli@0.2.0(zod@4.0.17)':
     dependencies:
@@ -14320,7 +14325,7 @@ snapshots:
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
       '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
-      '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+      '@revenuecat/purchases-capacitor-ui': 14.1.0(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
       '@sentry/cloudflare': 10.76.2(wrangler@4.156.1(@types/node@26.6.5))
       '@sentry/react': 10.76.2(react@19.3.1)
       '@sentry/vite-plugin': 5.4.1(rollup@4.65.1)(supports-color@10.2.2)
