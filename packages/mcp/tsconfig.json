@@ -1,0 +1,17 @@
+{
+  "extends": "@trizum/tsconfig/base.json",
+  "include": ["./src"],
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "composite": true,
+    "declaration": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "noEmit": false
+  }
+}

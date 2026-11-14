@@ -26,6 +26,7 @@ import { Route as MigrateTricountRouteRouteImport } from './routes/migrate_.tric
 import { Route as PartyPartyIdRouteRouteImport } from './routes/party.$partyId/route'
 import { Route as HomeSettingsCloudSyncRouteImport } from './routes/_home/settings_.cloud-sync'
 import { Route as PartyPartyIdAddRouteImport } from './routes/party_.$partyId.add'
+import { Route as PartyPartyIdContinueRouteImport } from './routes/party_.$partyId.continue'
 import { Route as PartyPartyIdPayRouteRouteImport } from './routes/party_.$partyId.pay/route'
 import { Route as PartyPartyIdSettingsRouteRouteImport } from './routes/party_.$partyId.settings/route'
 import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
@@ -124,6 +125,11 @@ const PartyPartyIdAddRoute = PartyPartyIdAddRouteImport.update({
   path: '/party/$partyId/add',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartyPartyIdContinueRoute = PartyPartyIdContinueRouteImport.update({
+  id: '/party_/$partyId/continue',
+  path: '/party/$partyId/continue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartyPartyIdPayRouteRoute = PartyPartyIdPayRouteRouteImport.update({
   id: '/party_/$partyId/pay',
   path: '/party/$partyId/pay',
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/party/$partyId/transfer-debt': typeof PartyPartyIdTransferDebtRouteRoute
   '/settings/cloud-sync': typeof HomeSettingsCloudSyncRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
+  '/party/$partyId/continue': typeof PartyPartyIdContinueRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/stats': typeof PartyPartyIdStatsRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/party/$partyId/transfer-debt': typeof PartyPartyIdTransferDebtRouteRoute
   '/settings/cloud-sync': typeof HomeSettingsCloudSyncRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
+  '/party/$partyId/continue': typeof PartyPartyIdContinueRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/stats': typeof PartyPartyIdStatsRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/party_/$partyId/transfer-debt': typeof PartyPartyIdTransferDebtRouteRoute
   '/_home/settings_/cloud-sync': typeof HomeSettingsCloudSyncRoute
   '/party_/$partyId/add': typeof PartyPartyIdAddRoute
+  '/party_/$partyId/continue': typeof PartyPartyIdContinueRoute
   '/party_/$partyId/share': typeof PartyPartyIdShareRoute
   '/party_/$partyId/stats': typeof PartyPartyIdStatsRoute
   '/party_/$partyId/who': typeof PartyPartyIdWhoRoute
@@ -315,6 +324,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/transfer-debt'
     | '/settings/cloud-sync'
     | '/party/$partyId/add'
+    | '/party/$partyId/continue'
     | '/party/$partyId/share'
     | '/party/$partyId/stats'
     | '/party/$partyId/who'
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/transfer-debt'
     | '/settings/cloud-sync'
     | '/party/$partyId/add'
+    | '/party/$partyId/continue'
     | '/party/$partyId/share'
     | '/party/$partyId/stats'
     | '/party/$partyId/who'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/party_/$partyId/transfer-debt'
     | '/_home/settings_/cloud-sync'
     | '/party_/$partyId/add'
+    | '/party_/$partyId/continue'
     | '/party_/$partyId/share'
     | '/party_/$partyId/stats'
     | '/party_/$partyId/who'
@@ -408,6 +420,7 @@ export interface RootRouteChildren {
   PartyPartyIdSettingsRouteRoute: typeof PartyPartyIdSettingsRouteRouteWithChildren
   PartyPartyIdTransferDebtRouteRoute: typeof PartyPartyIdTransferDebtRouteRoute
   PartyPartyIdAddRoute: typeof PartyPartyIdAddRoute
+  PartyPartyIdContinueRoute: typeof PartyPartyIdContinueRoute
   PartyPartyIdShareRoute: typeof PartyPartyIdShareRoute
   PartyPartyIdStatsRoute: typeof PartyPartyIdStatsRoute
   PartyPartyIdWhoRoute: typeof PartyPartyIdWhoRoute
@@ -534,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/party/$partyId/add'
       fullPath: '/party/$partyId/add'
       preLoaderRoute: typeof PartyPartyIdAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/continue': {
+      id: '/party_/$partyId/continue'
+      path: '/party/$partyId/continue'
+      fullPath: '/party/$partyId/continue'
+      preLoaderRoute: typeof PartyPartyIdContinueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/party_/$partyId/pay': {
@@ -688,6 +708,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartyPartyIdSettingsRouteRoute: PartyPartyIdSettingsRouteRouteWithChildren,
   PartyPartyIdTransferDebtRouteRoute: PartyPartyIdTransferDebtRouteRoute,
   PartyPartyIdAddRoute: PartyPartyIdAddRoute,
+  PartyPartyIdContinueRoute: PartyPartyIdContinueRoute,
   PartyPartyIdShareRoute: PartyPartyIdShareRoute,
   PartyPartyIdStatsRoute: PartyPartyIdStatsRoute,
   PartyPartyIdWhoRoute: PartyPartyIdWhoRoute,

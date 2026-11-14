@@ -1,3 +1,5 @@
+import { readAnalyticsCampaign } from "@trizum/analytics";
+import { createAiHandoffUrl, NATIVE_APP_ORIGIN } from "../../src/lib/aiInvite";
 import { z } from "zod";
 import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo";
@@ -172,6 +174,20 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const request = c.req.raw;
 
     if (!isPartyPreviewRequest(request)) {
+      const url = new URL(request.url);
+      const partyId = c.req.param("partyId");
+
+      if (
+        url.origin === NATIVE_APP_ORIGIN &&
+        url.searchParams.get("entry") === "ai" &&
+        isValidDocumentId(partyId)
+      ) {
+        c.header("Cache-Control", "no-store");
+        c.header("Referrer-Policy", "no-referrer");
+
+        return c.redirect(createAiHandoffUrl(partyId, readAnalyticsCampaign(url.search)), 302);
+      }
+
       const assetResponse = await c.env.ASSETS.fetch(request);
 
       return new Response(assetResponse.body, {

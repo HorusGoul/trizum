@@ -109,3 +109,14 @@ test("preserves branded promo codes when routing a native app link", async () =>
     href: "/redeem?code=FRIENDS",
   });
 });
+
+test("keeps AI party handoffs on the existing associated native origin", async () => {
+  const href = "/party/party-id?utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff";
+  await expect(resolveNativeDeepLink(`https://trizum.app${href}`)).resolves.toEqual({
+    isAppLink: true,
+    href,
+  });
+  await expect(resolveNativeDeepLink(`https://join.trizum.app${href}`)).resolves.toEqual({
+    isAppLink: false,
+  });
+});

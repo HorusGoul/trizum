@@ -16,6 +16,22 @@ connected repository builds.
 
 Configure the [GitHub Actions secrets](#github-actions-secrets) before deploying.
 
+## AI invite browser fallback
+
+`join.trizum.app` is a second custom domain on the same Worker, declared in
+`wrangler.jsonc`. It serves the AI download/web handoff. Keep `trizum.app` as the
+native-associated target: Safari can then launch an installed app from the
+handoff's cross-domain link using existing entitlements and AASA configuration.
+
+Production deployment must provision this custom domain and HTTPS before AI
+invites are enabled. Preview version uploads do not provision custom domains;
+their handoff stays on the preview host. Verify both domains after production
+deployment, including the redirect, an already-installed iOS app, and web
+continuation. No new database, link storage or native entitlement is involved.
+The host and trusted-origin lists include `join.trizum.app` for the existing API
+and analytics proxy. Human analytics keeps each origin's existing privacy gates;
+only approved campaign labels travel back to the canonical web join flow.
+
 ## Outbound sync routing
 
 Keep `global_fetch_strictly_public` enabled so outbound requests from
@@ -87,6 +103,13 @@ the normal Automerge storage and sync path.
 The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party
 list document pointer.
 
+MCP party and expense tools do not access D1. Migration
+`0008_drop_mcp_operations.sql` removes the retry table introduced by `0007`, which
+remains in migration history. Deploy the direct-sync MCP implementation before
+applying this removal to a shared environment: older Worker versions still use
+the table. The migration drops only MCP operation records and their index; app
+accounts, cloud-sync settings, and Automerge groups remain intact.
+
 Create the database with Wrangler, then copy the generated database name and ID
 into `wrangler.jsonc`:
 
@@ -110,6 +133,18 @@ CI validates migrations as part of `@trizum/pwa#check`. Production releases
 apply remote D1 migrations before deploying the Worker. To apply migrations
 without deploying, run the `PWA Production Migrations` GitHub Actions workflow
 manually and enter the branch, tag, or commit SHA containing the migrations.
+
+## MCP write controls
+
+The `MCP_WRITE_LIMITER` binding allows 60 write-related attempts per minute per
+source IP, hostname, and Cloudflare location. Each mutation attempt counts. Cloudflare's rate limiter is approximate and agents sharing an egress IP
+share this allowance. Its namespace ID must remain unique to this limiter in the
+account. Counters contain no group data and never enter analytics.
+
+MCP has no write tokens, signing secret dependency, operation receipts, or
+scheduled cleanup. Missing limiter configuration fails writes closed; read-only
+MCP operations remain available. The empty cron list clears the former MCP
+cleanup schedule on production deployment.
 
 ## Email
 

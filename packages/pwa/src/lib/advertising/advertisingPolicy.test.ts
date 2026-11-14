@@ -69,6 +69,7 @@ describe("advertising policy", () => {
 
   it.each([
     "/new",
+    "/party/one/continue",
     "/settings",
     "/party/one/add",
     "/party/one/who",
@@ -88,6 +89,7 @@ describe("advertising policy", () => {
   it("protects transient media and calculator surfaces", () => {
     expect(isProtectedAdRoute("/party/one", { media: 0 })).toBe(true);
     expect(isProtectedAdRoute("/party/one", { calculator: "amount" })).toBe(true);
+    expect(isProtectedAdRoute("/party/one", { entry: "ai" })).toBe(true);
     expect(isProtectedAdRoute("/party/one", {})).toBe(false);
   });
 });

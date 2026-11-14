@@ -10,6 +10,7 @@ The main React application, with offline-first Automerge state and a Cloudflare 
 - **Change UI or client state:** [PWA conventions](../../docs/agents/pwa.md).
 - **Change HTTP routes or clients:** [First-party API](./docs/api.md).
 - **Configure Cloudflare:** [Worker setup and deployment](./docs/cloudflare.md).
+- **Change the ChatGPT app or MCP tools:** [MCP package](../mcp/README.md).
 - **Change authentication or deletion:** [OAuth](./docs/oauth.md) and [account deletion](./docs/account-deletion.md).
 - **Change paid features:** [Party Boost state](./docs/party-boost.md), [promo codes](./docs/promo-codes.md), and [native monetization](../mobile/docs/monetization.md).
 - **Change telemetry:** [Analytics integration](./docs/analytics.md).

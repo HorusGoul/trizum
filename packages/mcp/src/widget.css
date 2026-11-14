@@ -1,0 +1,16 @@
+@import "@trizum/ui/styles.css";
+
+@source "./widget.tsx";
+
+html {
+  scrollbar-gutter: auto;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  min-width: 0;
+}

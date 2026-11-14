@@ -33,6 +33,11 @@ The endpoint audit excludes Better Auth (owned by its auth client), health and
 OpenAPI discovery (not consumed by app code), static assets, HTML/social previews,
 and third-party requests such as Tricount's upstream API and attachment downloads.
 
+The Worker also mounts the agent-facing MCP protocol at `/api/mcp`. It has its
+own schemas, Origin policy, and stateless transport, separate from the
+first-party OpenAPI contract. See the [MCP package](../../mcp/README.md) for tools,
+shared-link access, retry semantics, and ChatGPT setup.
+
 ## Receipt extraction
 
 `POST /api/premium/receipts` takes `{ partyDocumentId, image, locale }`, where `image`

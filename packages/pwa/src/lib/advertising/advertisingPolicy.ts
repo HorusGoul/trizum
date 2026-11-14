@@ -7,6 +7,7 @@ export const APP_OPEN_AD_MAX_AGE_MS = 4 * 60 * 60 * 1_000;
 
 const PROTECTED_AD_ROUTE_SEGMENTS = new Set([
   "add",
+  "continue",
   "edit",
   "join",
   "migrate",
@@ -102,6 +103,8 @@ export function isPreparedAppOpenFresh(preparedAt: number | undefined, now: numb
 }
 
 export function isProtectedAdRoute(pathname: string, search: AppSearch) {
+  if (search.entry === "ai") return true;
+
   if (
     adMediaSearchSchema.safeParse(search).success ||
     adCalculatorSearchSchema.safeParse(search).success

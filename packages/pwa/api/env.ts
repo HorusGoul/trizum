@@ -12,6 +12,8 @@ export interface ApiEnv {
   DB: D1Database;
   EMAIL: SendEmail;
   SPYCAT?: Pick<Fetcher, "fetch">;
+  MCP_ANALYTICS_ENABLED?: string;
+  MCP_WRITE_LIMITER?: RateLimit;
   AI?: ReceiptAI;
   IMAGES?: ReceiptImages;
   RECEIPT_RATE_LIMITER?: RateLimit;

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { describe, expect, it, vi } from "vite-plus/test";
 import {
   createAnalytics,
+  MCP_HANDOFF_CAMPAIGN,
   hasPrivacySignal,
   type AnalyticsEvent,
   type AnalyticsPayload,
@@ -84,6 +85,72 @@ describe("privacy boundary", () => {
     expect(
       readCollectToken(bootstrap().replace('"test.token.signature"', "evil()"), siteId),
     ).toBeUndefined();
+  });
+});
+
+describe("campaign attribution", () => {
+  const campaign = `?${new URLSearchParams(MCP_HANDOFF_CAMPAIGN)}`;
+
+  it("keeps approved startup attribution through join redirects without sending private query data", async () => {
+    const { client, fetch, payloads } = harness();
+    client.captureCampaign(
+      `${campaign}&partyId=${documentId}&code=secret&name=Alice&utm_content=private`,
+    );
+    client.page(`/party/${documentId}/continue`);
+    client.captureCampaign("?redirectTo=private&name=Alice");
+    client.page(`/party/${documentId}`);
+    client.track("ai_handoff_web_continue_requested");
+    await client.flush();
+    expect(fetch).not.toHaveBeenCalled();
+    client.setEnabled(true, telemetryId);
+    await client.flush();
+    expect(payloads()).toHaveLength(3);
+    expect(payloads().every((payload) => payload.query === campaign)).toBe(true);
+    expect(payloads()[2]).toMatchObject({
+      eventName: "ai_handoff_web_continue_requested",
+      eventData: {},
+    });
+    expect(JSON.stringify(payloads())).not.toMatch(/Alice|secret|private|2f9Vysj/);
+  });
+
+  it("snapshots each visit's campaign and detects a new campaign on the same route", async () => {
+    const { client, payloads } = harness();
+    client.setEnabled(true, telemetryId);
+    client.page("/settings");
+    client.captureCampaign(campaign);
+    client.page("/settings");
+    client.page("/settings");
+    client.captureCampaign(campaign.replace("mcp", "chatgpt"));
+    client.page("/settings");
+    await client.flush();
+    expect(payloads().map((payload) => payload.query)).toEqual([
+      "",
+      campaign,
+      campaign.replace("mcp", "chatgpt"),
+    ]);
+  });
+
+  it.each(["opt-out", "privacy", "profile"])("clears attribution on %s", async (reason) => {
+    const { client, canCollect, payloads } = harness();
+    client.setEnabled(true, telemetryId);
+    client.captureCampaign(campaign);
+
+    if (reason === "privacy") {
+      canCollect.mockReturnValue(false);
+      client.captureCampaign(campaign);
+      canCollect.mockReturnValue(true);
+    } else if (reason === "opt-out") {
+      client.setEnabled(false);
+      client.captureCampaign(campaign);
+    } else {
+      client.setEnabled(true, crypto.randomUUID());
+    }
+
+    if (reason !== "profile") client.setEnabled(true, telemetryId);
+    client.page("/settings");
+    await client.flush();
+    expect(payloads()).toHaveLength(1);
+    expect(payloads()[0].query).toBe("");
   });
 });
 

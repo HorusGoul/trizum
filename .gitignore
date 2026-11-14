@@ -161,6 +161,7 @@ test-results/
 
 # Generated icon sprite artifacts
 packages/pwa/src/generated/
+packages/mcp/src/generated/
 
 # Generated RevenueCat API types
 packages/revenuecat-api/src/generated/
