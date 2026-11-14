@@ -4,7 +4,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createPartyFromMigrationData } from "#src/models/migration.ts";
-import { MigrationApiError, trizumApiClient } from "#src/lib/trizumApiClient.ts";
+import { trizumApiClient } from "#src/lib/trizumApiClient.ts";
+import { extractTricountId } from "#src/lib/tricount.ts";
 import type { Party } from "#src/models/party.ts";
 import { ErrorState, SuccessState } from "./-components/FinishedStates.js";
 import { IdleState } from "./-components/IdleState.js";
@@ -16,23 +17,24 @@ export const Route = createFileRoute("/migrate_/tricount")({
 });
 
 function RouteComponent() {
-  const [state, migrate] = useMigrateTricount();
+  const [state, migrate, editLink] = useMigrateTricount();
 
   switch (state.type) {
     case "idle":
-      return <IdleState onSubmit={(values) => void migrate(values)} />;
+      return <IdleState defaultValues={state.values} onSubmit={(values) => void migrate(values)} />;
     case "in-progress":
       return <InProgressState {...state} />;
     case "success":
       return <SuccessState {...state} />;
     case "error":
-      return <ErrorState {...state} />;
+      return <ErrorState onCheckLink={editLink} />;
   }
 }
 
 type MigrationState =
   | {
       type: "idle";
+      values?: MigrateParams;
     }
   | {
       type: "in-progress";
@@ -45,14 +47,19 @@ type MigrationState =
     }
   | {
       type: "error";
-      message: string;
+      values: MigrateParams;
     };
 
 function useMigrateTricount() {
   const [state, setState] = useState<MigrationState>({ type: "idle" });
   const repo = useRepo();
 
-  async function migrate({ key, importAttachments }: MigrateParams) {
+  async function migrate(values: MigrateParams) {
+    const { key, importAttachments } = values;
+    const tricountKey = extractTricountId(key);
+
+    if (!tricountKey) return;
+
     trackEvent("tricount_import_started");
     setState({
       type: "in-progress",
@@ -61,7 +68,7 @@ function useMigrateTricount() {
     });
 
     try {
-      const data = await trizumApiClient.migration.importTricount(key);
+      const data = await trizumApiClient.migration.importTricount(tricountKey);
 
       const partyId = await createPartyFromMigrationData({
         repo,
@@ -78,19 +85,18 @@ function useMigrateTricount() {
 
       trackEvent("tricount_import_completed");
       setState({ type: "success", partyId });
-    } catch (error) {
+    } catch {
       trackEvent("tricount_import_failed");
       setState({
         type: "error",
-        message:
-          error instanceof MigrationApiError && error.status === "invalid_response"
-            ? t`Tricount import returned an invalid response.`
-            : error instanceof Error
-              ? error.message
-              : "Unknown error",
+        values,
       });
     }
   }
 
-  return [state, migrate] as const;
+  function editLink() {
+    if (state.type === "error") setState({ type: "idle", values: state.values });
+  }
+
+  return [state, migrate, editLink] as const;
 }

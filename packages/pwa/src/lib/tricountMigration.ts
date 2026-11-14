@@ -94,7 +94,14 @@ export interface TricountResponse {
 }
 
 export function parseTricountData(data: TricountResponse): MigrationData {
-  const registry = data.Response[0].Registry;
+  const registry = data?.Response?.[0]?.Registry;
+
+  if (!registry) {
+    throw new Error(
+      "tricount could not be found. Check that the sharing link is correct and still available.",
+    );
+  }
+
   const registryEntries = registry.all_registry_entry.slice().sort(compareRegistryEntries);
 
   // Create photo mapping with temporary IDs
