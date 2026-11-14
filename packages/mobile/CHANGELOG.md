@@ -1,5 +1,14 @@
 # @trizum/mobile
 
+## 1.14.0
+
+### Patch Changes
+
+- [#633](https://github.com/HorusGoul/trizum/pull/633) [`d70b693`](https://github.com/HorusGoul/trizum/commit/d70b69312dd307afb25c6652a72c82cb2472821c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add the approved English and Spanish search artwork to the App Store release. Fix header processing so releases attach their build and selected artwork before automatic review submission.
+- Updated dependencies [[`d46dd8a`](https://github.com/HorusGoul/trizum/commit/d46dd8af9bf13789cf7f839f923efacaf7ac66ba), [`83b33f6`](https://github.com/HorusGoul/trizum/commit/83b33f669cf9e9ddef4477bae4e306721f81b890), [`9bd67a2`](https://github.com/HorusGoul/trizum/commit/9bd67a240bdd3f9d5ef5bde4f43f5a47e049fbed), [`79ba6d5`](https://github.com/HorusGoul/trizum/commit/79ba6d50fa38f8474289354a5daa361f2b3a0ed7)]:
+  - @trizum/pwa@1.14.0
+  - @trizum/logging@1.1.3
+
 ## 1.13.6
 
 ### Patch Changes
