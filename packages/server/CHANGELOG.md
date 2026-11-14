@@ -1,5 +1,11 @@
 # @trizum/server
 
+## 2.0.4
+
+### Patch Changes
+
+- [#634](https://github.com/HorusGoul/trizum/pull/634) [`f01fb5d`](https://github.com/HorusGoul/trizum/commit/f01fb5d7258c5b172496786204f1ea19fec71f6e) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Report storage operations, sync traffic, Automerge latency, active connections, and process memory as Sentry metrics for production monitoring.
+
 ## 2.0.3
 
 ### Patch Changes
