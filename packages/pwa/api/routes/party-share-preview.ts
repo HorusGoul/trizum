@@ -69,7 +69,7 @@ const PARTY_SHARE_IMAGE_STYLES = {
   hero: "display: flex; align-items: center; margin-top: 182px;",
   partyCopy: "display: flex; flex-direction: column; margin-left: 48px;",
   partyIcon:
-    "display: flex; align-items: center; justify-content: center; width: 124px; height: 124px; color: #FFFFFF; font-size: 108px; line-height: 1; filter: grayscale(1) brightness(2.35) contrast(1.8);",
+    "display: flex; align-items: center; justify-content: center; width: 124px; height: 124px; color: #FFFFFF; font-size: 108px; line-height: 1;",
   partyIconTile:
     "display: flex; align-items: center; justify-content: center; width: 196px; height: 196px; border-radius: 40px; background: linear-gradient(180deg, #171717 0%, #050505 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.03);",
   title: "display: flex; max-width: 780px; font-weight: 800; line-height: 0.98; letter-spacing: 0;",
@@ -258,7 +258,7 @@ async function createWorkersOgImageResponse(
   const interFonts = await loadInterFontData(env, request);
 
   return new ImageResponse(html, {
-    emoji: "twemoji",
+    emoji: "fluent",
     format: "png",
     fonts: interFonts.map(({ data, weight }) => ({
       data,
