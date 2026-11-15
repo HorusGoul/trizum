@@ -9,6 +9,7 @@ import interRegularFontUrl from "../assets/inter/Inter-Regular.ttf?url";
 import type { ApiEnv, ApiHonoEnv } from "../env";
 import { getAutomergeWssUrl, type AutomergeDocuments } from "../automergeDocuments";
 import { createApiI18n } from "../i18n";
+import { embedPreviewEmoji } from "../previewEmoji";
 import { DEFAULT_LOCALE, type SupportedLocale } from "../../src/lib/locales.js";
 import { getLogger } from "../../src/lib/log.js";
 import {
@@ -257,8 +258,7 @@ async function createWorkersOgImageResponse(
   const { ImageResponse } = await import("workers-og");
   const interFonts = await loadInterFontData(env, request);
 
-  return new ImageResponse(html, {
-    emoji: "fluent",
+  return new ImageResponse(await embedPreviewEmoji(html), {
     format: "png",
     fonts: interFonts.map(({ data, weight }) => ({
       data,
