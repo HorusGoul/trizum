@@ -1,3 +1,4 @@
+import { metrics } from "@sentry/node";
 import { createHmac, randomBytes } from "node:crypto";
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 import type { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket";
@@ -19,7 +20,20 @@ export function observeSync(
   const connections = new WeakMap<WebSocket, string>();
   const documents = new WeakMap<WebSocket, Set<DocumentId>>();
 
+  // Sample idle servers too; connection-close logs alone miss sustained load.
+  const sampleRuntime = () => {
+    metrics.gauge("server.sync.connections.active", server.clients.size);
+    metrics.gauge("server.memory.rss", process.memoryUsage().rss, { unit: "byte" });
+    metrics.gauge("server.memory.heap_used", process.memoryUsage().heapUsed, { unit: "byte" });
+  };
+
+  sampleRuntime();
+  const runtimeTimer = setInterval(sampleRuntime, 30_000);
+  runtimeTimer.unref();
+  server.once("close", () => clearInterval(runtimeTimer));
+
   server.on("connection", (socket) => {
+    metrics.count("server.sync.connections.opened");
     const connectionRef = crypto.randomUUID();
     connections.set(socket, connectionRef);
     documents.set(socket, new Set());
@@ -34,11 +48,26 @@ export function observeSync(
         ? data.reduce((sum, part) => sum + part.byteLength, 0)
         : data.byteLength;
 
+      metrics.count("server.sync.messages.received");
+      metrics.distribution("server.sync.message.size", bytes, { unit: "byte" });
       messageCount++;
       receivedBytes += bytes;
       largestMessageBytes = Math.max(largestMessageBytes, bytes);
     });
     socket.on("close", (closeCode, reason) => {
+      // Collapse application-defined close codes to avoid unbounded dimensions.
+      const closeCategory =
+        closeCode === 1000 ? "normal" : closeCode === 1001 ? "going_away" : "abnormal";
+
+      metrics.count("server.sync.connections.closed", 1, { attributes: { closeCategory } });
+      metrics.distribution("server.sync.connection.duration", performance.now() - started, {
+        unit: "millisecond",
+        attributes: { closeCategory },
+      });
+      metrics.distribution("server.sync.connection.buffered", socket.bufferedAmount, {
+        unit: "byte",
+      });
+      sampleRuntime();
       logger.info("Sync connection closed {connectionRef} with code {closeCode}", {
         connectionRef,
         closeCode,
@@ -57,6 +86,7 @@ export function observeSync(
       });
     });
     socket.on("error", (error) => {
+      metrics.count("server.sync.socket.errors");
       logger.error("Sync socket failed {connectionRef}: {error}", { connectionRef, error });
     });
   });
@@ -94,6 +124,11 @@ export function observeSync(
 
   repo.on("doc-metrics", (metric) => {
     if (!("durationMillis" in metric)) return;
+
+    metrics.distribution("server.automerge.operation.duration", metric.durationMillis, {
+      unit: "millisecond",
+      attributes: { operation: metric.type },
+    });
 
     const fields = {
       documentRef: diagnosticRef(metric.documentId),

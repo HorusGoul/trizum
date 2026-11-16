@@ -1,3 +1,4 @@
+import { metrics } from "@sentry/node";
 import type { Database } from "#src/db.ts";
 import { CURRENT_TIMESTAMP } from "#src/db/columns.helpers.ts";
 import { automergeKV } from "#src/db/schema.ts";
@@ -103,7 +104,11 @@ export class DrizzleSqliteStorageAdapter implements StorageAdapterInterface {
       writeBytes,
     };
 
+    const attributes = { operation, chunkType: fields.chunkType ?? "metadata" };
+    let outcome = "error";
+
     const pending = setTimeout(() => {
+      metrics.count("server.storage.operations.pending", 1, { attributes });
       logger.warning("Storage operation still pending {operation} for {documentRef}", {
         ...fields,
         durationMs: Math.round(performance.now() - started),
@@ -122,6 +127,8 @@ export class DrizzleSqliteStorageAdapter implements StorageAdapterInterface {
             ? result.reduce((sum, chunk: Chunk) => sum + (chunk.data?.byteLength ?? 0), 0)
             : (writeBytes ?? 0);
 
+      outcome = "success";
+      metrics.distribution("server.storage.operation.bytes", bytes, { unit: "byte", attributes });
       const durationMs = Math.round(performance.now() - started);
       const completed = { ...fields, bytes, durationMs };
 
@@ -154,6 +161,11 @@ export class DrizzleSqliteStorageAdapter implements StorageAdapterInterface {
       throw error;
     } finally {
       clearTimeout(pending);
+      metrics.count("server.storage.operations", 1, { attributes: { ...attributes, outcome } });
+      metrics.distribution("server.storage.operation.duration", performance.now() - started, {
+        unit: "millisecond",
+        attributes: { ...attributes, outcome },
+      });
     }
   }
 }

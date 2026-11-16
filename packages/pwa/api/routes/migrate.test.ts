@@ -47,6 +47,20 @@ describe("Tricount migration contract", () => {
     expect(data.photos).toEqual([]);
   });
 
+  test.each<z.infer<ReturnType<typeof z.json>>>([{ Response: [] }, { Response: [{}] }, {}, null])(
+    "reports an unavailable Tricount for a response without a registry: %j",
+    async (upstream) => {
+      stubUpstream(upstream);
+      const response = await apiMigrateRoute.request("/?key=test-key");
+      expect(response.status).toBe(500);
+      await expect(response.json()).resolves.toEqual({
+        error:
+          "tricount could not be found. Check that the sharing link is correct and still available.",
+        data: upstream,
+      });
+    },
+  );
+
   test("preserves upstream failure status and error payload", async () => {
     vi.stubGlobal(
       "fetch",

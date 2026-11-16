@@ -1,5 +1,12 @@
 # @trizum/ts-template
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`79ba6d5`](https://github.com/HorusGoul/trizum/commit/79ba6d50fa38f8474289354a5daa361f2b3a0ed7)]:
+  - @trizum/logging@1.1.3
+
 ## 1.0.3
 
 ### Patch Changes

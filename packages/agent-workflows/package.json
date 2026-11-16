@@ -1,6 +1,6 @@
 {
   "name": "@trizum/agent-workflows",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "description": "Agentic maintenance workflows for the trizum workspace.",
   "keywords": [
