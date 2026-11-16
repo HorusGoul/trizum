@@ -155,6 +155,35 @@ it("validates write arguments before touching the service and returns structured
   expect(service.addExpense).not.toHaveBeenCalled();
 });
 
+it("accepts original expense currencies and optional user-supplied rates", async () => {
+  const { client, service } = await connect();
+
+  const input = {
+    partyId: "party",
+    name: "Dinner",
+    amount: "12.00",
+    currency: "USD",
+    exchangeRate: 0.75,
+    paidBy: "alice",
+    splitBetween: ["alice"],
+    paidAt: "2026-11-06T20:00:00Z",
+  };
+
+  const result = await client.callTool({ name: "add_expense", arguments: input });
+  expect(result.isError).not.toBe(true);
+  expect(service.addExpense).toHaveBeenCalledWith(input);
+  await client.callTool({ name: "add_expense", arguments: { ...input, exchangeRate: undefined } });
+  expect(service.addExpense).toHaveBeenCalledTimes(2);
+
+  for (const invalid of [{ currency: "usd" }, { exchangeRate: 0 }, { exchangeRate: -1 }]) {
+    expect(
+      await client.callTool({ name: "add_expense", arguments: { ...input, ...invalid } }),
+    ).toMatchObject({ isError: true });
+  }
+
+  expect(service.addExpense).toHaveBeenCalledTimes(2);
+});
+
 it("validates participant additions and returns IDs for expense follow-ups", async () => {
   const { client, service } = await connect();
   service.addParticipants.mockResolvedValueOnce({

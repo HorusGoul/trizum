@@ -10,6 +10,7 @@ import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddlew
 import { WorkerPartyService } from "../mcp/partyService";
 import { createMcpAnalytics } from "../mcp/analytics";
 import { createMcpWriteLimit } from "../mcp/writeLimit";
+import { loadExchangeRates } from "../exchangeRates";
 import {
   mcpBalancesMessage,
   mcpErrorMessage,
@@ -56,7 +57,14 @@ mcpRoute.use("*", createAutomergeDocumentsMiddleware());
 mcpRoute.on(["POST", "GET", "DELETE"], "/", (c) => {
   const i18n = c.get("i18n");
 
-  const service = new WorkerPartyService(c.get("documents"), NATIVE_APP_ORIGIN);
+  const service = new WorkerPartyService(c.get("documents"), NATIVE_APP_ORIGIN, async (base) => {
+    const { table } = await loadExchangeRates(base, c.req.url, (task) =>
+      c.executionCtx.waitUntil(task),
+    );
+
+    return table;
+  });
+
   const trackEvent = createMcpAnalytics(c.env, c.req.raw, (task) => c.executionCtx.waitUntil(task));
 
   return handleMcpRequest(c.req.raw, service, {

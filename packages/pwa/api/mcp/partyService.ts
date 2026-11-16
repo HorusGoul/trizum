@@ -25,14 +25,21 @@ import {
 } from "../../src/models/expense";
 import type { Party } from "../../src/models/party";
 
-import { PartyExpenses, MAX_CHUNKS, formatAmount, type PartyDocuments } from "./expenseService";
+import {
+  PartyExpenses,
+  MAX_CHUNKS,
+  formatAmount,
+  type PartyDocuments,
+  type LoadExpenseRates,
+} from "./expenseService";
 
 export class WorkerPartyService implements PartyService {
   constructor(
     private readonly documents: PartyDocuments,
     private readonly origin: string,
+    loadRates?: LoadExpenseRates,
   ) {
-    this.expenses = new PartyExpenses(documents);
+    this.expenses = new PartyExpenses(documents, loadRates);
   }
 
   private readonly expenses: PartyExpenses;

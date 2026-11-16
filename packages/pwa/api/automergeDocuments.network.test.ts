@@ -196,7 +196,7 @@ describe("Worker document reads over WebSocket", () => {
 
     async function call<T>(
       name: string,
-      input: Record<string, string | string[]>,
+      input: Record<string, string | string[] | number>,
       schema: z.ZodType<T>,
     ) {
       const response = await app.request(
@@ -256,6 +256,32 @@ describe("Worker document reads over WebSocket", () => {
     expect(cleaned.expenses).toHaveLength(1);
     expect(cleaned.participants.map((person) => person.balance)).toEqual(["24.00", "-24.00"]);
     expect(limit).toHaveBeenCalledTimes(5);
+
+    const foreign = await call(
+      "add_expense",
+      {
+        ...expense,
+        name: "Dinner abroad",
+        amount: "12.00",
+        currency: "USD",
+        exchangeRate: 0.75,
+      },
+      partyViewSchema,
+    );
+
+    const foreignRecord = foreign.expenses.find((entry) => entry.name === "Dinner abroad")!;
+    const foreignTarget = { partyId: first.partyId, expenseId: foreignRecord.id };
+    const saved = await call("get_expense", foreignTarget, expenseViewSchema);
+    expect(saved).toMatchObject({
+      currency: "EUR",
+      amount: "9.00",
+      originalAmount: { currency: "USD", amount: "12.00" },
+      exchangeRate: 0.75,
+    });
+    await call("delete_expense", { ...foreignTarget, version: saved.version }, partyViewSchema);
+    const restored = await call("get_party", { partyId: first.partyId }, partyViewSchema);
+    expect(restored.participants.map((person) => person.balance)).toEqual(["24.00", "-24.00"]);
+    expect(limit).toHaveBeenCalledTimes(7);
   });
 
   it("creates agent parties and expenses that survive Worker cleanup with correct shared balances", async () => {

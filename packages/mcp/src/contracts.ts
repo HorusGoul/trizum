@@ -50,7 +50,21 @@ export const addExpenseSchema = z.object({
     .string()
     .regex(/^(?:0|[1-9]\d{0,9})(?:\.\d{1,2})?$/)
     .describe(
-      "Positive total in the party's currency, as a decimal string, e.g. '42.50'. trizum supports up to two decimal places for every currency. Never convert currencies implicitly.",
+      "Positive total in the supplied expense currency, or the party currency when currency is omitted, as a decimal string, e.g. '42.50'. trizum supports up to two decimal places for every currency. Send the original amount rather than converting it yourself.",
+    ),
+  currency: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .optional()
+    .describe(
+      "Currency the expense was paid in, such as USD. Omit to use the party currency. Ask if ambiguous.",
+    ),
+  exchangeRate: z
+    .number()
+    .positive()
+    .optional()
+    .describe(
+      "Optional user-supplied rate: party-currency units per one expense-currency unit. Only for a different currency. Never invent a rate; omit to use trizum's reference rates.",
     ),
   paidBy: participantId.describe(
     "The payer's participant ID returned by get_party, never a display name.",
@@ -118,7 +132,11 @@ export const updateExpenseSchema = z
     expenseId,
     version,
     name: addExpenseSchema.shape.name.optional(),
-    amount: addExpenseSchema.shape.amount.optional(),
+    amount: addExpenseSchema.shape.amount
+      .describe(
+        "Positive total in the party currency, as a decimal string. Converted expenses support only name/date edits here.",
+      )
+      .optional(),
     paidBy: addExpenseSchema.shape.paidBy.optional(),
     splitBetween: addExpenseSchema.shape.splitBetween.optional(),
     paidAt: addExpenseSchema.shape.paidAt.optional(),

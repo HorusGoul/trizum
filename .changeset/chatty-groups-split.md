@@ -21,7 +21,11 @@ Publish independent expense and balance documents before linking them to the
 group, preserving concurrent additions. Patch existing records without replacing
 identities, attachments, custom splits or unspecified fields. Return a known group
 link when a new party's sync acknowledgement cannot be confirmed.
-Expose saved foreign-currency amounts and conversion rates on expense reads.
+Support creating expenses in different currencies using shared web reference-rate
+lookup and edge caching, or a user-supplied exchange rate. Reuse PWA conversion,
+rounding and split helpers, keeping balances in the party currency while saving
+original amounts and shares. Expose saved conversion details on expense reads.
+Reject missing or invalid conversions before publishing expense documents.
 Preserve conversion metadata during name/date edits and direct financial edits
 of converted expenses to trizum. Preserve participant payment methods during
 renaming and archival/restoration. Integrate with the shared Worker telemetry

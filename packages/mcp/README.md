@@ -29,7 +29,7 @@ English and Spanish through the Worker's `Accept-Language` or `?lang=es` setting
 | `create_party`       | Create a named group with a currency and 1–50 named participants; return its invite URL.    |
 | `get_party`          | Sync a known party's participants, shared balances, and up to 20 recent expenses on demand. |
 | `add_participants`   | Add named people to a party and return their IDs for subsequent expenses.                   |
-| `add_expense`        | Record a paid expense with one payer, split equally among selected participants.            |
+| `add_expense`        | Record a paid expense in the party or another currency, with one payer and an equal split.  |
 | `get_expense`        | Read a specific expense's payer amounts, split rules, and version before changing it.       |
 | `update_party`       | Change the group name, description, or symbol without replacing other fields.               |
 | `update_participant` | Rename, archive, or restore a participant while retaining their ID and history.             |
@@ -62,9 +62,37 @@ expense hashes use the existing domain model. Positive balances mean money is
 owed to that person; negative balances mean they owe money.
 
 This version excludes account discovery, contacts, notifications, payments,
-attachment editing, currency changes/conversion, custom-split creation,
+attachment editing, party-currency changes, financial edits to converted expenses, custom-split creation,
 and transfer editing/deletion. Reads are bounded to 100 expense chunks and 1,000 expenses per existing chunk; larger
 parties must be opened in trizum.
+
+## Expense currencies
+
+`add_expense` accepts an optional `currency` for the amount actually paid. Omit
+it, or supply the party currency, to retain the existing behavior. For example,
+in an EUR party, `amount: "12.00", currency: "USD"` records USD 12 and converts
+its total into EUR. Results and balances remain in the party currency.
+
+Without an explicit rate, the Worker uses the same reference-rate loader and
+edge cache as `/api/exchange-rates`, with the PWA's bundled fallback and newest-quote
+selection. Public web requests and MCP requests on the same host share entries;
+there is no extra D1 lookup, persistent MCP rate store, or party cache. Reference
+rates cache for six hours, or five minutes for a bundled fallback. The tool uses
+reference rates available at creation, not historical rates for `paidAt`.
+
+An optional `exchangeRate` accepts a rate explicitly supplied by the user, in
+party-currency units per expense-currency unit: `0.75` means USD 1 = EUR 0.75
+in that example. This skips rate lookup. Agents must not invent rates or
+preconvert the amount. If no reference rate exists, ask the user for one rather
+than recording an unconverted amount. A rate is invalid for a party-currency
+expense. Unsupported currencies, invalid rates, overflow and converted totals
+that round to zero are rejected before creating any expense documents.
+
+Conversion uses the PWA's integer-hundredths helper and half-even rounding.
+The saved expense retains its original amount/currency, exchange rate and
+original per-person allocations; its payer amounts and balances use the party
+currency. `get_expense` returns the saved conversion details. Reads and metadata
+edits never refresh an existing expense's rate.
 
 ## Editing existing data
 
@@ -272,6 +300,10 @@ omit Origin; Origin checks are not party authorization.
   Replaying it must not delete another record. Ambiguous expense names require
   clarification; stale versions require a fresh read.
 - Negative: “Find all Bob's groups.” Expect no search or account access.
+- Foreign currency: in an EUR party, “Alice paid USD 12 for dinner, split equally
+  with Sam.” Expect the original USD amount, reference-rate conversion and EUR
+  balances. Read the expense to inspect its saved rate and original shares.
+  “Use EUR 0.75 per USD” should save EUR 9 without a reference-rate lookup.
 - Negative: “Budget €100 for dinner.” Expect no paid expense to be recorded.
 - Negative: invalid party ID, unknown payer, duplicate split member, zero amount,
   or more than two decimals. Expect no expense write.

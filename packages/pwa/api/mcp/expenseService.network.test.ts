@@ -1,4 +1,5 @@
 import { once } from "node:events";
+import { Hono } from "hono";
 import { McpToolError } from "@trizum/mcp/index";
 import { clone } from "@opentf/std";
 import { createRequire } from "node:module";
@@ -10,6 +11,10 @@ import type { WebSocketServer } from "ws" with { "resolution-mode": "require" };
 import { beforeEach, afterEach, expect, it, vi } from "vite-plus/test";
 import { AutomergeDocuments } from "../automergeDocuments";
 import { WorkerPartyService } from "./partyService";
+import type { LoadExpenseRates } from "./expenseService";
+import { createExchangeRatesLoader } from "../exchangeRates";
+import { createExchangeRatesRoute } from "../routes/exchange-rates";
+import { getBundledExchangeRates } from "../../src/lib/exchangeRateTables";
 import {
   calculateBalancesByParticipant,
   calculateExpenseHash,
@@ -120,6 +125,227 @@ async function fixture(amounts = [1000, 2000]) {
 
   return { api, docs, partyId, alice, bob, chunk, summary };
 }
+
+it.each([
+  { currency: "USD", amount: "12.00", rate: 0.75, converted: "9.00", shares: [600, 600] },
+  { currency: "JPY", amount: "300.00", rate: 0.01, converted: "3.00", shares: [15000, 15000] },
+  { currency: "KWD", amount: "0.03", rate: 1.5, converted: "0.04", shares: [1, 2] },
+])("creates and persists a $currency expense at a supplied rate", async (sample) => {
+  const f = await fixture([]);
+
+  const view = await f.api.addExpense({
+    partyId: f.partyId,
+    name: "Foreign dinner",
+    amount: sample.amount,
+    currency: sample.currency,
+    exchangeRate: sample.rate,
+    paidBy: f.alice,
+    splitBetween: [f.alice, f.bob].toSorted().reverse(),
+    paidAt: "2026-11-06T20:00:00Z",
+  });
+
+  const expenseId = view.expenses[0].id;
+  const input = { partyId: f.partyId, expenseId };
+  const fresh = service();
+  const read = await fresh.getExpense(input);
+  expect(view.currency).toBe("EUR");
+  expect(read).toMatchObject({
+    amount: sample.converted,
+    currency: "EUR",
+    originalAmount: { currency: sample.currency, amount: sample.amount },
+    exchangeRate: sample.rate,
+    paidBy: [{ participantId: f.alice, amount: sample.converted }],
+  });
+  expect(read.shares.map((share) => share.originalAmount).sort((a, b) => a! - b!)).toEqual(
+    sample.shares,
+  );
+  const party = await documents().read<Party>(f.partyId);
+  const saved = (await documents().read<PartyExpenseChunk>(party.chunkRefs[0].chunkId)).expenses[0];
+  expect(saved.__hash).toBe(calculateExpenseHash(saved));
+  expect(read.version).toBe(saved.__hash);
+  const expectedBalances = calculateBalancesByParticipant([saved], party.participants);
+
+  const balanceDocument = await documents().read<PartyExpenseChunkBalances>(
+    party.chunkRefs[0].balancesId,
+  );
+
+  expect(balanceDocument.balances).toEqual(expectedBalances);
+
+  await fresh.updateExpense({ ...input, version: read.version, name: "Dinner abroad" });
+  const renamed = await service().getExpense(input);
+  expect(renamed).toMatchObject({
+    name: "Dinner abroad",
+    amount: read.amount,
+    originalAmount: read.originalAmount,
+    exchangeRate: read.exchangeRate,
+    shares: read.shares,
+  });
+  const removed = await service().deleteExpense({ ...input, version: renamed.version });
+  expect(removed.expenses).toEqual([]);
+  expect(balances(removed)).toEqual({ Alice: "0.00", Bob: "0.00" });
+});
+
+it("reuses the web rate cache and converts the quote in the correct direction", async () => {
+  const f = await fixture([]);
+  let cached: Response | undefined;
+  const pending: Promise<unknown>[] = [];
+
+  const cache = {
+    match: vi.fn<Cache["match"]>(async () => cached?.clone()),
+    put: vi.fn<Cache["put"]>(async (_key, value) => {
+      cached = value.clone();
+    }),
+  };
+
+  const fetchRates = vi.fn<typeof fetch>(async () =>
+    Response.json([
+      { base: "EUR", quote: "USD", rate: 2, date: getBundledExchangeRates("EUR").rates.USD!.date },
+    ]),
+  );
+
+  const options = { fetchRates, getCache: () => cache };
+
+  const context = {
+    waitUntil: (task: Promise<unknown>) => {
+      pending.push(task);
+    },
+    passThroughOnException() {},
+    props: {},
+  };
+
+  const app = new Hono().route("/api/exchange-rates", createExchangeRatesRoute(options));
+
+  const response = await app.request(
+    "https://trizum.test/api/exchange-rates?base=EUR",
+    {},
+    {},
+    context,
+  );
+
+  expect(response.status).toBe(200);
+  await Promise.all(pending);
+  const load = createExchangeRatesLoader(options);
+
+  const api = new WorkerPartyService(f.docs, "https://trizum.test", async (base) => {
+    const { table } = await load(base, "https://trizum.test/api/mcp", context.waitUntil);
+
+    return table;
+  });
+
+  const view = await api.addExpense({
+    partyId: f.partyId,
+    name: "Dinner",
+    amount: "12.00",
+    currency: "USD",
+    paidBy: f.alice,
+    splitBetween: [f.alice, f.bob],
+    paidAt: "2026-11-06T20:00:00Z",
+  });
+
+  const read = await service().getExpense({ partyId: f.partyId, expenseId: view.expenses[0].id });
+  expect(read).toMatchObject({
+    amount: "6.00",
+    exchangeRate: 0.5,
+    originalAmount: { amount: "12.00", currency: "USD" },
+  });
+  expect(balances(view)).toEqual({ Alice: "3.00", Bob: "-3.00" });
+  expect(fetchRates).toHaveBeenCalledOnce();
+  expect(cache.put).toHaveBeenCalledOnce();
+  expect(cache.match.mock.calls.map(([key]) => new Request(key).url)).toEqual([
+    "https://trizum.test/api/exchange-rates?base=EUR",
+    "https://trizum.test/api/exchange-rates?base=EUR",
+  ]);
+});
+
+it("keeps party-currency expenses unchanged and does not request exchange rates", async () => {
+  const f = await fixture([]);
+
+  const load = vi.fn<LoadExpenseRates>(async () => {
+    throw new Error("Must not fetch");
+  });
+
+  const api = new WorkerPartyService(f.docs, "https://trizum.test", load);
+
+  const view = await api.addExpense({
+    partyId: f.partyId,
+    name: "Dinner",
+    amount: "10.00",
+    currency: "EUR",
+    paidBy: f.alice,
+    splitBetween: [f.alice, f.bob],
+    paidAt: "2026-11-06T20:00:00Z",
+  });
+
+  const read = await service().getExpense({ partyId: f.partyId, expenseId: view.expenses[0].id });
+  expect(read).not.toHaveProperty("originalAmount");
+  expect(read).not.toHaveProperty("exchangeRate");
+  expect(read.shares.every((share) => !Object.hasOwn(share, "originalAmount"))).toBe(true);
+  expect(balances(view)).toEqual({ Alice: "5.00", Bob: "-5.00" });
+  expect(load).not.toHaveBeenCalled();
+});
+
+it.each(["missing", "wrong-base", "unavailable"])(
+  "requires a user rate when reference rates are %s, and permits an explicit override",
+  async (mode) => {
+    const f = await fixture([]);
+
+    const load = vi.fn<LoadExpenseRates>(async () => {
+      if (mode === "unavailable") throw new Error("Provider failure");
+
+      const base = mode === "wrong-base" ? "USD" : "EUR";
+
+      return { base, rates: { [base]: { rate: 1, date: "2026-11-16" } } };
+    });
+
+    const api = new WorkerPartyService(f.docs, "https://trizum.test", load);
+
+    const input = {
+      partyId: f.partyId,
+      name: "Dinner",
+      amount: "12.00",
+      currency: "XXX",
+      paidBy: f.alice,
+      splitBetween: [f.alice, f.bob],
+      paidAt: "2026-11-06T20:00:00Z",
+    };
+
+    const create = vi.spyOn(f.docs, "create");
+    await expect(api.addExpense(input)).rejects.toThrow("No reference exchange rate");
+    expect(create).not.toHaveBeenCalled();
+    const view = await api.addExpense({ ...input, exchangeRate: 0.5 });
+    expect(view.expenses[0].amount).toBe("6.00");
+    expect(load).toHaveBeenCalledOnce();
+  },
+);
+
+it.each([
+  { currency: "ZZZ", exchangeRate: 1 },
+  { currency: "USD" },
+  { currency: "EUR", exchangeRate: 2 },
+  { exchangeRate: 2 },
+  { currency: "USD", exchangeRate: 0 },
+  { currency: "USD", exchangeRate: -1 },
+  { currency: "USD", exchangeRate: Infinity },
+  { currency: "USD", exchangeRate: Number.MAX_VALUE },
+  { currency: "USD", exchangeRate: 0.00001 },
+])("rejects an unsupported conversion before creating documents: %j", async (conversion) => {
+  const f = await fixture([]);
+  const create = vi.spyOn(f.docs, "create");
+  const before = await f.api.getParty(f.partyId);
+  await expect(
+    f.api.addExpense({
+      partyId: f.partyId,
+      name: "Dinner",
+      amount: "0.01",
+      ...conversion,
+      paidBy: f.alice,
+      splitBetween: [f.alice, f.bob],
+      paidAt: "2026-11-06T20:00:00Z",
+    }),
+  ).rejects.toBeInstanceOf(McpToolError);
+  expect(create).not.toHaveBeenCalled();
+  expect(await service().getParty(f.partyId)).toEqual(before);
+});
 
 async function foreignCurrencyFixture(exchangeRate?: number) {
   const f = await fixture([1000]);

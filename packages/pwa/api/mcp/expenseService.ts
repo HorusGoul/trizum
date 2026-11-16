@@ -1,7 +1,14 @@
 import { deleteAt } from "@automerge/automerge-repo";
 import { clone } from "@opentf/std";
 import { toDecimal } from "dinero.js";
-import { createMoney } from "../../src/lib/money";
+import { createMoney, isCurrencyCode, type CurrencyCode } from "../../src/lib/money";
+import type { ExchangeRates } from "../../src/lib/api/exchangeRatesContract";
+import {
+  getBundledExchangeRates,
+  getExchangeRate,
+  mergeExchangeRates,
+} from "../../src/lib/exchangeRateTables";
+import { convertExpenseAmount } from "../../src/lib/currencyConversion";
 import { convertToUnits } from "../../src/lib/expenses";
 import { addExpenseSchema } from "@trizum/mcp/contracts";
 import { recalculateChunkBalances } from "./recalculateChunkBalances";
@@ -21,6 +28,7 @@ import {
   createExpenseId,
   decodeExpenseId,
   getExpenseTotalAmount,
+  getExpenseUnitShares,
   findExpenseById,
   type Expense,
 } from "../../src/models/expense";
@@ -39,11 +47,16 @@ export type PartyDocuments = Pick<
 
 export const MAX_CHUNKS = 100;
 
+export type LoadExpenseRates = (base: CurrencyCode) => Promise<ExchangeRates>;
+
 /** Expense edits own scope checks, optimistic versions, and shared-balance reconciliation. */
 export class PartyExpenses {
-  constructor(private readonly documents: PartyDocuments) {}
+  constructor(
+    private readonly documents: PartyDocuments,
+    private readonly loadRates?: LoadExpenseRates,
+  ) {}
   async add(party: Party, input: AddExpenseInput) {
-    const amount = parseExpenseAmount(input.amount);
+    const originalAmount = parseExpenseAmount(input.amount);
     const people = [input.paidBy, ...input.splitBetween];
 
     if (
@@ -64,6 +77,31 @@ export class PartyExpenses {
         "This party is too large for this integration. Open it in trizum to add the expense.",
       );
 
+    const currency = input.currency ?? party.currency;
+
+    if (!isCurrencyCode(currency))
+      throw new McpToolError(
+        "Unsupported expense currency. Choose a currency supported by trizum.",
+      );
+
+    const converted = currency !== party.currency;
+
+    if (!converted && input.exchangeRate !== undefined)
+      throw new McpToolError(
+        "An exchange rate requires an expense currency different from the party currency.",
+      );
+
+    const rate = converted
+      ? await this.exchangeRate(party.currency, currency, input.exchangeRate)
+      : 1;
+
+    const amount = converted ? convertExpenseAmount(originalAmount, rate) : originalAmount;
+
+    if (amount === undefined || amount <= 0)
+      throw new McpToolError(
+        "The converted amount must be positive and within trizum's supported range. Check the amount and exchange rate.",
+      );
+
     // Independent requests must not replace the same derived balance map.
     // Publish a completed chunk and its balance before merging its party reference.
     // maxSize: 1 also makes normal PWA appends start a new chunk.
@@ -73,12 +111,26 @@ export class PartyExpenses {
         name: input.name,
         paidAt: new Date(input.paidAt),
         paidBy: { [input.paidBy]: amount },
+        // Match Automerge's map order for saved hashes and odd-cent allocations.
         shares: Object.fromEntries(
-          input.splitBetween.map((id) => [id, { type: "divide", value: 1 }]),
+          input.splitBetween.toSorted().map((id) => [id, { type: "divide", value: 1 }]),
         ),
         photos: [],
         __hash: "",
       };
+
+      if (converted) {
+        expense.originalAmount = { amount: originalAmount, currency };
+        expense.exchangeRate = rate;
+
+        const originalShares = getExpenseUnitShares({
+          paidBy: { [input.paidBy]: originalAmount },
+          shares: expense.shares,
+        });
+
+        for (const [id, share] of Object.entries(expense.shares))
+          share.originalAmount = originalShares[id];
+      }
 
       expense.__hash = calculateExpenseHash(expense);
 
@@ -103,6 +155,34 @@ export class PartyExpenses {
     await this.documents.change<Party>(party.id, (doc) => {
       doc.chunkRefs.unshift(reference);
     });
+  }
+
+  private async exchangeRate(base: CurrencyCode, currency: CurrencyCode, supplied?: number) {
+    if (supplied !== undefined) {
+      if (!Number.isFinite(supplied) || supplied <= 0)
+        throw new McpToolError("Choose a positive finite exchange rate supplied by the user.");
+
+      return supplied;
+    }
+
+    try {
+      if (this.loadRates) {
+        const table = await this.loadRates(base);
+
+        const quote =
+          table.base === base
+            ? getExchangeRate(mergeExchangeRates(getBundledExchangeRates(base), table), currency)
+            : undefined;
+
+        if (quote) return quote.rate;
+      }
+    } catch {
+      // A missing reference rate must not result in a guessed conversion or a partial write.
+    }
+
+    throw new McpToolError(
+      "No reference exchange rate is available for this currency. Ask the user for a rate in party-currency units per expense-currency unit, or open trizum.",
+    );
   }
 
   async get(party: Party, input: GetExpenseInput): Promise<ExpenseView> {
