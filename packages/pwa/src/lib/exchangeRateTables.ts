@@ -36,3 +36,14 @@ export function getBundledExchangeRates(base: CurrencyCode): ExchangeRates {
 
   return { base, rates };
 }
+
+/** Retain bundled currencies while preferring the newest available quote. */
+export function mergeExchangeRates(current: ExchangeRates, incoming: ExchangeRates): ExchangeRates {
+  const rates = { ...current.rates };
+
+  for (const [currency, value] of Object.entries(incoming.rates)) {
+    if (!rates[currency] || value.date >= rates[currency].date) rates[currency] = value;
+  }
+
+  return { base: current.base, rates };
+}

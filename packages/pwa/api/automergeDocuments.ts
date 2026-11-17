@@ -5,13 +5,29 @@ import {
   type Doc,
   type SyncState,
 } from "@automerge/automerge";
-import { isValidDocumentId, Repo, type DocumentId, type PeerId } from "@automerge/automerge-repo";
+import {
+  isValidDocumentId,
+  Repo,
+  type DocHandle,
+  type DocumentId,
+  type PeerId,
+} from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { getLogger } from "../src/lib/log.js";
 import type { ApiEnv } from "./env";
 
 const logger = getLogger("api", "automergeDocuments");
 const DEFAULT_TIMEOUT_MS = 10_000;
+
+/** A new document ID exists, but the peer has not confirmed its write. */
+export class UnconfirmedDocumentWriteError extends Error {
+  constructor(
+    readonly documentId: DocumentId,
+    cause: ErrorOptions["cause"],
+  ) {
+    super("Document creation was not acknowledged by the sync peer.", { cause });
+  }
+}
 
 interface AutomergeDocumentsOptions {
   env: Pick<ApiEnv, "AUTOMERGE_WSS_URL">;
@@ -36,13 +52,57 @@ export class AutomergeDocuments {
     this.#signal = AbortSignal.any([this.#controller.signal, options.request.signal]);
   }
 
+  /** A fresh sync view for verifying cross-document projections, sharing this request's deadline. */
+  fork() {
+    this.#signal.throwIfAborted();
+
+    return new AutomergeDocuments({
+      ...this.#options,
+      request: new Request(this.#options.request.url, { signal: this.#signal }),
+    });
+  }
+
   async read<T>(documentId: DocumentId): Promise<Doc<T>> {
     return (await this.#find<T>(documentId)).doc();
+  }
+
+  /** Repo-style local reads and immediate mutations with awaitable sync receipts. */
+  async find<T>(documentId: DocumentId) {
+    const handle = await this.#find<T>(documentId);
+
+    return {
+      doc: () => handle.doc(),
+      change: (change: ChangeFn<T>) => this.#acknowledge(handle, change),
+    };
+  }
+
+  /** Publish a new document and wait for the sync peer before request cleanup. */
+  async create<T extends object>(initialize: (documentId: DocumentId) => T): Promise<Doc<T>> {
+    this.#signal.throwIfAborted();
+    const repo = await (this.#ready ??= this.#connect());
+    this.#signal.throwIfAborted();
+    const handle = repo.create<T>();
+    this.#requestedIds.add(handle.documentId);
+
+    try {
+      return await this.#acknowledge(handle, (doc) => {
+        Object.assign(doc, initialize(handle.documentId));
+        repo.shareConfigChanged();
+      });
+    } catch (error) {
+      throw new UnconfirmedDocumentWriteError(handle.documentId, error);
+    }
   }
 
   /** Wait for the connected sync peer to acknowledge the change before returning. */
   async change<T>(documentId: DocumentId, change: ChangeFn<T>): Promise<Doc<T>> {
     const handle = await this.#find<T>(documentId);
+
+    return this.#acknowledge(handle, change);
+  }
+
+  async #acknowledge<T>(handle: DocHandle<T>, change: ChangeFn<T>): Promise<Doc<T>> {
+    const documentId = handle.documentId;
     const repo = this.#repo!;
     const previousHeads = getHeads(handle.doc()).join(",");
     await new Promise<void>((resolve, reject) => {

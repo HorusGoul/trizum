@@ -31,6 +31,8 @@ peerDependencyRules:
     vite: "*"
     vitest: "*"
 catalog:
+  "@modelcontextprotocol/ext-apps": 2.0.4
+  "@modelcontextprotocol/sdk": 1.32.2
   oxc-transform-react: 0.152.0
   storybook: 10.6.5
   "@storybook/react-vite": 10.6.5

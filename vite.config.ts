@@ -36,6 +36,7 @@ const ignorePatterns = [
   "**/visual-results/**",
   "**/visual-report/**",
   "packages/ui/src/generated/**",
+  "packages/mcp/src/generated/**",
   "**/locales/*/messages.ts",
   "**/node_modules/**",
   "**/coverage/**",

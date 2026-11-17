@@ -55,6 +55,30 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
+          <h2 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+            <Trans>ChatGPT and other agents</Trans>
+          </h2>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              You can create and use shared expense groups through connected agents without signing
+              in. The group and expense details you provide are synchronized through the same
+              service as the app. Anyone with a group link can access and edit that group. The agent
+              provider processes your conversation under its own privacy policy.
+            </Trans>
+          </p>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              We count completed agent actions using anonymous, self-hosted analytics. These counts
+              contain no user identifier, client network address, user agent, group identifier,
+              names, or amounts. They do not depend on an app profile or its analytics setting. We
+              respect privacy signals when the agent forwards them. Separate temporary counters
+              based on the source network address limit excessive write requests and are not used
+              for analytics.
+            </Trans>
+          </p>
+        </section>
+
+        <section className="flex flex-col gap-4">
           <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             1. Information We Collect
           </h2>

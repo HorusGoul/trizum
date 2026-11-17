@@ -1,5 +1,22 @@
 /** Approved names and meanings. No event accepts caller-supplied properties. */
 export const analyticsEvents = {
+  ai_handoff_app_store_requested:
+    "The user followed the App Store link from an AI invite; installation is not confirmed.",
+  ai_handoff_play_store_requested:
+    "The user followed the Google Play link from an AI invite; installation is not confirmed.",
+  ai_handoff_app_open_requested:
+    "The user followed the existing-app party link from an AI invite; native launch is not confirmed.",
+  ai_handoff_web_continue_requested:
+    "The user chose to continue an AI invite through the normal web join flow.",
+  mcp_party_created: "An MCP create_party action completed.",
+  mcp_party_viewed: "An explicit MCP get_party action completed; internal reads are excluded.",
+  mcp_participants_added: "An MCP add_participants batch completed. No names or IDs are sent.",
+  mcp_expense_added: "An MCP add_expense action completed.",
+  mcp_expense_viewed: "An explicit MCP get_expense completed; internal edit lookups are excluded.",
+  mcp_expense_updated: "An MCP update_expense completed.",
+  mcp_expense_deleted: "An MCP delete_expense completed.",
+  mcp_party_updated: "An MCP update_party completed.",
+  mcp_participant_updated: "An MCP participant rename, archive, or restoration completed.",
   party_created: "A group document was created through the new-group form.",
   party_joined: "The user selected their participant when joining a group.",
   party_left: "A group was removed from the user's group list.",
@@ -96,3 +113,5 @@ export const analyticsEvents = {
 } as const;
 
 export type AnalyticsEvent = keyof typeof analyticsEvents;
+
+export type McpAnalyticsEvent = Extract<AnalyticsEvent, `mcp_${string}`>;

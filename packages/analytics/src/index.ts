@@ -1,12 +1,25 @@
 import { readCollectToken } from "./insightflare.js";
 import { isTelemetryId, redactPathname } from "./privacy.js";
 import { analyticsEvents, type AnalyticsEvent } from "./events.js";
+import { readAnalyticsCampaign } from "./campaign.js";
+
+export {
+  analyticsCampaignSchema,
+  MCP_HANDOFF_CAMPAIGN,
+  readAnalyticsCampaign,
+} from "./campaign.js";
+
+export type { AnalyticsCampaign } from "./campaign.js";
 
 const allowedAnalyticsEvents = new Set(Object.keys(analyticsEvents));
 
 export { hasPrivacySignal, isAutomatedBrowser, isTelemetryId } from "./privacy.js";
 
 export type { AnalyticsEvent } from "./events.js";
+
+export { createAnonymousServerAnalytics } from "./server.js";
+
+export type { McpAnalyticsEvent } from "./events.js";
 
 export interface AnalyticsOptions {
   endpoint: string;
@@ -20,6 +33,7 @@ export interface AnalyticsOptions {
 
 interface Visit {
   pathname: string;
+  query: string;
   visitId: string;
   startedAt: number;
 }
@@ -29,7 +43,6 @@ interface AnalyticsVisitPayload extends Visit {
   hostname: string;
   timestamp: number;
   visitorId: string;
-  query: string;
   hash: string;
   title: string;
   referrerUrl: string;
@@ -70,6 +83,7 @@ export function createAnalytics(options: AnalyticsOptions) {
   let controller = new AbortController();
   let visit: Visit | undefined;
   let lastPathname: string | undefined;
+  let campaignQuery = "";
   let token: { value: string; expiresAt: number } | undefined;
   let queue = { pending: 0, tail: Promise.resolve() };
 
@@ -93,6 +107,7 @@ export function createAnalytics(options: AnalyticsOptions) {
     token = undefined;
     visit = undefined;
     lastPathname = undefined;
+    campaignQuery = "";
   }
 
   function canRecord() {
@@ -191,7 +206,6 @@ export function createAnalytics(options: AnalyticsOptions) {
       ...current,
       timestamp: Date.now(),
       visitorId: "",
-      query: "",
       hash: "",
       title: "",
       referrerUrl: "",
@@ -210,6 +224,13 @@ export function createAnalytics(options: AnalyticsOptions) {
   }
 
   return {
+    /** Keep only the latest approved campaign in memory, until analytics is disabled. */
+    captureCampaign(search: string) {
+      if (!canRecord()) return;
+      const campaign = readAnalyticsCampaign(search);
+
+      if (campaign) campaignQuery = `?${new URLSearchParams(campaign)}`;
+    },
     setEnabled(value: boolean, id?: string) {
       if (!value || !isTelemetryId(id) || !options.canCollect()) {
         disable();
@@ -234,12 +255,13 @@ export function createAnalytics(options: AnalyticsOptions) {
       for (const payload of buffered) enqueue(payload);
     },
     page(pathname: string) {
-      if (!canRecord() || pathname === lastPathname) return;
+      if (!canRecord() || (pathname === lastPathname && visit?.query === campaignQuery)) return;
 
       if (state === "pending" && startup.length >= 20) return;
       lastPathname = pathname;
       visit = {
         pathname: redactPathname(pathname, options.routes),
+        query: campaignQuery,
         visitId: crypto.randomUUID(),
         startedAt: Date.now(),
       };

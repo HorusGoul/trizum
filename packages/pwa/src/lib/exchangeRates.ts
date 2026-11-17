@@ -1,5 +1,5 @@
 import { exchangeRatesSchema, type ExchangeRates } from "./api/exchangeRatesContract";
-import { getBundledExchangeRates } from "./exchangeRateTables";
+import { getBundledExchangeRates, mergeExchangeRates } from "./exchangeRateTables";
 import { trizumApiClient } from "./trizumApiClient";
 import type { CurrencyCode } from "./money";
 
@@ -81,16 +81,6 @@ export function createExchangeRatesStore(
       return inFlight;
     },
   };
-}
-
-function mergeExchangeRates(current: ExchangeRates, incoming: ExchangeRates): ExchangeRates {
-  const rates = { ...current.rates };
-
-  for (const [currency, value] of Object.entries(incoming.rates)) {
-    if (!rates[currency] || value.date >= rates[currency].date) rates[currency] = value;
-  }
-
-  return { base: current.base, rates };
 }
 
 const stores = new Map<CurrencyCode, ReturnType<typeof createExchangeRatesStore>>();

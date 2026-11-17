@@ -10,10 +10,10 @@ import { createApiI18nMiddleware } from "./i18n";
 import { premiumRoute } from "./routes/premium";
 import { spycatRoute } from "./routes/spycat";
 import { ANALYTICS_PROXY_PATH } from "../src/lib/api/analyticsConfig";
-
+import { mcpRoute } from "./routes/mcp";
 import { exchangeRatesRoute } from "./routes/exchange-rates";
 
-const app = new OpenAPIHono<ApiHonoEnv>();
+export const app = new OpenAPIHono<ApiHonoEnv>();
 
 app.use("*", async (c, next) => {
   const startedAt = Date.now();
@@ -39,6 +39,9 @@ app.use("*", async (c, next) => {
 });
 
 app.use("*", createApiI18nMiddleware());
+
+// MCP owns its Origin policy and protocol preflight headers.
+app.route("/api/mcp", mcpRoute);
 
 app.use("/api/*", createApiCorsMiddleware());
 

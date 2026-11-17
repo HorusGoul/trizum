@@ -12,6 +12,9 @@ lifecycle.
   boundaries.
 - [PWA integration](../pwa/src/lib/analytics.ts): endpoint, build flags,
   preferences, connectivity, and profile switching.
+- [Anonymous server events](./src/server.ts): MCP action payloads and InsightFlare
+  transport, with [Worker integration](../pwa/api/mcp/analytics.ts) owning the
+  binding, environment gates, and request privacy signals.
 - [First-party proxy](../pwa/api/routes/spycat.ts): upstream forwarding and header filtering.
 - [Telemetry integration](../pwa/src/lib/telemetry.ts): shared identity and Sentry
   privacy handling.
@@ -29,6 +32,13 @@ on an internal protocol: when upgrading the deployment, check the upstream
 and [collector](https://github.com/RavelloH/InsightFlare/blob/main/src/lib/edge/collector/collect.ts).
 Never fall back to executing the remote SDK.
 
+Browser acquisition attribution accepts only the fixed labels in
+[`campaign.ts`](./src/campaign.ts). The client reconstructs the three approved
+UTM fields; it never forwards a raw query string. Attribution stays in memory
+through party-join redirects, is attached to visit snapshots, and is cleared when
+collection is disabled or profiles change. It does not track an invite or restore
+party context after installing an app.
+
 The first-party proxy handles native CORS. A Cloudflare service binding preserves
 the client IP and location metadata that public cross-zone fetches can replace;
 bootstrap and collection must use the same forwarding path for IP-bound tokens.
@@ -37,3 +47,11 @@ The synced `telemetryId` is random rather than derived from a document ID becaus
 document IDs grant sharing access. It enables pseudonymous cross-device
 correlation, not anonymity. Concurrent offline migrations can temporarily produce
 different IDs before Automerge converges.
+
+MCP server events use a separate anonymous path through this package. They have
+no human identity or properties, use a fixed synthetic service visitor, and
+never receive tool arguments or request metadata. The package shares a synthetic
+visit and token for five minutes per live server client, including in-flight
+bootstrap. These `/api/mcp` visits describe service activity and must be excluded
+from human pageview/unique-visitor reports; custom events provide action counts.
+See [the PWA integration guide](../pwa/docs/analytics.md) for collection gates.

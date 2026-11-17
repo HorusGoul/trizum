@@ -3,7 +3,7 @@ import {
   partyBoostErrorResponseSchema,
   partyBoostStatusSchema,
 } from "../src/lib/api/premiumContract";
-import app from "./worker";
+import { app } from "./worker";
 
 describe("trizum OpenAPI contract", () => {
   test("publishes the assembled first-party operations", async () => {

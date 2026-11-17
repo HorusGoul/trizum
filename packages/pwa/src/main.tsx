@@ -15,7 +15,12 @@ import {
   type RegisteredRouter,
 } from "@tanstack/react-router";
 import { parseAppSearch, stringifyAppSearch, type AppSearch } from "./lib/routerSearch.ts";
-import { initializeAnalytics, bindAnalytics, trackPage } from "./lib/analytics.ts";
+import {
+  initializeAnalytics,
+  bindAnalytics,
+  trackPage,
+  captureAnalyticsCampaign,
+} from "./lib/analytics.ts";
 import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
 import "./index.css";
 import { I18nProvider } from "@lingui/react";
@@ -275,6 +280,7 @@ if (Capacitor.isNativePlatform()) {
 
     void resolveNativeDeepLink(rawUrl).then(({ href }) => {
       if (href) {
+        captureAnalyticsCampaign(new URL(href, window.location.origin).search);
         pushHistoryWithoutDuplicateEntry(router.history, href);
       }
     });

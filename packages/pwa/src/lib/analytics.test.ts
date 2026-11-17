@@ -6,6 +6,7 @@ import { Capacitor } from "@capacitor/core";
 import { ensureTelemetryId, setPartyListId, type PartyList } from "#src/models/partyList.ts";
 import {
   bindAnalytics,
+  captureAnalyticsCampaign,
   initializeAnalytics,
   trackCloudSyncActivated,
   trackEvent,
@@ -20,7 +21,7 @@ import {
 
 let repo: Repo;
 let cleanups: (() => void)[];
-let browser: EventTarget & { location: { hostname: string; origin: string } };
+let browser: EventTarget & { location: { hostname: string; origin: string; search: string } };
 
 interface TestPrivacyPreferences {
   onLine: boolean;
@@ -38,7 +39,7 @@ beforeEach(() => {
   repo = new Repo({ network: [] });
   cleanups = [];
   browser = Object.assign(new EventTarget(), {
-    location: { hostname: "trizum.app", origin: "https://trizum.app" },
+    location: { hostname: "trizum.app", origin: "https://trizum.app", search: "" },
   });
   preferences = { onLine: true };
   vi.stubGlobal("window", browser);
@@ -373,4 +374,20 @@ it("does not replay activation rejected by destination preferences after re-enab
   });
   await vi.waitFor(() => expect(payloads()).toHaveLength(1));
   expect(payloads()[0].kind).toBe("pageview");
+});
+
+it("preserves initial and validated native campaign labels through join redirects", async () => {
+  const campaign = "?utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff";
+  browser.location.search = `${campaign}&code=secret&name=Alice`;
+  initializeAnalytics(["/", "/party/$partyId", "/party/$partyId/continue"]);
+  browser.location.search = "?redirectTo=private";
+  cleanups.push(bindAnalytics(profile(), () => "/party/group/continue"));
+  await vi.waitFor(() => expect(payloads()).toHaveLength(1));
+  expect(payloads()[0].query).toBe(campaign);
+  captureAnalyticsCampaign(campaign.replace("mcp", "chatgpt"));
+  trackPage("/party/group");
+  trackEvent("ai_handoff_web_continue_requested");
+  await vi.waitFor(() => expect(payloads()).toHaveLength(3));
+  expect(payloads()[2].query).toBe(campaign.replace("mcp", "chatgpt"));
+  expect(JSON.stringify(payloads())).not.toMatch(/private|secret|Alice|group/);
 });

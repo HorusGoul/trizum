@@ -2,26 +2,15 @@ import { z } from "zod";
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import type { RevenueCatPlatform } from "./revenueCatConfig.ts";
+import { APPLE_APP_ID } from "../appStores.ts";
 
-export const APPLE_APP_ID = "6755971747";
+export { APPLE_APP_ID, detectMobilePlatform as detectRedemptionPlatform } from "../appStores.ts";
+
 const PENDING_REDEMPTION_KEY = "trizum:pending-premium-redemption:v1";
 const REDEMPTION_SYNC_WINDOW_MS = 15 * 60_000;
 
 export function parseRedemptionSearch(search: AppSearch) {
   return { code: optionalSearchTextSchema.parse(search.code)?.trim().slice(0, 128) ?? "" };
-}
-
-export function detectRedemptionPlatform(
-  userAgent: string,
-  maxTouchPoints = 0,
-): RevenueCatPlatform | undefined {
-  if (/android/i.test(userAgent)) return "android";
-
-  // iPadOS can request desktop sites and identify as a Mac.
-  if (/iPad|iPhone|iPod/i.test(userAgent) || (/Macintosh/i.test(userAgent) && maxTouchPoints > 1))
-    return "ios";
-
-  return undefined;
 }
 
 export function getStoreRedemptionUrl(platform: RevenueCatPlatform, code: string) {

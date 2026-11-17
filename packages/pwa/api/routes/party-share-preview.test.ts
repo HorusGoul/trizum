@@ -57,6 +57,49 @@ describe("party share preview crawler detection", () => {
   });
 });
 
+test("redirects browser AI invites off the associated app domain before loading party data", async () => {
+  const assetFetch = vi.fn<AssetFetch>(async () => new Response("app"));
+  const loadPreview = vi.fn<LoadPreview>(async () => createPreview());
+  const app = createTestApp(assetFetch, loadPreview);
+  const url = new URL(createPartyUrl());
+  url.search = "?entry=ai&utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff&code=private";
+
+  const response = await app.request(
+    url.href,
+    { headers: { Accept: "text/html", "User-Agent": "Safari" } },
+    createEnv(assetFetch),
+  );
+
+  expect(response.status).toBe(302);
+  expect(response.headers.get("Cache-Control")).toBe("no-store");
+  expect(response.headers.get("Referrer-Policy")).toBe("no-referrer");
+  expect(response.headers.get("Location")).toBe(
+    `https://join.trizum.app${url.pathname}/continue?entry=ai&utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`,
+  );
+  expect(assetFetch).not.toHaveBeenCalled();
+  expect(loadPreview).not.toHaveBeenCalled();
+});
+
+test.each(["https://join.trizum.app", "https://pr-592-trizum.horusdev.workers.dev"])(
+  "does not redirect the handoff host or preview into a loop: %s",
+  async (origin) => {
+    const assetFetch = vi.fn<AssetFetch>(async () => new Response("app"));
+    const loadPreview = vi.fn<LoadPreview>(async () => createPreview());
+    const url = new URL(createPartyUrl());
+    const requestUrl = `${origin}${url.pathname}?entry=ai`;
+
+    const response = await createTestApp(assetFetch, loadPreview).request(
+      requestUrl,
+      { headers: { Accept: "text/html" } },
+      createEnv(assetFetch),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.has("Location")).toBe(false);
+    expect(loadPreview).not.toHaveBeenCalled();
+  },
+);
+
 describe("party share preview metadata", () => {
   test("injects escaped share metadata before the head closes", () => {
     const preview = createPreview({

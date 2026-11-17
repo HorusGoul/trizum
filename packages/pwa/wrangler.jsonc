@@ -41,8 +41,14 @@
       "namespace_id": "1001",
       "simple": { "limit": 10, "period": 60 },
     },
+    {
+      "name": "MCP_WRITE_LIMITER",
+      "namespace_id": "2026110601",
+      "simple": { "limit": 60, "period": 60 },
+    },
   ],
   "services": [{ "binding": "SPYCAT", "service": "insightflare" }],
+  "triggers": { "crons": [] },
   "vars": {
     "SENTRY_DSN": "https://a092f2bfaa76133ba689f2fb96960c00@o524893.ingest.us.sentry.io/4512410544504832",
     "APPLE_APP_BUNDLE_IDENTIFIER": "app.trizum.capacitor",
@@ -50,8 +56,8 @@
     "AUTOMERGE_WSS_URL": "wss://server.trizum.app/sync",
     "PARTY_SHARE_PREVIEW_TIMEOUT_MS": "10000",
     "AUTH_EMAIL_FROM": "trizum <noreply@trizum.app>",
-    "BETTER_AUTH_ALLOWED_HOSTS": "trizum.app,*.horusdev.workers.dev,localhost:5173,localhost:8787,127.0.0.1:5173,127.0.0.1:8787",
-    "BETTER_AUTH_TRUSTED_ORIGINS": "https://trizum.app,https://*.horusdev.workers.dev,capacitor://localhost,ionic://localhost,https://localhost,http://localhost,http://localhost:5173,http://localhost:8787",
+    "BETTER_AUTH_ALLOWED_HOSTS": "trizum.app,join.trizum.app,*.horusdev.workers.dev,localhost:5173,localhost:8787,127.0.0.1:5173,127.0.0.1:8787",
+    "BETTER_AUTH_TRUSTED_ORIGINS": "https://trizum.app,https://join.trizum.app,https://*.horusdev.workers.dev,capacitor://localhost,ionic://localhost,https://localhost,http://localhost,http://localhost:5173,http://localhost:8787",
     "BETTER_AUTH_URL": "https://trizum.app",
     "GOOGLE_ANDROID_APK_CLIENT_ID": "554871818976-9el2tt5b2fj1quodn14be8jncpefij7v.apps.googleusercontent.com",
     "GOOGLE_ANDROID_GOOGLE_PLAY_CLIENT_ID": "554871818976-bps9ha7q5qhop0i8nt8jfa2l2mu48a6a.apps.googleusercontent.com",
@@ -64,6 +70,10 @@
   "routes": [
     {
       "pattern": "trizum.app",
+      "custom_domain": true,
+    },
+    {
+      "pattern": "join.trizum.app",
       "custom_domain": true,
     },
   ],
