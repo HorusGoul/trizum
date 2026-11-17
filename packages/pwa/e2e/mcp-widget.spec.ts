@@ -14,7 +14,7 @@ interface HostMessage {
 
 const party = {
   partyId: "party",
-  url: "https://trizum.app/party/party",
+  url: "https://trizum.app/party/party?entry=ai&utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff",
   name: "Weekend",
   description: "Shared expenses",
   symbol: "🏝️",

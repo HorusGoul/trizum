@@ -28,16 +28,12 @@ Attribution stays in memory, follows subsequent pages and events, and is cleared
 when analytics is disabled, offline, or changes profiles. Existing environment,
 preference, DNT/GPC, and automation gates apply.
 
-The handoff pageview counts exposure; store, app-open, and web-continue events
-count requested actions. They do not confirm installations or native launches.
-Existing party-join events measure web activation. Store links carry neither the
-party ID nor campaign parameters and suppress the referrer. There is no deferred
-install tracking: after installing, users reopen the invite. Server action counts
-cannot be joined to individual browser sessions. Production browser handoffs live
-on `join.trizum.app`; web continuation returns approved UTM labels to `trizum.app`
-without passing profile IDs. Each origin retains its own analytics preference
-and local profile, so cross-origin campaign reports are aggregate counts rather
-than individual visitor conversion tracking.
+The handoff pageview counts exposure. Store and web-continue events count
+requested actions. Existing party-join events measure web activation. Store
+links omit party IDs and campaign parameters and suppress the referrer. After
+installing, users reopen the original invite. The browser handoff and web join
+use the same profile and analytics preference on `trizum.app`. Server action
+counts are aggregate and cannot be joined to individual browser sessions.
 
 ## Anonymous MCP server events
 

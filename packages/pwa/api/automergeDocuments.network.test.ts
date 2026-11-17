@@ -191,6 +191,7 @@ describe("Worker document reads over WebSocket", () => {
     const app = new Hono<ApiHonoEnv>();
     app.use("*", createApiI18nMiddleware());
     app.route("/api/mcp", mcpRoute);
+    app.route("/", createPartySharePreviewRoute());
     const bindings = { ...env, MCP_WRITE_LIMITER: { limit } };
     let requestNumber = 0;
 
@@ -234,6 +235,12 @@ describe("Worker document reads over WebSocket", () => {
     const first = await call("create_party", input, partyViewSchema);
     const second = await call("create_party", input, partyViewSchema);
     expect(first.partyId).not.toBe(second.partyId);
+
+    const handoff = await app.request(first.url, { headers: { Accept: "text/html" } }, bindings);
+    expect(handoff.status).toBe(302);
+    expect(handoff.headers.get("Location")).toBe(
+      `https://trizum.app/party/${first.partyId}/continue?entry=ai&utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`,
+    );
 
     const expense = {
       partyId: first.partyId,

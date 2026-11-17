@@ -13,14 +13,14 @@ import {
   type PartyList,
 } from "#src/models/partyList.ts";
 import { getTelemetryId, setTelemetryIdentity } from "./telemetry.ts";
-import { AI_HANDOFF_ORIGIN, NATIVE_APP_ORIGIN } from "./aiInvite.ts";
+import { NATIVE_APP_ORIGIN } from "./aiInvite.ts";
 import { ANALYTICS_PROXY_PATH, ANALYTICS_SITE_ID } from "./api/analyticsConfig.ts";
 
 let client: Analytics | undefined;
 let activation: { destination: DocumentId; expiresAt: number } | undefined;
 
 export function initializeAnalytics(routes: readonly string[]) {
-  const isProductionHost = [NATIVE_APP_ORIGIN, AI_HANDOFF_ORIGIN].includes(window.location.origin);
+  const isProductionHost = window.location.origin === NATIVE_APP_ORIGIN;
 
   const isEnabledBuild =
     import.meta.env.VITE_APP_ENABLE_ANALYTICS === "true" ||
