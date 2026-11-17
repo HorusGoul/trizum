@@ -20,6 +20,11 @@ participant to join through the normal PWA flow.
   existing Cloudflare Worker, with no separate hosting.
 - [`../pwa/api/mcp`](../pwa/api/mcp): existing Automerge domain operations.
 
+Stable MCP releases deploy the PWA Worker that hosts `/api/mcp`, as well as
+attaching the submission archive. The PWA accepts all stable workspace MCP
+versions so Changesets does not propagate MCP bumps into the shared PWA/mobile
+release group. PWA and mobile still version together for their own changesets.
+
 The package uses the shared `@trizum/ui` design system. Its host supplies
 persistence and Lingui UI labels; it has no PWA dependency. Protocol descriptions guide agents in English; widget labels support
 English and Spanish through the Worker's `Accept-Language` or `?lang=es` setting.

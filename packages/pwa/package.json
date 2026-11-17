@@ -46,7 +46,7 @@
     "@tanstack/react-router": "catalog:",
     "@trizum/analytics": "workspace:*",
     "@trizum/logging": "workspace:*",
-    "@trizum/mcp": "workspace:*",
+    "@trizum/mcp": "workspace:>=0.0.0",
     "@trizum/react-suspense-cache": "workspace:*",
     "@trizum/revenuecat-api": "workspace:*",
     "@trizum/ui": "workspace:*",
