@@ -25,7 +25,12 @@ export default defineConfig({
       },
       check: {
         command: "vp check .",
+        dependsOn: ["package:submission"],
+      },
+      "package:submission": {
+        command: "node dist/packageSubmission.js",
         dependsOn: ["build"],
+        cache: false,
       },
       test: {
         command: "vp test .",

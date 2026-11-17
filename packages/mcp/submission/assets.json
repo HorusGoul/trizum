@@ -1,0 +1,4 @@
+{
+  "assets/icon.png": "../pwa/public/pwa-64x64.png",
+  "assets/logo.png": "../pwa/public/pwa-512x512.png"
+}

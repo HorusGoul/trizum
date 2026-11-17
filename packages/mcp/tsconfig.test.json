@@ -2,9 +2,15 @@
   "extends": "./tsconfig.json",
   "include": ["./src"],
   "exclude": ["dist", "node_modules"],
-  "references": [{ "path": "./tsconfig.json" }],
+  "references": [
+    {
+      "path": "./tsconfig.json"
+    }
+  ],
   "compilerOptions": {
     "composite": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["vite/client", "node"],
+    "resolveJsonModule": true
   }
 }

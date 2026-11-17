@@ -46,9 +46,11 @@
     "@tailwindcss/vite": "catalog:",
     "@trizum/icon-sprite": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@typescript/native": "catalog:",
+    "fflate": "catalog:",
     "tailwindcss": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"

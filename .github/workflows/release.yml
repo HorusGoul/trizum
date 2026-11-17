@@ -83,6 +83,38 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: ./packages/server/deploy.sh
 
+  attach-mcp-submission:
+    name: Attach MCP ChatGPT Submission
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mcp@') && !github.event.release.prerelease
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Build submission package
+        run: vp run --filter @trizum/mcp package:submission
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+
+      - name: Attach submission package and checksum
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#@trizum/mcp@}"
+          archive="packages/mcp/artifacts/trizum-chatgpt-${version}.zip"
+          gh release upload "$RELEASE_TAG" "$archive" "${archive}.sha256" --clobber
+
   build-mobile-android-release-apk:
     name: Build Mobile Android Release APK
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
