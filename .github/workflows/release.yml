@@ -48,7 +48,7 @@ jobs:
 
   deploy-pwa-production:
     name: Deploy PWA Production
-    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/pwa@') && !github.event.release.prerelease
+    if: github.event_name == 'release' && (startsWith(github.event.release.tag_name, '@trizum/pwa@') || startsWith(github.event.release.tag_name, '@trizum/mcp@')) && !github.event.release.prerelease
     permissions:
       contents: read
       deployments: write

@@ -854,7 +854,7 @@ importers:
         specifier: workspace:*
         version: link:../logging
       '@trizum/mcp':
-        specifier: workspace:*
+        specifier: workspace:>=0.0.0
         version: link:../mcp
       '@trizum/react-suspense-cache':
         specifier: workspace:*
