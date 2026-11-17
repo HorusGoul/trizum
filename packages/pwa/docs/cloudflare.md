@@ -18,19 +18,10 @@ Configure the [GitHub Actions secrets](#github-actions-secrets) before deploying
 
 ## AI invite browser fallback
 
-`join.trizum.app` is a second custom domain on the same Worker, declared in
-`wrangler.jsonc`. It serves the AI download/web handoff. Keep `trizum.app` as the
-native-associated target: Safari can then launch an installed app from the
-handoff's cross-domain link using existing entitlements and AASA configuration.
-
-Production deployment must provision this custom domain and HTTPS before AI
-invites are enabled. Preview version uploads do not provision custom domains;
-their handoff stays on the preview host. Verify both domains after production
-deployment, including the redirect, an already-installed iOS app, and web
-continuation. No new database, link storage or native entitlement is involved.
-The host and trusted-origin lists include `join.trizum.app` for the existing API
-and analytics proxy. Human analytics keeps each origin's existing privacy gates;
-only approved campaign labels travel back to the canonical web join flow.
+`trizum.app` serves both canonical party invites and the AI download/web handoff.
+The app links associated with that domain open the party directly when the OS
+dispatches the invite to an installed app. Browser requests for an AI invite
+redirect to `/party/<id>/continue` on the same host.
 
 ## Outbound sync routing
 

@@ -349,26 +349,15 @@ unchanged.
 
 ### Installed-app dispatch
 
-`trizum.app` remains the native-associated domain. An installed app receives the
-canonical invite directly and skips download choices. For browser visits,
-production AI entries redirect to `join.trizum.app/party/<id>/continue`, hosted by
-the same Worker. The handoff's app link points directly back to `trizum.app`,
-which avoids Safari's same-domain universal-link navigation behavior without
-changing native entitlements or requiring existing users to update the app.
-Preview handoff pages use the canonical native target too. MCP responses always
-return the canonical app-associated origin, including calls through preview or
-Worker aliases. This lets installed apps open directly from ChatGPT. To test the
-new browser handoff before production deployment, replace only the invite's
-origin with the PR preview origin; production URLs use the deployed production
-frontend until release.
+MCP responses use the native-associated `trizum.app` origin, including calls
+through preview or Worker aliases. When the OS opens an invite in the installed
+app, it goes straight to the party. Browser visits redirect to
+`trizum.app/party/<id>/continue`. The redirect runs before party data is loaded
+and carries only the entry flag and approved campaign labels. The web choice
+opens the regular party route and keeps campaign attribution in memory.
 
-The web choice returns to the canonical party route without `entry=ai`, carrying
-only approved UTM labels. Copied production invites also remain canonical. The
-redirect reads no party data and never forwards arbitrary query fields. The
-handoff and web app have separate origin-local profiles, so campaign labels
-support aggregate funnel reports, not cross-origin visitor identity matching.
-The new custom domain must be active before enabling the production redirect;
-preview deployment does not provision production routes. See the Worker setup.
+To test the browser handoff before production deployment, replace the invite's
+origin with the PR preview origin. Preview visits stay on that origin.
 
 If a new party's write acknowledgement is lost after a document ID is allocated,
 the tool remains an error and returns that party's recovery link. Check it with
