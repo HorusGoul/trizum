@@ -14,6 +14,8 @@ participant to join through the normal PWA flow.
   MCP SDK's fetch-native Streamable HTTP transport.
 - [`src/widget.tsx`](./src/widget.tsx): React card built with `@trizum/ui` and
   the standard MCP Apps bridge. Other MCP clients can use structured results without rendering UI.
+- [`submission`](./submission/README.md): directory-listing configuration and the
+  ZIP attached to MCP GitHub releases.
 - [`../pwa/api/routes/mcp.ts`](../pwa/api/routes/mcp.ts): `/api/mcp` in the
   existing Cloudflare Worker, with no separate hosting.
 - [`../pwa/api/mcp`](../pwa/api/mcp): existing Automerge domain operations.

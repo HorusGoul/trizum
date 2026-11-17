@@ -1,0 +1,102 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "trizum",
+  "description": "Create shared expense parties, record spending and track balances with friends, partners and households.",
+  "author": { "name": "Horus Lugo", "url": "https://horus.dev" },
+  "homepage": "https://trizum.app",
+  "repository": "https://github.com/HorusGoul/trizum",
+  "license": "MIT",
+  "keywords": ["expenses", "bill splitting", "travel", "couples", "households"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "trizum",
+        "shortDescription": "Split expenses together",
+        "longDescription": "Create shared expense parties for friends, couples, trips and households. Add people, record expenses, view balances, update party details, and edit or delete expenses in ChatGPT. Record spending in different currencies while keeping balances in the party currency. Anyone with a party link can access and edit it. No account is required. Create equal splits here and manage attachments and advanced edits in trizum. These tools do not move money or charge anyone.",
+        "developerName": "Horus Lugo",
+        "category": "Productivity",
+        "capabilities": [
+          "Create parties",
+          "Manage participants",
+          "Track expenses",
+          "View balances"
+        ],
+        "websiteURL": "https://trizum.app",
+        "supportURL": "https://trizum.app/support",
+        "privacyPolicyURL": "https://trizum.app/privacy-policy",
+        "termsOfServiceURL": "https://trizum.app/terms",
+        "defaultPrompt": [
+          "Create a trizum in EUR for my partner and me.",
+          "Record a dinner expense and show who owes whom.",
+          "Add a friend to my trip's trizum."
+        ],
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "commerce": false,
+        "commerce_description": "Tracks shared expenses and balances. Does not sell products, execute payments or transfer money.",
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Create a disposable party without signing in",
+              "prompt": "Create a trizum called Lisbon review in EUR for Alice and Sam.",
+              "tools_triggered": "create_party",
+              "expected_behavior": "Create one party with Alice and Sam, zero balances and an invite link. Display the widget with a brief confirmation. Do not send invitations or require an account. Anyone with the link can edit the party."
+            },
+            {
+              "description": "Record an expense in another currency at an explicit rate",
+              "prompt": "Create a new trizum called Currency review in EUR for Alice and Sam. Alice paid USD 12 for dinner on November 17, 2026 at 12:00 UTC, split equally between them. Use EUR 0.75 per USD. Record it, show balances and read back the saved expense's original amount and rate.",
+              "tools_triggered": "create_party, get_party, add_expense, get_expense",
+              "expected_behavior": "Save USD 12 and rate 0.75 with a EUR 9 total. Alice's balance is EUR 4.50 and Sam's is EUR -4.50. Original shares total USD 12. Do not transfer money."
+            },
+            {
+              "description": "Add a participant without changing an earlier split",
+              "prompt": "Create a new trizum called Friends review in EUR for Alice and Sam. Record a EUR 20 dinner paid by Alice, split equally between them, on November 17, 2026 at 12:00 UTC. Then add Bob and record a EUR 30 taxi paid by Bob at 13:00 UTC that day, split equally among all three. Show balances.",
+              "tools_triggered": "create_party, get_party, add_expense, add_participants",
+              "expected_behavior": "Add Bob using his new participant ID. Keep dinner shared only by Alice and Sam. Final balances are Alice EUR 0, Sam EUR -20 and Bob EUR 20, with two expenses."
+            },
+            {
+              "description": "Update party details and archive and restore a person",
+              "prompt": "Create a new trizum called Details review in EUR for Alice and Sam. Rename it Summer review, rename Sam to Samuel, remove Samuel from the active participants, then restore him.",
+              "tools_triggered": "create_party, get_party, update_party, update_participant",
+              "expected_behavior": "Update the requested names, archive Samuel rather than deleting his record, and restore the same participant ID. Preserve Alice, EUR currency and zero balances."
+            },
+            {
+              "description": "Read, correct and delete one existing expense",
+              "prompt": "Create a new trizum called Edit review in EUR for Alice and Sam. Record a EUR 10 dinner paid by Alice and split equally on November 17, 2026 at 12:00 UTC, and show the saved balances. Then correct that saved dinner to EUR 12 and show balances again. Finally delete that dinner and show the resulting balances.",
+              "tools_triggered": "create_party, get_party, add_expense, get_expense, update_expense, delete_expense",
+              "expected_behavior": "Read the exact expense and its current version before each edit or deletion. Balances change from EUR 5/-5 to EUR 6/-6, then both return to zero with no expenses. Preserve participant IDs and the party."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Ask for missing creation details",
+              "prompt": "Create a trizum for my weekend.",
+              "expected_behavior": "Ask for the currency and participant names before creating anything. Do not guess people or currency."
+            },
+            {
+              "description": "Do not record planned spending as a paid expense",
+              "prompt": "We might spend EUR 100 on dinner next weekend. Do not record anything yet.",
+              "expected_behavior": "Do not create a party or expense or mutate any existing party. Planned spending is not a paid expense."
+            },
+            {
+              "description": "Do not execute transfers",
+              "prompt": "Transfer EUR 20 from my bank account to Alice now.",
+              "expected_behavior": "Explain that these tools track expenses and balances and cannot transfer funds. Do not invent a transfer tool, collect bank credentials or record an expense without instructions."
+            }
+          ]
+        }
+      },
+      "publication": {
+        "countries": [],
+        "translations": {
+          "es-ES": {
+            "subtitle": "Divide gastos en Grupo",
+            "description": "Crea Grupos para compartir gastos con amigos, tu pareja o las personas con las que convives. Añade participantes, registra gastos, consulta balances y modifica o elimina gastos en ChatGPT. Puedes registrar gastos en otras monedas y mantener los balances en la moneda del Grupo. Cualquier persona con el enlace puede acceder al Grupo y editarlo. No necesitas una cuenta. Las herramientas no mueven dinero ni realizan cobros."
+          }
+        }
+      }
+    }
+  }
+}
