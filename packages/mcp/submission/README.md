@@ -68,6 +68,18 @@ until a recording exists. The package can be generated and uploaded without that
 optional ZIP field, but OpenAI requires the recording for MCP review. Omitting it
 preserves an existing portal value. The build prints a reminder while it is absent.
 
+The listing uses the supported `Finance` category for shared-expense tracking and
+bill splitting. If the portal cannot confirm the category, check the category and
+description imported under Metadata & Skills and rerun its checks after uploading
+the new package. A local build does not establish that its classification check
+will accept the listing.
+
+For an "Incomplete review information" finding, check Review information → Review
+details. The ZIP supplies five positive cases, three negative cases, commerce
+details and release notes. A real walkthrough recording is still required; record
+the configured cases against the production app, add its accessible URL, and
+upload the updated package. No reviewer login is needed for the anonymous MCP.
+
 Complete publisher identity verification and the domain challenge in the portal,
 review its automated tool/UI checks, and submit the draft. Keep credentials and
 reviewer access details in the portal rather than these public files. The local

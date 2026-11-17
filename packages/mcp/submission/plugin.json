@@ -11,10 +11,10 @@
     "com.openai": {
       "interface": {
         "displayName": "trizum",
-        "shortDescription": "Split expenses together",
+        "shortDescription": "Split bills and track balances",
         "longDescription": "Create shared expense parties for friends, couples, trips and households. Add people, record expenses, view balances, update party details, and edit or delete expenses in ChatGPT. Record spending in different currencies while keeping balances in the party currency. Anyone with a party link can access and edit it. No account is required. Create equal splits here and manage attachments and advanced edits in trizum. These tools do not move money or charge anyone.",
         "developerName": "Horus Lugo",
-        "category": "Productivity",
+        "category": "Finance",
         "capabilities": [
           "Create parties",
           "Manage participants",
