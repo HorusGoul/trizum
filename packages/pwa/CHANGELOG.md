@@ -1,5 +1,12 @@
 # @trizum/pwa
 
+## 1.15.1
+
+### Patch Changes
+
+- Updated dependencies [[`72c82a8`](https://github.com/HorusGoul/trizum/commit/72c82a889193caaabc3b194f650f5ccdf92bb16d)]:
+  - @trizum/mcp@0.3.0
+
 ## 1.15.0
 
 ### Minor Changes

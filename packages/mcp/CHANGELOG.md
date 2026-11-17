@@ -1,5 +1,16 @@
 # @trizum/mcp
 
+## 0.3.0
+
+### Minor Changes
+
+- [#641](https://github.com/HorusGoul/trizum/pull/641) [`72c82a8`](https://github.com/HorusGoul/trizum/commit/72c82a889193caaabc3b194f650f5ccdf92bb16d) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Build a versioned ChatGPT directory submission ZIP from committed listing,
+  review-case, MCP-connection and asset configuration. Reuse existing trizum brand
+  images, derive the package version and release notes from the MCP release, and
+  include a SHA-256 checksum. Attach both files to stable MCP GitHub releases.
+  Validate the generated package locally without uploading to OpenAI; publisher
+  verification, the demo recording and final submission remain portal steps.
+
 ## 0.2.0
 
 ### Minor Changes
