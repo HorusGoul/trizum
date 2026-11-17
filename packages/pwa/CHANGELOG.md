@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.15.2
+
+### Patch Changes
+
+- [#645](https://github.com/HorusGoul/trizum/pull/645) [`a5d981c`](https://github.com/HorusGoul/trizum/commit/a5d981c86824f3dade0d7e2a7f2069dce155eaed) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep AI invite download and web options on trizum.app. Installed apps can still open the party directly from the original invite.
+
 ## 1.15.1
 
 ### Patch Changes
