@@ -400,7 +400,7 @@ msgstr "Afgani Afgano"
 
 #: src/routes/party_.$partyId.continue.tsx:136
 msgid "After installing, reopen this invite to join your group. No account is needed."
-msgstr "Después de instalar la app, vuelve a abrir esta invitación para unirte al grupo. No necesitas una cuenta."
+msgstr "Después de instalar la app, vuelve a abrir esta invitación para unirte al Grupo. No necesitas una cuenta."
 
 #: src/components/PremiumPaywall.tsx:433
 msgid "After the free trial, {price} is charged automatically until canceled."
@@ -432,7 +432,7 @@ msgstr "Todo el tiempo"
 
 #: src/routes/party_.$partyId.continue.tsx:147
 msgid "Already have trizum? Open your group"
-msgstr "¿Ya tienes trizum? Abre tu grupo"
+msgstr "¿Ya tienes trizum? Abre tu Grupo"
 
 #: src/components/PremiumRedemptionHelp.tsx:137
 msgid "Already redeemed?"
@@ -1879,7 +1879,7 @@ msgstr "Recibir pagos"
 
 #: src/routes/party_.$partyId.continue.tsx:125
 msgid "Get the app to track shared expenses with your group, even offline."
-msgstr "Descarga la app para llevar los gastos compartidos de tu grupo, incluso sin conexión."
+msgstr "Descarga la app para llevar los gastos compartidos de tu Grupo, incluso sin conexión."
 
 #: src/routes/new/route.tsx:242
 msgid "Ghanaian Cedi"

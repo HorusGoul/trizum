@@ -192,12 +192,13 @@ This adds bounded Automerge connections/reads and balance writes for existing
 expense changes, with no extra D1 queries, new persistent fields, or MCP cache.
 Read-only tool calls never write group data.
 
-The Cloudflare rate limiter allows 60 write-related attempts per minute per
-source IP, hostname, and Cloudflare location. Preparation and mutation each count
-as an attempt. This approximate edge limit uses no D1 queries; it is not a global
-quota and agents sharing an egress IP share its allowance. Missing limiter or
-signing configuration disables writes. Read-only calls are bounded by document
-limits but do not consume this write allowance.
+The Cloudflare rate limiter allows 60 mutation attempts per minute per source IP,
+hostname, and Cloudflare location. Mutation requests that pass argument validation
+consume the allowance, including requests whose service operation fails. This
+approximate edge limit uses no D1 queries; it is not a global quota and agents
+sharing an egress IP share its allowance. A missing limiter binding disables
+writes. Read-only calls are bounded by document limits but do not consume this
+write allowance.
 
 Analytics reuses its token and synthetic service visit for five minutes per
 live Worker client. After bootstrap, an action sends only its custom event.

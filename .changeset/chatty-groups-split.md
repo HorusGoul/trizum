@@ -46,6 +46,8 @@ open directly; browser visitors receive app-download or web choices on a separat
 custom domain hosted by the same Worker. Identify the download page with the
 sign-in screen's small logo treatment beside the lowercase trizum name and a
 "Your party is ready" heading, localized in English and Spanish.
+Use consistent Grupo terminology in the Spanish download-page copy and document
+the direct mutation tools' rate limits without obsolete signing requirements.
 Space the branding, headings and sections consistently, with a
 separate emoji gap and aligned wrapping for long group names. Keep mobile content
 near the top with comfortable padding. Preserve the party through desktop QR codes, invite copying
