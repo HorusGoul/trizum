@@ -1200,7 +1200,7 @@ msgid "Could not delete account"
 msgstr "Could not delete account"
 
 #. Error shown when a receipt attachment download fails during a Tricount import. HTTP status is a technical error code.
-#: src/models/migration.ts:66
+#: src/models/migration.ts:65
 msgid "Could not import attachment (HTTP {status})"
 msgstr "Could not import attachment (HTTP {status})"
 

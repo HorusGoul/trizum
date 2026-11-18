@@ -108,6 +108,61 @@ describe("createPartyFromMigrationData", () => {
       symbol: "🏕️",
     });
   });
+
+  test("imports expenses even when the browser has no idle time", async () => {
+    const { repo } = createMockRepo();
+
+    const requestIdleCallback = vi.fn<typeof window.requestIdleCallback>(() => 1);
+
+    vi.stubGlobal("window", { requestIdleCallback });
+
+    const partyId = await createPartyFromMigrationData({
+      repo,
+      data: createMigrationData(
+        { participants: { alice: { id: "alice", name: "Alice" } } },
+        {
+          expenses: [
+            {
+              name: "Lunch",
+              paidAt: "2026-01-01T00:00:00.000Z",
+              paidBy: { alice: 1000 },
+              shares: { alice: { type: "divide", value: 1 } },
+              photos: [],
+            },
+          ],
+        },
+      ),
+    });
+
+    const party = (await repo.find<Party>(partyId)).doc();
+    const chunk = (await repo.find<PartyExpenseChunk>(party.chunkRefs[0]!.chunkId)).doc();
+    expect(chunk.expenses).toHaveLength(1);
+    expect(chunk.expenses[0]).toMatchObject({ name: "Lunch", paidBy: { alice: 1000 } });
+  });
+
+  test("rejects an expense write failure instead of leaving the import pending", async () => {
+    const { repo } = createMockRepo();
+
+    await expect(
+      createPartyFromMigrationData({
+        repo,
+        data: createMigrationData(
+          {},
+          {
+            expenses: [
+              {
+                name: "Invalid date",
+                paidAt: "invalid",
+                paidBy: {},
+                shares: {},
+                photos: [],
+              },
+            ],
+          },
+        ),
+      }),
+    ).rejects.toThrow("Error importing expense Invalid date:");
+  });
 });
 
 test("persists original currency metadata through a real Automerge import", async () => {
