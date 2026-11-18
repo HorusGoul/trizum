@@ -138,8 +138,8 @@ catalog:
   playwright: 1.64.1
   qr-code-styling: 1.9.2
   react: 19.3.1
-  react-aria: 3.50.0
-  react-aria-components: 1.19.0
+  react-aria: 3.52.1
+  react-aria-components: 1.21.1
   react-doctor: 0.9.18
   react-dom: 19.3.1
   react-modal-sheet: 5.6.0
@@ -187,7 +187,6 @@ minimumReleaseAgeExclude:
 patchedDependencies:
   "@automerge/automerge-repo@2.5.6": patches/@automerge__automerge-repo@2.5.6.patch
   "@capacitor-community/admob@8.2.1": patches/@capacitor-community__admob@8.2.1.patch
-  react-aria@3.50.0: patches/react-aria@3.50.0.patch
   react-modal-sheet@5.6.0: patches/react-modal-sheet@5.6.0.patch
   sonner@2.0.8: patches/sonner@2.0.8.patch
   vite-plugin-top-level-await@1.6.0: patches/vite-plugin-top-level-await@1.6.0.patch
