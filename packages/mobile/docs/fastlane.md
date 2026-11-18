@@ -103,9 +103,12 @@ that is waiting for review as editable. Before changing App Store metadata,
 `deploy_appstore_full` and `submit_review` cancel any in-progress review
 submission, including one already in review, and wait up to ten minutes for the
 cancellation. The new release then reuses that version. Logs name the cancelled
-version and submission. `deploy_appstore` and
+version and submission. `submit_review` uploads no metadata, so it replaces
+only a review of the same version; for an older version in review it stops
+before cancelling and points to `deploy_appstore_full`. `deploy_appstore` and
 `deploy_appstore_full submit_for_review:false` do not submit a replacement, so
-they stop before changing a version in review.
+they stop before changing a version in review. Every lane waits for a
+cancellation already in progress before continuing.
 
 If a release stops after the binary upload, recover without rebuilding or
 uploading the IPA again:

@@ -61,24 +61,23 @@ class AppStoreReleaseTest < Minitest::Test
     @app = Object.new
     @app.define_singleton_method(:id) { "app" }
     version = @version
+    @existing_versions = ["1.13.5", "1.13.6"]
+    existing_versions = @existing_versions
     @app.define_singleton_method(:get_app_store_versions) do |**options|
       events << [:versions, options]
-      [version]
+      existing_versions.include?(options.dig(:filter, :versionString)) ? [version] : []
     end
     @active_submissions = []
     active_submissions = @active_submissions
-    @app.define_singleton_method(:get_in_progress_review_submission) do |**options|
-      events << [:review_lookup, options]
-      active_submissions.first
-    end
     @app.define_singleton_method(:get_review_submissions) do |**options|
-      events << [:review_poll, options]
-      active_submissions.dup
+      events << [options.key?(:includes) ? :review_lookup : :review_poll, options]
+      states = options.fetch(:filter).fetch(:state).split(",")
+      active_submissions.select { |submission| states.include?(submission.state) }
     end
   end
 
-  def submit_older_release_for_review
-    submission = Submission.new("review-1", "WAITING_FOR_REVIEW", Version.new("1.13.5"), @fastfile.events)
+  def submit_older_release_for_review(state: "WAITING_FOR_REVIEW", version: "1.13.5")
+    submission = Submission.new("review-1", state, Version.new(version), @fastfile.events)
     @active_submissions << submission
     submission
   end
@@ -188,7 +187,7 @@ class AppStoreReleaseTest < Minitest::Test
   end
 
   def test_missing_version_stops_without_attaching_to_another_release
-    @app.define_singleton_method(:get_app_store_versions) { |**_options| [] }
+    @existing_versions.clear
 
     error = assert_raises(FastlaneCore::Interface::FastlaneError) { run_lane(:deploy_appstore_full) }
 
@@ -214,7 +213,9 @@ class AppStoreReleaseTest < Minitest::Test
     run_lane(:deploy_appstore_full)
 
     operations = @fastfile.events.map(&:first)
-    assert_equal({ platform: "IOS", includes: "appStoreVersionForReview" }, @fastfile.events.assoc(:review_lookup).last)
+    lookup = @fastfile.events.assoc(:review_lookup).last
+    assert_equal "appStoreVersionForReview", lookup.fetch(:includes)
+    assert_includes lookup.fetch(:filter).fetch(:state).split(","), "CANCELING"
     assert_equal "review-1", @fastfile.events.assoc(:cancel_review).last
     assert_operator operations.index(:build_release), :<, operations.index(:cancel_review)
     assert_operator operations.index(:cancel_review), :<, operations.index(:deliver)
@@ -260,15 +261,44 @@ class AppStoreReleaseTest < Minitest::Test
     refute @fastfile.events.assoc(:deliver)
   end
 
-  def test_submit_review_replaces_the_in_progress_review_before_attaching_the_build
-    submit_older_release_for_review
+  def test_rerun_waits_for_a_cancellation_already_in_progress
+    submit_older_release_for_review(state: "CANCELING")
+    active_submissions = @active_submissions
+    @fastfile.sleep_hook = -> { active_submissions.clear }
+
+    run_lane(:deploy_appstore, build_number: "10130600")
+
+    operations = @fastfile.events.map(&:first)
+    refute @fastfile.events.assoc(:cancel_review)
+    assert @fastfile.events.assoc(:sleep)
+    assert_operator operations.rindex(:review_poll), :<, operations.index(:deliver)
+  end
+
+  def test_submit_review_replaces_a_review_of_the_same_version_before_attaching_the_build
+    submit_older_release_for_review(version: "1.13.6")
     active_submissions = @active_submissions
     @fastfile.sleep_hook = -> { active_submissions.clear }
 
     run_lane(:submit_review, app_version: "1.13.6", build_number: "10130600")
 
     operations = @fastfile.events.map(&:first)
+    assert_operator operations.index(:wait), :<, operations.index(:cancel_review)
     assert_operator operations.index(:cancel_review), :<, operations.index(:attach)
+    assert_equal 1, @fastfile.events.count { |name, _| name == :wait }
     assert_equal 1, submissions.length
+  end
+
+  def test_submit_review_keeps_an_older_version_in_review_when_it_cannot_replace_it
+    submit_older_release_for_review(version: "1.13.5")
+    @existing_versions.delete("1.13.6")
+
+    error = assert_raises(FastlaneCore::Interface::FastlaneError) do
+      run_lane(:submit_review, app_version: "1.13.6", build_number: "10130600")
+    end
+
+    assert_match(/Run deploy_appstore_full to replace it with 1.13.6/, error.message)
+    refute @fastfile.events.assoc(:cancel_review)
+    refute @fastfile.events.assoc(:attach)
+    assert_empty submissions
   end
 end

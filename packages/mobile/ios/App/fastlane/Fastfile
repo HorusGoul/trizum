@@ -435,15 +435,18 @@ platform :ios do
   desc "Submit existing build for App Store review"
   desc "Attach a processed build and selected creatives, then submit the version without uploading another binary"
   lane :submit_review do |options|
-    load_api_key
-    clear_in_progress_review_submission(
-      app_version: options[:app_version] || get_version_number(xcodeproj: "App.xcodeproj"),
-      supersede: true
-    )
-    build = attach_processed_app_store_build(
+    build = wait_for_app_store_build_processing(
       app_version: options[:app_version],
       build_number: options[:build_number]
     )
+    # Recovery uploads no metadata and cannot rename a version, so it only
+    # replaces a review of the same version.
+    clear_in_progress_review_submission(
+      app_version: build.app_version,
+      supersede: true,
+      same_version_only: true
+    )
+    attach_processed_app_store_build(build: build)
     upload_creative_assets(app_version: build.app_version)
     submit_processed_build_for_review(build: build, automatic_release: options[:automatic_release])
   end
@@ -482,7 +485,7 @@ platform :ios do
   end
 
   private_lane :attach_processed_app_store_build do |options|
-    build = wait_for_app_store_build_processing(options)
+    build = options[:build] || wait_for_app_store_build_processing(options)
     app = Spaceship::ConnectAPI::App.find(IOS_APP_IDENTIFIER)
     versions = app.get_app_store_versions(filter: { platform: "IOS", versionString: build.app_version })
     unless versions.length == 1
@@ -503,21 +506,39 @@ platform :ios do
     app = Spaceship::ConnectAPI::App.find(IOS_APP_IDENTIFIER)
     UI.user_error!("Unable to find App Store Connect app #{IOS_APP_IDENTIFIER}") unless app
 
-    submission = app.get_in_progress_review_submission(platform: "IOS", includes: "appStoreVersionForReview")
+    # Fastlane's in-progress lookup omits CANCELING, which would let a rerun
+    # after an interrupted cancellation continue before Apple unlocks the version.
+    submission = app.get_review_submissions(
+      filter: { platform: "IOS", state: IOS_ACTIVE_REVIEW_SUBMISSION_STATES.join(",") },
+      includes: "appStoreVersionForReview"
+    ).first
     next if submission.nil?
 
     description = review_submission_description(submission)
-    unless options[:supersede]
-      UI.user_error!(
-        "#{description} is already in App Store review. Remove it from review in App Store Connect, " \
-        "or deploy #{app_version} with submit_for_review:true to replace it."
-      )
+    if submission.state == Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::CANCELING
+      UI.important("Waiting for App Store Connect to finish cancelling #{description}")
+    else
+      unless options[:supersede]
+        UI.user_error!(
+          "#{description} is already in App Store review. Remove it from review in App Store Connect, " \
+          "or deploy #{app_version} with submit_for_review:true to replace it."
+        )
+      end
+
+      submitted_version = submission.app_store_version_for_review&.version_string
+      if options[:same_version_only] && submitted_version != app_version
+        UI.user_error!(
+          "#{description} is in App Store review, so #{app_version} has no App Store version to submit. " \
+          "Run deploy_appstore_full to replace it with #{app_version}, or remove it from review in App Store Connect."
+        )
+      end
+
+      UI.important("Cancelling #{description} so #{app_version} can replace it")
+      submission.cancel_submission
     end
 
-    UI.important("Cancelling #{description} so #{app_version} can replace it")
-    submission.cancel_submission
     wait_for_review_submission_cancellation(app: app, submission_id: submission.id)
-    UI.success("Cancelled #{description}")
+    UI.success("#{description} is no longer in review")
   end
 
   private_lane :submit_processed_build_for_review do |options|
