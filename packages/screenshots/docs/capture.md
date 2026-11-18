@@ -28,6 +28,9 @@ seed data, local marketing font files, and all composition assets. Before each
 capture it finishes finite browser animations, waits for two paint frames and
 font readiness, hides notifications and the caret, and disables CSS motion.
 No random IDs or network images are visible in the final scenes.
+Seeding waits for the browser harness to initialize and for the worker to finish
+calculating and persisting balances before navigating into the party. Expense
+import completion alone does not guarantee that derived balances are ready.
 
 By default the app is captured from `https://trizum.app`. Set
 `SCREENSHOTS_BASE_URL` to capture a locally served build or a release candidate.

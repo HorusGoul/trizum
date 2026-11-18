@@ -3,7 +3,7 @@ import { chromium, devices } from "playwright";
 import { createScreenshotContext } from "./screenshotContext.ts";
 import { mkdir, rm } from "node:fs/promises";
 import path from "node:path";
-import { getMigrationData } from "./data/migration-data.ts";
+import { seedScreenshotParty } from "./seedParty.ts";
 import { generateFeatureGraphics } from "./feature-graphic.ts";
 import { configureScreenshotsLogging, getLogger } from "./log.ts";
 import {
@@ -262,20 +262,7 @@ async function main() {
                 async function setupParty() {
                   try {
                     await page.goto(APP_ENTRY_PATH);
-                    await page
-                      .getByText("trizum", {
-                        exact: true,
-                      })
-                      .waitFor({
-                        state: "visible",
-                      });
-
-                    const partyId = await page.evaluate(async (data) => {
-                      // @ts-expect-error - Internal function
-                      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                      // SAFETY: The browser harness function returns its newly created party document ID as a string; this separate package does not import browser globals.
-                      return (await window.__internal_createPartyFromMigrationData(data)) as string;
-                    }, getMigrationData(language));
+                    const partyId = await seedScreenshotParty(page, language);
 
                     await page.goto(`/party/${partyId}/who`);
                     await page.getByRole("radio", { name: "Modest" }).click({ force: true });
