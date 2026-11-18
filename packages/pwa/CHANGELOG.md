@@ -1,5 +1,15 @@
 # @trizum/pwa
 
+## 1.15.3
+
+### Patch Changes
+
+- [#647](https://github.com/HorusGoul/trizum/pull/647) [`37d95f7`](https://github.com/HorusGoul/trizum/commit/37d95f7aafce29f4bde170146c7ab5cb606741ac) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use the party currency by default when adding or editing expenses.
+
+- [#648](https://github.com/HorusGoul/trizum/pull/648) [`2f9331c`](https://github.com/HorusGoul/trizum/commit/2f9331c2b96c8f6bcf0ffb880c77fb32bdc9b428) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep focus rings from appearing on tapped controls when returning to trizum. Existing keyboard focus rings stay visible.
+
+- [#651](https://github.com/HorusGoul/trizum/pull/651) [`42ce000`](https://github.com/HorusGoul/trizum/commit/42ce0004b8001cea9f29270cfb80cbe763406301) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Restore Tricount imports by updating the Android client version used to start a Tricount session.
+
 ## 1.15.2
 
 ### Patch Changes
