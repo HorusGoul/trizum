@@ -120,7 +120,8 @@ export function ExpenseEditor({
   onCloseCalculator,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
-  const partyCurrency = use(CurrencyContext);
+  const { party } = useCurrentParty();
+  const partyCurrency = party.currency;
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
@@ -356,18 +357,20 @@ export function ExpenseEditor({
         }}
         className="container mt-4 flex flex-col px-4"
       >
-        <ExpenseDetailsFields
-          activeCalculatorId={activeCalculatorId}
-          autoOpenCalculator={autoOpenCalculator}
-          createFieldFocusHandlers={createFieldFocusHandlers}
-          form={form}
-          onCloseCalculator={onCloseCalculator}
-          onOpenCalculator={onOpenCalculator}
-          onViewPhoto={onViewPhoto}
-          participants={participants}
-          photos={photos}
-          shouldAutoFocus={autoFocus}
-        />
+        <CurrencyContext value={partyCurrency}>
+          <ExpenseDetailsFields
+            activeCalculatorId={activeCalculatorId}
+            autoOpenCalculator={autoOpenCalculator}
+            createFieldFocusHandlers={createFieldFocusHandlers}
+            form={form}
+            onCloseCalculator={onCloseCalculator}
+            onOpenCalculator={onOpenCalculator}
+            onViewPhoto={onViewPhoto}
+            participants={participants}
+            photos={photos}
+            shouldAutoFocus={autoFocus}
+          />
+        </CurrencyContext>
         <CurrencyContext value={currency}>
           <ExpenseParticipantsSection
             activeCalculatorId={activeCalculatorId}
