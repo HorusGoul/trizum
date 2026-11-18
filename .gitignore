@@ -171,6 +171,7 @@ packages/server/build/
 
 # Claude
 .claude/*
+!.claude/skills
 
 # Codex
 .codex/*
