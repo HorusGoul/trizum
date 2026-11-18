@@ -70,7 +70,7 @@ class TricountAPIClient {
     this.public_key = "";
     this.private_key = "";
     this.headers = {
-      "User-Agent": "com.bunq.tricount.android:RELEASE:7.0.7:3174:ANDROID:13:C",
+      "User-Agent": "com.bunq.tricount.android:RELEASE:14.8.2:500004156:ANDROID:13:C",
       "app-id": this.app_installation_id,
       "X-Bunq-Client-Request-Id": crypto.randomUUID(),
     };
