@@ -1,5 +1,12 @@
 # @trizum/mobile
 
+## 1.15.5
+
+### Patch Changes
+
+- Updated dependencies [[`dd250da`](https://github.com/HorusGoul/trizum/commit/dd250dae7d534df22ea0c1cf0b6e991c010e5355)]:
+  - @trizum/pwa@1.15.5
+
 ## 1.15.4
 
 ### Patch Changes

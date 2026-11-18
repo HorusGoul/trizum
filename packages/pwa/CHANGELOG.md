@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.15.5
+
+### Patch Changes
+
+- [#661](https://github.com/HorusGoul/trizum/pull/661) [`dd250da`](https://github.com/HorusGoul/trizum/commit/dd250dae7d534df22ea0c1cf0b6e991c010e5355) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent Tricount imports from stalling while waiting for browser idle time, and surface expense import failures instead of leaving the import pending.
+
 ## 1.15.4
 
 ### Patch Changes
