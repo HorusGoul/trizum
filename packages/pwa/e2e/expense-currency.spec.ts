@@ -2,6 +2,36 @@ import { createPartyFixture, defaultParticipants } from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
 import { ExpenseDetailPage } from "./pages/expense-detail.page";
 
+test("defaults to the party currency when adding and reopening an expense", async ({
+  harness,
+  page,
+}) => {
+  const fixture = createPartyFixture();
+
+  const { partyId } = await harness.seedJoinedParty({
+    fixture: { ...fixture, party: { ...fixture.party, currency: "USD" } },
+    memberParticipantId: defaultParticipants.blair.id,
+  });
+
+  await harness.navigate(`/party/${partyId}/add`);
+  const currency = page.getByRole("button", { name: /Currency$/ });
+  const amount = page.getByLabel("Amount", { exact: true });
+
+  await expect(currency).toHaveText(/^USD/);
+  await page.getByLabel("Title", { exact: true }).fill("Dinner in dollars");
+  await amount.fill("25");
+  const includeAll = page.getByRole("checkbox", { name: "Include all", exact: true });
+  await includeAll.press("Space");
+  await expect(includeAll).toBeChecked();
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+
+  const detail = new ExpenseDetailPage(page);
+  await expect(detail.heading("Dinner in dollars")).toBeVisible();
+  await detail.openEdit();
+  await expect(currency).toHaveText(/^USD/);
+  await expect(amount).toHaveValue("25");
+});
+
 for (const width of [390, 1280]) {
   test(`swaps currency with the converted field and preserves conversion details at ${width}px`, async ({
     harness,
