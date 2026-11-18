@@ -6,7 +6,6 @@ import { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
 import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { requestIdleCallback } from "@trizum/ui/requestIdleCallback";
 import type { MigrationData } from "./migrationData";
 import { t } from "@lingui/core/macro";
 
@@ -103,14 +102,6 @@ export async function createPartyFromMigrationData({
   // Expenses from oldest to newest
   data.expenses.sort((a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime());
 
-  function waitIdleCallback(fn: () => Promise<void>) {
-    return new Promise<void>((resolve) => {
-      requestIdleCallback(() => {
-        void fn().then(() => resolve());
-      });
-    });
-  }
-
   await importExpenseAtIndex(0);
 
   async function importExpenseAtIndex(index: number): Promise<void> {
@@ -120,8 +111,12 @@ export async function createPartyFromMigrationData({
       return;
     }
 
-    await waitIdleCallback(async () => {
-      await helpers.addExpenseToParty({
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0);
+    });
+
+    await helpers
+      .addExpenseToParty({
         name: expense.name,
         isTransfer: expense.isTransfer ?? false,
         ...getExpenseConversionFields(expense),
@@ -131,16 +126,16 @@ export async function createPartyFromMigrationData({
         photos: expense.photos
           .map((photoId) => photoMap.get(photoId))
           .filter((photoId): photoId is MediaFile["id"] => !!photoId),
+      })
+      .catch((error) => {
+        logger.error("Failed to import migrated expense", {
+          error,
+          expenseName: expense.name,
+        });
+        throw new Error(
+          `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       });
-    }).catch((error) => {
-      logger.error("Failed to import migrated expense", {
-        error,
-        expenseName: expense.name,
-      });
-      throw new Error(
-        `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
-    });
 
     onProgress?.({
       name: `Imported ${expense.name} (${index + 1} of ${data.expenses.length})`,
