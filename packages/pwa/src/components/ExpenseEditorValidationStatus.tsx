@@ -60,7 +60,7 @@ const statusAppearances: Record<ExpenseEditorValidationStatus, StatusAppearance>
 };
 
 const statusBarClassName =
-  "flex h-12 w-full items-center gap-3 rounded-lg border px-4 text-left text-sm font-medium";
+  "flex h-auto min-h-12 w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-medium";
 
 export function ExpenseEditorValidationStatus({
   isOpen,
@@ -73,7 +73,7 @@ export function ExpenseEditorValidationStatus({
   const content = (
     <>
       <Icon icon={appearance.icon} className="size-5 shrink-0" />
-      <span className="min-w-0 flex-1 truncate">
+      <span className="min-w-0 flex-1 text-pretty wrap-break-word">
         <ExpenseEditorStatusMessage
           issueCount={validation.issues.length}
           status={validation.status}
@@ -88,12 +88,12 @@ export function ExpenseEditorValidationStatus({
   return (
     <div aria-live="polite" className="container px-4">
       <LazyMotion features={domAnimation}>
-        <div className="relative h-12">
+        <div className="grid">
           <AnimatePresence initial={false}>
             <motion.div
               key={validation.status}
               animate={{ opacity: 1, transform: "translateY(0)" }}
-              className="absolute inset-0"
+              className="col-start-1 row-start-1"
               exit={{
                 opacity: 0,
                 transform: shouldReduceMotion ? "translateY(0)" : "translateY(-3px)",
