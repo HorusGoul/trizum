@@ -129,10 +129,10 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
           }}
           onClickCapture={(event) => {
             // A held pointer must not navigate when the browser sends a late click.
-            // Detail 0 keeps ordinary keyboard and assistive activation available.
+            // Detail 0 keeps keyboard and assistive activation available.
             if (suppressHeldClickRef.current && event.detail > 0) {
+              // Let React Aria's one-time listener receive the canceled click.
               event.preventDefault();
-              event.stopPropagation();
             }
           }}
           onPointerUpCapture={copyAfterHold}
