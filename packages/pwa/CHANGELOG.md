@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.15.4
+
+### Patch Changes
+
+- [#655](https://github.com/HorusGoul/trizum/pull/655) [`8e8818e`](https://github.com/HorusGoul/trizum/commit/8e8818e2d2463c8ce2278f9055a2b704964a74da) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Wrap long alert and expense check messages instead of cutting them off, such as the Spanish "all checks passed" message in the expense editor.
+
 ## 1.15.3
 
 ### Patch Changes
