@@ -25,6 +25,14 @@ IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
 IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
 IOS_SCREENSHOT_SYNC_TIMEOUT_SECONDS = 15 * 60
 IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
+IOS_REVIEW_CANCELLATION_TIMEOUT_SECONDS = 10 * 60
+IOS_REVIEW_CANCELLATION_POLL_SECONDS = 15
+IOS_ACTIVE_REVIEW_SUBMISSION_STATES = [
+  Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::WAITING_FOR_REVIEW,
+  Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::IN_REVIEW,
+  Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::UNRESOLVED_ISSUES,
+  Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::CANCELING
+].freeze
 IOS_ENTITLEMENTS_PATH = File.expand_path("../App/App.entitlements", __dir__)
 ADMOB_CONFIG_PATH = File.expand_path("../../../admob.config.json", __dir__)
 
@@ -291,6 +299,10 @@ platform :ios do
   desc "Upload to App Store (binary only, no metadata)"
   lane :deploy_appstore do |options|
     build_release(build_number: options[:build_number])
+    clear_in_progress_review_submission(
+      app_version: get_version_number(xcodeproj: "App.xcodeproj"),
+      supersede: false
+    )
     upload_to_app_store(
       app_identifier: IOS_APP_IDENTIFIER,
       submit_for_review: false,
@@ -368,6 +380,10 @@ platform :ios do
     skip_screenshots = options[:skip_screenshots].nil? ? true : options[:skip_screenshots]
 
     build_release(build_number: options[:build_number])
+    clear_in_progress_review_submission(
+      app_version: get_version_number(xcodeproj: "App.xcodeproj"),
+      supersede: submit_for_review
+    )
 
     deliver(
       app_identifier: IOS_APP_IDENTIFIER,
@@ -419,6 +435,11 @@ platform :ios do
   desc "Submit existing build for App Store review"
   desc "Attach a processed build and selected creatives, then submit the version without uploading another binary"
   lane :submit_review do |options|
+    load_api_key
+    clear_in_progress_review_submission(
+      app_version: options[:app_version] || get_version_number(xcodeproj: "App.xcodeproj"),
+      supersede: true
+    )
     build = attach_processed_app_store_build(
       app_version: options[:app_version],
       build_number: options[:build_number]
@@ -471,6 +492,32 @@ platform :ios do
     versions.first.select_build(build_id: build.id)
     UI.success("Attached build #{build.app_version} (#{build.version}) to its App Store version")
     build
+  end
+
+  # deliver treats a version that is waiting for review as editable. It would
+  # rename the submitted version to this release and then fail to replace the
+  # screenshots Apple locked for review. Releases that submit for review cancel
+  # the in-progress submission first; other deployments stop before changing it.
+  private_lane :clear_in_progress_review_submission do |options|
+    app_version = options.fetch(:app_version)
+    app = Spaceship::ConnectAPI::App.find(IOS_APP_IDENTIFIER)
+    UI.user_error!("Unable to find App Store Connect app #{IOS_APP_IDENTIFIER}") unless app
+
+    submission = app.get_in_progress_review_submission(platform: "IOS", includes: "appStoreVersionForReview")
+    next if submission.nil?
+
+    description = review_submission_description(submission)
+    unless options[:supersede]
+      UI.user_error!(
+        "#{description} is already in App Store review. Remove it from review in App Store Connect, " \
+        "or deploy #{app_version} with submit_for_review:true to replace it."
+      )
+    end
+
+    UI.important("Cancelling #{description} so #{app_version} can replace it")
+    submission.cancel_submission
+    wait_for_review_submission_cancellation(app: app, submission_id: submission.id)
+    UI.success("Cancelled #{description}")
   end
 
   private_lane :submit_processed_build_for_review do |options|
@@ -654,6 +701,32 @@ platform :ios do
     return true if allowed_string == "*"
 
     allowed_string.end_with?("*") && expected_string.start_with?(allowed_string.delete_suffix("*"))
+  end
+
+  def review_submission_description(submission)
+    version = submission.app_store_version_for_review
+    return "Review submission #{submission.id} (#{submission.state})" unless version
+
+    "iOS #{version.version_string} (review submission #{submission.id}, #{submission.state})"
+  end
+
+  def wait_for_review_submission_cancellation(app:, submission_id:)
+    checks = IOS_REVIEW_CANCELLATION_TIMEOUT_SECONDS / IOS_REVIEW_CANCELLATION_POLL_SECONDS
+    0.upto(checks) do |check|
+      active = app.get_review_submissions(
+        filter: { platform: "IOS", state: IOS_ACTIVE_REVIEW_SUBMISSION_STATES.join(",") }
+      )
+      return if active.none? { |submission| submission.id == submission_id }
+      break if check == checks
+
+      UI.message("Waiting #{IOS_REVIEW_CANCELLATION_POLL_SECONDS} seconds for App Store Connect to cancel the review submission")
+      sleep(IOS_REVIEW_CANCELLATION_POLL_SECONDS)
+    end
+
+    UI.user_error!(
+      "App Store Connect did not cancel review submission #{submission_id} " \
+      "within #{IOS_REVIEW_CANCELLATION_TIMEOUT_SECONDS / 60} minutes"
+    )
   end
 
   def version_segments(version)
