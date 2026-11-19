@@ -83,26 +83,3 @@ Vite+-generated `pnpm-lock.yaml`, and Renovate can then request queueing after t
 updated branch passes checks. If a later contributor push cancels the pending
 command or removes the PR from the queue, a fresh queue request is needed after
 the new head passes checks.
-
-Agent-created replacement PRs retain the `ready for human review` label and
-require a separate merge decision; this Renovate handoff does not auto-queue
-them.
-
-## Agent Review
-
-The
-[`Renovate Agent Review`](../.github/workflows/renovate-agent-review.yml)
-workflow runs after the `CI` workflow completes on a `renovate/**` branch. It
-finds the open non-draft Renovate PR for that branch.
-
-The workflow cancels older in-progress review runs for the same manual PR input
-or Renovate branch so only the newest review continues.
-
-The workflow uses `BOT_GITHUB_TOKEN` for checkout and GitHub CLI write actions,
-configures commits as `lilith[bot]`, restores Codex account auth from Bitwarden
-Secrets Manager, invokes Codex through Sandcastle, and writes the refreshed
-Codex auth cache back to Bitwarden after the run.
-
-When checks pass and the agent finds no blockers, it adds the
-`ready for human review` label. When checks fail, the agent can create a
-replacement PR with the same dependency-update purpose.

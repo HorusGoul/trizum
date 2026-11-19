@@ -44,9 +44,7 @@ catalog:
   "@automerge/automerge-repo-network-messagechannel": 2.5.6
   "@automerge/automerge-repo-network-websocket": 2.5.6
   "@automerge/automerge-repo-storage-indexeddb": 2.5.6
-  "@ai-hero/sandcastle": 0.12.0
   "@babel/core": 8.0.9
-  "@barnum/barnum": 0.4.0
   "@capacitor/android": 8.5.3
   "@capacitor/app": 8.1.2
   "@capacitor/assets": 3.0.5
@@ -81,7 +79,6 @@ catalog:
   "@lingui/vite-plugin": 6.11.0
   "@logtape/logtape": 2.4.2
   "@logtape/sentry": 2.4.2
-  "@openai/codex": 0.164.0
   "@oxlint/plugins": 1.89.0
   "@playwright/test": 1.64.1
   "@rolldown/plugin-babel": 0.3.0
@@ -171,7 +168,6 @@ catalog:
   wrangler: 4.156.1
   ws: 8.22.0
   fflate: 0.8.3
-  tsx: 4.23.15
   zod: 4.6.7
 minimumReleaseAgeExclude:
   - vite-plus
