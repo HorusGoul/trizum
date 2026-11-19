@@ -69,18 +69,23 @@ reviewed together.
 version, and update-type matchers there instead of duplicating them in this
 document.
 
-Renovate adds the `automerge` label to eligible updates instead of merging them
-itself. A `pull_request_rules` entry in [`.mergify.yml`](../.mergify.yml) queues
-open `renovate[bot]` PRs from same-repository `renovate/` branches that carry
-that label. Mergify performs the merge using the CI gates, review requirements,
-and squash commit settings in its `default` queue rule. GitHub platform-native
-automerge and Renovate's own automerge stay disabled.
+Renovate labels every update `manual-merge` by default, and the automerge
+package rule replaces that with `automerge` for eligible updates. Renovate
+unions labels across grouped updates, so a group containing any ineligible
+update keeps `manual-merge`. Renovate does not merge these PRs itself.
 
-Mergify re-evaluates the rule on every change, so a push to the branch (a
+`merge_protections_settings.auto_merge_conditions` in
+[`.mergify.yml`](../.mergify.yml) queues open `renovate[bot]` PRs from
+same-repository `renovate/` branches that have `automerge` and not
+`manual-merge`. Mergify performs the merge using the CI gates, review
+requirements, and squash commit settings in its `default` queue rule. GitHub
+platform-native automerge stays disabled.
+
+Mergify re-evaluates these conditions on every change, so a push to the branch (a
 lockfile refresh, a conflict rebase, or a contributor commit) re-queues the PR
 once the new head passes checks. A one-time `@mergifyio queue` comment would be
-cancelled by such a push and never re-posted. Remove the label to stop a PR
-from auto-queueing.
+cancelled by such a push and never re-posted. Add `manual-merge` or remove
+`automerge` to stop a PR from auto-queueing.
 
 `rebaseWhen` is `conflicted`, so Renovate only rebases a branch when it
 conflicts with `main`. Mergify brings queued PRs up to date itself, so rebasing

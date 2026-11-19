@@ -11,11 +11,16 @@
       "skipArtifactsUpdate": true
     },
     {
-      "description": "Label non-major dependency updates for Mergify auto-queueing, excluding 0.x current versions and TypeScript.",
+      "description": "Mark every update for manual merging by default. Renovate unions labels across grouped updates, so one ineligible update keeps the whole PR out of Mergify auto-queueing.",
+      "matchPackageNames": ["*"],
+      "labels": ["manual-merge"]
+    },
+    {
+      "description": "Label non-major dependency updates for Mergify auto-queueing, excluding 0.x current versions and TypeScript. Must stay after the manual-merge default so it replaces that label.",
       "matchUpdateTypes": ["patch", "minor"],
       "matchPackageNames": ["!typescript"],
       "matchCurrentVersion": "!/^0\\./",
-      "addLabels": ["automerge"]
+      "labels": ["automerge"]
     },
     {
       "description": "Keep automergeable patch and minor dependency updates together to reduce Renovate PR volume.",
