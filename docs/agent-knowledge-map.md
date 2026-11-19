@@ -62,7 +62,6 @@ guides. Use [What Belongs Where](#what-belongs-where) to choose the destination.
 | [`/packages/pwa/README.md`](../packages/pwa/README.md)                                                                                             | Main app package map, PWA-specific validation, and where common app work lives                                 | PWA maintainer          | Update in the same PR as package structure or workflow changes                          |
 | [`/packages/pwa/e2e/README.md`](../packages/pwa/e2e/README.md)                                                                                     | Browser journey harness strategy, seeded-state conventions, and E2E setup seams                                | PWA maintainer          | Update in the same PR as the Playwright harness shape or setup strategy changes         |
 | [`/packages/pwa/locale/AGENTS.md`](../packages/pwa/locale/AGENTS.md)                                                                               | Locale entry point linking terminology, formatting, and language guides                                        | Localization maintainer | Update in the same PR as translation rules or product terminology changes               |
-| [`/packages/agent-workflows/README.md`](../packages/agent-workflows/README.md)                                                                     | Barnum workflow entry point and CLI usage; runtime and CI auth in package docs                                 | Workspace maintainer    | Update in the same PR as agent workflow commands or behavior changes                    |
 | [`/packages/mobile/README.md`](../packages/mobile/README.md)                                                                                       | Native wrapper entry point linking setup, lifecycle, monetization, signing, and releases                       | Mobile maintainer       | Update in the same PR as mobile setup or release workflow changes                       |
 | [`/packages/server/README.md`](../packages/server/README.md)                                                                                       | Sync server package map and validation; deployment runbook in package docs                                     | Server maintainer       | Update in the same PR as server structure, run flow, or deployment assumptions change   |
 | [`/packages/mcp/README.md`](../packages/mcp/README.md)                                                                                             | MCP tools, ChatGPT widget, shared-link access, retries, and connection setup                                   | Integration maintainer  | Update when tool contracts, persistence, or setup changes                               |
@@ -162,8 +161,8 @@ in `.agents/skills` rather than duplicating them in these documents.
 5. Consult the package's `vite.config.ts` and `package.json` for exact commands.
 
 This map is a lookup and maintenance reference, not a mandatory second read.
-The screenshots, mobile, server, and agent-workflows READMEs are specialist entry
-points; read them when working in those areas.
+The screenshots, mobile, and server READMEs are specialist entry points; read
+them when working in those areas.
 
 ## When A Rule Graduates To Automation
 
