@@ -38,3 +38,15 @@ index 8cc7d32328cd72e6e67b376b25ecd8baa3a07ad6..a3b4154a116d2982734c5b3565c7352a
      }
  
      peerIds.forEach(peerId => {
+diff --git a/dist/Repo.js b/dist/Repo.js
+--- a/dist/Repo.js
++++ b/dist/Repo.js
+@@ -477 +477 @@
+-            const loadingPromise = await (this.storageSubsystem
++            const loadingPromise = (this.storageSubsystem
+diff --git a/src/Repo.ts b/src/Repo.ts
+--- a/src/Repo.ts
++++ b/src/Repo.ts
+@@ -680 +680 @@
+-      const loadingPromise = await (this.storageSubsystem
++      const loadingPromise = (this.storageSubsystem
