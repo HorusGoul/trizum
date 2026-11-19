@@ -12,20 +12,27 @@ merge_queue:
 
 merge_protections_settings:
   # Queue explicitly with @mergifyio queue; do not auto-queue approved PRs.
+  # Renovate updates are the exception, handled by pull_request_rules below.
   auto_merge_conditions: null
+
+pull_request_rules:
+  # Renovate labels automerge-eligible updates (see renovate.json). Mergify
+  # re-evaluates this rule on every push, so lockfile refreshes and rebases
+  # re-queue the PR instead of cancelling a one-time queue command.
+  - name: Queue automerge-eligible Renovate updates
+    conditions:
+      - author = renovate[bot]
+      - head ~= ^renovate/
+      - -from-fork
+      - label = automerge
+    actions:
+      queue:
+        name: default
 
 commands_restrictions:
   queue:
     conditions:
-      - or:
-          - sender-permission >= write
-          # GitHub App bots need an explicit allowance; restrict Renovate to
-          # its own same-repository update PRs.
-          - and:
-              - sender = renovate[bot]
-              - author = renovate[bot]
-              - head ~= ^renovate/
-              - -from-fork
+      - sender-permission >= write
   dequeue:
     conditions:
       - sender-permission >= write

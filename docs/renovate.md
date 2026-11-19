@@ -69,17 +69,24 @@ reviewed together.
 version, and update-type matchers there instead of duplicating them in this
 document.
 
-For eligible updates, Renovate waits for passing branch status checks and posts
-`@mergifyio queue` using `automergeType: "pr-comment"`. Mergify performs the merge
-using the CI gates, review requirements, and squash commit settings in
-[`.mergify.yml`](../.mergify.yml). GitHub platform-native automerge remains
-disabled, and Renovate does not merge these PRs directly.
-The queue command restriction explicitly permits `renovate[bot]` on its own
-same-repository `renovate/` PRs; other senders still need repository write access.
+Renovate adds the `automerge` label to eligible updates instead of merging them
+itself. A `pull_request_rules` entry in [`.mergify.yml`](../.mergify.yml) queues
+open `renovate[bot]` PRs from same-repository `renovate/` branches that carry
+that label. Mergify performs the merge using the CI gates, review requirements,
+and squash commit settings in its `default` queue rule. GitHub platform-native
+automerge and Renovate's own automerge stay disabled.
 
-This also keeps the behavior compatible with the lockfile repair workflow:
-Renovate opens the branch, the `Renovate Lockfiles` workflow commits the
-Vite+-generated `pnpm-lock.yaml`, and Renovate can then request queueing after the
-updated branch passes checks. If a later contributor push cancels the pending
-command or removes the PR from the queue, a fresh queue request is needed after
-the new head passes checks.
+Mergify re-evaluates the rule on every change, so a push to the branch (a
+lockfile refresh, a conflict rebase, or a contributor commit) re-queues the PR
+once the new head passes checks. A one-time `@mergifyio queue` comment would be
+cancelled by such a push and never re-posted. Remove the label to stop a PR
+from auto-queueing.
+
+`rebaseWhen` is `conflicted`, so Renovate only rebases a branch when it
+conflicts with `main`. Mergify brings queued PRs up to date itself, so rebasing
+on every `main` change would only restart CI and requeue the PR.
+
+This keeps the behavior compatible with the lockfile repair workflow: Renovate
+opens the branch, the `Renovate Lockfiles` workflow commits the
+Vite+-generated `pnpm-lock.yaml`, and Mergify queues the PR after the updated
+branch passes checks.
