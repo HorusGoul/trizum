@@ -156,7 +156,7 @@ catalog:
   tailwindcss-react-aria-components: 2.2.0
   typescript: npm:@typescript/typescript6@6.0.2
   ulidx: 2.4.1
-  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8000
   vite-plugin-pwa: 2.0.0
   vite-plugin-top-level-await: 1.6.0
   vite-plugin-wasm: 3.6.0
