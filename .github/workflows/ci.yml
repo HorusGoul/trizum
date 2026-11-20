@@ -137,7 +137,7 @@ jobs:
 
   e2e:
     name: E2E (shard ${{ matrix.shard }}/4)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     container:
       # Keep this version aligned with the Playwright catalog entries.
       image: mcr.microsoft.com/playwright:v1.64.1-noble

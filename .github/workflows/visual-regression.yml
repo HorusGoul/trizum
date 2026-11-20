@@ -28,7 +28,7 @@ concurrency:
 jobs:
   visual:
     name: Visual parity with main
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     container:
       # Keep aligned with the Playwright catalog and the functional E2E job.
       image: mcr.microsoft.com/playwright:v1.64.1-noble
