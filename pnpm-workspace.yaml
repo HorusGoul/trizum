@@ -33,7 +33,7 @@ peerDependencyRules:
 catalog:
   "@modelcontextprotocol/ext-apps": 2.0.4
   "@modelcontextprotocol/sdk": 1.32.2
-  oxc-transform-react: 0.152.0
+  oxc-transform-react: 0.158.0
   storybook: 10.6.5
   "@storybook/react-vite": 10.6.5
   "@storybook/addon-docs": 10.6.5
@@ -56,7 +56,7 @@ catalog:
   "@capacitor/splash-screen": 8.0.2
   "@capacitor-community/admob": 8.2.1
   "@capawesome/capacitor-app-update": 8.1.1
-  "@capawesome/capacitor-apple-sign-in": 0.1.4
+  "@capawesome/capacitor-apple-sign-in": 0.1.5
   "@capawesome/capacitor-google-sign-in": 0.1.4
   "@capawesome/capver": 0.1.5
   "@changesets/changelog-github": 1.0.1
@@ -103,7 +103,7 @@ catalog:
   "@vite-pwa/assets-generator": 2.0.0
   "@vitejs/plugin-react": 6.1.2
   "@vitest/coverage-v8": 5.0.5
-  agent-browser: 0.39.4
+  agent-browser: 0.43.0
   all-contributors-cli: 7.0.0
   babel-plugin-react-compiler: 1.0.0
   barcode-detector: 3.0.8
