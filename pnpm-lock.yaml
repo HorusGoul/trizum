@@ -140,8 +140,8 @@ catalogs:
       specifier: 1.64.1
       version: 1.64.1
     '@revenuecat/purchases-capacitor':
-      specifier: 13.7.6
-      version: 13.7.6
+      specifier: 14.1.2
+      version: 14.1.2
     '@revenuecat/purchases-capacitor-ui':
       specifier: 13.7.6
       version: 13.7.6
@@ -667,10 +667,10 @@ importers:
         version: 0.1.4(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)
+        version: 14.1.2(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.2(@capacitor/core@8.5.3))
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -776,10 +776,10 @@ importers:
         version: '@jsr/opentf__std@0.12.0'
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)
+        version: 14.1.2(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.2(@capacitor/core@8.5.3))
       '@sentry/cloudflare':
         specifier: 10.76.2
         version: 10.76.2(wrangler@4.156.1(@types/node@26.6.5))
@@ -4534,13 +4534,16 @@ packages:
       '@capacitor/core': '>=8.0.0'
       '@revenuecat/purchases-capacitor': 13.7.6
 
-  '@revenuecat/purchases-capacitor@13.7.6':
-    resolution: {integrity: sha512-Ynwsno3yhW1QbfICVlx8jXwmnVV933ADSl+d0kCV56tENxb4kwT7lXLReCc7HmrbVs2cfGaLYLEAVF8zYzREnw==}
+  '@revenuecat/purchases-capacitor@14.1.2':
+    resolution: {integrity: sha512-NooPFCCBf6/5c38r7KpkbDSj1yUP6PCPqngi0/1H3YWFZ7wucZdtUyJETdmyDaIwNd3ZiPP0byDnjEAOTc7Slw==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0':
     resolution: {integrity: sha512-OUTgB/sqKKr4Wu/u1MT9dYWjc2mw1FRgwes4y/xyboQb781rDZ3yy7ICb8u+B/6bMDG7s0EzcUPLRLNdRz1bJw==}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.10.0':
+    resolution: {integrity: sha512-m5NaLeJS8vXdt0Hd4FUXmt1CiwoVL4oVpgbJvUgrdQjqImBkz+PTbmFXOu83stAUUV8ReL4DKTUrYRJWQvToug==}
 
   '@robingenz/zli@0.2.0':
     resolution: {integrity: sha512-LME7G4xkEFuqyVg/MYTB3xoJnvWb955aEfZ7J7yRstzyULs3HBdxz0l5QiP8gmMMMZ434cb8Wn/DdHqeNTT2fA==}
@@ -9508,10 +9511,6 @@ packages:
     resolution: {integrity: sha512-PcByqNyT/38F2kDNi006HAMRJaULuBzq/FOsw3qdZvX/GA9W/jamDaRskgHjubHiftXK5sIFxLNkvrXUwcof6Q==}
     engines: {node: '>= 0.4'}
 
-  side-channel-list@1.0.0:
-    resolution: {integrity: sha512-FCLHtRD/gnpCiCHEiJLOwdmFP+wzCmDEkc9y7NsYxeF4u7Btsn1ZuwgwJGxImImHicJArLP4R0yX4c2KCrMrTA==}
-    engines: {node: '>= 0.4'}
-
   side-channel-list@1.0.1:
     resolution: {integrity: sha512-mjn/0bi/oUURjc5Xl7IaWi/OJJJumuoJFQJfDDyO46+hBWsfaVM65TBHq2eoZBhzl9EchxOijpkbRC8SVBQU0w==}
     engines: {node: '>= 0.4'}
@@ -9522,10 +9521,6 @@ packages:
 
   side-channel-weakmap@1.0.2:
     resolution: {integrity: sha512-WPS/HvHQTYnHisLo9McqBHOJk2FkHO/tlpvldyrnem4aeQp4hai3gythswg6p01oSoTl58rcpiFAjF2br2Ak2A==}
-    engines: {node: '>= 0.4'}
-
-  side-channel@1.1.0:
-    resolution: {integrity: sha512-ZX99e6tRweoUXqR+VBrslhda51Nh5MTQwou5tnUDgbtyM0dBgmhEDtWGP/xbKn6hqfPRHujUNwz5fy/wbbhnpw==}
     engines: {node: '>= 0.4'}
 
   side-channel@1.1.1:
@@ -13687,18 +13682,20 @@ snapshots:
 
   '@resvg/resvg-wasm@2.4.0': {}
 
-  '@revenuecat/purchases-capacitor-ui@13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))':
+  '@revenuecat/purchases-capacitor-ui@13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.2(@capacitor/core@8.5.3))':
     dependencies:
       '@capacitor/core': 8.5.3
-      '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
+      '@revenuecat/purchases-capacitor': 14.1.2(@capacitor/core@8.5.3)
       '@revenuecat/purchases-typescript-internal-esm': 19.15.0
 
-  '@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3)':
+  '@revenuecat/purchases-capacitor@14.1.2(@capacitor/core@8.5.3)':
     dependencies:
       '@capacitor/core': 8.5.3
-      '@revenuecat/purchases-typescript-internal-esm': 19.15.0
+      '@revenuecat/purchases-typescript-internal-esm': 20.10.0
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0': {}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.10.0': {}
 
   '@robingenz/zli@0.2.0(zod@4.0.17)':
     dependencies:
@@ -14554,8 +14551,8 @@ snapshots:
       '@logtape/sentry': 2.4.2(@logtape/logtape@2.4.2)(@sentry/core@10.76.2)
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
-      '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
-      '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+      '@revenuecat/purchases-capacitor': 14.1.2(@capacitor/core@8.5.3)
+      '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.2(@capacitor/core@8.5.3))
       '@sentry/cloudflare': 10.76.2(wrangler@4.156.1(@types/node@26.6.5))
       '@sentry/react': 10.76.2(react@19.3.1)
       '@sentry/vite-plugin': 5.4.1(rollup@4.65.1)(supports-color@10.2.2)
@@ -17094,7 +17091,7 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
       hasown: 2.0.4
-      side-channel: 1.1.0
+      side-channel: 1.1.1
 
   ip-address@10.7.6: {}
 
@@ -18984,11 +18981,6 @@ snapshots:
 
   shell-quote@1.12.0: {}
 
-  side-channel-list@1.0.0:
-    dependencies:
-      es-errors: 1.3.0
-      object-inspect: 1.13.4
-
   side-channel-list@1.0.1:
     dependencies:
       es-errors: 1.3.0
@@ -19008,14 +19000,6 @@ snapshots:
       get-intrinsic: 1.3.0
       object-inspect: 1.13.4
       side-channel-map: 1.0.1
-
-  side-channel@1.1.0:
-    dependencies:
-      es-errors: 1.3.0
-      object-inspect: 1.13.4
-      side-channel-list: 1.0.0
-      side-channel-map: 1.0.1
-      side-channel-weakmap: 1.0.2
 
   side-channel@1.1.1:
     dependencies:
@@ -19233,7 +19217,7 @@ snapshots:
       internal-slot: 1.1.0
       regexp.prototype.flags: 1.5.4
       set-function-name: 2.0.2
-      side-channel: 1.1.0
+      side-channel: 1.1.1
 
   string.prototype.trim@1.2.10:
     dependencies:
