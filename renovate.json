@@ -2,6 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "rebaseWhen": "conflicted",
+  "automergeType": "pr-comment",
+  "automergeComment": "Checks passed. The Renovate Automerge workflow queues this PR in Mergify; add the `manual-merge` label to stop it.",
   "minimumReleaseAge": "1 day",
   "gitIgnoredAuthors": ["259750894+PUNK-02@users.noreply.github.com"],
   "packageRules": [
@@ -11,16 +13,11 @@
       "skipArtifactsUpdate": true
     },
     {
-      "description": "Mark every update for manual merging by default. Renovate unions labels across grouped updates, so one ineligible update keeps the whole PR out of Mergify auto-queueing.",
-      "matchPackageNames": ["*"],
-      "labels": ["manual-merge"]
-    },
-    {
-      "description": "Label non-major dependency updates for Mergify auto-queueing, excluding 0.x current versions and TypeScript. Must stay after the manual-merge default so it replaces that label.",
+      "description": "Mark non-major dependency updates as automerge, excluding 0.x current versions and TypeScript. Renovate enables automerge for a grouped PR only when every update in it is eligible, and the Renovate Automerge workflow queues PRs whose body says Automerge is enabled. automergeType pr-comment keeps Renovate from merging or enabling GitHub auto-merge itself.",
       "matchUpdateTypes": ["patch", "minor"],
       "matchPackageNames": ["!typescript"],
       "matchCurrentVersion": "!/^0\\./",
-      "labels": ["automerge"]
+      "automerge": true
     },
     {
       "description": "Keep automergeable patch and minor dependency updates together to reduce Renovate PR volume.",
