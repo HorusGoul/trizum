@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.15.6
+
+### Patch Changes
+
+- [#672](https://github.com/HorusGoul/trizum/pull/672) [`7957ba5`](https://github.com/HorusGoul/trizum/commit/7957ba512ccc5eee6d9bf394f3b15f09dcbb8bd8) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Upgrade Better Auth to 1.7.27 to pick up the latest security fixes for sign-in and account email handling.
+
 ## 1.15.5
 
 ### Patch Changes
