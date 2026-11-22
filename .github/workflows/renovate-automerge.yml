@@ -17,11 +17,13 @@ on:
 
 permissions: {}
 
-# Serialize per PR so queue and dequeue comments keep event order. Each run
-# reads the PR's current state, so a superseded pending run is safe to drop.
+# Serialize per PR so queue and dequeue comments keep event order. queue: max
+# keeps every pending run; the default replaces an older pending run, so an
+# unrelated edit could drop a veto or the re-queue after a push.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   queue:
@@ -44,7 +46,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          marker='**Automerge**: Enabled.'
+          # Read only Renovate's Automerge field from the last Configuration
+          # section, which Renovate appends after any upstream release notes.
+          # Fail closed when the field is missing or appears more than once.
+          automerge_enabled() {
+            tr -d '\r' | awk '
+              /^### Configuration$/ { n = 0; found = 1; next }
+              found && /^[^ ]+ \*\*Automerge\*\*: / { values[++n] = substr($0, index($0, ": ") + 2) }
+              END { exit !(n == 1 && values[1] == "Enabled.") }'
+          }
+
           pr_json=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER")
 
           if [ "$(jq -r '.state' <<<"$pr_json")" != "open" ]; then
@@ -53,7 +64,7 @@ jobs:
           fi
 
           eligible=false
-          if jq -r '.body // ""' <<<"$pr_json" | grep -qF "$marker"; then
+          if jq -r '.body // ""' <<<"$pr_json" | automerge_enabled; then
             eligible=true
           fi
           vetoed=$(jq -r '[.labels[].name] | index("manual-merge") != null' <<<"$pr_json")
@@ -79,7 +90,7 @@ jobs:
                 exit 0
               fi
               was_eligible=false
-              if jq -r '.changes.body.from // ""' "$GITHUB_EVENT_PATH" | grep -qF "$marker"; then
+              if jq -r '.changes.body.from // ""' "$GITHUB_EVENT_PATH" | automerge_enabled; then
                 was_eligible=true
               fi
               if [ "$was_eligible" = "$eligible" ]; then
@@ -91,7 +102,10 @@ jobs:
               fi
               ;;
             labeled)
-              comment "@mergifyio dequeue"
+              # Recheck the label: it may have been removed before this run.
+              if [ "$vetoed" = true ]; then
+                comment "@mergifyio dequeue"
+              fi
               ;;
             unlabeled)
               if [ "$eligible" = true ] && [ "$vetoed" = false ]; then

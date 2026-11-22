@@ -80,7 +80,8 @@ auto-merge, both of which bypass the Mergify queue.
 
 The [`Renovate Automerge`](../.github/workflows/renovate-automerge.yml) workflow
 comments `@mergifyio queue` on same-repository `renovate/` PRs from
-`renovate[bot]` whose body says automerge is enabled:
+`renovate[bot]` whose Automerge field, read only from the Configuration section
+Renovate appends after any release notes, is enabled:
 
 - when the PR opens or reopens,
 - after every push, because Mergify cancels a pending queue request when the
