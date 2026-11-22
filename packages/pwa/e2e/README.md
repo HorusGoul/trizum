@@ -88,9 +88,11 @@ so shards do not run apt or download browsers. The setup-vp action still install
 the repository's Node version and workspace packages; its package cache is
 independent of the browsers bundled in the image.
 
-The image tag in the [CI workflow](../../../.github/workflows/ci.yml) must match
-both Playwright catalog entries in `pnpm-workspace.yaml`. Renovate groups these
-updates, and CI checks the installed package against the image's version before
+The `playwright-image` job in the [CI workflow](../../../.github/workflows/ci.yml)
+derives the image tag (`v<version>-noble`) from the `@playwright/test` catalog
+entry in `pnpm-workspace.yaml`, and fails if the `playwright` entry differs.
+Renovate groups both entries, so a Playwright update moves the image too. Each
+shard also checks the installed package against the image's version before
 building. See Playwright's [image version guidance](https://playwright.dev/docs/docker#image-tags).
 
 Each shard builds the E2E app, then runs `test:e2e:prebuilt` against that build.

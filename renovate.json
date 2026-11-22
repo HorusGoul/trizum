@@ -179,8 +179,8 @@
       "groupName": "GitHub Actions major updates"
     },
     {
-      "description": "Keep Playwright packages and the preinstalled CI browser image on the same version.",
-      "matchPackageNames": ["@playwright/test", "playwright", "mcr.microsoft.com/playwright"],
+      "description": "Keep the Playwright catalog packages on the same version. CI derives its Playwright container image from the @playwright/test catalog version.",
+      "matchPackageNames": ["@playwright/test", "playwright"],
       "groupName": "Playwright updates",
       "groupSlug": "playwright"
     }
