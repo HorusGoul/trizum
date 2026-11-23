@@ -47,8 +47,9 @@ instead of being buried in the broad non-major dependency group.
 React Doctor dependencies are grouped together so the CLI and matching Oxlint
 plugin stay in sync.
 
-Playwright packages and the CI browser image share a group so their versions
-stay aligned. The [E2E setup guide](../packages/pwa/e2e/README.md#ci-buildsetup-path)
+Playwright packages share a group so both catalog entries stay on the same
+version. CI derives its Playwright container image tag from the catalog, so the
+image follows the packages without a separate update. The [E2E setup guide](../packages/pwa/e2e/README.md#ci-buildsetup-path)
 describes the version check and container setup.
 
 React runtime and type package updates are grouped together now that the app uses
