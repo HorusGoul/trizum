@@ -48,12 +48,19 @@ jobs:
 
           # Read only Renovate's Automerge field from the last Configuration
           # section, which Renovate appends after any upstream release notes.
+          # Require the body to end with Renovate's debug marker: Renovate's
+          # fallback truncation cuts off the whole tail, which could leave a
+          # Configuration example from release notes as the last section.
           # Fail closed when the field is missing or appears more than once.
           automerge_enabled() {
             tr -d '\r' | awk '
               /^### Configuration$/ { n = 0; found = 1; next }
               found && /^[^ ]+ \*\*Automerge\*\*: / { values[++n] = substr($0, index($0, ": ") + 2) }
-              END { exit !(n == 1 && values[1] == "Enabled.") }'
+              NF { last = $0 }
+              END {
+                intact = last ~ /^<!--renovate-debug:[A-Za-z0-9+\/=]*-->$/
+                exit !(intact && n == 1 && values[1] == "Enabled.")
+              }'
           }
 
           pr_json=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER")
