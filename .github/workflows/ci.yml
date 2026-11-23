@@ -171,7 +171,7 @@ jobs:
 
   e2e:
     name: E2E (shard ${{ matrix.shard }}/4)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [playwright-image]
     container:
       image: ${{ needs.playwright-image.outputs.image }}
