@@ -70,23 +70,37 @@ reviewed together.
 version, and update-type matchers there instead of duplicating them in this
 document.
 
-Renovate labels every update `manual-merge` by default, and the automerge
-package rule replaces that with `automerge` for eligible updates. Renovate
-unions labels across grouped updates, so a group containing any ineligible
-update keeps `manual-merge`. Renovate does not merge these PRs itself.
+The automerge package rule sets `automerge: true` on eligible updates. Renovate
+enables automerge for a grouped PR only when every update in it is eligible, and
+writes `Automerge: Enabled.` in the PR body's Configuration section when it does.
 
-`merge_protections_settings.auto_merge_conditions` in
-[`.mergify.yml`](../.mergify.yml) queues open `renovate[bot]` PRs from
-same-repository `renovate/` branches that have `automerge` and not
-`manual-merge`. Mergify performs the merge using the CI gates, review
-requirements, and squash commit settings in its `default` queue rule. GitHub
-platform-native automerge stays disabled.
+Renovate does not merge these PRs itself. `automergeType` is `pr-comment`, so
+once checks pass Renovate only posts a one-time note pointing to the workflow
+below. The `pr` type would merge through the GitHub API or enable GitHub
+auto-merge, both of which bypass the Mergify queue.
 
-Mergify re-evaluates these conditions on every change, so a push to the branch (a
-lockfile refresh, a conflict rebase, or a contributor commit) re-queues the PR
-once the new head passes checks. A one-time `@mergifyio queue` comment would be
-cancelled by such a push and never re-posted. Add `manual-merge` or remove
-`automerge` to stop a PR from auto-queueing.
+The [`Renovate Automerge`](../.github/workflows/renovate-automerge.yml) workflow
+comments `@mergifyio queue` on same-repository `renovate/` PRs from
+`renovate[bot]` whose Automerge field, read only from the Configuration section
+Renovate appends after any release notes, is enabled. A body that does not end
+with Renovate's debug marker, such as one Renovate truncated past its
+Configuration section, counts as not eligible. The workflow queues:
+
+- when the PR opens or reopens,
+- after every push, because Mergify cancels a pending queue request when the
+  branch changes (a lockfile refresh, a conflict rebase, or a contributor
+  commit),
+- and when Renovate rewrites the body so the Automerge line flips. If it flips
+  to disabled, the workflow comments `@mergifyio dequeue` instead.
+
+Mergify's `default` queue rule still decides when the PR enters the queue and
+performs the merge using its CI gates, review requirements, and squash commit
+settings. Add the `manual-merge` label to dequeue a PR and stop it from
+auto-queueing; remove the label to queue it again.
+
+The workflow runs on `pull_request_target`, so the copy on `main` runs and PR
+code is never checked out. It comments with `BOT_GITHUB_TOKEN` because Mergify
+only accepts queue commands from senders with write access.
 
 `rebaseWhen` is `conflicted`, so Renovate only rebases a branch when it
 conflicts with `main`. Mergify brings queued PRs up to date itself, so rebasing
@@ -94,5 +108,5 @@ on every `main` change would only restart CI and requeue the PR.
 
 This keeps the behavior compatible with the lockfile repair workflow: Renovate
 opens the branch, the `Renovate Lockfiles` workflow commits the
-Vite+-generated `pnpm-lock.yaml`, and Mergify queues the PR after the updated
-branch passes checks.
+Vite+-generated `pnpm-lock.yaml`, and the resulting push re-queues the PR, which
+enters the queue after the updated branch passes checks.

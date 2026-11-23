@@ -1,0 +1,122 @@
+name: Renovate Automerge
+
+# Queue Renovate PRs that renovate.json marks as automerge in the Mergify merge
+# queue. Renovate writes "Automerge: Enabled." in the PR body only when every
+# update in the PR is eligible. Mergify cancels a pending queue request when the
+# branch receives a push, so this re-queues after every push, including the
+# Renovate Lockfiles commit. Mergify's queue_conditions still decide when the PR
+# enters the queue. The `manual-merge` label vetoes auto-queueing.
+#
+# pull_request_target runs this file from main and never checks out PR code. The
+# comments come from the BOT_GITHUB_TOKEN user so they meet Mergify's
+# `sender-permission >= write` command restriction.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited, labeled, unlabeled]
+
+permissions: {}
+
+# Serialize per PR so queue and dequeue comments keep event order. queue: max
+# keeps every pending run; the default replaces an older pending run, so an
+# unrelated edit could drop a veto or the re-queue after a push.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  queue:
+    name: Queue eligible Renovate PR
+    if: >-
+      github.event.pull_request.user.login == 'renovate[bot]' &&
+      startsWith(github.event.pull_request.head.ref, 'renovate/') &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      ((github.event.action != 'labeled' && github.event.action != 'unlabeled') ||
+        github.event.label.name == 'manual-merge')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Queue or dequeue with Mergify
+        env:
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EVENT_ACTION: ${{ github.event.action }}
+        run: |
+          set -euo pipefail
+
+          # Read only Renovate's Automerge field from the last Configuration
+          # section, which Renovate appends after any upstream release notes.
+          # Require the body to end with Renovate's debug marker: Renovate's
+          # fallback truncation cuts off the whole tail, which could leave a
+          # Configuration example from release notes as the last section.
+          # Fail closed when the field is missing or appears more than once.
+          automerge_enabled() {
+            tr -d '\r' | awk '
+              /^### Configuration$/ { n = 0; found = 1; next }
+              found && /^[^ ]+ \*\*Automerge\*\*: / { values[++n] = substr($0, index($0, ": ") + 2) }
+              NF { last = $0 }
+              END {
+                intact = last ~ /^<!--renovate-debug:[A-Za-z0-9+\/=]*-->$/
+                exit !(intact && n == 1 && values[1] == "Enabled.")
+              }'
+          }
+
+          pr_json=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER")
+
+          if [ "$(jq -r '.state' <<<"$pr_json")" != "open" ]; then
+            echo "PR is not open; nothing to do."
+            exit 0
+          fi
+
+          eligible=false
+          if jq -r '.body // ""' <<<"$pr_json" | automerge_enabled; then
+            eligible=true
+          fi
+          vetoed=$(jq -r '[.labels[].name] | index("manual-merge") != null' <<<"$pr_json")
+          echo "event=$EVENT_ACTION eligible=$eligible vetoed=$vetoed"
+
+          comment() {
+            echo "Commenting: $1"
+            gh pr comment "$PR_NUMBER" --body "$1"
+          }
+
+          case "$EVENT_ACTION" in
+            opened | reopened | synchronize)
+              if [ "$eligible" = true ] && [ "$vetoed" = false ]; then
+                comment "@mergifyio queue"
+              fi
+              ;;
+            edited)
+              # Renovate rewrites the body after pushing, so act only when the
+              # Automerge line flips. That also corrects a stale-body decision
+              # made by the synchronize run.
+              if [ "$(jq -r '.changes.body != null' "$GITHUB_EVENT_PATH")" != true ]; then
+                echo "Body unchanged."
+                exit 0
+              fi
+              was_eligible=false
+              if jq -r '.changes.body.from // ""' "$GITHUB_EVENT_PATH" | automerge_enabled; then
+                was_eligible=true
+              fi
+              if [ "$was_eligible" = "$eligible" ]; then
+                echo "Automerge eligibility unchanged."
+              elif [ "$eligible" = true ] && [ "$vetoed" = false ]; then
+                comment "@mergifyio queue"
+              elif [ "$eligible" = false ]; then
+                comment "@mergifyio dequeue"
+              fi
+              ;;
+            labeled)
+              # Recheck the label: it may have been removed before this run.
+              if [ "$vetoed" = true ]; then
+                comment "@mergifyio dequeue"
+              fi
+              ;;
+            unlabeled)
+              if [ "$eligible" = true ] && [ "$vetoed" = false ]; then
+                comment "@mergifyio queue"
+              fi
+              ;;
+          esac
