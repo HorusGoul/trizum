@@ -7,6 +7,8 @@
  *   node scripts/bench-ui-tests.ts --platform ios --device <udid> --runs 5
  *   node scripts/bench-ui-tests.ts --platform android --device <serial> --runs 5
  *
+ * Pass --app-id <id> to test a renamed build instead of app.trizum.capacitor.
+ *
  * Writes `bench-results/<platform>-<timestamp>/summary.{json,md}`.
  */
 import { spawnSync } from "node:child_process";
@@ -29,16 +31,18 @@ const { values } = parseArgs({
     platform: { type: "string" },
     device: { type: "string" },
     runs: { type: "string", default: "5" },
+    "app-id": { type: "string" },
   },
 });
 
 const platform = values.platform;
 const device = values.device;
 const runs = Number(values.runs);
+const appId = values["app-id"];
 
 if ((platform !== "ios" && platform !== "android") || !device || !Number.isInteger(runs)) {
   process.stderr.write(
-    "Usage: node scripts/bench-ui-tests.ts --platform ios|android --device <id> --runs <n>\n",
+    "Usage: node scripts/bench-ui-tests.ts --platform ios|android --device <id> --runs <n> [--app-id <id>]\n",
   );
   process.exit(2);
 }
@@ -67,7 +71,16 @@ function runMaestro(round: number): RunResult {
 
   const result = spawnSync(
     "maestro",
-    ["--device", device!, "test", ".maestro", "--debug-output", debugDir, "--flatten-debug-output"],
+    [
+      "--device",
+      device!,
+      "test",
+      ".maestro",
+      "--debug-output",
+      debugDir,
+      "--flatten-debug-output",
+      ...(appId ? ["-e", `APP_ID=${appId}`] : []),
+    ],
     {
       cwd: packageDir,
       env: {
@@ -114,6 +127,15 @@ function runMaestro(round: number): RunResult {
 
 function runE2E(round: number): RunResult {
   const outputDir = path.join(outDir, `e2e-${round}`);
+
+  const env: NodeJS.ProcessEnv = {
+    ...process.env,
+    E2E_TELEMETRY_DISABLED: "1",
+    [platform === "ios" ? "E2E_IOS_DEVICE" : "E2E_ANDROID_DEVICE"]: device,
+  };
+
+  if (appId) env.E2E_APP_ID = appId;
+
   const started = performance.now();
 
   const result = spawnSync(
@@ -131,11 +153,7 @@ function runE2E(round: number): RunResult {
     ],
     {
       cwd: packageDir,
-      env: {
-        ...process.env,
-        E2E_TELEMETRY_DISABLED: "1",
-        [platform === "ios" ? "E2E_IOS_DEVICE" : "E2E_ANDROID_DEVICE"]: device,
-      },
+      env,
       encoding: "utf8",
     },
   );

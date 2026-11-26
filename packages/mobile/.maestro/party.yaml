@@ -1,4 +1,5 @@
-appId: app.trizum.capacitor
+# APP_ID defaults to the store app id; pass -e APP_ID=<id> for a renamed build.
+appId: ${APP_ID || "app.trizum.capacitor"}
 name: A new party records its first expense
 ---
 - launchApp:

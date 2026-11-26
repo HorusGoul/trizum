@@ -1,7 +1,9 @@
 import type { E2EConfig } from "e2e";
 import { mobile } from "@e2e-dev/mobile";
 
-const bundleId = "app.trizum.capacitor";
+// E2E_APP_ID points the suite at a renamed build, such as a debug build with an
+// applicationIdSuffix installed beside the store app.
+const bundleId = process.env.E2E_APP_ID ?? "app.trizum.capacitor";
 
 export default {
   tests: ["e2e/**/*.e2e.ts"],

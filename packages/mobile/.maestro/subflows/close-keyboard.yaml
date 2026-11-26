@@ -1,4 +1,5 @@
-appId: app.trizum.capacitor
+# APP_ID defaults to the store app id; pass -e APP_ID=<id> for a renamed build.
+appId: ${APP_ID || "app.trizum.capacitor"}
 ---
 # hideKeyboard gestures on the iOS page and can open the currency picker, so
 # iOS uses the WKWebView keyboard toolbar's Done button instead.

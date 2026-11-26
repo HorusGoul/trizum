@@ -7,6 +7,7 @@ Capacitor wrappers for the trizum PWA, distributed through the App Store and Goo
 - **Run build or upload lanes:** [Fastlane](./docs/fastlane.md).
 - **Edit store listings, screenshots, or privacy answers:** [Store metadata](./docs/store-metadata.md).
 - **Change ads or purchases:** [Monetization](./docs/monetization.md).
+- **Run or change device UI tests (e2e and Maestro):** [Native UI tests](./docs/ui-tests.md).
 - **Validate or release native builds:** [Releases and CI](./docs/releases.md).
 - **Configure signing or CI credentials:** [Signing](./docs/signing.md).
 
