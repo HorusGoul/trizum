@@ -1,14 +1,14 @@
-# Native UI tests
+# trizum mobile UI tests
 
-[Back to package overview](../README.md). Read when running or changing the
-device UI tests for the native apps. Commands run from `packages/mobile`.
+Device UI tests for the [native apps](../mobile/README.md). Commands run from
+`packages/mobile-e2e`.
 
 The same three journeys exist twice, so the two runners can be compared:
 
-- [`e2e/`](../e2e) with [`e2e.config.ts`](../e2e.config.ts): TypeScript tests
+- [`e2e/`](./e2e) with [`e2e.config.ts`](./e2e.config.ts): TypeScript tests
   for [e2e](https://e2e.com/docs/mobile), driven by agent-device. They need no
   model or API key.
-- [`.maestro/`](../.maestro): Maestro flows. Shared steps live in
+- [`.maestro/`](./.maestro): Maestro flows. Shared steps live in
   `.maestro/subflows/`.
 
 Keep the two in step: a change to one journey changes both files.
@@ -20,10 +20,10 @@ and clear its data before each test.
 
 - **iOS simulator:** build the `App` scheme for the simulator, then install the
   `.app` with `xcrun simctl install <udid> <path>`.
-- **Android:** build with `./gradlew assembleDebug` in `android/`, then
+- **Android:** build with `./gradlew assembleDebug` in `packages/mobile/android/`, then
   `adb -s <serial> install -r <apk>`.
 
-See [Mobile development](./development.md) for the PWA build and Capacitor sync
+See [Mobile development](../mobile/docs/development.md) for the PWA build and Capacitor sync
 that come first.
 
 ## Run the suites

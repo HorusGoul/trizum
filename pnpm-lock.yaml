@@ -220,6 +220,9 @@ catalogs:
     agent-browser:
       specifier: 0.39.4
       version: 0.39.4
+    agent-device:
+      specifier: 0.21.39
+      version: 0.21.39
     ai:
       specifier: 7.0.181
       version: 7.0.181
@@ -432,6 +435,7 @@ catalogs:
       version: 4.6.7
 
 overrides:
+  '@modelcontextprotocol/ext-apps>@modelcontextprotocol/server': '-'
   vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
   esbuild: 0.28.2
   vitest@*: 5.0.5
@@ -588,7 +592,7 @@ importers:
         version: 6.10.1(@babel/core@8.0.9)(babel-plugin-macros@3.1.0)(react@19.3.1)
       '@modelcontextprotocol/ext-apps':
         specifier: 'catalog:'
-        version: 2.0.4(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(@modelcontextprotocol/server@2.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
+        version: 2.0.4(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
       '@modelcontextprotocol/sdk':
         specifier: 'catalog:'
         version: 1.32.2(supports-color@10.2.2)(zod@4.6.7)
@@ -699,6 +703,27 @@ importers:
       '@capawesome/capver':
         specifier: 'catalog:'
         version: 0.1.5(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@26.6.5)(@typescript/typescript6@6.0.2)(supports-color@10.2.2)
+      '@trizum/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.5
+      '@typescript/native':
+        specifier: 'catalog:'
+        version: typescript@7.0.2
+      sharp:
+        specifier: 'catalog:'
+        version: 0.35.5(@types/node@26.6.5)
+      svgexport:
+        specifier: 'catalog:'
+        version: 0.4.2(supports-color@10.2.2)
+      typescript:
+        specifier: 'catalog:'
+        version: '@typescript/typescript6@6.0.2'
+
+  packages/mobile-e2e:
+    devDependencies:
       '@e2e-dev/mobile':
         specifier: 'catalog:'
         version: 0.12.8(@e2e-dev/core@0.24.0(ai@7.0.181(zod@4.6.7)))(ai@7.0.181(zod@4.6.7))(e2e@0.24.0(ai@7.0.181(zod@4.6.7)))
@@ -711,21 +736,15 @@ importers:
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
+      agent-device:
+        specifier: 'catalog:'
+        version: 0.21.39(ai@7.0.181(zod@4.6.7))
       ai:
         specifier: 'catalog:'
         version: 7.0.181(zod@4.6.7)
       e2e:
         specifier: 'catalog:'
         version: 0.24.0(ai@7.0.181(zod@4.6.7))
-      sharp:
-        specifier: 'catalog:'
-        version: 0.35.5(@types/node@26.6.5)
-      svgexport:
-        specifier: 'catalog:'
-        version: 0.4.2(supports-color@10.2.2)
-      typescript:
-        specifier: 'catalog:'
-        version: '@typescript/typescript6@6.0.2'
 
   packages/pwa:
     dependencies:
@@ -3506,13 +3525,10 @@ packages:
     peerDependencies:
       '@modelcontextprotocol/client': ^2.0.0
       '@modelcontextprotocol/core': ^2.0.0
-      '@modelcontextprotocol/server': ^2.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
       zod: ^4.2.0
     peerDependenciesMeta:
-      '@modelcontextprotocol/server':
-        optional: true
       react:
         optional: true
       react-dom:
@@ -13743,14 +13759,13 @@ snapshots:
     dependencies:
       zod: 4.6.7
 
-  '@modelcontextprotocol/ext-apps@2.0.4(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(@modelcontextprotocol/server@2.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)':
+  '@modelcontextprotocol/ext-apps@2.0.4(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)':
     dependencies:
       '@modelcontextprotocol/client': 2.4.0
       '@modelcontextprotocol/core': 2.4.0
       '@standard-schema/spec': 1.1.0
       zod: 4.6.7
     optionalDependencies:
-      '@modelcontextprotocol/server': 2.4.0
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
@@ -15398,11 +15413,11 @@ snapshots:
       bs58check: 4.0.0
       zod: 4.6.7
 
-  '@trizum/mcp@file:packages/mcp(@babel/core@8.0.9)(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(@modelcontextprotocol/server@2.4.0)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(supports-color@10.2.2)(tailwindcss@4.3.3)':
+  '@trizum/mcp@file:packages/mcp(@babel/core@8.0.9)(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(supports-color@10.2.2)(tailwindcss@4.3.3)':
     dependencies:
       '@lingui/core': 6.10.1(@babel/core@8.0.9)(babel-plugin-macros@3.1.0)
       '@lingui/react': 6.10.1(@babel/core@8.0.9)(babel-plugin-macros@3.1.0)(react@19.3.1)
-      '@modelcontextprotocol/ext-apps': 2.0.4(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(@modelcontextprotocol/server@2.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
+      '@modelcontextprotocol/ext-apps': 2.0.4(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
       '@modelcontextprotocol/sdk': 1.32.2(supports-color@10.2.2)(zod@4.6.7)
       '@trizum/ui': file:packages/ui(@lingui/core@6.10.1(@babel/core@8.0.9)(babel-plugin-macros@3.1.0))(@lingui/react@6.10.1(@babel/core@8.0.9)(babel-plugin-macros@3.1.0)(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.3)
       react: 19.3.1
@@ -15413,7 +15428,6 @@ snapshots:
       - '@cfworker/json-schema'
       - '@modelcontextprotocol/client'
       - '@modelcontextprotocol/core'
-      - '@modelcontextprotocol/server'
       - '@types/react'
       - babel-plugin-macros
       - supports-color
@@ -15452,7 +15466,7 @@ snapshots:
       '@tanstack/react-router': 1.170.46(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@trizum/analytics': file:packages/analytics
       '@trizum/logging': file:packages/logging
-      '@trizum/mcp': file:packages/mcp(@babel/core@8.0.9)(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(@modelcontextprotocol/server@2.4.0)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(supports-color@10.2.2)(tailwindcss@4.3.3)
+      '@trizum/mcp': file:packages/mcp(@babel/core@8.0.9)(@modelcontextprotocol/client@2.4.0)(@modelcontextprotocol/core@2.4.0)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(supports-color@10.2.2)(tailwindcss@4.3.3)
       '@trizum/react-suspense-cache': file:packages/react-suspense-cache(react@19.3.1)
       '@trizum/revenuecat-api': file:packages/revenuecat-api
       '@trizum/ui': file:packages/ui(@lingui/core@6.10.1(@babel/core@8.0.9)(babel-plugin-macros@3.1.0))(@lingui/react@6.10.1(@babel/core@8.0.9)(babel-plugin-macros@3.1.0)(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.3)
@@ -15496,7 +15510,6 @@ snapshots:
       - '@lynx-js/react'
       - '@modelcontextprotocol/client'
       - '@modelcontextprotocol/core'
-      - '@modelcontextprotocol/server'
       - '@neondatabase/serverless'
       - '@netlify/db'
       - '@op-engineering/op-sqlite'

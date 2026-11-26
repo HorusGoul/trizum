@@ -59,12 +59,9 @@
     "@capacitor/assets": "catalog:",
     "@capacitor/cli": "catalog:",
     "@capawesome/capver": "catalog:",
-    "@e2e-dev/mobile": "catalog:",
     "@trizum/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@typescript/native": "catalog:",
-    "ai": "catalog:",
-    "e2e": "catalog:",
     "sharp": "catalog:",
     "svgexport": "catalog:",
     "typescript": "catalog:"

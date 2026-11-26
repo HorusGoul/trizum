@@ -1,0 +1,12 @@
+{
+  "extends": "@trizum/tsconfig/base.json",
+  "include": ["./e2e", "./e2e.config.ts", "./scripts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "rootDir": "./",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "types": ["node"],
+    "noEmit": true
+  }
+}

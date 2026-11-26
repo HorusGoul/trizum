@@ -1,6 +1,6 @@
 {
   "extends": "@trizum/tsconfig/base.json",
-  "include": ["./src", "./capacitor.log.ts", "./e2e", "./e2e.config.ts", "./scripts"],
+  "include": ["./src", "./capacitor.log.ts"],
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "rootDir": "./",

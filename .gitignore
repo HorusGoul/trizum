@@ -198,5 +198,5 @@ packages/pwa/visual-results/
 packages/pwa/visual-report/
 
 # UI test runners
-packages/mobile/.e2e/
-packages/mobile/bench-results/
+packages/mobile-e2e/.e2e/
+packages/mobile-e2e/bench-results/

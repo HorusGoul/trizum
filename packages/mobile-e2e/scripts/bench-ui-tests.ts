@@ -3,11 +3,16 @@
  * on one device. Both suites cover the same three journeys and run against the
  * already-installed app, alternating which runner goes first in each round.
  *
- * Usage (from packages/mobile):
+ * Usage (from packages/mobile-e2e):
  *   node scripts/bench-ui-tests.ts --platform ios --device <udid> --runs 5
  *   node scripts/bench-ui-tests.ts --platform android --device <serial> --runs 5
  *
  * Pass --app-id <id> to test a renamed build instead of app.trizum.capacitor.
+ *
+ * By default every run starts cold: the agent-device daemon that e2e leaves
+ * running (with its device runner) is stopped before each run, untimed, the
+ * same way Maestro starts its driver on every run. Pass --warm-e2e to keep the
+ * daemon between e2e runs instead.
  *
  * Writes `bench-results/<platform>-<timestamp>/summary.{json,md}`.
  */
@@ -32,6 +37,7 @@ const { values } = parseArgs({
     device: { type: "string" },
     runs: { type: "string", default: "5" },
     "app-id": { type: "string" },
+    "warm-e2e": { type: "boolean", default: false },
   },
 });
 
@@ -39,10 +45,11 @@ const platform = values.platform;
 const device = values.device;
 const runs = Number(values.runs);
 const appId = values["app-id"];
+const warmE2E = values["warm-e2e"];
 
 if ((platform !== "ios" && platform !== "android") || !device || !Number.isInteger(runs)) {
   process.stderr.write(
-    "Usage: node scripts/bench-ui-tests.ts --platform ios|android --device <id> --runs <n> [--app-id <id>]\n",
+    "Usage: node scripts/bench-ui-tests.ts --platform ios|android --device <id> --runs <n> [--app-id <id>] [--warm-e2e]\n",
   );
   process.exit(2);
 }
@@ -178,12 +185,23 @@ function runE2E(round: number): RunResult {
   return { runner: "e2e", round, wallMs, passed: result.status === 0, tests };
 }
 
+// Stops the agent-device daemon e2e started, with its device runner, so the
+// next run starts cold and Maestro's driver has the device to itself.
+function stopAgentDevice() {
+  spawnSync("vp", ["exec", "agent-device", "daemon", "stop", "--clean"], {
+    cwd: packageDir,
+    encoding: "utf8",
+  });
+}
+
 const results: RunResult[] = [];
 
 for (let round = 0; round < runs; round++) {
   const order: Runner[] = round % 2 === 0 ? ["maestro", "e2e"] : ["e2e", "maestro"];
 
   for (const runner of order) {
+    if (!warmE2E) stopAgentDevice();
+
     const result = runner === "maestro" ? runMaestro(round) : runE2E(round);
     results.push(result);
     process.stdout.write(
@@ -215,6 +233,7 @@ const summary = {
   platform,
   device,
   runs,
+  warmE2E,
   passRate: Object.fromEntries(
     runners.map((runner) => {
       const own = results.filter((result) => result.runner === runner);
@@ -258,7 +277,7 @@ const row = (label: string, maestro: ReturnType<typeof stats>, e2e: ReturnType<t
   `| ${label} | ${seconds(maestro.median)} (${seconds(maestro.min)}–${seconds(maestro.max)}) | ${seconds(e2e.median)} (${seconds(e2e.min)}–${seconds(e2e.max)}) | ${((1 - e2e.median / maestro.median) * 100).toFixed(0)}% |`;
 
 const markdown = [
-  `## ${platform} · ${device} · ${runs} rounds`,
+  `## ${platform} · ${device} · ${runs} rounds · ${warmE2E ? "warm" : "cold"} e2e daemon`,
   "",
   `Pass rate: Maestro ${summary.passRate.maestro}, e2e ${summary.passRate.e2e}`,
   "",

@@ -1,0 +1,18 @@
+{
+  "name": "@trizum/mobile-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Device UI tests for the trizum native apps, in e2e and Maestro.",
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "type": "module",
+  "devDependencies": {
+    "@e2e-dev/mobile": "catalog:",
+    "@trizum/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
+    "agent-device": "catalog:",
+    "ai": "catalog:",
+    "e2e": "catalog:"
+  }
+}

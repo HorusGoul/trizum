@@ -3,6 +3,12 @@ packages:
 autoInstallPeers: true
 injectWorkspacePackages: true
 minimumReleaseAge: 1440
+# e2e depends on @modelcontextprotocol/server v2. Linked as ext-apps' optional
+# peer or hoisted, it would type ext-apps' server helpers for packages/mcp,
+# which uses the v1 SDK server. See the matching override below.
+hoistPattern:
+  - "*"
+  - "!@modelcontextprotocol/server"
 publicHoistPattern:
   - workbox-window
 savePrefix: ""
@@ -20,6 +26,7 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 overrides:
+  "@modelcontextprotocol/ext-apps>@modelcontextprotocol/server": "-"
   vite@*: "catalog:"
   esbuild: 0.28.2
   vitest@*: "catalog:"
@@ -170,6 +177,7 @@ catalog:
   ws: 8.22.0
   fflate: 0.8.3
   zod: 4.6.7
+  agent-device: 0.21.39
   ai: 7.0.181
   e2e: 0.24.0
 minimumReleaseAgeExclude:
