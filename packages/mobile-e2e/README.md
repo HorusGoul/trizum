@@ -54,13 +54,19 @@ The script alternates which runner goes first in each round and writes
 `bench-results/<platform>-<timestamp>/summary.md` with wall-clock and per-test
 medians. Add `--app-id <id>` for a renamed build.
 
-## App quirks the tests work around
+## Platform differences the tests work around
 
 - The iOS keyboard closes through the WKWebView toolbar's **Done** button.
   Maestro's `hideKeyboard` gestures on the page and can open the currency
   picker.
 - After a party is created, its toasts overlap the floating **Add an expense**
   button. Touching a toast pauses its timer for good, so both suites tap the
-  button's uncovered right edge.
+  button's uncovered right edge. Maestro can only tap screen positions, so
+  `.maestro/subflows/tap-add-expense.yaml` holds one point per platform.
 - In the iOS accessibility tree, web headings read as `other` with their level
   as the value. Match them by text, not by the `heading` role.
+- The accessibility trees of the two WebViews differ. Android exposes links as
+  plain groups, a field's label and help text only as its placeholder, and
+  toggles as checkboxes; iOS names fields after their labels and reads toggles
+  as switches. Match links by text, fields with `textField()` from
+  `e2e/fields.ts`, and toggles by either role.

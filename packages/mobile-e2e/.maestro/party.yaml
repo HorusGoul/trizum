@@ -8,9 +8,7 @@ name: A new party records its first expense
     visible: "Create a Party"
     timeout: 20000
 - tapOn: "Create a Party"
-- tapOn:
-    text: "Name"
-    index: 1
+- tapOn: "Name"
 - inputText: "Bench trip"
 - runFlow: subflows/close-keyboard.yaml
 - scrollUntilVisible:
@@ -25,13 +23,9 @@ name: A new party records its first expense
 - tapOn: "Alice"
 - tapOn: "Save"
 - runFlow: subflows/tap-add-expense.yaml
-- tapOn:
-    text: "Title"
-    index: 1
+- tapOn: "Title"
 - inputText: "Groceries"
-- tapOn:
-    text: "Amount"
-    index: 1
+- tapOn: "Amount"
 - inputText: "42.50"
 - runFlow: subflows/close-keyboard.yaml
 - tapOn: "Include all"

@@ -4,5 +4,16 @@ appId: ${APP_ID || "app.trizum.capacitor"}
 # The "Party created" and welcome toasts overlap the floating add button. A
 # touch pauses their timers for good, and Maestro cannot tap relative to an
 # element, so tap the button's uncovered right edge by screen position.
-- tapOn:
-    point: "97%,90%"
+# Measured on an iPhone 17 Pro and a Pixel 7 profile.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          point: "97%,90%"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          point: "97%,92%"
