@@ -31,6 +31,7 @@ peerDependencyRules:
     vite: "*"
     vitest: "*"
 catalog:
+  "@e2e-dev/mobile": 0.12.8
   "@modelcontextprotocol/ext-apps": 2.0.4
   "@modelcontextprotocol/sdk": 1.32.2
   oxc-transform-react: 0.152.0
@@ -169,6 +170,8 @@ catalog:
   ws: 8.22.0
   fflate: 0.8.3
   zod: 4.6.7
+  ai: 7.0.181
+  e2e: 0.24.0
 minimumReleaseAgeExclude:
   - vite-plus
   - "@voidzero-dev/*"

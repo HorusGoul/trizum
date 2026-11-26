@@ -1,0 +1,10 @@
+appId: app.trizum.capacitor
+name: A fresh install shows the empty-state actions
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Split expenses, stay even."
+    timeout: 20000
+- assertVisible: "Create a Party"
+- assertVisible: "Join with a code"

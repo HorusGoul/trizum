@@ -1,0 +1,39 @@
+appId: app.trizum.capacitor
+name: A new party records its first expense
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Create a Party"
+    timeout: 20000
+- tapOn: "Create a Party"
+- tapOn:
+    text: "Name"
+    index: 1
+- inputText: "Bench trip"
+- runFlow: subflows/close-keyboard.yaml
+- scrollUntilVisible:
+    element: "Add participant"
+- tapOn: "Participant name"
+- inputText: "Alice"
+- tapOn: "New participant name"
+- inputText: "Bob"
+- tapOn: "Add participant"
+- tapOn: "Save"
+- assertVisible: "Who are you?"
+- tapOn: "Alice"
+- tapOn: "Save"
+- runFlow: subflows/tap-add-expense.yaml
+- tapOn:
+    text: "Title"
+    index: 1
+- inputText: "Groceries"
+- tapOn:
+    text: "Amount"
+    index: 1
+- inputText: "42.50"
+- runFlow: subflows/close-keyboard.yaml
+- tapOn: "Include all"
+- tapOn: "Save"
+- assertNotVisible: "New expense"
+- assertVisible: "Groceries"

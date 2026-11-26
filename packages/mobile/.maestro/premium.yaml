@@ -1,0 +1,17 @@
+appId: app.trizum.capacitor
+name: A signed-out user is sent to sign in from the Premium settings
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Profile and app menu"
+    timeout: 20000
+- tapOn: "Profile and app menu"
+- tapOn: "Settings"
+- scrollUntilVisible:
+    element: "Sign in to get Premium"
+- tapOn: "Sign in to get Premium"
+- assertVisible: "Sign in to trizum cloud"
+- assertVisible: "Continue with Apple"
+- tapOn: "Close sign-in"
+- assertNotVisible: "Sign in to trizum cloud"

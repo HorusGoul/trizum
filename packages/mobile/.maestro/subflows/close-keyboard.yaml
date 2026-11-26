@@ -1,0 +1,14 @@
+appId: app.trizum.capacitor
+---
+# hideKeyboard gestures on the iOS page and can open the currency picker, so
+# iOS uses the WKWebView keyboard toolbar's Done button instead.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "Done"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard

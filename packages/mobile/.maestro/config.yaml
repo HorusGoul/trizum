@@ -1,0 +1,5 @@
+flows:
+  - "*.yaml"
+  - "!subflows/*"
+executionOrder:
+  continueOnFailure: true
