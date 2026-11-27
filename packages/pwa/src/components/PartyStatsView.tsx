@@ -298,10 +298,10 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         ) : null}
       </section>
 
-      <section className="shadow-surface rounded-3xl bg-neutral-950 p-5 text-white lg:p-6 dark:bg-white dark:text-neutral-950">
+      <section className="shadow-surface rounded-3xl bg-white p-5 text-neutral-950 lg:p-6 dark:bg-neutral-900 dark:text-white">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold tracking-[0.24em] text-white/70 uppercase dark:text-neutral-950/60">
+            <div className="text-[11px] font-semibold tracking-[0.24em] text-neutral-600 uppercase dark:text-neutral-400">
               <Trans>Total spent</Trans>
             </div>
 
@@ -314,7 +314,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
               />
             </div>
 
-            <p className="mt-2 text-sm text-white/70 dark:text-neutral-950/60">
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
               <Trans>Across the selected timeframe</Trans>
             </p>
           </div>
@@ -394,18 +394,18 @@ function StatsSummaryCard({
 }: StatsSummaryCardProps) {
   if (compact) {
     return (
-      <div className="inline-flex max-w-full items-center gap-2 self-start rounded-full bg-white/10 px-3 py-2 sm:self-start dark:bg-neutral-950/5">
-        <span className="rounded-full bg-white/10 p-1.5 dark:bg-neutral-950/10">
+      <div className="inline-flex max-w-full items-center gap-2 self-start rounded-full bg-neutral-950/5 px-3 py-2 sm:self-start dark:bg-white/10">
+        <span className="rounded-full bg-neutral-950/5 p-1.5 dark:bg-white/10">
           <Icon icon={icon} width={14} height={14} />
         </span>
 
         <span className="text-base font-semibold tracking-tight">{value}</span>
-        <span className="text-[11px] font-semibold tracking-[0.18em] text-white/70 uppercase dark:text-neutral-950/60">
+        <span className="text-[11px] font-semibold tracking-[0.18em] text-neutral-600 uppercase dark:text-neutral-400">
           {label}
         </span>
 
         {badge !== undefined && badge !== null ? (
-          <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold dark:bg-neutral-950/10">
+          <span className="inline-flex items-center rounded-full bg-neutral-950/5 px-2 py-1 text-[10px] font-semibold dark:bg-white/10">
             {badge}
           </span>
         ) : null}
@@ -416,27 +416,27 @@ function StatsSummaryCard({
   }
 
   return (
-    <div className={cn("w-full rounded-2xl bg-white/10 sm:w-52 dark:bg-neutral-950/5", "p-4")}>
+    <div className={cn("w-full rounded-2xl bg-neutral-950/5 sm:w-52 dark:bg-white/10", "p-4")}>
       <div className="flex items-start gap-3">
-        <div className="rounded-full bg-white/10 p-3 dark:bg-neutral-950/10">
+        <div className="rounded-full bg-neutral-950/5 p-3 dark:bg-white/10">
           <Icon icon={icon} width={20} height={20} />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <div className="text-[11px] font-semibold tracking-[0.18em] text-white/70 uppercase dark:text-neutral-950/60">
+            <div className="text-[11px] font-semibold tracking-[0.18em] text-neutral-600 uppercase dark:text-neutral-400">
               {label}
             </div>
 
             {badge !== undefined && badge !== null ? (
-              <div className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold dark:bg-neutral-950/10">
+              <div className="inline-flex items-center rounded-full bg-neutral-950/5 px-2.5 py-1 text-[11px] font-semibold dark:bg-white/10">
                 {badge}
               </div>
             ) : null}
           </div>
 
           <div className="mt-3">{value}</div>
-          <div className="mt-2 text-sm text-white/70 dark:text-neutral-950/60">{description}</div>
+          <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{description}</div>
         </div>
       </div>
     </div>
