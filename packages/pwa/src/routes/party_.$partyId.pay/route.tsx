@@ -95,15 +95,15 @@ function RouteComponent() {
       </div>
 
       <div className="container flex flex-col gap-4 px-4 pt-4">
-        <div className="dark:bg-accent-900 flex rounded-xl bg-white p-4">
+        <div className="flex rounded-xl bg-white p-4 dark:bg-neutral-900">
           <div className="flex flex-1 flex-col">
-            <span className="text-accent-400 text-lg">
+            <span className="text-lg text-neutral-400">
               {from.name} {fromId === me.id ? t`(me)` : ""}
             </span>
-            <span className="text-accent-700 dark:text-accent-300 text-sm">
+            <span className="text-sm text-neutral-700 dark:text-neutral-300">
               <Trans>owes</Trans>
             </span>
-            <span className="text-accent-400 text-lg">
+            <span className="text-lg text-neutral-400">
               {to.name} {toId === me.id ? t`(me)` : ""}
             </span>
           </div>
@@ -135,7 +135,7 @@ function RouteComponent() {
           </Alert>
         ) : null}
 
-        <div className="divide-accent-100 dark:divide-accent-800 divide-y rounded-xl">
+        <div className="divide-y divide-neutral-100 rounded-xl dark:divide-neutral-800">
           {paymentMethodTypes.map((type) => {
             const details = methods[type];
 

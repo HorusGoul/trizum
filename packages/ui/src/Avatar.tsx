@@ -10,8 +10,8 @@ interface AvatarProps {
 }
 
 const colorSchemes = [
-  { bg: "bg-accent-500 dark:bg-accent-600", text: "text-accent-50" },
-  { bg: "bg-accent-500 dark:bg-accent-600", text: "text-accent-50" },
+  { bg: "bg-neutral-500 dark:bg-neutral-600", text: "text-neutral-50" },
+  { bg: "bg-neutral-500 dark:bg-neutral-600", text: "text-neutral-50" },
   { bg: "bg-red-500 dark:bg-red-600", text: "text-red-50" },
   { bg: "bg-green-500 dark:bg-green-600", text: "text-green-50" },
   { bg: "bg-yellow-500 dark:bg-yellow-600", text: "text-yellow-50" },

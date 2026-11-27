@@ -289,8 +289,8 @@ function SettingsFormFields({
 
       <PremiumSection />
 
-      <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
-        <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
+      <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>Privacy</Trans>
         </h2>
         <UsageAnalyticsSetting />
@@ -367,12 +367,12 @@ function PremiumSection() {
   }
 
   return (
-    <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
+    <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
       <div className="flex flex-col gap-1">
-        <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
+        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>Premium</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300 text-sm">
+        <p className="text-sm text-neutral-700 dark:text-neutral-300">
           <PremiumStatusDescription
             isLoading={isLoading}
             isPremium={isPremium}

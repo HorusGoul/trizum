@@ -165,10 +165,11 @@ function Who() {
                   className={({ isFocusVisible, isSelected, isPressed }) =>
                     cn(
                       "group relative flex cursor-default rounded-xl bg-clip-padding px-4 py-3 shadow-lg outline-hidden",
-                      isFocusVisible && "ring-2 ring-accent-600 ring-offset-1 ring-offset-white/80",
-                      isSelected ? "bg-accent-600 text-white" : "border-transparent",
-                      isPressed && !isSelected ? "bg-accent-50 dark:bg-accent-800" : "",
-                      !isSelected && !isPressed ? "bg-accent-50 dark:bg-accent-900" : "",
+                      isFocusVisible &&
+                        "ring-2 ring-neutral-600 ring-offset-1 ring-offset-white/80",
+                      isSelected ? "bg-neutral-600 text-white" : "border-transparent",
+                      isPressed && !isSelected ? "bg-neutral-50 dark:bg-neutral-800" : "",
+                      !isSelected && !isPressed ? "bg-neutral-50 dark:bg-neutral-900" : "",
                     )
                   }
                 >
@@ -178,7 +179,7 @@ function Who() {
                         <Icon icon={isSelected ? "lucide.circle-check" : "lucide.circle"} />
                       </div>
                       <div className="flex flex-1 flex-col">
-                        <div className="text-accent-10 text-lg font-semibold">
+                        <div className="text-neutral-10 text-lg font-semibold">
                           {participant.name}
                         </div>
                       </div>

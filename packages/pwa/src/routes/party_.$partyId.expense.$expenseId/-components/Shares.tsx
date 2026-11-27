@@ -39,13 +39,13 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmo
               return (
                 <li
                   key={userId}
-                  className="bg-accent-50 even:bg-accent-50/80 dark:bg-accent-900 dark:even:bg-accent-900/60 flex justify-between p-2 px-3"
+                  className="flex justify-between bg-neutral-50 p-2 px-3 even:bg-neutral-50/80 dark:bg-neutral-900 dark:even:bg-neutral-900/60"
                 >
                   <span className="flex items-center gap-1 font-medium">
                     {party.participants[userId].name}
 
                     {isMe ? (
-                      <span className="bg-accent-500 text-accent-50 h-4 rounded-xs px-1 text-xs font-semibold uppercase">
+                      <span className="h-4 rounded-xs bg-neutral-500 px-1 text-xs font-semibold text-neutral-50 uppercase">
                         {t`Me`}
                       </span>
                     ) : null}
@@ -60,7 +60,7 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmo
                       <CurrencyText
                         amount={amount}
                         currency={party.currency}
-                        className="text-accent-600 dark:text-accent-300 text-xs"
+                        className="text-xs text-neutral-600 dark:text-neutral-300"
                         variant="inherit"
                       />
                     ) : null}

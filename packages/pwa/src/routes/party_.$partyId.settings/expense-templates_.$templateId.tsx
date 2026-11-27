@@ -435,7 +435,7 @@ function ExpenseTemplateEditor() {
                   </span>
                   <span
                     id={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
-                    className="text-accent-500 text-sm"
+                    className="text-sm text-neutral-500"
                   >
                     <Trans>Select everyone now and automatically include new participants.</Trans>
                   </span>

@@ -247,7 +247,7 @@ export function AnimatedTabs({
           {/* Selection indicator. */}
           <motion.span
             className={cn(
-              "absolute -bottom-2 z-10 h-0.5 rounded-full bg-accent-500",
+              "absolute -bottom-2 z-10 h-0.5 rounded-full bg-neutral-500",
               isSelectionPending && "animate-pulse",
             )}
             style={{ x, width }}

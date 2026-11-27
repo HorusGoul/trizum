@@ -29,8 +29,8 @@ function About() {
         {/* App Info Section */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-accent-900 dark:text-accent-100 text-4xl font-bold">trizum</h2>
-            <div className="text-accent-600 dark:text-accent-400 flex items-center justify-center gap-2 text-sm">
+            <h2 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100">trizum</h2>
+            <div className="flex items-center justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
               <p>
                 <Trans>Version</Trans> {version}
               </p>
@@ -39,7 +39,7 @@ function About() {
                   href={`https://github.com/HorusGoul/trizum/commit/${commit}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-accent-100 text-accent-700 hover:bg-accent-200 hover:text-accent-900 dark:bg-accent-800 dark:text-accent-300 dark:hover:bg-accent-700 dark:hover:text-accent-100 rounded-sm px-1 pt-1 font-mono leading-none"
+                  className="rounded-sm bg-neutral-100 px-1 pt-1 font-mono leading-none text-neutral-700 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100"
                 >
                   {commit}
                 </a>
@@ -47,7 +47,7 @@ function About() {
             </div>
           </div>
 
-          <p className="text-accent-700 dark:text-accent-300 text-center text-lg">
+          <p className="text-center text-lg text-neutral-700 dark:text-neutral-300">
             <Trans>
               Split bills with friends and family. Track, calculate, and settle expenses together.
             </Trans>
@@ -56,7 +56,7 @@ function About() {
 
         {/* Features Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
             <Trans>Features</Trans>
           </h3>
           <ul className="flex flex-col gap-3">
@@ -80,7 +80,7 @@ function About() {
 
         {/* Links Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
             <Trans>Links</Trans>
           </h3>
           <div className="flex flex-col gap-3">
@@ -122,7 +122,7 @@ function About() {
 
         {/* Contributors Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
             <Trans>Contributors</Trans>
           </h3>
           <div className="flex flex-col gap-3">
@@ -133,10 +133,10 @@ function About() {
 
         {/* Credits Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
             <Trans>Credits</Trans>
           </h3>
-          <p className="text-accent-700 dark:text-accent-300">
+          <p className="text-neutral-700 dark:text-neutral-300">
             <Trans>This project uses various open source libraries and tools.</Trans>
           </p>
           <AboutLink
@@ -148,7 +148,7 @@ function About() {
         </section>
 
         {/* Footer */}
-        <section className="border-accent-200 text-accent-600 dark:border-accent-800 dark:text-accent-400 mt-8 border-t pt-6 text-center text-sm">
+        <section className="mt-8 border-t border-neutral-200 pt-6 text-center text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
           <p>
             <Trans>© {currentYear} trizum</Trans>
           </p>

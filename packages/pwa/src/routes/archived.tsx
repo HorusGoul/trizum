@@ -79,16 +79,16 @@ function useArchivedPartyIds(partyList: PartyList) {
 
 function ArchivedEmptyState() {
   return (
-    <div className="border-accent-300 dark:border-accent-700 dark:bg-accent-950/70 rounded-xl border border-dashed bg-white/80 p-6 text-center shadow-xs dark:shadow-none">
+    <div className="rounded-xl border border-dashed border-neutral-300 bg-white/80 p-6 text-center shadow-xs dark:border-neutral-700 dark:bg-neutral-950/70 dark:shadow-none">
       <div className="mx-auto flex max-w-md flex-col items-center gap-4">
-        <div className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-200 rounded-full p-4">
+        <div className="rounded-full bg-neutral-100 p-4 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
           <Icon icon="lucide.archive-restore" width={22} height={22} />
         </div>
         <div>
-          <h2 className="text-accent-950 dark:text-accent-50 text-xl font-semibold">
+          <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>No archived parties</Trans>
           </h2>
-          <p className="text-accent-700 dark:text-accent-300 mt-2 text-sm">
+          <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
             <Trans>
               Archive a party from the home screen when you want to clear some space without losing
               it.
@@ -101,9 +101,9 @@ function ArchivedEmptyState() {
           className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
-              "inline-flex items-center justify-center rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-accent-50 outline-hidden transition-all duration-200 ease-in-out dark:bg-accent-500",
-              (isHovered || isFocusVisible) && "bg-accent-600 dark:bg-accent-400",
-              isPressed && "scale-95 bg-accent-700 dark:bg-accent-300",
+              "inline-flex items-center justify-center rounded-full bg-neutral-500 px-4 py-2.5 text-sm font-semibold text-neutral-50 outline-hidden transition-all duration-200 ease-in-out dark:bg-neutral-500",
+              (isHovered || isFocusVisible) && "bg-neutral-600 dark:bg-neutral-400",
+              isPressed && "scale-95 bg-neutral-700 dark:bg-neutral-300",
             )
           }
         >

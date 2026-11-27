@@ -162,9 +162,9 @@ export function EmojiPicker({
         aria-label={ariaLabel ?? t`Select emoji`}
         className={composeRenderProps(className, (className) =>
           cn(
-            "flex h-10 w-10 items-center justify-center rounded-md border border-accent-500 bg-white text-2xl ring-offset-white transition-all dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
-            "data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-800",
-            "data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-accent-500 data-[focus-visible]:ring-offset-2",
+            "flex h-10 w-10 items-center justify-center rounded-md border border-neutral-500 bg-white text-2xl ring-offset-white transition-all dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900",
+            "data-[hovered]:bg-neutral-100 dark:data-[hovered]:bg-neutral-800",
+            "data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-neutral-500 data-[focus-visible]:ring-offset-2",
             "data-[pressed]:scale-95",
             className,
           ),
@@ -179,25 +179,25 @@ export function EmojiPicker({
               aria-label={t`Search emoji`}
               value={searchQuery}
               onChange={setSearchQuery}
-              className="border-accent-200 dark:border-accent-700 border-b p-2"
+              className="border-b border-neutral-200 p-2 dark:border-neutral-700"
             >
               <div className="relative">
                 <Icon
                   icon="lucide.search"
-                  className="text-accent-500 dark:text-accent-400 absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                  className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400"
                 />
                 <Input
                   placeholder={t`Search emoji...`}
                   className={cn(
-                    "flex h-9 w-full rounded-md border border-accent-300 bg-accent-50 py-2 pl-9 text-sm placeholder:text-accent-500 dark:border-accent-600 dark:bg-accent-800 dark:placeholder:text-accent-400",
-                    "focus:border-accent-500 focus:outline-hidden focus:ring-1 focus:ring-accent-500 dark:focus:border-accent-400 dark:focus:ring-accent-400",
+                    "flex h-9 w-full rounded-md border border-neutral-300 bg-neutral-50 py-2 pl-9 text-sm placeholder:text-neutral-500 dark:border-neutral-600 dark:bg-neutral-800 dark:placeholder:text-neutral-400",
+                    "focus:border-neutral-500 focus:outline-hidden focus:ring-1 focus:ring-neutral-500 dark:focus:border-neutral-400 dark:focus:ring-neutral-400",
                     searchQuery ? "pr-9" : "pr-3",
                   )}
                 />
                 {searchQuery && (
                   <ClearButton
                     aria-label={t`Clear search`}
-                    className="text-accent-500 hover:bg-accent-200 hover:text-accent-700 dark:text-accent-400 dark:hover:bg-accent-700 dark:hover:text-accent-200 absolute top-1/2 right-2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full outline-hidden"
+                    className="absolute top-1/2 right-2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 outline-hidden hover:bg-neutral-200 hover:text-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
                     slot={null}
                     onPress={() => setSearchQuery("")}
                   >
@@ -219,7 +219,7 @@ export function EmojiPicker({
 function EmojiGridSkeleton() {
   return (
     <div className="flex h-[280px] items-center justify-center">
-      <TrizumSpinner size={24} className="text-accent-600 dark:text-accent-400" />
+      <TrizumSpinner size={24} className="text-neutral-600 dark:text-neutral-400" />
     </div>
   );
 }
@@ -274,9 +274,9 @@ function EmojiButton({ emoji, onSelect }: { emoji: Emoji; onSelect: (emoji: stri
       onClick={() => onSelect(emoji.emoji)}
       className={cn(
         "flex size-9 cursor-pointer items-center justify-center rounded-md text-2xl outline-hidden transition-colors",
-        "hover:bg-accent-100 dark:hover:bg-accent-800",
-        "focus-visible:bg-accent-200 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500 dark:focus-visible:bg-accent-700",
-        "active:bg-accent-500 active:text-white",
+        "hover:bg-neutral-100 dark:hover:bg-neutral-800",
+        "focus-visible:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500 dark:focus-visible:bg-neutral-700",
+        "active:bg-neutral-500 active:text-white",
       )}
     >
       {emoji.emoji}
@@ -329,7 +329,7 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
 
   if (emojis.length === 0) {
     return (
-      <div className="text-accent-500 dark:text-accent-400 flex h-[200px] items-center justify-center text-sm">
+      <div className="flex h-[200px] items-center justify-center text-sm text-neutral-500 dark:text-neutral-400">
         <Trans>No emoji found</Trans>
       </div>
     );
@@ -444,7 +444,7 @@ function CategorizedEmojiRow({
           boxSizing: "border-box",
           paddingInline: GRID_PADDING,
         }}
-        className="text-accent-600 dark:text-accent-400 flex items-center text-xs font-medium capitalize"
+        className="flex items-center text-xs font-medium text-neutral-600 capitalize dark:text-neutral-400"
       >
         {groupLabels[row.group]}
       </div>
@@ -506,7 +506,7 @@ function CategorizedEmojiGrid({
     <div className="flex flex-col">
       {/* Category tabs */}
       <div
-        className="border-accent-200 dark:border-accent-700 flex justify-between border-b px-1"
+        className="flex justify-between border-b border-neutral-200 px-1 dark:border-neutral-700"
         style={{ height: CATEGORY_TAB_HEIGHT }}
       >
         {orderedGroups.map((group) => (
@@ -518,9 +518,9 @@ function CategorizedEmojiGrid({
             title={groupLabels[group]}
             className={cn(
               "flex flex-1 items-center justify-center text-lg transition-colors",
-              "hover:bg-accent-100 dark:hover:bg-accent-800",
-              "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500",
-              activeGroup === group && "bg-accent-100 dark:bg-accent-800",
+              "hover:bg-neutral-100 dark:hover:bg-neutral-800",
+              "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500",
+              activeGroup === group && "bg-neutral-100 dark:bg-neutral-800",
             )}
           >
             {hasCategoryIcon(group) ? CATEGORY_ICONS[group] : "📁"}

@@ -184,7 +184,7 @@ export function Balances({
 
         {allOtherDiffs.length > 0 ? (
           <>
-            <h2 className="text-accent-400 flex items-center px-4">
+            <h2 className="flex items-center px-4 text-neutral-400">
               <Icon icon="lucide.circle-help" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">

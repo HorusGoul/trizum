@@ -34,12 +34,12 @@ interface StatusAppearance {
 const statusAppearances: Record<ExpenseEditorValidationStatus, StatusAppearance> = {
   pristine: {
     className:
-      "border-accent-400 bg-accent-50 text-accent-700 dark:border-accent-700 dark:bg-accent-900 dark:text-accent-200",
+      "border-neutral-400 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200",
     icon: "lucide.badge-info",
   },
   incomplete: {
     className:
-      "border-accent-400 bg-accent-50 text-accent-700 dark:border-accent-700 dark:bg-accent-900 dark:text-accent-200",
+      "border-neutral-400 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200",
     icon: "lucide.badge-info",
   },
   valid: {
@@ -123,7 +123,7 @@ export function ExpenseEditorValidationStatus({
                           "brightness-95 dark:brightness-110",
                         !isOpen &&
                           isFocusVisible &&
-                          "ring-2 ring-current ring-offset-2 ring-offset-white dark:ring-offset-accent-950",
+                          "ring-2 ring-current ring-offset-2 ring-offset-white dark:ring-offset-neutral-950",
                         !isOpen && isPressed && "brightness-90 dark:brightness-125",
                         isOpen && "scale-100 brightness-100 dark:brightness-100",
                       )
@@ -176,7 +176,7 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
       isDismissable
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -193,7 +193,7 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
       >
         <Dialog
           aria-label={t`Expense checks`}
-          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 max-h-[inherit] overflow-y-auto rounded-lg border bg-white shadow-2xl outline-hidden"
+          className="max-h-[inherit] overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-2xl outline-hidden dark:border-neutral-800 dark:bg-black"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
             <div className="flex flex-col gap-3">
@@ -205,7 +205,7 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
               </h2>
             </div>
 
-            <ul className="border-accent-200 divide-accent-200 dark:border-accent-800 dark:divide-accent-800 flex flex-col divide-y border-y">
+            <ul className="flex flex-col divide-y divide-neutral-200 border-y border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
               {issues.map((issue) => (
                 <ExpenseEditorValidationIssueItem issue={issue} key={issue.code} />
               ))}
@@ -231,7 +231,7 @@ function ExpenseEditorValidationIssueItem({ issue }: { issue: ExpenseEditorValid
           <h3 className="font-medium">
             <Trans>Split total does not match</Trans>
           </h3>
-          <p className="text-accent-700 dark:text-accent-200 mt-1 text-sm">
+          <p className="mt-1 text-sm text-neutral-700 dark:text-neutral-200">
             <Trans>
               Shares sum up to{" "}
               <CurrencyText

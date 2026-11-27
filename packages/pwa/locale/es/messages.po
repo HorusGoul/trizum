@@ -25,7 +25,7 @@ msgid "[DEV] Create expenses"
 msgstr "[DEV] Crear gastos"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:405
+#: src/components/PremiumPaywall.tsx:408
 msgid "{0, plural, one {# day free} other {# days free}}"
 msgstr "{0, plural, one {# día gratis} other {# días gratis}}"
 
@@ -35,17 +35,17 @@ msgid "{0, plural, one {# issue must be resolved before saving.} other {# issues
 msgstr "{0, plural, one {Se debe resolver # problema antes de guardar.} other {Se deben resolver # problemas antes de guardar.}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:409
+#: src/components/PremiumPaywall.tsx:412
 msgid "{0, plural, one {# month free} other {# months free}}"
 msgstr "{0, plural, one {# mes gratis} other {# meses gratis}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:407
+#: src/components/PremiumPaywall.tsx:410
 msgid "{0, plural, one {# week free} other {# weeks free}}"
 msgstr "{0, plural, one {# semana gratis} other {# semanas gratis}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:411
+#: src/components/PremiumPaywall.tsx:414
 msgid "{0, plural, one {# year free} other {# years free}}"
 msgstr "{0, plural, one {# año gratis} other {# años gratis}}"
 
@@ -105,11 +105,11 @@ msgstr "{name}"
 msgid "{partyCurrency} per 1 {currency}"
 msgstr "{partyCurrency} por 1 {currency}"
 
-#: src/components/PremiumPaywall.tsx:440
+#: src/components/PremiumPaywall.tsx:443
 msgid "{price} is charged automatically until canceled."
 msgstr "Se cobrarán {price} automáticamente hasta que canceles."
 
-#: src/components/PremiumPaywall.tsx:396
+#: src/components/PremiumPaywall.tsx:399
 msgid "{pricePerMonth} per month"
 msgstr "{pricePerMonth} al mes"
 
@@ -402,7 +402,7 @@ msgstr "Afgani Afgano"
 msgid "After installing, reopen this invite to join your group. No account is needed."
 msgstr "Después de instalar la app, vuelve a abrir esta invitación para unirte al Grupo. No necesitas una cuenta."
 
-#: src/components/PremiumPaywall.tsx:433
+#: src/components/PremiumPaywall.tsx:436
 msgid "After the free trial, {price} is charged automatically until canceled."
 msgstr "Tras la prueba gratuita, se cobrarán {price} automáticamente hasta que canceles."
 
@@ -480,7 +480,7 @@ msgstr "así como su"
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
 
-#: src/components/PremiumPaywall.tsx:378
+#: src/components/PremiumPaywall.tsx:381
 msgid "Annual"
 msgstr "Anual"
 
@@ -2326,7 +2326,7 @@ msgstr "Dinar Libio"
 msgid "License"
 msgstr "Licencia"
 
-#: src/components/PremiumPaywall.tsx:380
+#: src/components/PremiumPaywall.tsx:383
 msgid "Lifetime"
 msgstr "De por vida"
 
@@ -2342,7 +2342,7 @@ msgstr "Enlaces"
 msgid "Loading licenses..."
 msgstr "Cargando licencias..."
 
-#: src/components/PremiumPaywall.tsx:562
+#: src/components/PremiumPaywall.tsx:565
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
@@ -2471,7 +2471,7 @@ msgstr "Leu Moldavo"
 msgid "Mongolian Tugrik"
 msgstr "Tugrik Mongol"
 
-#: src/components/PremiumPaywall.tsx:376
+#: src/components/PremiumPaywall.tsx:379
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -2652,7 +2652,7 @@ msgstr "Todavía no hay plantillas de gasto"
 msgid "No new title or total could be suggested. Your edits are kept."
 msgstr "No hay nuevas sugerencias de título o importe total. Se mantienen tus cambios."
 
-#: src/components/PremiumPaywall.tsx:543
+#: src/components/PremiumPaywall.tsx:546
 msgid "No Premium purchase was found for this account."
 msgstr "No se ha encontrado ninguna compra de Premium para esta cuenta."
 
@@ -2749,11 +2749,11 @@ msgstr "Cuando hayas enviado el dinero, marca esta deuda como pagada."
 msgid "One Party Boost"
 msgstr "Un Party Boost"
 
-#: src/components/PremiumPaywall.tsx:425
+#: src/components/PremiumPaywall.tsx:428
 msgid "One payment. No recurring charge."
 msgstr "Un solo pago. Sin cargos recurrentes."
 
-#: src/components/PremiumPaywall.tsx:399
+#: src/components/PremiumPaywall.tsx:402
 msgid "one-time"
 msgstr "pago único"
 
@@ -3130,11 +3130,11 @@ msgstr "Personas"
 msgid "People that owe you money"
 msgstr "Personas que te deben dinero"
 
-#: src/components/PremiumPaywall.tsx:390
+#: src/components/PremiumPaywall.tsx:393
 msgid "per month"
 msgstr "al mes"
 
-#: src/components/PremiumPaywall.tsx:396
+#: src/components/PremiumPaywall.tsx:399
 msgid "per year"
 msgstr "al año"
 
@@ -3241,7 +3241,7 @@ msgstr "Premium"
 msgid "Premium belongs to the purchasing person and may not be transferred, resold, or shared as a separate account entitlement. A Premium owner may assign a Party Boost to one eligible group under the rules shown in the app. A Party Boost gives that group the group-level benefits described in the app; it does not make every group member a Premium owner or remove all advertising for them."
 msgstr "Premium pertenece a la persona que realiza la compra y no puede transferirse, revenderse ni compartirse como un derecho independiente de la cuenta. El titular de Premium puede asignar un Party Boost (impulso de grupo) a un grupo que cumpla los requisitos, conforme a las reglas que se muestran en la aplicación. Un Party Boost concede a ese grupo las ventajas colectivas descritas en la aplicación; no convierte a todos los miembros del grupo en titulares de Premium ni elimina toda la publicidad para ellos."
 
-#: src/components/PremiumPaywall.tsx:516
+#: src/components/PremiumPaywall.tsx:519
 msgid "Premium could not be purchased. Please try again."
 msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 
@@ -3257,7 +3257,7 @@ msgstr "Premium está activo en esta cuenta."
 msgid "Premium is active."
 msgstr "Premium está activo."
 
-#: src/components/PremiumPaywall.tsx:506
+#: src/components/PremiumPaywall.tsx:509
 msgid "Premium is now active."
 msgstr "Premium ya está activo."
 
@@ -3282,7 +3282,7 @@ msgstr "Los titulares de Premium pueden impulsar un grupo a la vez y mover el im
 msgid "Premium plan"
 msgstr "Plan Premium"
 
-#: src/components/PremiumPaywall.tsx:540
+#: src/components/PremiumPaywall.tsx:543
 msgid "Premium purchases restored."
 msgstr "Se han restaurado las compras de Premium."
 
@@ -3342,7 +3342,7 @@ msgstr "Puedes comprar y restaurar compras en la app de trizum instalada desde A
 msgid "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
 msgstr "Apple o Google procesan las compras a través de la cuenta de la tienda que utilices para adquirir Premium. Los precios pueden incluir o excluir impuestos según tu ubicación y la configuración de la tienda. La compra también se asocia a la cuenta de trizum que tenga la sesión iniciada en el momento de la compra, para que el acceso a Premium que corresponda pueda restaurarse en los dispositivos en los que hayas iniciado sesión."
 
-#: src/components/PremiumPaywall.tsx:550
+#: src/components/PremiumPaywall.tsx:553
 msgid "Purchases could not be restored. Please try again."
 msgstr "No se han podido restaurar las compras. Inténtalo de nuevo."
 
@@ -4960,7 +4960,7 @@ msgstr "Tu nombre de usuario o enlace de perfil de PayPal.Me."
 msgid "Your Premium is boosting this party for everyone in it."
 msgstr "Tu Premium está impulsando este grupo para todos sus miembros."
 
-#: src/components/PremiumPaywall.tsx:509
+#: src/components/PremiumPaywall.tsx:512
 msgid "Your purchase is still syncing. Try restoring it in a moment."
 msgstr "Tu compra todavía se está sincronizando. Prueba a restaurarla dentro de un momento."
 

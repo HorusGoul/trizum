@@ -26,9 +26,9 @@ export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Ex
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex min-h-24 w-full scale-100 rounded-xl bg-white p-4 text-start outline-hidden transition-all duration-200 ease-in-out dark:bg-accent-900",
-          (isHovered || isFocusVisible) && "shadow-md dark:bg-accent-800 dark:shadow-none",
-          isPressed && "scale-95 bg-white/90 shadow-lg dark:bg-accent-700/90 dark:shadow-none",
+          "flex min-h-24 w-full scale-100 rounded-xl bg-white p-4 text-start outline-hidden transition-all duration-200 ease-in-out dark:bg-neutral-900",
+          (isHovered || isFocusVisible) && "shadow-md dark:bg-neutral-800 dark:shadow-none",
+          isPressed && "scale-95 bg-white/90 shadow-lg dark:bg-neutral-700/90 dark:shadow-none",
         )
       }
     >
@@ -46,7 +46,7 @@ export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Ex
           <CurrencyText
             amount={getExpenseTotalAmount(expense)}
             currency={party.currency}
-            className="text-accent-600 dark:text-accent-300 text-sm"
+            className="text-sm text-neutral-600 dark:text-neutral-300"
             variant="inherit"
           />
         ) : null}

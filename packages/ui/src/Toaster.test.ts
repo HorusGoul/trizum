@@ -45,11 +45,11 @@ describe("Toaster", () => {
     expect(toastClassNames.title).toContain("font-medium");
     expect(toastClassNames.description).toContain("font-normal");
     expect(toastClassNames.description).toContain("text-white/75");
-    expect(toastClassNames.icon).toContain("text-accent-300");
+    expect(toastClassNames.icon).toContain("text-neutral-300");
     expect(toastClassNames.success).toContain("[&_[data-icon]]:text-success-400");
     expect(toastClassNames.error).toContain("[&_[data-icon]]:text-danger-400");
     expect(toastClassNames.warning).toContain("[&_[data-icon]]:text-warning-400");
-    expect(toastClassNames.info).toContain("[&_[data-icon]]:text-accent-300");
+    expect(toastClassNames.info).toContain("[&_[data-icon]]:text-neutral-300");
     expect(toastClassNames.loading).toContain("[&_[data-icon]]:text-white/80");
 
     const classNames = Object.values(toastClassNames).join(" ");

@@ -11,12 +11,12 @@ export function PremiumBrowserHelp({ onClose }: { onClose: () => void }) {
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      className="bg-accent-950/45 px-safe-or-4 py-safe-offset-6 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md"
+      className="px-safe-or-4 py-safe-offset-6 fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/45 backdrop-blur-md"
     >
       <Modal className="w-full max-w-[420px] outline-hidden">
         <Dialog
           aria-label={t`trizum Premium`}
-          className="border-accent-200 text-accent-950 dark:border-accent-800 dark:bg-accent-950 dark:text-accent-50 relative rounded-2xl border bg-white p-6 shadow-2xl outline-hidden"
+          className="relative rounded-2xl border border-neutral-200 bg-white p-6 text-neutral-950 shadow-2xl outline-hidden dark:border-neutral-800 dark:bg-black dark:text-neutral-50"
         >
           <IconButton
             icon="lucide.x"
@@ -27,7 +27,7 @@ export function PremiumBrowserHelp({ onClose }: { onClose: () => void }) {
           <h2 className="pr-8 text-lg font-bold">
             <Trans>Premium in the mobile app</Trans>
           </h2>
-          <p className="text-accent-800 dark:text-accent-200 mt-4 text-sm leading-relaxed">
+          <p className="mt-4 text-sm leading-relaxed text-neutral-800 dark:text-neutral-200">
             <Trans>
               Purchases and restores are available in the trizum app installed from the App Store or
               Google Play.

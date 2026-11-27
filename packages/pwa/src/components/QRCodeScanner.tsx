@@ -45,7 +45,7 @@ type ScannerState =
 const QRCodeFrameHandle = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
-    className={cn("border-l-3 border-t-3 size-4 rounded-tl-lg border-accent-50", className)}
+    className={cn("border-l-3 border-t-3 size-4 rounded-tl-lg border-neutral-50", className)}
   />
 );
 

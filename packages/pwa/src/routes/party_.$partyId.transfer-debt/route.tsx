@@ -497,7 +497,7 @@ function useTransferDebtRouteView() {
                     description={t`This party needs another active participant besides you to receive the transferred debt.`}
                   />
                 ) : (
-                  <div className="divide-accent-200/80 border-accent-200/80 dark:divide-accent-800 dark:border-accent-800 dark:bg-accent-900 divide-y overflow-hidden rounded-xl border bg-white shadow-xs dark:shadow-none">
+                  <div className="divide-y divide-neutral-200/80 overflow-hidden rounded-xl border border-neutral-200/80 bg-white shadow-xs dark:divide-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none">
                     {orderedDestinationParticipants.map((participant) => (
                       <DestinationParticipantCard
                         key={participant.id}

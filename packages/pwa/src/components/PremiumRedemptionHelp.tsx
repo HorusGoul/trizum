@@ -27,13 +27,13 @@ export function PremiumRedemptionHelp({
   onOpenPremium: () => void;
 }) {
   return (
-    <div className="border-accent-200 dark:border-accent-800 divide-accent-200 dark:divide-accent-800 divide-y border-t text-sm">
+    <div className="divide-y divide-neutral-200 border-t border-neutral-200 text-sm dark:divide-neutral-800 dark:border-neutral-800">
       <details className="group">
-        <summary className="text-accent-950 dark:text-accent-50 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-neutral-950 dark:text-neutral-50 [&::-webkit-details-marker]:hidden">
           <Trans>How do I redeem my code?</Trans>
           <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
         </summary>
-        <ol className="text-accent-900 dark:text-accent-100 list-decimal space-y-2 pb-3 pl-5 leading-relaxed">
+        <ol className="list-decimal space-y-2 pb-3 pl-5 leading-relaxed text-neutral-900 dark:text-neutral-100">
           {!isSignedIn ? (
             <li>
               <Trans>
@@ -115,11 +115,11 @@ export function PremiumRedemptionHelp({
       </details>
       {devicePlatform !== "ios" ? (
         <details className="group">
-          <summary className="text-accent-950 dark:text-accent-50 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-neutral-950 dark:text-neutral-50 [&::-webkit-details-marker]:hidden">
             <Trans>Code not working in Google Play?</Trans>
             <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
           </summary>
-          <p className="text-accent-900 dark:text-accent-100 pb-3 leading-relaxed">
+          <p className="pb-3 leading-relaxed text-neutral-900 dark:text-neutral-100">
             <Trans>
               Some offers need to be redeemed at checkout. Open{" "}
               <HelpButton onPress={onOpenPremium} isDisabled={isDisabled || isOffline}>
@@ -133,11 +133,11 @@ export function PremiumRedemptionHelp({
         </details>
       ) : null}
       <details className="group">
-        <summary className="text-accent-950 dark:text-accent-50 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-neutral-950 dark:text-neutral-50 [&::-webkit-details-marker]:hidden">
           <Trans>Already redeemed?</Trans>
           <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
         </summary>
-        <p className="text-accent-900 dark:text-accent-100 pb-3 leading-relaxed">
+        <p className="pb-3 leading-relaxed text-neutral-900 dark:text-neutral-100">
           <Trans>
             Open{" "}
             <HelpButton onPress={onOpenPremium} isDisabled={isDisabled || isOffline}>

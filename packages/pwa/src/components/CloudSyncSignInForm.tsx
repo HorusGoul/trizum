@@ -13,7 +13,7 @@ import {
 } from "./CloudSyncDialogs.tsx";
 
 const AUTH_SECONDARY_BUTTON_CLASS_NAME =
-  "h-9 text-sm font-medium text-accent-700 dark:text-accent-50";
+  "h-9 text-sm font-medium text-neutral-700 dark:text-neutral-50";
 
 export type AuthPendingAction =
   | "apple"
@@ -93,7 +93,7 @@ export function CloudSyncSignInForm({
           value={authState.email}
         />
         {authState.passwordResetMessage ? (
-          <p className="text-accent-700 dark:text-accent-50 text-sm">
+          <p className="text-sm text-neutral-700 dark:text-neutral-50">
             {authState.passwordResetMessage}
           </p>
         ) : null}
@@ -157,10 +157,10 @@ export function CloudSyncSignInForm({
         </Button>
       </div>
 
-      <div className="text-accent-600 dark:text-accent-300 flex items-center gap-3 text-xs font-medium uppercase">
-        <span className="bg-accent-200 dark:bg-accent-700 h-px flex-1" />
+      <div className="flex items-center gap-3 text-xs font-medium text-neutral-600 uppercase dark:text-neutral-300">
+        <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-700" />
         <Trans>or use email</Trans>
-        <span className="bg-accent-200 dark:bg-accent-700 h-px flex-1" />
+        <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-700" />
       </div>
 
       {mode === "password" ? (

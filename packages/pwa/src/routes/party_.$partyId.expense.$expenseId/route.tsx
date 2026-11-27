@@ -172,7 +172,7 @@ function ExpenseDeleteConfirmationDialog({
       onOpenChange={onOpenChange}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -189,7 +189,7 @@ function ExpenseDeleteConfirmationDialog({
       >
         <Dialog
           aria-label={t`Delete expense`}
-          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 rounded-lg border bg-white shadow-2xl outline-hidden"
+          className="rounded-lg border border-neutral-200 bg-white shadow-2xl outline-hidden dark:border-neutral-800 dark:bg-black"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
             <div className="flex flex-col gap-3">
@@ -200,7 +200,7 @@ function ExpenseDeleteConfirmationDialog({
                 <h2 className="text-lg font-medium">
                   <Trans>Delete expense?</Trans>
                 </h2>
-                <p className="text-accent-700 dark:text-accent-50 text-sm">
+                <p className="text-sm text-neutral-700 dark:text-neutral-50">
                   <Trans>
                     This expense will be permanently deleted. This action cannot be undone.
                   </Trans>

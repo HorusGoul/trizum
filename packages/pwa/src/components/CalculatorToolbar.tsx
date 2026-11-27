@@ -1102,7 +1102,7 @@ export function CalculatorToolbar({
       role="application"
       aria-label={t`Calculator`}
       data-presence-proxy-element-id={presenceElementId}
-      className="border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 overflow-y-auto rounded-lg border bg-white shadow-lg"
+      className="fixed z-50 overflow-y-auto rounded-lg border border-neutral-300 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
       style={{
         top: desktopPopoverPosition.top,
         left: desktopPopoverPosition.left,
@@ -1205,7 +1205,7 @@ function CalculatorMobileAttachmentContent({
     <>
       <m.div
         data-calculator-attachment-toolbar=""
-        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950 pointer-events-auto absolute inset-x-0 top-0 z-10 bg-white shadow-sm"
+        className="pt-safe pointer-events-auto absolute inset-x-0 top-0 z-10 border-neutral-200/80 bg-white shadow-sm dark:border-neutral-800 dark:bg-black"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -1215,7 +1215,7 @@ function CalculatorMobileAttachmentContent({
         <div
           role="toolbar"
           aria-label={t`Attachments`}
-          className="border-accent-200/80 px-safe-or-4 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
+          className="px-safe-or-4 flex h-16 items-center gap-2 border-b border-neutral-200/80 dark:border-neutral-800"
         >
           <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto py-2">
             {photoIds.map((photoId, index) => (
@@ -1246,7 +1246,7 @@ function CalculatorMobileAttachmentContent({
         {activeIndex !== null ? (
           <m.section
             aria-label={t`Attachment preview`}
-            className="bg-accent-950/85 pointer-events-auto absolute inset-x-0 z-0 overflow-hidden backdrop-blur-sm"
+            className="pointer-events-auto absolute inset-x-0 z-0 overflow-hidden bg-neutral-950/85 backdrop-blur-sm"
             style={{
               top: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE,
               bottom: 0,
@@ -1302,8 +1302,8 @@ function CalculatorMobileAttachmentButton({
       })}
       onPress={() => onSelect(index)}
       className={cn(
-        "border-accent-200 bg-accent-50 dark:bg-accent-900 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-accent-700",
-        isActive && "ring-accent-500 dark:ring-accent-400 ring-2 ring-inset",
+        "border-neutral-200 bg-neutral-50 dark:bg-neutral-900 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-neutral-700",
+        isActive && "ring-neutral-500 dark:ring-neutral-400 ring-2 ring-inset",
       )}
     >
       <span
@@ -1359,7 +1359,7 @@ function CalculatorContent({
         <div className="flex justify-center">
           <span
             aria-hidden="true"
-            className="bg-accent-200 dark:bg-accent-700 h-1.5 w-12 rounded-full"
+            className="h-1.5 w-12 rounded-full bg-neutral-200 dark:bg-neutral-700"
           />
         </div>
       ) : null}
@@ -1367,7 +1367,7 @@ function CalculatorContent({
       <div className="flex min-h-8 items-center gap-2 px-1">
         {fieldLabel ? (
           <span
-            className="text-accent-700 dark:text-accent-200 min-w-0 flex-1 truncate text-sm font-medium"
+            className="min-w-0 flex-1 truncate text-sm font-medium text-neutral-700 dark:text-neutral-200"
             title={fieldLabel}
           >
             {fieldLabel}
@@ -1438,7 +1438,7 @@ function CalculatorPreview({
   return (
     <div className="flex h-8 min-w-0 shrink-0 items-center justify-end">
       {previewValue !== null && expression ? (
-        <span className="text-accent-600 dark:text-accent-400 text-sm font-medium">
+        <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
           = {formatCalculatorPreviewValue(previewValue, currency)}
         </span>
       ) : null}
@@ -1481,7 +1481,7 @@ function CalculatorExpressionDisplay({
   return (
     <div
       ref={expressionRef}
-      className="border-accent-400 bg-accent-50 dark:border-accent-600 dark:bg-accent-800 flex cursor-text touch-none items-center overflow-hidden rounded-md border px-3 py-2 select-none"
+      className="flex cursor-text touch-none items-center overflow-hidden rounded-md border border-neutral-400 bg-neutral-50 px-3 py-2 select-none dark:border-neutral-600 dark:bg-neutral-800"
     >
       <span
         ref={expressionScrollRef}
@@ -1502,7 +1502,7 @@ function CalculatorExpressionDisplay({
                   activeSelectionRange &&
                     index >= activeSelectionRange.start &&
                     index < activeSelectionRange.end &&
-                    "bg-accent-300 text-accent-950 dark:bg-accent-700 dark:text-accent-50",
+                    "bg-neutral-300 text-neutral-950 dark:bg-neutral-700 dark:text-neutral-50",
                 )}
               >
                 {!activeSelectionRange && index === cursorPosition ? (

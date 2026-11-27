@@ -68,7 +68,7 @@ function RouteComponent() {
           <QRCode
             value={shareUrl}
             size="xl"
-            className="text-accent-50 rounded-lg"
+            className="rounded-lg text-neutral-50"
             options={{
               image: getQRCodeImage(),
               imageOptions: {

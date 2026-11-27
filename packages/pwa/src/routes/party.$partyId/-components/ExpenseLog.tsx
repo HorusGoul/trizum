@@ -154,13 +154,13 @@ export function ExpenseLog() {
                       className={cn(
                         "inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent transition-colors",
                         participant.alwaysUseDefaultExpenseTemplate
-                          ? "bg-accent-500"
-                          : "bg-accent-800",
+                          ? "bg-neutral-500"
+                          : "bg-neutral-800",
                       )}
                     >
                       <span
                         className={cn(
-                          "bg-accent-50 block size-5 rounded-full shadow-lg transition-transform",
+                          "bg-neutral-50 block size-5 rounded-full shadow-lg transition-transform",
                           participant.alwaysUseDefaultExpenseTemplate && "translate-x-5",
                         )}
                       />
@@ -242,21 +242,23 @@ function ExpenseTemplateSheetAction({
       className={({ isFocusVisible, isHovered, isPressed }) =>
         cn(
           "grid min-h-16 w-full grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-3 rounded-[1.35rem] px-safe-or-4 py-3 text-left outline-hidden transition-all sm:px-safe-or-5",
-          (isHovered || isFocusVisible) && "bg-accent-100 dark:bg-accent-900",
-          isFocusVisible && "ring-accent-300 dark:ring-accent-700 ring-2",
-          isPressed && "bg-accent-200 dark:bg-accent-800 scale-[0.98]",
+          (isHovered || isFocusVisible) && "bg-neutral-100 dark:bg-neutral-900",
+          isFocusVisible && "ring-neutral-300 dark:ring-neutral-700 ring-2",
+          isPressed && "bg-neutral-200 dark:bg-neutral-800 scale-[0.98]",
         )
       }
     >
       <span
         aria-hidden="true"
-        className="bg-accent-100 dark:bg-accent-800 flex size-10 items-center justify-center rounded-full text-xl"
+        className="flex size-10 items-center justify-center rounded-full bg-neutral-100 text-xl dark:bg-neutral-800"
       >
         {symbol}
       </span>
       <span className="flex min-w-0 flex-col gap-1">
-        <span className="text-accent-950 dark:text-accent-50 truncate font-medium">{name}</span>
-        <span className="text-accent-700 dark:text-accent-200 truncate text-sm">{description}</span>
+        <span className="truncate font-medium text-neutral-950 dark:text-neutral-50">{name}</span>
+        <span className="truncate text-sm text-neutral-700 dark:text-neutral-200">
+          {description}
+        </span>
       </span>
     </AriaButton>
   );

@@ -147,7 +147,7 @@ function ExpenseTemplatesSettings() {
               </span>
               <span
                 id={ALWAYS_USE_DEFAULT_TEMPLATE_DESCRIPTION_ID}
-                className="text-accent-500 text-sm"
+                className="text-sm text-neutral-500"
               >
                 <Trans>Skip the template picker when you add an expense.</Trans>
               </span>
@@ -211,7 +211,7 @@ function ExpenseTemplatesSettings() {
                   </span>
                   <span
                     id={ONLY_USE_CUSTOM_TEMPLATES_DESCRIPTION_ID}
-                    className="text-accent-500 text-sm"
+                    className="text-sm text-neutral-500"
                   >
                     {templateCount > 0 ? (
                       <Trans>Hide the blank option when adding an expense.</Trans>
@@ -237,7 +237,7 @@ function ExpenseTemplatesSettings() {
                   <h3 className="font-semibold">
                     <Trans>Custom templates</Trans>
                   </h3>
-                  <p className="text-accent-700 dark:text-accent-200 text-sm">
+                  <p className="text-sm text-neutral-700 dark:text-neutral-200">
                     <Trans>
                       {templateCount} of {MAX_EXPENSE_TEMPLATES} custom templates
                     </Trans>
@@ -248,7 +248,7 @@ function ExpenseTemplatesSettings() {
                   <Link
                     to="/party/$partyId/settings/expense-templates/$templateId"
                     params={{ partyId, templateId: "new" }}
-                    className="bg-accent-500 text-accent-50 focus-visible:ring-accent-500 hover:bg-accent-600 flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-all focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-95"
+                    className="flex h-8 items-center gap-1.5 rounded-full bg-neutral-500 px-3 text-sm font-medium text-neutral-50 outline-hidden transition-all hover:bg-neutral-600 focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:scale-95"
                   >
                     <Icon icon="lucide.plus" className="size-3.5" />
                     <Trans>Add</Trans>
@@ -266,15 +266,15 @@ function ExpenseTemplatesSettings() {
               </div>
 
               {templates.length === 0 ? (
-                <div className="border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-950 flex flex-col items-center gap-2 rounded-2xl border px-6 py-8 text-center">
+                <div className="flex flex-col items-center gap-2 rounded-2xl border border-neutral-200 bg-neutral-50 px-6 py-8 text-center dark:border-neutral-800 dark:bg-black">
                   <Icon
                     icon="lucide.layout-template"
-                    className="text-accent-600 dark:text-accent-300 size-8"
+                    className="size-8 text-neutral-600 dark:text-neutral-300"
                   />
                   <p className="font-medium">
                     <Trans>No custom templates yet</Trans>
                   </p>
-                  <p className="text-accent-700 dark:text-accent-200 text-sm">
+                  <p className="text-sm text-neutral-700 dark:text-neutral-200">
                     <Trans>Create one to prefill common expense details and splits.</Trans>
                   </p>
                 </div>
@@ -285,20 +285,20 @@ function ExpenseTemplatesSettings() {
                       key={template.id}
                       to="/party/$partyId/settings/expense-templates/$templateId"
                       params={{ partyId, templateId: template.id }}
-                      className="border-accent-200 hover:bg-accent-100/70 focus-visible:ring-accent-500 dark:border-accent-800 dark:bg-accent-950 dark:hover:bg-accent-900/70 flex min-h-18 items-center gap-3 rounded-xl border bg-white px-4 py-3 outline-hidden transition-all focus-visible:ring-2 active:scale-[0.98]"
+                      className="flex min-h-18 items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 outline-hidden transition-all hover:bg-neutral-100/70 focus-visible:ring-2 focus-visible:ring-neutral-500 active:scale-[0.98] dark:border-neutral-800 dark:bg-black dark:hover:bg-neutral-900/70"
                     >
-                      <span className="bg-accent-100 dark:bg-accent-900 flex size-11 shrink-0 items-center justify-center rounded-full text-xl">
+                      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-xl dark:bg-neutral-900">
                         {template.symbol}
                       </span>
                       <span className="min-w-0 flex-1 truncate font-medium">{template.name}</span>
                       {party.defaultExpenseTemplateId === template.id ? (
-                        <span className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-100 rounded-full px-2 py-1 text-xs font-medium">
+                        <span className="rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700 dark:bg-neutral-900 dark:text-neutral-100">
                           <Trans>Default</Trans>
                         </span>
                       ) : null}
                       <Icon
                         icon="lucide.chevron-right"
-                        className="text-accent-600 size-4 shrink-0"
+                        className="size-4 shrink-0 text-neutral-600"
                       />
                     </Link>
                   ))}

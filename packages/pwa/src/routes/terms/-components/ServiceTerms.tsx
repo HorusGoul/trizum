@@ -4,10 +4,10 @@ export function ServiceTerms() {
   return (
     <>
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>8. Advertising</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             The free installed Android and iOS apps may display advertising. Premium may remove
             advertising for the Premium owner as described on the purchase screen. Advertising and
@@ -17,17 +17,17 @@ export function ServiceTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>9. Our Software and Intellectual Property</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             The Service, its branding, and its original content are protected by intellectual
             property laws. Subject to these Terms, we grant you a limited, personal, non-exclusive,
             non-transferable right to use the Service.
           </Trans>
         </p>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             Some trizum source code and third-party components are available under open-source
             licenses. Those licenses continue to govern the code and components they cover, and
@@ -37,10 +37,10 @@ export function ServiceTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>10. Third-Party Services</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             The Service relies on or links to third-party services, including Apple, Google,
             RevenueCat, authentication providers, hosting providers, and error monitoring services.
@@ -51,10 +51,10 @@ export function ServiceTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>11. Availability and Changes to the Service</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             We may maintain, update, add, remove, or change parts of the Service. We do not
             guarantee that the Service will always be available, uninterrupted, secure, or free of
@@ -62,7 +62,7 @@ export function ServiceTerms() {
             without taking the steps required by applicable law and store rules.
           </Trans>
         </p>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             If the Service is discontinued, we will provide notice and any remedy required by
             applicable law or the store through which you purchased Premium.
@@ -71,10 +71,10 @@ export function ServiceTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>12. Suspension and Termination</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             You may stop using the Service at any time. We may restrict or suspend access when
             reasonably necessary to protect users or the Service, investigate misuse, comply with

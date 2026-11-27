@@ -16,6 +16,14 @@
   --font-mono: "Fira Code Variable", monospace;
   --animate-blink: blink 1s step-end infinite;
 
+  /*
+   * Elevation. Surfaces have no borders: separation comes from the shade of
+   * the surface and from these shadows. The values switch in dark mode below.
+   */
+  --shadow-surface: var(--elevation-surface);
+  --shadow-raised: var(--elevation-raised);
+  --shadow-overlay: var(--elevation-overlay);
+
   --color-danger-50: var(--color-red-50);
   --color-danger-100: var(--color-red-100);
   --color-danger-200: var(--color-red-200);
@@ -58,6 +66,21 @@
   --safe-area-inset-right: env(safe-area-inset-right, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
+
+  --elevation-surface: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 10px rgb(0 0 0 / 0.04);
+  --elevation-raised: 0 2px 6px rgb(0 0 0 / 0.06), 0 10px 28px rgb(0 0 0 / 0.1);
+  --elevation-overlay: 0 4px 12px rgb(0 0 0 / 0.08), 0 20px 56px rgb(0 0 0 / 0.2);
+}
+
+.dark {
+  /*
+   * Shadows are invisible on a black canvas, so resting surfaces rely on their
+   * shade alone. Floating layers keep a deep shadow and a faint top highlight
+   * so they separate from the surfaces they overlap.
+   */
+  --elevation-surface: 0 0 0 0 transparent;
+  --elevation-raised: inset 0 0.5px 0 rgb(255 255 255 / 0.08), 0 8px 24px rgb(0 0 0 / 0.5);
+  --elevation-overlay: inset 0 0.5px 0 rgb(255 255 255 / 0.1), 0 20px 56px rgb(0 0 0 / 0.7);
 }
 
 @utility container {
@@ -77,7 +100,7 @@ body {
   margin: 0;
   padding: 0;
 
-  @apply bg-accent-50 text-accent-950 dark:bg-accent-950 dark:text-accent-50 font-sans;
+  @apply bg-neutral-100 font-sans text-neutral-950 dark:bg-black dark:text-neutral-50;
 }
 
 html {

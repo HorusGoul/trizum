@@ -265,7 +265,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
             comment: "Label for the timeframe filter on the party stats screen",
             message: "Timeframe",
           })}
-          className="[&>button]:border-accent-300 [&>button]:bg-accent-50 dark:[&>button]:border-accent-700 dark:[&>button]:bg-accent-900 w-full gap-0 sm:w-auto [&>button]:h-9 [&>button]:w-full [&>button]:rounded-full [&>button]:px-3 sm:[&>button]:w-auto sm:[&>button]:min-w-44"
+          className="w-full gap-0 sm:w-auto [&>button]:h-9 [&>button]:w-full [&>button]:rounded-full [&>button]:border-neutral-300 [&>button]:bg-neutral-50 [&>button]:px-3 sm:[&>button]:w-auto sm:[&>button]:min-w-44 dark:[&>button]:border-neutral-700 dark:[&>button]:bg-neutral-900"
           items={timeframeOptions}
           selectedKey={selectedTimeframeKey}
           onSelectionChange={(nextTimeframe) => {
@@ -298,10 +298,10 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         ) : null}
       </section>
 
-      <section className="border-accent-300/80 from-accent-500 via-accent-600 to-accent-700 text-accent-50 dark:border-accent-500/60 dark:from-accent-700 dark:via-accent-800 dark:to-accent-950 rounded-[1.9rem] border bg-gradient-to-br p-5 shadow-xs lg:p-6 dark:shadow-none">
+      <section className="rounded-[1.9rem] border border-neutral-300/80 bg-gradient-to-br from-neutral-500 via-neutral-600 to-neutral-700 p-5 text-neutral-50 shadow-xs lg:p-6 dark:border-neutral-500/60 dark:from-neutral-700 dark:via-neutral-800 dark:to-neutral-950 dark:shadow-none">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="text-accent-50/75 text-[11px] font-semibold tracking-[0.24em] uppercase">
+            <div className="text-[11px] font-semibold tracking-[0.24em] text-neutral-50/75 uppercase">
               <Trans>Total spent</Trans>
             </div>
 
@@ -314,7 +314,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
               />
             </div>
 
-            <p className="text-accent-50/80 mt-2 text-sm">
+            <p className="mt-2 text-sm text-neutral-50/80">
               <Trans>Across the selected timeframe</Trans>
             </p>
           </div>
@@ -337,11 +337,11 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         stats.totalExpenseCount > 0 ? (
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-accent-950 dark:text-accent-50 text-xl font-semibold">
+              <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
                 <Trans>Participants</Trans>
               </h2>
 
-              <div className="text-accent-700 dark:text-accent-300 text-sm">
+              <div className="text-sm text-neutral-700 dark:text-neutral-300">
                 {leaderboard.length} <Trans>participants</Trans>
               </div>
             </div>
@@ -394,18 +394,18 @@ function StatsSummaryCard({
 }: StatsSummaryCardProps) {
   if (compact) {
     return (
-      <div className="text-accent-50 dark:bg-accent-950/30 inline-flex max-w-full items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-3 py-2 shadow-xs backdrop-blur-xs sm:self-start dark:shadow-none">
-        <span className="text-accent-50 rounded-full bg-white/12 p-1.5">
+      <div className="inline-flex max-w-full items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-3 py-2 text-neutral-50 shadow-xs backdrop-blur-xs sm:self-start dark:bg-neutral-950/30 dark:shadow-none">
+        <span className="rounded-full bg-white/12 p-1.5 text-neutral-50">
           <Icon icon={icon} width={14} height={14} />
         </span>
 
         <span className="text-base font-semibold tracking-tight">{value}</span>
-        <span className="text-accent-50/72 text-[11px] font-semibold tracking-[0.18em] uppercase">
+        <span className="text-[11px] font-semibold tracking-[0.18em] text-neutral-50/72 uppercase">
           {label}
         </span>
 
         {badge !== undefined && badge !== null ? (
-          <span className="text-accent-50 inline-flex items-center rounded-full bg-white/12 px-2 py-1 text-[10px] font-semibold">
+          <span className="inline-flex items-center rounded-full bg-white/12 px-2 py-1 text-[10px] font-semibold text-neutral-50">
             {badge}
           </span>
         ) : null}
@@ -418,30 +418,30 @@ function StatsSummaryCard({
   return (
     <div
       className={cn(
-        "w-full rounded-[1.35rem] border border-white/15 bg-white/10 shadow-xs backdrop-blur-xs sm:w-52 dark:bg-accent-950/30 dark:shadow-none",
+        "w-full rounded-[1.35rem] border border-white/15 bg-white/10 shadow-xs backdrop-blur-xs sm:w-52 dark:bg-neutral-950/30 dark:shadow-none",
         "p-4",
       )}
     >
       <div className="flex items-start gap-3">
-        <div className={cn("bg-white/12 rounded-full p-3 text-accent-50")}>
+        <div className={cn("bg-white/12 rounded-full p-3 text-neutral-50")}>
           <Icon icon={icon} width={20} height={20} />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <div className="text-accent-50/70 text-[11px] font-semibold tracking-[0.18em] uppercase">
+            <div className="text-[11px] font-semibold tracking-[0.18em] text-neutral-50/70 uppercase">
               {label}
             </div>
 
             {badge !== undefined && badge !== null ? (
-              <div className="text-accent-50 inline-flex items-center rounded-full bg-white/12 px-2.5 py-1 text-[11px] font-semibold">
+              <div className="inline-flex items-center rounded-full bg-white/12 px-2.5 py-1 text-[11px] font-semibold text-neutral-50">
                 {badge}
               </div>
             ) : null}
           </div>
 
-          <div className="text-accent-50 mt-3">{value}</div>
-          <div className={cn("text-accent-50/70", "mt-2 text-sm")}>{description}</div>
+          <div className="mt-3 text-neutral-50">{value}</div>
+          <div className={cn("text-neutral-50/70", "mt-2 text-sm")}>{description}</div>
         </div>
       </div>
     </div>
@@ -450,7 +450,7 @@ function StatsSummaryCard({
 
 function StatsPodium({ currency, currentParticipantId, first, second, third }: StatsPodiumProps) {
   return (
-    <div className="border-accent-200/80 bg-accent-50/80 dark:border-accent-800 dark:bg-accent-950/70 rounded-[1.75rem] border p-4 shadow-xs dark:shadow-none">
+    <div className="rounded-[1.75rem] border border-neutral-200/80 bg-neutral-50/80 p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-950/70 dark:shadow-none">
       <div className="grid grid-cols-3 items-end gap-3">
         {second ? (
           <SecondPlacePodiumColumn
@@ -533,15 +533,15 @@ function SecondPlacePodiumColumn({
   return (
     <StatsPodiumColumnShell
       amountClassName="text-lg"
-      avatarClassName="h-14 w-14 text-sm ring-accent-200 dark:ring-accent-700"
+      avatarClassName="h-14 w-14 text-sm ring-neutral-200 dark:ring-neutral-700"
       avatarId={avatarId}
       currency={currency}
       currentParticipantId={currentParticipantId}
       entry={entry}
       iconName="lucide.scale"
       nameClassName="text-lg"
-      pedestalClassName="min-h-32 border-accent-300 bg-gradient-to-t from-accent-300 to-accent-100 text-accent-950 dark:border-accent-700 dark:from-accent-800 dark:to-accent-700 dark:text-accent-50"
-      rankClassName="bg-accent-200 text-accent-700 dark:bg-accent-800 dark:text-accent-200"
+      pedestalClassName="min-h-32 border-neutral-300 bg-gradient-to-t from-neutral-300 to-neutral-100 text-neutral-950 dark:border-neutral-700 dark:from-neutral-800 dark:to-neutral-700 dark:text-neutral-50"
+      rankClassName="bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
     />
   );
 }
@@ -560,7 +560,7 @@ function ThirdPlacePodiumColumn({
   return (
     <StatsPodiumColumnShell
       amountClassName="text-lg"
-      avatarClassName="h-14 w-14 text-sm ring-accent-200 dark:ring-accent-700"
+      avatarClassName="h-14 w-14 text-sm ring-neutral-200 dark:ring-neutral-700"
       avatarId={avatarId}
       currency={currency}
       currentParticipantId={currentParticipantId}
@@ -568,7 +568,7 @@ function ThirdPlacePodiumColumn({
       iconName="lucide.scale"
       nameClassName="text-lg"
       pedestalClassName="min-h-24 border-orange-300/70 bg-gradient-to-t from-orange-300 to-amber-100 text-orange-950 dark:border-orange-700 dark:from-orange-900 dark:to-amber-800 dark:text-amber-50"
-      rankClassName="bg-accent-200 text-accent-700 dark:bg-accent-800 dark:text-accent-200"
+      rankClassName="bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
     />
   );
 }
@@ -629,7 +629,7 @@ function StatsPodiumColumnShell({
         <div className="flex flex-wrap items-center justify-center">
           <span
             className={cn(
-              "truncate font-semibold tracking-tight text-accent-950 dark:text-accent-50",
+              "truncate font-semibold tracking-tight text-neutral-950 dark:text-neutral-50",
               nameClassName,
               nameSizeClassName,
             )}
@@ -638,7 +638,7 @@ function StatsPodiumColumnShell({
           </span>
         </div>
 
-        <div className="text-accent-700 dark:text-accent-300 mt-1 text-[11px] font-medium tracking-[0.18em] uppercase">
+        <div className="mt-1 text-[11px] font-medium tracking-[0.18em] text-neutral-700 uppercase dark:text-neutral-300">
           {formatPercent(shareOfTotal)}
         </div>
       </div>
@@ -679,15 +679,15 @@ function StatsParticipantRow({
       className={cn(
         "rounded-[1.5rem] border p-4 shadow-xs dark:shadow-none",
         isCurrentParticipant
-          ? "border-accent-300 bg-accent-50/80 dark:border-accent-600 dark:bg-accent-900"
-          : "border-accent-200/80 bg-white/80 dark:border-accent-800 dark:bg-accent-950/70",
+          ? "border-neutral-300 bg-neutral-50/80 dark:border-neutral-600 dark:bg-neutral-900"
+          : "border-neutral-200/80 bg-white/80 dark:border-neutral-800 dark:bg-neutral-950/70",
       )}
     >
       <div className="flex items-start gap-4">
         <StatsParticipantAvatar
           avatarId={avatarId}
           badge={<StatsAvatarBadge>#{rank}</StatsAvatarBadge>}
-          className="ring-accent-200 dark:ring-accent-700 h-10 w-10 shrink-0 text-xs ring-2 ring-inset"
+          className="h-10 w-10 shrink-0 text-xs ring-2 ring-neutral-200 ring-inset dark:ring-neutral-700"
           name={participant.name}
         />
 
@@ -697,7 +697,7 @@ function StatsParticipantRow({
               <div className="flex flex-wrap items-center gap-2">
                 <span
                   className={cn(
-                    "truncate font-semibold text-accent-950 dark:text-accent-50",
+                    "truncate font-semibold text-neutral-950 dark:text-neutral-50",
                     nameSizeClassName,
                   )}
                 >
@@ -705,14 +705,14 @@ function StatsParticipantRow({
                 </span>
 
                 {isCurrentParticipant ? (
-                  <span className="bg-accent-500 text-accent-50 rounded-full px-2 py-1 text-[11px] font-semibold tracking-wide uppercase">
+                  <span className="rounded-full bg-neutral-500 px-2 py-1 text-[11px] font-semibold tracking-wide text-neutral-50 uppercase">
                     {t`Me`}
                   </span>
                 ) : null}
               </div>
 
-              <div className="text-accent-700 dark:text-accent-300 mt-2 flex flex-wrap items-center gap-2 text-xs font-medium">
-                <span className="bg-accent-100 dark:bg-accent-800 rounded-full px-2 py-1">
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                <span className="rounded-full bg-neutral-100 px-2 py-1 dark:bg-neutral-800">
                   {formatPercent(totalSpent > 0 ? participant.totalSpent / totalSpent : 0)}
                 </span>
                 <span>
@@ -791,8 +791,8 @@ function StatsAvatarBadge({
       className={cn(
         "inline-flex min-h-5 min-w-5 items-center justify-center rounded-full border px-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] shadow-xs",
         tone === "accent"
-          ? "border-accent-200 bg-accent-500 text-accent-50 dark:border-accent-700"
-          : "border-white bg-accent-950 text-accent-50 dark:border-accent-700 dark:bg-accent-100 dark:text-accent-950",
+          ? "border-neutral-200 bg-neutral-500 text-neutral-50 dark:border-neutral-700"
+          : "border-white bg-neutral-950 text-neutral-50 dark:border-neutral-700 dark:bg-neutral-100 dark:text-neutral-950",
       )}
     >
       {children}
@@ -809,7 +809,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
       >
         <Icon
           icon="lucide.calendar"
-          className="text-accent-600 dark:text-accent-300 size-4 shrink-0"
+          className="size-4 shrink-0 text-neutral-600 dark:text-neutral-300"
         />
         <span className="truncate">{formatRangeLabel(value)}</span>
       </Button>
@@ -849,7 +849,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
 
 function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
   return (
-    <div className="border-accent-300 dark:border-accent-700 dark:bg-accent-900 rounded-2xl border border-dashed bg-white p-6 text-center shadow-xs dark:shadow-none">
+    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-6 text-center shadow-xs dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-none">
       <h2 className="text-xl font-semibold">
         {hasAnyTrackedExpense ? (
           <Trans>No spending stats for this timeframe</Trans>
@@ -858,7 +858,7 @@ function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
         )}
       </h2>
 
-      <p className="text-accent-700 dark:text-accent-200 mt-2 text-sm">
+      <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-200">
         {hasAnyTrackedExpense ? (
           <Trans>Try another timeframe to compare a different period of your party.</Trans>
         ) : (

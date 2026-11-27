@@ -105,7 +105,7 @@ export function ModalSheet({
           </FocusScope>
 
           <Sheet.Backdrop
-            className={cn("bg-accent-950/45 backdrop-blur-[2px]", overlayClassName)}
+            className={cn("bg-neutral-950/45 backdrop-blur-[2px]", overlayClassName)}
             onContextMenu={(event) => {
               onContextMenu?.(event);
               event.preventDefault();
@@ -223,7 +223,7 @@ export function ModalSheetHeader({
           <div className="flex justify-center">
             <span
               aria-hidden="true"
-              className="bg-accent-200 dark:bg-accent-700 h-1.5 w-12 rounded-full"
+              className="h-1.5 w-12 rounded-full bg-neutral-200 dark:bg-neutral-700"
             />
           </div>
         )}
@@ -250,7 +250,7 @@ export function ModalSheetTitle({ className, ...props }: HeadingProps) {
       id={context.titleId}
       slot="title"
       className={cn(
-        "text-base font-semibold tracking-tight text-accent-950 dark:text-accent-50",
+        "text-base font-semibold tracking-tight text-neutral-950 dark:text-neutral-50",
         className,
       )}
       {...props}
@@ -272,7 +272,7 @@ export function ModalSheetDescription({ className, ...props }: ComponentPropsWit
   return (
     <p
       id={context.descriptionId}
-      className={cn("text-sm text-accent-700 dark:text-accent-300", className)}
+      className={cn("text-sm text-neutral-700 dark:text-neutral-300", className)}
       {...props}
     />
   );
@@ -297,17 +297,19 @@ function sheetRowFeedback(
 ) {
   return cn(
     "outline-hidden transition-[scale,background-color,box-shadow] duration-200 ease-in-out motion-reduce:scale-100 motion-reduce:transition-none",
-    tone === "danger" ? "text-rose-700 dark:text-rose-300" : "text-accent-950 dark:text-accent-50",
+    tone === "danger"
+      ? "text-rose-700 dark:text-rose-300"
+      : "text-neutral-950 dark:text-neutral-50",
     state.isHovered &&
-      (tone === "danger" ? "bg-rose-50 dark:bg-rose-950/30" : "bg-accent-100 dark:bg-accent-900"),
+      (tone === "danger" ? "bg-rose-50 dark:bg-rose-950/30" : "bg-neutral-100 dark:bg-neutral-900"),
     state.isFocusVisible &&
       (tone === "danger"
         ? "bg-rose-50 ring-2 ring-rose-300 dark:bg-rose-950/30 dark:ring-rose-800"
-        : "bg-accent-100 ring-2 ring-accent-300 dark:bg-accent-900 dark:ring-accent-700"),
+        : "bg-neutral-100 ring-2 ring-neutral-300 dark:bg-neutral-900 dark:ring-neutral-700"),
     state.isPressed &&
       (tone === "danger"
         ? "scale-[0.98] bg-rose-100 dark:bg-rose-950/50"
-        : "scale-[0.98] bg-accent-200 dark:bg-accent-800"),
+        : "scale-[0.98] bg-neutral-200 dark:bg-neutral-800"),
   );
 }
 
@@ -356,7 +358,7 @@ export function ModalSheetAction({
           "col-start-1 row-start-1 shrink-0",
           tone === "danger"
             ? "text-rose-600 dark:text-rose-300"
-            : "text-accent-700 dark:text-accent-200",
+            : "text-neutral-700 dark:text-neutral-200",
         )}
       />
       <span className="col-start-2 row-start-1 min-w-0 text-base leading-tight font-medium">
@@ -382,8 +384,8 @@ export function ModalSheetChoice({
       {...props}
       className={composeRenderProps(className, (className, state) =>
         cn(
-          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl border border-accent-500 bg-white px-3 py-2.5 text-left ring-offset-white dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
-          state.isSelected && "border-accent-600 dark:border-accent-400",
+          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl border border-neutral-500 bg-white px-3 py-2.5 text-left ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900",
+          state.isSelected && "border-neutral-600 dark:border-neutral-400",
           sheetRowFeedback(state, "default"),
           className,
         ),
@@ -394,10 +396,10 @@ export function ModalSheetChoice({
           icon={icon}
           width={20}
           height={20}
-          className="text-accent-700 dark:text-accent-200 col-start-1 row-span-2 row-start-1 size-5 self-center"
+          className="col-start-1 row-span-2 row-start-1 size-5 self-center text-neutral-700 dark:text-neutral-200"
         />
-        <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">{label}</span>
-        <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold break-words">
+        <span className="text-sm font-normal text-neutral-700 dark:text-neutral-300">{label}</span>
+        <span className="col-start-2 text-base font-semibold break-words text-neutral-950 dark:text-neutral-50">
           {children}
         </span>
       </span>

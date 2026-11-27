@@ -85,20 +85,20 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
 
   const content = (
     <>
-      <span className="text-accent-700 dark:text-accent-200 mt-1 w-5 shrink-0">
+      <span className="mt-1 w-5 shrink-0 text-neutral-700 dark:text-neutral-200">
         <PaymentMethodIcon type={type} size={20} />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-lg font-semibold">{methodName}</span>
         <span
           id={valueId}
-          className={`text-accent-800 dark:text-accent-100 mt-1 block text-base ${showInstructions ? "wrap-anywhere whitespace-pre-wrap select-text" : "truncate"}`}
+          className={`mt-1 block text-base text-neutral-800 dark:text-neutral-100 ${showInstructions ? "wrap-anywhere whitespace-pre-wrap select-text" : "truncate"}`}
         >
           {displayDetails}
         </span>
         <span
           id={descriptionId}
-          className="text-accent-600 dark:text-accent-400 mt-1 block text-sm"
+          className="mt-1 block text-sm text-neutral-600 dark:text-neutral-400"
         >
           {description}
         </span>
@@ -110,12 +110,12 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
   );
 
   const rowClassName =
-    "flex w-full min-w-0 cursor-pointer touch-pan-y items-start gap-3 rounded-[inherit] bg-transparent px-4 py-3 text-left outline-hidden transition-colors hover:bg-accent-50 dark:hover:bg-accent-800/60 [-webkit-touch-callout:none] select-none";
+    "flex w-full min-w-0 cursor-pointer touch-pan-y items-start gap-3 rounded-[inherit] bg-transparent px-4 py-3 text-left outline-hidden transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/60 [-webkit-touch-callout:none] select-none";
 
   return (
     <section
       aria-label={methodName}
-      className="group dark:bg-accent-900 focus-within:ring-accent-400 relative bg-white first:rounded-t-xl last:rounded-b-xl focus-within:z-10 focus-within:ring-2 focus-within:ring-inset"
+      className="group relative bg-white first:rounded-t-xl last:rounded-b-xl focus-within:z-10 focus-within:ring-2 focus-within:ring-neutral-400 focus-within:ring-inset dark:bg-neutral-900"
     >
       {href ? (
         <a

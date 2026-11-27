@@ -19,7 +19,7 @@ const Label = ({ className, ...props }: AriaLabelProps) => (
 function FormDescription({ className, ...props }: AriaTextProps) {
   return (
     <AriaText
-      className={cn("text-sm text-accent-950 dark:text-accent-50", className)}
+      className={cn("text-sm text-neutral-950 dark:text-neutral-50", className)}
       {...props}
       slot="description"
     />

@@ -40,7 +40,7 @@ export function TransferSuccessState({
         <Trans>Debt transferred</Trans>
       </h2>
 
-      <p className="text-accent-800 dark:text-accent-200 mt-3 max-w-sm text-sm leading-6">
+      <p className="mt-3 max-w-sm text-sm leading-6 text-neutral-800 dark:text-neutral-200">
         <Trans>
           The new debt is now in <span className="font-semibold">{destinationPartyName}</span>,
           where <span className="font-semibold">{destinationCounterpartyName}</span> is owed by{" "}

@@ -20,19 +20,19 @@ const colorSchemes: Record<
   }
 > = {
   transparent: {
-    base: "bg-accent-950/0 dark:bg-accent-50/0",
-    focus: "bg-accent-950/5 dark:bg-accent-50/5",
-    pressed: "bg-accent-950/10 dark:bg-accent-50/10",
+    base: "bg-neutral-950/0 dark:bg-neutral-50/0",
+    focus: "bg-neutral-950/5 dark:bg-neutral-50/5",
+    pressed: "bg-neutral-950/10 dark:bg-neutral-50/10",
   },
   accent: {
-    base: "text-accent-50 bg-accent-500 dark:bg-accent-500",
-    focus: "bg-accent-600 dark:bg-accent-400",
-    pressed: "bg-accent-700 dark:bg-accent-300",
+    base: "text-neutral-50 bg-neutral-500 dark:bg-neutral-500",
+    focus: "bg-neutral-600 dark:bg-neutral-400",
+    pressed: "bg-neutral-700 dark:bg-neutral-300",
   },
   "input-like": {
-    base: "border border-accent-500 bg-white ring-offset-white dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
-    focus: "ring-accent-500 dark:ring-accent-400",
-    pressed: "ring-accent-700 dark:ring-accent-300",
+    base: "border border-neutral-500 bg-white ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900",
+    focus: "ring-neutral-500 dark:ring-neutral-400",
+    pressed: "ring-neutral-700 dark:ring-neutral-300",
   },
 };
 

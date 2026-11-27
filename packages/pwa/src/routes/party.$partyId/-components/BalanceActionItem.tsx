@@ -29,16 +29,16 @@ export function BalanceActionItem({
   const navigate = useNavigate();
 
   return (
-    <div className="dark:bg-accent-900 flex flex-col gap-4 rounded-xl bg-white p-4">
+    <div className="flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-neutral-900">
       <div className="flex">
         <div className="flex flex-1 flex-col">
-          <span className="text-accent-400 text-lg">
+          <span className="text-lg text-neutral-400">
             {from.name} {fromId === me.id ? t`(me)` : ""}
           </span>
-          <span className="text-accent-700 dark:text-accent-300 text-sm">
+          <span className="text-sm text-neutral-700 dark:text-neutral-300">
             <Trans>owes</Trans>
           </span>
-          <span className="text-accent-400 text-lg">
+          <span className="text-lg text-neutral-400">
             {to.name} {toId === me.id ? t`(me)` : ""}
           </span>
         </div>
@@ -72,7 +72,7 @@ export function BalanceActionItem({
         {isFromMe && canTransferDebt ? (
           <Button
             color="transparent"
-            className="text-accent-500 hover:text-accent-400 dark:text-accent-300 dark:hover:text-accent-200 h-8 rounded-lg px-3 text-sm font-medium"
+            className="h-8 rounded-lg px-3 text-sm font-medium text-neutral-500 hover:text-neutral-400 dark:text-neutral-300 dark:hover:text-neutral-200"
             onPress={() =>
               void navigate({
                 to: "/party/$partyId/transfer-debt",

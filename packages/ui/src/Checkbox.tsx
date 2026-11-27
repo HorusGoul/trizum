@@ -63,11 +63,11 @@ const Checkbox = ({
         <>
           <div
             className={cn(
-              "ring-offset-background flex size-4 shrink-0 items-center justify-center rounded-xs border border-accent-500 text-current dark:border-accent-700",
+              "ring-offset-background flex size-4 shrink-0 items-center justify-center rounded-xs border border-neutral-500 text-current dark:border-neutral-700",
               /* Focus Visible */
               "group-data-[focus-visible]/checkbox:ring-ring group-data-[focus-visible]/checkbox:outline-hidden group-data-[focus-visible]/checkbox:ring-2 group-data-[focus-visible]/checkbox:ring-offset-2",
               /* Selected */
-              "group-data-[indeterminate]/checkbox:bg-accent-500 group-data-[selected]/checkbox:bg-accent-500 group-data-[indeterminate]/checkbox:text-accent-50 group-data-[selected]/checkbox:text-accent-50",
+              "group-data-[indeterminate]/checkbox:bg-neutral-500 group-data-[selected]/checkbox:bg-neutral-500 group-data-[indeterminate]/checkbox:text-neutral-50 group-data-[selected]/checkbox:text-neutral-50",
               /* Disabled */
               "group-data-[disabled]/checkbox:cursor-not-allowed group-data-[disabled]/checkbox:opacity-50",
               /* Invalid */

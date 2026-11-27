@@ -43,9 +43,9 @@ export function PartyBoostCard({
 
   return (
     <>
-      <div className="border-accent-200 bg-accent-50/60 dark:border-accent-800 dark:bg-accent-900/45 flex flex-col gap-4 rounded-2xl border p-4">
+      <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 dark:border-neutral-800 dark:bg-neutral-900/45">
         <div className="flex items-start gap-3">
-          <span className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-100 flex size-11 shrink-0 items-center justify-center rounded-full">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
             <Icon icon="lucide.sparkles" width={21} height={21} />
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -54,7 +54,7 @@ export function PartyBoostCard({
                 <Trans>Party Boost</Trans>
               </h3>
               {status?.party.isBoosted ? (
-                <span className="bg-accent-200 text-accent-800 dark:bg-accent-700 dark:text-accent-50 rounded-full px-2 py-0.5 text-xs font-semibold">
+                <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-xs font-semibold text-neutral-800 dark:bg-neutral-700 dark:text-neutral-50">
                   <Trans>Active</Trans>
                 </span>
               ) : null}
@@ -107,7 +107,7 @@ function PartyBoostCheckedAt({ boost }: { boost?: PartyBoostSnapshot }) {
   const checkedAt = i18n.date(date, { dateStyle: "medium", timeStyle: "short" });
 
   return (
-    <p className="text-accent-600 dark:text-accent-300 text-xs">
+    <p className="text-xs text-neutral-600 dark:text-neutral-300">
       <time dateTime={date.toISOString()}>
         <Trans>Last checked {checkedAt}</Trans>
       </time>
@@ -191,7 +191,7 @@ function PartyBoostDescription({
 
   if (!status && isRefreshing && userId) {
     return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
         <Trans>Checking Party Boost…</Trans>
       </p>
     );
@@ -199,7 +199,7 @@ function PartyBoostDescription({
 
   if (error?.code === "premium_required" && !status?.party.isBoosted) {
     return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
         <Trans>Premium is required for Party Boost.</Trans>
       </p>
     );
@@ -207,7 +207,7 @@ function PartyBoostDescription({
 
   if (!status && error) {
     return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
         <Trans>Party Boost could not be checked. Try again when you are online.</Trans>
       </p>
     );
@@ -215,7 +215,7 @@ function PartyBoostDescription({
 
   if (status?.party.isBoostedByCurrentUser) {
     return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
         <Trans>Your Premium is boosting this party for everyone in it.</Trans>
       </p>
     );
@@ -223,7 +223,7 @@ function PartyBoostDescription({
 
   if (status?.party.isBoosted) {
     return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
         <Trans>A Premium member is boosting this party.</Trans>
       </p>
     );
@@ -231,7 +231,7 @@ function PartyBoostDescription({
 
   if (!userId) {
     return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
         <Trans>Sign in to activate Premium benefits for this party.</Trans>
       </p>
     );
@@ -241,7 +241,7 @@ function PartyBoostDescription({
     const transferableDate = formatTransferDate(assignment.transferableAt);
 
     return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
         {canTransfer ? (
           <Trans>Your Party Boost is active elsewhere and can be moved here.</Trans>
         ) : (
@@ -252,7 +252,7 @@ function PartyBoostDescription({
   }
 
   return (
-    <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+    <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
       <Trans>Premium owners can boost one party at a time and move it every seven days.</Trans>
     </p>
   );

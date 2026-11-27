@@ -38,7 +38,7 @@ export function AppEmojiField({
         onChange={onChange}
       />
       {description && (
-        <Text className="text-accent-700 dark:text-accent-50 text-sm" slot="description">
+        <Text className="text-sm text-neutral-700 dark:text-neutral-50" slot="description">
           {description}
         </Text>
       )}

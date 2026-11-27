@@ -50,7 +50,7 @@ function StoreLink({ platform }: { platform: MobilePlatform }) {
           platform === "ios" ? "ai_handoff_app_store_requested" : "ai_handoff_play_store_requested",
         )
       }
-      className="bg-accent-500 text-accent-50 hover:bg-accent-600 dark:hover:bg-accent-400 flex min-h-12 items-center justify-center gap-3 rounded-full px-5 py-3 font-semibold outline-offset-4"
+      className="flex min-h-12 items-center justify-center gap-3 rounded-full bg-neutral-500 px-5 py-3 font-semibold text-neutral-50 outline-offset-4 hover:bg-neutral-600 dark:hover:bg-neutral-400"
     >
       <Icon
         icon={platform === "ios" ? "brand.app-store" : "brand.google-play"}
@@ -104,7 +104,7 @@ function AiInvite() {
               <span className="min-w-0 wrap-anywhere">{party.name}</span>
             </h2>
           </div>
-          <p className="text-accent-700 dark:text-accent-200 leading-relaxed">
+          <p className="leading-relaxed text-neutral-700 dark:text-neutral-200">
             <Trans>Get the app to track shared expenses with your group, even offline.</Trans>
           </p>
         </div>
@@ -115,7 +115,7 @@ function AiInvite() {
           {platform !== "android" && <StoreLink platform="ios" />}
           {platform !== "ios" && <StoreLink platform="android" />}
         </div>
-        <p className="text-accent-700 dark:text-accent-200 text-sm leading-relaxed">
+        <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">
           <Trans>
             After installing, reopen this invite to join your group. No account is needed.
           </Trans>
@@ -123,7 +123,7 @@ function AiInvite() {
       </div>
 
       {!platform && (
-        <section className="bg-accent-100 dark:bg-accent-900 flex flex-col items-center gap-3 rounded-2xl p-5">
+        <section className="flex flex-col items-center gap-3 rounded-2xl bg-neutral-100 p-5 dark:bg-neutral-900">
           <h3 className="font-medium">
             <Trans>Open this invite on your phone</Trans>
           </h3>

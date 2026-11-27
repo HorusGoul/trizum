@@ -28,7 +28,7 @@ export function DeleteExpenseTemplateSheet({
         </ModalSheetSection>
       </ModalSheetHeader>
       <ModalSheetContent>
-        <ModalSheetSection className="text-accent-700 dark:text-accent-200 pb-3 text-sm">
+        <ModalSheetSection className="pb-3 text-sm text-neutral-700 dark:text-neutral-200">
           <Trans>
             This removes the template for everyone in the party. Existing expenses are not affected.
           </Trans>

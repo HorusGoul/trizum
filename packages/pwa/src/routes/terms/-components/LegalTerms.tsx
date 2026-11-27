@@ -4,10 +4,10 @@ export function LegalTerms() {
   return (
     <>
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>13. Disclaimers and Liability</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             To the extent permitted by law, the Service is provided &quot;as is&quot; and &quot;as
             available&quot; without warranties that are not expressly stated in these Terms. You
@@ -15,7 +15,7 @@ export function LegalTerms() {
             information before acting on it.
           </Trans>
         </p>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             To the extent permitted by law, we are not liable for indirect, incidental, special,
             consequential, or punitive losses, or for losses caused by inaccurate User Content,
@@ -27,10 +27,10 @@ export function LegalTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>14. Governing Law and Consumer Rights</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             These Terms are governed by the laws of Spain. If you are a consumer, you also keep the
             protections of mandatory consumer law in the country where you live, and you may bring a
@@ -41,10 +41,10 @@ export function LegalTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>15. Changes to These Terms</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-700 dark:text-neutral-300">
           <Trans>
             We may update these Terms to reflect changes to the Service, law, security, or our
             business. We will post the updated Terms and change the &quot;Last updated&quot; date.
@@ -56,15 +56,15 @@ export function LegalTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           <Trans>16. Contact Us</Trans>
         </h2>
-        <div className="bg-accent-50 dark:bg-accent-900 rounded-lg p-4">
-          <p className="text-accent-700 dark:text-accent-300 mb-2">
+        <div className="rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900">
+          <p className="mb-2 text-neutral-700 dark:text-neutral-300">
             <Trans>If you have questions about these Terms, please contact us:</Trans>
           </p>
-          <p className="text-accent-700 dark:text-accent-300">
-            <strong className="text-accent-900 dark:text-accent-100 font-semibold">
+          <p className="text-neutral-700 dark:text-neutral-300">
+            <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
               Horus Lugo López
             </strong>
             <br />
@@ -75,7 +75,7 @@ export function LegalTerms() {
             <Trans>Email:</Trans>{" "}
             <a
               href="mailto:hola@horus.dev"
-              className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
+              className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
             >
               hola@horus.dev
             </a>

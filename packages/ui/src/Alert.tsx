@@ -3,11 +3,11 @@ import * as React from "react";
 import { cn, cva, type VariantProps } from "./utils.js";
 
 const alertVariants = cva({
-  base: "relative w-full rounded-lg border border-accent-200 dark:border-accent-700 px-4 py-3 text-sm grid has-[>svg]:grid-cols-[16px_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
+  base: "relative w-full rounded-lg border border-neutral-200 dark:border-neutral-700 px-4 py-3 text-sm grid has-[>svg]:grid-cols-[16px_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
   variants: {
     variant: {
-      default: "bg-white text-accent-950 dark:bg-accent-900 dark:text-accent-50",
-      info: "bg-white text-accent-950 dark:bg-accent-900 dark:text-accent-50 [&>svg]:text-accent-600 dark:[&>svg]:text-accent-300",
+      default: "bg-white text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50",
+      info: "bg-white text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50 [&>svg]:text-neutral-600 dark:[&>svg]:text-neutral-300",
       destructive:
         "border-danger-500 bg-danger-50 text-danger-700 dark:border-danger-700 dark:bg-danger-950/40 dark:text-danger-200 [&>svg]:text-current [&_[data-slot=alert-description]]:text-danger-700 dark:[&_[data-slot=alert-description]]:text-danger-200",
     },

@@ -58,7 +58,7 @@ function Home() {
 
           <span
             aria-label="Beta"
-            className="text-accent-600 dark:text-accent-400 mb-4 ml-0.5 font-mono text-xs leading-none font-semibold"
+            className="mb-4 ml-0.5 font-mono text-xs leading-none font-semibold text-neutral-600 dark:text-neutral-400"
           >
             βeta
           </span>

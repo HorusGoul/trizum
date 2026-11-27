@@ -17,7 +17,7 @@ export function CurrencyText({
   format = "$0.00",
   ...props
 }: CurrencyTextProps) {
-  let color = "text-accent-400";
+  let color = "text-neutral-400";
 
   if (variant === "diff") {
     if (amount < 0) {

@@ -63,7 +63,7 @@ const CalendarGridHeader = ({ ...props }: AriaCalendarGridHeaderProps) => (
 const CalendarHeaderCell = ({ className, ...props }: AriaCalendarHeaderCellProps) => (
   <AriaCalendarHeaderCell
     className={cn(
-      "w-9 rounded-md text-[0.8rem] font-normal text-accent-700 dark:text-accent-50",
+      "w-9 rounded-md text-[0.8rem] font-normal text-neutral-700 dark:text-neutral-50",
       className,
     )}
     {...props}
@@ -81,31 +81,31 @@ const CalendarCell = ({ className, ...props }: AriaCalendarCellProps) => {
     <AriaCalendarCell
       className={composeRenderProps(className, (className, renderProps) =>
         cn(
-          "data-[hovered]:bg-accent-500/20 data-[hovered]:text-accent-50", // TODO: replace this with button ghost variant or something
+          "data-[hovered]:bg-neutral-500/20 data-[hovered]:text-neutral-50", // TODO: replace this with button ghost variant or something
           "relative flex size-9 items-center justify-center p-0 text-sm font-normal",
           /* Disabled */
-          renderProps.isDisabled && "text-accent-700 opacity-50 dark:text-accent-50",
+          renderProps.isDisabled && "text-neutral-700 opacity-50 dark:text-neutral-50",
           /* Selected */
           renderProps.isSelected &&
-            "bg-accent-500 text-accent-50 data-[focused]:bg-accent-500 data-[focused]:text-accent-50",
+            "bg-neutral-500 text-neutral-50 data-[focused]:bg-neutral-500 data-[focused]:text-neutral-50",
           /* Hover */
           renderProps.isHovered &&
             renderProps.isSelected &&
             (renderProps.isSelectionStart || renderProps.isSelectionEnd || !isRange) &&
-            "data-[hovered]:bg-accent-400 data-[hovered]:text-accent-50",
+            "data-[hovered]:bg-neutral-400 data-[hovered]:text-neutral-50",
           /* Selection Start/End */
           renderProps.isSelected &&
             isRange &&
             !renderProps.isSelectionStart &&
             !renderProps.isSelectionEnd &&
-            "rounded-none bg-accent-500 text-accent-50",
+            "rounded-none bg-neutral-500 text-neutral-50",
           /* Outside Month */
           renderProps.isOutsideMonth &&
-            "text-accent-700 opacity-50 data-[selected]:bg-accent-500/50 data-[selected]:text-accent-50 data-[selected]:opacity-30 dark:text-accent-50",
+            "text-neutral-700 opacity-50 data-[selected]:bg-neutral-500/50 data-[selected]:text-neutral-50 data-[selected]:opacity-30 dark:text-neutral-50",
           /* Current Date */
           renderProps.date.compare(today(getLocalTimeZone())) === 0 &&
             !renderProps.isSelected &&
-            "bg-accent-600 text-accent-50 data-[hovered]:bg-accent-400 data-[hovered]:text-accent-50",
+            "bg-neutral-600 text-neutral-50 data-[hovered]:bg-neutral-400 data-[hovered]:text-neutral-50",
           /* Unavailable Date */
           renderProps.isUnavailable && "cursor-default text-danger-500",
           renderProps.isInvalid &&

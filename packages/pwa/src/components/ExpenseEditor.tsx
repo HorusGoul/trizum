@@ -604,7 +604,7 @@ export function ExpenseParticipantsSection({
           >
             {t`Include all`}
           </Checkbox>
-          <span className="text-accent-600 dark:text-accent-300 text-xs font-medium">
+          <span className="text-xs font-medium text-neutral-600 dark:text-neutral-300">
             {currency}
           </span>
         </div>
@@ -759,7 +759,7 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="border-accent-500 dark:border-accent-700 dark:bg-accent-900 grid h-10 grid-cols-[minmax(0,1fr)_auto] items-center justify-between rounded-lg border bg-white pr-3"
+      className="grid h-10 grid-cols-[minmax(0,1fr)_auto] items-center justify-between rounded-lg border border-neutral-500 bg-white pr-3 dark:border-neutral-700 dark:bg-neutral-900"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
@@ -1001,7 +1001,7 @@ function ReceiptPhotosField({
         }}
       >
         {value.length === 0 ? (
-          <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
+          <div className="flex h-32 w-32 flex-col items-center justify-center rounded-xl bg-neutral-50 p-4 dark:bg-neutral-900 dark:text-neutral-500">
             <span className="text-center text-sm">
               <Trans>Upload or capture an image of your receipt</Trans>
             </span>

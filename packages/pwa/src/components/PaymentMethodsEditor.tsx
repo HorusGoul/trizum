@@ -41,7 +41,7 @@ export function PaymentMethodsEditor({
   const hasMethods = available.length < paymentMethodTypes.length;
 
   const addButtonClassName =
-    "text-accent-950 dark:text-accent-50 min-h-11 w-auto self-start gap-2 rounded-xl px-4 font-medium";
+    "text-neutral-950 dark:text-neutral-50 min-h-11 w-auto self-start gap-2 rounded-xl px-4 font-medium";
 
   function addMethod(type: PaymentMethodType) {
     pendingMethod.current = type;
@@ -71,12 +71,12 @@ export function PaymentMethodsEditor({
   });
 
   return (
-    <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-y py-6">
+    <section className="flex flex-col gap-3 border-y border-neutral-200 py-6 dark:border-neutral-800">
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold">
           <Trans>Get paid</Trans>
         </h2>
-        <p className="text-accent-700 dark:text-accent-300 text-sm">
+        <p className="text-sm text-neutral-700 dark:text-neutral-300">
           <Trans>
             Your payment details are shared with people in your groups to help them settle debts
             with you.
@@ -84,7 +84,7 @@ export function PaymentMethodsEditor({
         </p>
       </div>
       {hasMethods ? (
-        <div className="divide-accent-100 dark:divide-accent-800 divide-y">
+        <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
           {paymentMethodTypes.map((type) => {
             const details = value[type];
 
