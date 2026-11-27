@@ -20,7 +20,7 @@ export function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
         {participant.name}
 
         {isMe ? (
-          <span className="h-4 rounded-xs bg-neutral-500 px-1 text-xs font-semibold text-neutral-50 uppercase">
+          <span className="bg-accent-500 text-accent-50 h-4 rounded-full px-1.5 text-xs font-semibold uppercase">
             {t`Me`}
           </span>
         ) : null}

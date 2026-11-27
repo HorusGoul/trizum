@@ -26,7 +26,7 @@ export function BalanceItem({ participant, stats, visualRatio }: BalanceItemProp
     <div className={cn("relative flex items-center justify-start", isNegative && "justify-end")}>
       <div
         className={cn(
-          "h-10 rounded-lg bg-success-300 dark:bg-success-600",
+          "h-10 rounded-xl bg-success-300 dark:bg-success-600",
           isNegative && "bg-danger-300 dark:bg-danger-700",
         )}
         style={{

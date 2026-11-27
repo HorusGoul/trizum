@@ -41,7 +41,7 @@ function ExpenseListRow({
       }}
     >
       {index === loaderIndex ? (
-        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full rounded-3xl" />
       ) : (
         <ExpenseItem partyId={partyId} expense={expenses[index]} />
       )}

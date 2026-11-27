@@ -15,16 +15,16 @@ export function SheetSurface({
   const bottom = useTransform(y, (value) => Math.min(0, value));
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col p-px">
+    <div className="relative flex min-h-0 flex-1 flex-col">
       <motion.div
         aria-hidden="true"
         data-sheet-surface=""
-        className="pointer-events-none absolute inset-x-0 top-0 rounded-t-[1.75rem] border border-neutral-200/80 bg-gradient-to-b from-white via-white to-neutral-50/95 shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-950 dark:to-neutral-900 dark:shadow-none"
+        className="shadow-overlay pointer-events-none absolute inset-x-0 top-0 rounded-t-[2rem] bg-neutral-100 dark:bg-neutral-900"
         style={{ bottom }}
       />
       <div
         className={cn(
-          "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[calc(1.75rem-1px)]",
+          "relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[2rem] text-neutral-950 dark:text-neutral-50",
           contentClassName,
         )}
       >

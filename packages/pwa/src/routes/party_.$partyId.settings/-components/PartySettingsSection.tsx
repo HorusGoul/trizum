@@ -12,7 +12,7 @@ export function PartySettingsSection({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-neutral-200">
+      <div className="flex items-center gap-2 px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400">
         <Icon icon={icon} width={16} height={16} />
         <h2>{title}</h2>
       </div>

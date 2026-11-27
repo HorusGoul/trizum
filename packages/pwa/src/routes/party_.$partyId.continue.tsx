@@ -50,7 +50,7 @@ function StoreLink({ platform }: { platform: MobilePlatform }) {
           platform === "ios" ? "ai_handoff_app_store_requested" : "ai_handoff_play_store_requested",
         )
       }
-      className="flex min-h-12 items-center justify-center gap-3 rounded-full bg-neutral-500 px-5 py-3 font-semibold text-neutral-50 outline-offset-4 hover:bg-neutral-600 dark:hover:bg-neutral-400"
+      className="bg-accent-500 text-accent-50 outline-accent-500 hover:bg-accent-600 dark:outline-accent-400 dark:hover:bg-accent-400 flex min-h-12 items-center justify-center gap-3 rounded-full px-5 py-3 font-semibold outline-offset-4"
     >
       <Icon
         icon={platform === "ios" ? "brand.app-store" : "brand.google-play"}
@@ -104,7 +104,7 @@ function AiInvite() {
               <span className="min-w-0 wrap-anywhere">{party.name}</span>
             </h2>
           </div>
-          <p className="leading-relaxed text-neutral-700 dark:text-neutral-200">
+          <p className="leading-relaxed text-neutral-600 dark:text-neutral-400">
             <Trans>Get the app to track shared expenses with your group, even offline.</Trans>
           </p>
         </div>
@@ -115,7 +115,7 @@ function AiInvite() {
           {platform !== "android" && <StoreLink platform="ios" />}
           {platform !== "ios" && <StoreLink platform="android" />}
         </div>
-        <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">
+        <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
           <Trans>
             After installing, reopen this invite to join your group. No account is needed.
           </Trans>
@@ -123,11 +123,11 @@ function AiInvite() {
       </div>
 
       {!platform && (
-        <section className="flex flex-col items-center gap-3 rounded-2xl bg-neutral-100 p-5 dark:bg-neutral-900">
+        <section className="shadow-surface flex flex-col items-center gap-3 rounded-3xl bg-white p-5 dark:bg-neutral-900">
           <h3 className="font-medium">
             <Trans>Open this invite on your phone</Trans>
           </h3>
-          <figure aria-label={t`Invite QR code`} className="rounded-xl bg-white p-2">
+          <figure aria-label={t`Invite QR code`} className="rounded-2xl bg-white p-2">
             <QRCode value={inviteUrl} size="xl" options={qrOptions} />
           </figure>
         </section>
@@ -135,7 +135,7 @@ function AiInvite() {
 
       <div className="space-y-3">
         <Button
-          color="input-like"
+          color="neutral"
           pressAction={async () => {
             trackEvent("ai_handoff_web_continue_requested");
 

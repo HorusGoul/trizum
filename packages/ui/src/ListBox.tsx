@@ -22,7 +22,7 @@ function ListBox<T extends object>({ className, ...props }: AriaListBoxProps<T>)
       className={composeRenderProps(className, (className) =>
         cn(
           className,
-          "group overflow-auto rounded-md border bg-neutral-900 p-1 text-neutral-50 shadow-md outline-hidden",
+          "group overflow-auto rounded-3xl bg-white p-2 text-neutral-950 shadow-surface outline-hidden dark:bg-neutral-900 dark:text-neutral-50",
           /* Empty */
           "data-[empty]:p-6 data-[empty]:text-center data-[empty]:text-sm",
         ),
@@ -41,15 +41,17 @@ const ListBoxItem = <T extends object>({
     <AriaListBoxItem
       className={composeRenderProps(className, (className) =>
         cn(
-          "relative flex w-full cursor-default select-none items-center rounded-xs px-2 py-1.5 text-sm outline-hidden",
+          "relative flex w-full cursor-default select-none items-center rounded-2xl px-3 py-2.5 text-sm outline-hidden transition-colors",
           /* Disabled */
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           /* Focused */
-          "data-[focused]:bg-neutral-500 data-[focused]:text-neutral-50",
+          "data-[focused]:bg-neutral-950/5 dark:data-[focused]:bg-white/10",
           /* Hovered */
-          "data-[hovered]:bg-neutral-500 data-[hovered]:text-neutral-50",
+          "data-[hovered]:bg-neutral-950/5 dark:data-[hovered]:bg-white/10",
+          /* Pressed */
+          "data-[pressed]:bg-neutral-950/10 dark:data-[pressed]:bg-white/15",
           /* Selection */
-          "data-[selection-mode]:pr-12",
+          "data-[selection-mode]:pr-10 data-[selected]:font-medium",
           className,
         ),
       )}
@@ -58,7 +60,7 @@ const ListBoxItem = <T extends object>({
       {composeRenderProps(children, (children, renderProps) => (
         <>
           {renderProps.isSelected && (
-            <span className="absolute right-2 flex size-4 items-center justify-center">
+            <span className="text-accent-500 dark:text-accent-400 absolute right-3 flex size-4 items-center justify-center">
               <Icon icon="lucide.check" className="size-4" />
             </span>
           )}
@@ -70,7 +72,15 @@ const ListBoxItem = <T extends object>({
 };
 
 function ListBoxHeader({ className, ...props }: React.ComponentProps<typeof AriaHeader>) {
-  return <AriaHeader className={cn("px-2 py-1.5 text-sm font-semibold", className)} {...props} />;
+  return (
+    <AriaHeader
+      className={cn(
+        "px-3 pt-2.5 pb-1.5 text-xs font-semibold text-neutral-500 dark:text-neutral-400",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 export { ListBox, ListBoxItem, ListBoxHeader, ListBoxSection, ListBoxCollection };

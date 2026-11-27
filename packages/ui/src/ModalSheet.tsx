@@ -105,7 +105,7 @@ export function ModalSheet({
           </FocusScope>
 
           <Sheet.Backdrop
-            className={cn("bg-neutral-950/45 backdrop-blur-[2px]", overlayClassName)}
+            className={cn("bg-black/40 backdrop-blur-[2px] dark:bg-black/60", overlayClassName)}
             onContextMenu={(event) => {
               onContextMenu?.(event);
               event.preventDefault();
@@ -223,7 +223,7 @@ export function ModalSheetHeader({
           <div className="flex justify-center">
             <span
               aria-hidden="true"
-              className="h-1.5 w-12 rounded-full bg-neutral-200 dark:bg-neutral-700"
+              className="h-1.5 w-10 rounded-full bg-neutral-950/15 dark:bg-white/20"
             />
           </div>
         )}
@@ -272,7 +272,7 @@ export function ModalSheetDescription({ className, ...props }: ComponentPropsWit
   return (
     <p
       id={context.descriptionId}
-      className={cn("text-sm text-neutral-700 dark:text-neutral-300", className)}
+      className={cn("text-sm text-neutral-600 dark:text-neutral-400", className)}
       {...props}
     />
   );
@@ -301,15 +301,17 @@ function sheetRowFeedback(
       ? "text-rose-700 dark:text-rose-300"
       : "text-neutral-950 dark:text-neutral-50",
     state.isHovered &&
-      (tone === "danger" ? "bg-rose-50 dark:bg-rose-950/30" : "bg-neutral-100 dark:bg-neutral-900"),
+      (tone === "danger"
+        ? "bg-rose-500/10 dark:bg-rose-400/10"
+        : "bg-neutral-950/5 dark:bg-white/10"),
     state.isFocusVisible &&
       (tone === "danger"
-        ? "bg-rose-50 ring-2 ring-rose-300 dark:bg-rose-950/30 dark:ring-rose-800"
-        : "bg-neutral-100 ring-2 ring-neutral-300 dark:bg-neutral-900 dark:ring-neutral-700"),
+        ? "bg-rose-500/10 ring-2 ring-rose-500 dark:bg-rose-400/10 dark:ring-rose-400"
+        : "bg-neutral-950/5 ring-2 ring-accent-500 dark:bg-white/10 dark:ring-accent-400"),
     state.isPressed &&
       (tone === "danger"
-        ? "scale-[0.98] bg-rose-100 dark:bg-rose-950/50"
-        : "scale-[0.98] bg-neutral-200 dark:bg-neutral-800"),
+        ? "scale-[0.98] bg-rose-500/15 dark:bg-rose-400/15"
+        : "scale-[0.98] bg-neutral-950/10 dark:bg-white/15"),
   );
 }
 
@@ -343,7 +345,7 @@ export function ModalSheetAction({
       className={(state) =>
         cn(
           state.defaultClassName,
-          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-[1.35rem] py-4 text-left px-safe-or-4 sm:px-safe-or-5",
+          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-2xl py-4 text-left px-safe-or-4 sm:px-safe-or-5",
           sheetRowFeedback(state, tone),
           className,
         )
@@ -358,7 +360,7 @@ export function ModalSheetAction({
           "col-start-1 row-start-1 shrink-0",
           tone === "danger"
             ? "text-rose-600 dark:text-rose-300"
-            : "text-neutral-700 dark:text-neutral-200",
+            : "text-neutral-600 dark:text-neutral-400",
         )}
       />
       <span className="col-start-2 row-start-1 min-w-0 text-base leading-tight font-medium">
@@ -384,9 +386,10 @@ export function ModalSheetChoice({
       {...props}
       className={composeRenderProps(className, (className, state) =>
         cn(
-          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl border border-neutral-500 bg-white px-3 py-2.5 text-left ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900",
-          state.isSelected && "border-neutral-600 dark:border-neutral-400",
+          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl bg-white px-4 py-2.5 text-left shadow-surface dark:bg-neutral-800",
           sheetRowFeedback(state, "default"),
+          (state.isHovered || state.isFocusVisible) && "bg-neutral-50 dark:bg-neutral-700",
+          state.isPressed && "bg-neutral-100 dark:bg-neutral-700",
           className,
         ),
       )}
@@ -396,9 +399,9 @@ export function ModalSheetChoice({
           icon={icon}
           width={20}
           height={20}
-          className="col-start-1 row-span-2 row-start-1 size-5 self-center text-neutral-700 dark:text-neutral-200"
+          className="col-start-1 row-span-2 row-start-1 size-5 self-center text-neutral-600 dark:text-neutral-400"
         />
-        <span className="text-sm font-normal text-neutral-700 dark:text-neutral-300">{label}</span>
+        <span className="text-sm font-normal text-neutral-600 dark:text-neutral-400">{label}</span>
         <span className="col-start-2 text-base font-semibold break-words text-neutral-950 dark:text-neutral-50">
           {children}
         </span>

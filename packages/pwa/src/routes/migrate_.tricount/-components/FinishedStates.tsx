@@ -16,7 +16,7 @@ export function SuccessState({ partyId }: { partyId: Party["id"] }) {
         </h1>
 
         <Button
-          color="input-like"
+          color="accent"
           pressAction={async () => {
             await appWorker.recalculateBalances(partyId);
             await navigate({ to: `/party/${partyId}`, replace: true });
@@ -36,7 +36,7 @@ export function ErrorState({ onCheckLink }: { onCheckLink: () => void }) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="w-full max-w-sm px-4 py-8 text-center">
-        <div className="mx-auto mb-5 flex size-13 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 dark:border-neutral-800 dark:text-neutral-300">
+        <div className="shadow-surface mx-auto mb-5 flex size-13 items-center justify-center rounded-full bg-white text-neutral-600 dark:bg-neutral-900 dark:text-neutral-300">
           <Icon icon="lucide.unlink" />
         </div>
         <h1
@@ -46,7 +46,7 @@ export function ErrorState({ onCheckLink }: { onCheckLink: () => void }) {
         >
           <Trans>Couldn't import this tricount</Trans>
         </h1>
-        <p className="my-4 text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">
+        <p className="my-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
           <Trans>
             Check that you copied the full sharing link from tricount. If the link is correct, try
             again later.
@@ -63,7 +63,7 @@ export function ErrorState({ onCheckLink }: { onCheckLink: () => void }) {
         >
           <Trans>Go back to home</Trans>
         </Button>
-        <p className="mt-4 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
+        <p className="mt-4 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
           <Trans>Your link and import options are kept so you can try again.</Trans>
         </p>
       </div>

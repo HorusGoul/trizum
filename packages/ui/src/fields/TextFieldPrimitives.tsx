@@ -8,6 +8,7 @@ import {
   composeRenderProps,
 } from "react-aria-components";
 import { cn } from "../utils.js";
+import { fieldFocusRing, fieldSurface } from "./Field.styles.js";
 
 export const TextField = AriaTextField;
 export const NumberField = AriaNumberField;
@@ -17,9 +18,10 @@ export const Input = ({ className, ...props }: AriaInputProps) => {
     <AriaInput
       className={composeRenderProps(className, (className) =>
         cn(
-          "flex h-10 w-full rounded-md border border-neutral-500 bg-white px-3 py-2 text-sm ring-offset-neutral-900 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900 dark:placeholder:text-neutral-50",
+          "flex h-10 w-full rounded-2xl px-3.5 py-2 text-sm transition-shadow file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 dark:placeholder:text-neutral-500",
+          fieldSurface,
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-          "data-[focused]:ring-ring data-[focused]:outline-hidden data-[focused]:ring-2 data-[focused]:ring-offset-2",
+          fieldFocusRing,
           "focus-visible:outline-hidden",
           className,
         ),
@@ -34,8 +36,9 @@ export const TextArea = ({ className, ...props }: AriaTextAreaProps) => {
     <AriaTextArea
       className={composeRenderProps(className, (className) =>
         cn(
-          "flex min-h-[80px] w-full rounded-md border border-neutral-500 bg-white px-3 py-2 text-sm ring-offset-neutral-900 placeholder:text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900 dark:placeholder:text-neutral-50",
-          "data-[focused]:ring-ring data-[focused]:outline-hidden data-[focused]:ring-2 data-[focused]:ring-offset-2",
+          "flex min-h-[80px] w-full rounded-2xl px-3.5 py-2.5 text-sm transition-shadow placeholder:text-neutral-400 dark:placeholder:text-neutral-500",
+          fieldSurface,
+          fieldFocusRing,
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
           "focus-visible:outline-hidden",
           className,

@@ -162,9 +162,9 @@ export function EmojiPicker({
         aria-label={ariaLabel ?? t`Select emoji`}
         className={composeRenderProps(className, (className) =>
           cn(
-            "flex h-10 w-10 items-center justify-center rounded-md border border-neutral-500 bg-white text-2xl ring-offset-white transition-all dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900",
-            "data-[hovered]:bg-neutral-100 dark:data-[hovered]:bg-neutral-800",
-            "data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-neutral-500 data-[focus-visible]:ring-offset-2",
+            "flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-2xl shadow-surface inset-ring inset-ring-neutral-950/5 transition-all dark:bg-white/10 dark:inset-ring-0",
+            "data-[hovered]:bg-neutral-50 dark:data-[hovered]:bg-white/15",
+            "data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-accent-500 dark:data-[focus-visible]:ring-accent-400",
             "data-[pressed]:scale-95",
             className,
           ),
@@ -179,25 +179,25 @@ export function EmojiPicker({
               aria-label={t`Search emoji`}
               value={searchQuery}
               onChange={setSearchQuery}
-              className="border-b border-neutral-200 p-2 dark:border-neutral-700"
+              className="p-2"
             >
               <div className="relative">
                 <Icon
                   icon="lucide.search"
-                  className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400"
+                  className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400 dark:text-neutral-500"
                 />
                 <Input
                   placeholder={t`Search emoji...`}
                   className={cn(
-                    "flex h-9 w-full rounded-md border border-neutral-300 bg-neutral-50 py-2 pl-9 text-sm placeholder:text-neutral-500 dark:border-neutral-600 dark:bg-neutral-800 dark:placeholder:text-neutral-400",
-                    "focus:border-neutral-500 focus:outline-hidden focus:ring-1 focus:ring-neutral-500 dark:focus:border-neutral-400 dark:focus:ring-neutral-400",
+                    "flex h-9 w-full rounded-2xl bg-neutral-100 py-2 pl-9 text-sm placeholder:text-neutral-400 dark:bg-neutral-700 dark:placeholder:text-neutral-500",
+                    "focus:outline-hidden focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400",
                     searchQuery ? "pr-9" : "pr-3",
                   )}
                 />
                 {searchQuery && (
                   <ClearButton
                     aria-label={t`Clear search`}
-                    className="absolute top-1/2 right-2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 outline-hidden hover:bg-neutral-200 hover:text-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
+                    className="absolute top-1/2 right-2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 outline-hidden hover:bg-neutral-950/10 hover:text-neutral-950 dark:text-neutral-400 dark:hover:bg-white/15 dark:hover:text-neutral-50"
                     slot={null}
                     onPress={() => setSearchQuery("")}
                   >
@@ -273,10 +273,10 @@ function EmojiButton({ emoji, onSelect }: { emoji: Emoji; onSelect: (emoji: stri
       title={emoji.label}
       onClick={() => onSelect(emoji.emoji)}
       className={cn(
-        "flex size-9 cursor-pointer items-center justify-center rounded-md text-2xl outline-hidden transition-colors",
-        "hover:bg-neutral-100 dark:hover:bg-neutral-800",
-        "focus-visible:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500 dark:focus-visible:bg-neutral-700",
-        "active:bg-neutral-500 active:text-white",
+        "flex size-9 cursor-pointer items-center justify-center rounded-xl text-2xl outline-hidden transition-colors",
+        "hover:bg-neutral-950/5 dark:hover:bg-white/10",
+        "focus-visible:bg-neutral-950/5 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500 dark:focus-visible:bg-white/10 dark:focus-visible:ring-accent-400",
+        "active:bg-neutral-950/10 dark:active:bg-white/15",
       )}
     >
       {emoji.emoji}
@@ -505,10 +505,7 @@ function CategorizedEmojiGrid({
   return (
     <div className="flex flex-col">
       {/* Category tabs */}
-      <div
-        className="flex justify-between border-b border-neutral-200 px-1 dark:border-neutral-700"
-        style={{ height: CATEGORY_TAB_HEIGHT }}
-      >
+      <div className="flex justify-between gap-0.5 px-2" style={{ height: CATEGORY_TAB_HEIGHT }}>
         {orderedGroups.map((group) => (
           <button
             key={group}
@@ -517,10 +514,10 @@ function CategorizedEmojiGrid({
             aria-label={groupLabels[group]}
             title={groupLabels[group]}
             className={cn(
-              "flex flex-1 items-center justify-center text-lg transition-colors",
-              "hover:bg-neutral-100 dark:hover:bg-neutral-800",
-              "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500",
-              activeGroup === group && "bg-neutral-100 dark:bg-neutral-800",
+              "flex flex-1 items-center justify-center rounded-xl text-lg transition-colors",
+              "hover:bg-neutral-950/5 dark:hover:bg-white/10",
+              "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500 dark:focus-visible:ring-accent-400",
+              activeGroup === group && "bg-neutral-950/10 dark:bg-white/15",
             )}
           >
             {hasCategoryIcon(group) ? CATEGORY_ICONS[group] : "📁"}

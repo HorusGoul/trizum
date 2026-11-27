@@ -143,11 +143,11 @@ function Join() {
 
         {/* Divider */}
         <div className="container mt-6 flex items-center gap-4 px-4">
-          <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-          <span className="text-sm text-neutral-500">
+          <div className="h-px flex-1 bg-neutral-950/10 dark:bg-white/10" />
+          <span className="text-sm text-neutral-500 dark:text-neutral-400">
             <Trans>or enter code</Trans>
           </span>
-          <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+          <div className="h-px flex-1 bg-neutral-950/10 dark:bg-white/10" />
         </div>
 
         {/* Secondary action: Manual entry */}

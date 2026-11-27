@@ -14,7 +14,7 @@ import { openPremiumCodeRedemption } from "#src/lib/premium/revenueCatClient.ts"
 import { detectRedemptionPlatform } from "#src/lib/premium/premiumRedemption.ts";
 
 const storeButtonClassName =
-  "border-neutral-200 bg-neutral-50 text-neutral-950 hover:border-neutral-400 hover:bg-neutral-100 focus-visible:ring-neutral-500 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-50 dark:hover:border-neutral-600 dark:hover:bg-neutral-800 flex h-auto min-h-18 items-center justify-start gap-4 rounded-2xl border px-4 py-3 text-left outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2";
+  "flex h-auto min-h-18 items-center justify-start gap-4 rounded-2xl bg-neutral-100 px-4 py-3 text-left text-neutral-950 outline-hidden hover:bg-neutral-200/70 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:bg-neutral-700/60 dark:text-neutral-50 dark:hover:bg-neutral-700 dark:focus-visible:ring-accent-400 dark:focus-visible:ring-offset-neutral-800";
 
 export function PremiumCodeRedemption({
   userId,
@@ -79,7 +79,7 @@ export function PremiumCodeRedemption({
         </Label>
         <div className="relative">
           <Input
-            className="h-14 rounded-2xl border-neutral-200 bg-neutral-50 pr-14 font-mono text-base tracking-wider dark:border-neutral-700 dark:bg-neutral-900"
+            className="h-14 rounded-2xl bg-neutral-100 pr-14 font-mono text-base tracking-wider shadow-none dark:bg-neutral-700/60"
             placeholder={t`Promo code`}
             autoCapitalize="characters"
             spellCheck={false}
@@ -137,13 +137,13 @@ function StoreRedemptionContent({ platform }: { platform: "ios" | "android" }) {
         <span className="block text-sm font-bold">
           {platform === "ios" ? <Trans>App Store</Trans> : <Trans>Google Play</Trans>}
         </span>
-        <span className="block text-xs text-neutral-800 dark:text-neutral-200">
+        <span className="block text-xs text-neutral-600 dark:text-neutral-400">
           <Trans>Redeem your offer</Trans>
         </span>
       </span>
       <Icon
         icon="lucide.arrow-up-right"
-        className="size-4 text-neutral-500 dark:text-neutral-400"
+        className="size-4 text-neutral-400 dark:text-neutral-500"
       />
     </>
   );

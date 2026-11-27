@@ -85,14 +85,14 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
 
   const content = (
     <>
-      <span className="mt-1 w-5 shrink-0 text-neutral-700 dark:text-neutral-200">
+      <span className="mt-1 w-5 shrink-0 text-neutral-600 dark:text-neutral-400">
         <PaymentMethodIcon type={type} size={20} />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-lg font-semibold">{methodName}</span>
         <span
           id={valueId}
-          className={`mt-1 block text-base text-neutral-800 dark:text-neutral-100 ${showInstructions ? "wrap-anywhere whitespace-pre-wrap select-text" : "truncate"}`}
+          className={`mt-1 block text-base text-neutral-950 dark:text-neutral-50 ${showInstructions ? "wrap-anywhere whitespace-pre-wrap select-text" : "truncate"}`}
         >
           {displayDetails}
         </span>
@@ -110,12 +110,12 @@ export function PaymentMethodItem({ type, details }: { type: PaymentMethodType; 
   );
 
   const rowClassName =
-    "flex w-full min-w-0 cursor-pointer touch-pan-y items-start gap-3 rounded-[inherit] bg-transparent px-4 py-3 text-left outline-hidden transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800/60 [-webkit-touch-callout:none] select-none";
+    "flex w-full min-w-0 cursor-pointer touch-pan-y items-start gap-3 rounded-[inherit] bg-transparent px-4 py-3 text-left outline-hidden transition-colors hover:bg-neutral-950/5 dark:hover:bg-white/10 [-webkit-touch-callout:none] select-none";
 
   return (
     <section
       aria-label={methodName}
-      className="group relative bg-white first:rounded-t-xl last:rounded-b-xl focus-within:z-10 focus-within:ring-2 focus-within:ring-neutral-400 focus-within:ring-inset dark:bg-neutral-900"
+      className="group focus-within:ring-accent-500 dark:focus-within:ring-accent-400 relative first:rounded-t-3xl last:rounded-b-3xl focus-within:z-10 focus-within:ring-2 focus-within:ring-inset"
     >
       {href ? (
         <a

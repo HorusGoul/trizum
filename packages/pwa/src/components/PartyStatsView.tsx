@@ -265,7 +265,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
             comment: "Label for the timeframe filter on the party stats screen",
             message: "Timeframe",
           })}
-          className="w-full gap-0 sm:w-auto [&>button]:h-9 [&>button]:w-full [&>button]:rounded-full [&>button]:border-neutral-300 [&>button]:bg-neutral-50 [&>button]:px-3 sm:[&>button]:w-auto sm:[&>button]:min-w-44 dark:[&>button]:border-neutral-700 dark:[&>button]:bg-neutral-900"
+          className="w-full gap-0 sm:w-auto [&>button]:h-9 [&>button]:w-full [&>button]:rounded-full [&>button]:px-3 sm:[&>button]:w-auto sm:[&>button]:min-w-44"
           items={timeframeOptions}
           selectedKey={selectedTimeframeKey}
           onSelectionChange={(nextTimeframe) => {
@@ -298,10 +298,10 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         ) : null}
       </section>
 
-      <section className="rounded-[1.9rem] border border-neutral-300/80 bg-gradient-to-br from-neutral-500 via-neutral-600 to-neutral-700 p-5 text-neutral-50 shadow-xs lg:p-6 dark:border-neutral-500/60 dark:from-neutral-700 dark:via-neutral-800 dark:to-neutral-950 dark:shadow-none">
+      <section className="shadow-surface rounded-3xl bg-neutral-950 p-5 text-white lg:p-6 dark:bg-white dark:text-neutral-950">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold tracking-[0.24em] text-neutral-50/75 uppercase">
+            <div className="text-[11px] font-semibold tracking-[0.24em] text-white/70 uppercase dark:text-neutral-950/60">
               <Trans>Total spent</Trans>
             </div>
 
@@ -314,7 +314,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
               />
             </div>
 
-            <p className="mt-2 text-sm text-neutral-50/80">
+            <p className="mt-2 text-sm text-white/70 dark:text-neutral-950/60">
               <Trans>Across the selected timeframe</Trans>
             </p>
           </div>
@@ -341,7 +341,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
                 <Trans>Participants</Trans>
               </h2>
 
-              <div className="text-sm text-neutral-700 dark:text-neutral-300">
+              <div className="text-sm text-neutral-600 dark:text-neutral-400">
                 {leaderboard.length} <Trans>participants</Trans>
               </div>
             </div>
@@ -394,18 +394,18 @@ function StatsSummaryCard({
 }: StatsSummaryCardProps) {
   if (compact) {
     return (
-      <div className="inline-flex max-w-full items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-3 py-2 text-neutral-50 shadow-xs backdrop-blur-xs sm:self-start dark:bg-neutral-950/30 dark:shadow-none">
-        <span className="rounded-full bg-white/12 p-1.5 text-neutral-50">
+      <div className="inline-flex max-w-full items-center gap-2 self-start rounded-full bg-white/10 px-3 py-2 sm:self-start dark:bg-neutral-950/5">
+        <span className="rounded-full bg-white/10 p-1.5 dark:bg-neutral-950/10">
           <Icon icon={icon} width={14} height={14} />
         </span>
 
         <span className="text-base font-semibold tracking-tight">{value}</span>
-        <span className="text-[11px] font-semibold tracking-[0.18em] text-neutral-50/72 uppercase">
+        <span className="text-[11px] font-semibold tracking-[0.18em] text-white/70 uppercase dark:text-neutral-950/60">
           {label}
         </span>
 
         {badge !== undefined && badge !== null ? (
-          <span className="inline-flex items-center rounded-full bg-white/12 px-2 py-1 text-[10px] font-semibold text-neutral-50">
+          <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold dark:bg-neutral-950/10">
             {badge}
           </span>
         ) : null}
@@ -416,32 +416,27 @@ function StatsSummaryCard({
   }
 
   return (
-    <div
-      className={cn(
-        "w-full rounded-[1.35rem] border border-white/15 bg-white/10 shadow-xs backdrop-blur-xs sm:w-52 dark:bg-neutral-950/30 dark:shadow-none",
-        "p-4",
-      )}
-    >
+    <div className={cn("w-full rounded-2xl bg-white/10 sm:w-52 dark:bg-neutral-950/5", "p-4")}>
       <div className="flex items-start gap-3">
-        <div className={cn("bg-white/12 rounded-full p-3 text-neutral-50")}>
+        <div className="rounded-full bg-white/10 p-3 dark:bg-neutral-950/10">
           <Icon icon={icon} width={20} height={20} />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <div className="text-[11px] font-semibold tracking-[0.18em] text-neutral-50/70 uppercase">
+            <div className="text-[11px] font-semibold tracking-[0.18em] text-white/70 uppercase dark:text-neutral-950/60">
               {label}
             </div>
 
             {badge !== undefined && badge !== null ? (
-              <div className="inline-flex items-center rounded-full bg-white/12 px-2.5 py-1 text-[11px] font-semibold text-neutral-50">
+              <div className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold dark:bg-neutral-950/10">
                 {badge}
               </div>
             ) : null}
           </div>
 
-          <div className="mt-3 text-neutral-50">{value}</div>
-          <div className={cn("text-neutral-50/70", "mt-2 text-sm")}>{description}</div>
+          <div className="mt-3">{value}</div>
+          <div className="mt-2 text-sm text-white/70 dark:text-neutral-950/60">{description}</div>
         </div>
       </div>
     </div>
@@ -450,7 +445,7 @@ function StatsSummaryCard({
 
 function StatsPodium({ currency, currentParticipantId, first, second, third }: StatsPodiumProps) {
   return (
-    <div className="rounded-[1.75rem] border border-neutral-200/80 bg-neutral-50/80 p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-950/70 dark:shadow-none">
+    <div className="shadow-surface rounded-3xl bg-white p-4 dark:bg-neutral-900">
       <div className="grid grid-cols-3 items-end gap-3">
         {second ? (
           <SecondPlacePodiumColumn
@@ -506,15 +501,15 @@ function FirstPlacePodiumColumn({
   return (
     <StatsPodiumColumnShell
       amountClassName="text-2xl"
-      avatarClassName="h-16 w-16 text-base ring-white/25"
+      avatarClassName="h-16 w-16 text-base ring-yellow-400/60 dark:ring-yellow-400/50"
       avatarId={avatarId}
       currency={currency}
       currentParticipantId={currentParticipantId}
       entry={entry}
       iconName="lucide.trophy"
       nameClassName="text-xl"
-      pedestalClassName="min-h-40 border-yellow-300/70 bg-gradient-to-t from-yellow-500 via-amber-400 to-yellow-300 text-yellow-950 dark:border-yellow-500/60 dark:from-yellow-600 dark:via-amber-500 dark:to-yellow-400"
-      rankClassName="bg-yellow-400/20 text-yellow-100 dark:bg-yellow-400/15 dark:text-yellow-200"
+      pedestalClassName="min-h-40 bg-gradient-to-t from-yellow-500 via-amber-400 to-yellow-300 text-yellow-950 dark:from-yellow-600 dark:via-amber-500 dark:to-yellow-400"
+      rankClassName="bg-yellow-400/20 text-yellow-800 dark:bg-yellow-400/15 dark:text-yellow-200"
     />
   );
 }
@@ -533,15 +528,15 @@ function SecondPlacePodiumColumn({
   return (
     <StatsPodiumColumnShell
       amountClassName="text-lg"
-      avatarClassName="h-14 w-14 text-sm ring-neutral-200 dark:ring-neutral-700"
+      avatarClassName="h-14 w-14 text-sm ring-neutral-100 dark:ring-neutral-800"
       avatarId={avatarId}
       currency={currency}
       currentParticipantId={currentParticipantId}
       entry={entry}
       iconName="lucide.scale"
       nameClassName="text-lg"
-      pedestalClassName="min-h-32 border-neutral-300 bg-gradient-to-t from-neutral-300 to-neutral-100 text-neutral-950 dark:border-neutral-700 dark:from-neutral-800 dark:to-neutral-700 dark:text-neutral-50"
-      rankClassName="bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+      pedestalClassName="min-h-32 bg-gradient-to-t from-neutral-200 to-neutral-100 text-neutral-950 dark:from-neutral-800 dark:to-neutral-700 dark:text-neutral-50"
+      rankClassName="bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
     />
   );
 }
@@ -560,15 +555,15 @@ function ThirdPlacePodiumColumn({
   return (
     <StatsPodiumColumnShell
       amountClassName="text-lg"
-      avatarClassName="h-14 w-14 text-sm ring-neutral-200 dark:ring-neutral-700"
+      avatarClassName="h-14 w-14 text-sm ring-neutral-100 dark:ring-neutral-800"
       avatarId={avatarId}
       currency={currency}
       currentParticipantId={currentParticipantId}
       entry={entry}
       iconName="lucide.scale"
       nameClassName="text-lg"
-      pedestalClassName="min-h-24 border-orange-300/70 bg-gradient-to-t from-orange-300 to-amber-100 text-orange-950 dark:border-orange-700 dark:from-orange-900 dark:to-amber-800 dark:text-amber-50"
-      rankClassName="bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+      pedestalClassName="min-h-24 bg-gradient-to-t from-orange-300 to-amber-100 text-orange-950 dark:from-orange-900 dark:to-amber-800 dark:text-amber-50"
+      rankClassName="bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
     />
   );
 }
@@ -638,14 +633,14 @@ function StatsPodiumColumnShell({
           </span>
         </div>
 
-        <div className="mt-1 text-[11px] font-medium tracking-[0.18em] text-neutral-700 uppercase dark:text-neutral-300">
+        <div className="mt-1 text-[11px] font-medium tracking-[0.18em] text-neutral-600 uppercase dark:text-neutral-400">
           {formatPercent(shareOfTotal)}
         </div>
       </div>
 
       <div
         className={cn(
-          "mt-4 flex w-full flex-col items-center justify-end rounded-t-[1.75rem] border border-b-0 px-3 pb-4 pt-5 text-center shadow-xs dark:shadow-none",
+          "mt-4 flex w-full flex-col items-center justify-end rounded-t-3xl px-3 pb-4 pt-5 text-center",
           pedestalClassName,
         )}
       >
@@ -675,19 +670,12 @@ function StatsParticipantRow({
   const amountSizeClassName = getRankingAmountClassName(participant.totalSpent, "list");
 
   return (
-    <div
-      className={cn(
-        "rounded-[1.5rem] border p-4 shadow-xs dark:shadow-none",
-        isCurrentParticipant
-          ? "border-neutral-300 bg-neutral-50/80 dark:border-neutral-600 dark:bg-neutral-900"
-          : "border-neutral-200/80 bg-white/80 dark:border-neutral-800 dark:bg-neutral-950/70",
-      )}
-    >
+    <div className="shadow-surface rounded-3xl bg-white p-4 dark:bg-neutral-900">
       <div className="flex items-start gap-4">
         <StatsParticipantAvatar
           avatarId={avatarId}
           badge={<StatsAvatarBadge>#{rank}</StatsAvatarBadge>}
-          className="h-10 w-10 shrink-0 text-xs ring-2 ring-neutral-200 ring-inset dark:ring-neutral-700"
+          className="h-10 w-10 shrink-0 text-xs ring-2 ring-neutral-100 ring-inset dark:ring-neutral-800"
           name={participant.name}
         />
 
@@ -705,13 +693,13 @@ function StatsParticipantRow({
                 </span>
 
                 {isCurrentParticipant ? (
-                  <span className="rounded-full bg-neutral-500 px-2 py-1 text-[11px] font-semibold tracking-wide text-neutral-50 uppercase">
+                  <span className="bg-accent-500 text-accent-50 rounded-full px-2 py-1 text-[11px] font-semibold tracking-wide uppercase">
                     {t`Me`}
                   </span>
                 ) : null}
               </div>
 
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-neutral-700 dark:text-neutral-300">
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
                 <span className="rounded-full bg-neutral-100 px-2 py-1 dark:bg-neutral-800">
                   {formatPercent(totalSpent > 0 ? participant.totalSpent / totalSpent : 0)}
                 </span>
@@ -789,10 +777,10 @@ function StatsAvatarBadge({
   return (
     <span
       className={cn(
-        "inline-flex min-h-5 min-w-5 items-center justify-center rounded-full border px-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] shadow-xs",
+        "inline-flex min-h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] ring-2 ring-white dark:ring-neutral-900",
         tone === "accent"
-          ? "border-neutral-200 bg-neutral-500 text-neutral-50 dark:border-neutral-700"
-          : "border-white bg-neutral-950 text-neutral-50 dark:border-neutral-700 dark:bg-neutral-100 dark:text-neutral-950",
+          ? "bg-accent-500 text-accent-50"
+          : "bg-neutral-950 text-white dark:bg-neutral-100 dark:text-neutral-950",
       )}
     >
       {children}
@@ -809,7 +797,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
       >
         <Icon
           icon="lucide.calendar"
-          className="size-4 shrink-0 text-neutral-600 dark:text-neutral-300"
+          className="size-4 shrink-0 text-neutral-500 dark:text-neutral-400"
         />
         <span className="truncate">{formatRangeLabel(value)}</span>
       </Button>
@@ -849,7 +837,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
 
 function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
   return (
-    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-6 text-center shadow-xs dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-none">
+    <div className="shadow-surface rounded-3xl bg-white p-6 text-center dark:bg-neutral-900">
       <h2 className="text-xl font-semibold">
         {hasAnyTrackedExpense ? (
           <Trans>No spending stats for this timeframe</Trans>
@@ -858,7 +846,7 @@ function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
         )}
       </h2>
 
-      <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-200">
+      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
         {hasAnyTrackedExpense ? (
           <Trans>Try another timeframe to compare a different period of your party.</Trans>
         ) : (

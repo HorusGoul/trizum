@@ -58,7 +58,7 @@ function Home() {
 
           <span
             aria-label="Beta"
-            className="mb-4 ml-0.5 font-mono text-xs leading-none font-semibold text-neutral-600 dark:text-neutral-400"
+            className="text-accent-600 dark:text-accent-400 mb-4 ml-0.5 font-mono text-xs leading-none font-semibold"
           >
             βeta
           </span>
@@ -185,7 +185,7 @@ function Home() {
                   aria-label={t`Add or create`}
                   icon="lucide.plus"
                   color="accent"
-                  className="h-14 w-14 shadow-md"
+                  className="shadow-raised h-14 w-14"
                 />
 
                 <Popover placement="top end" offset={16}>

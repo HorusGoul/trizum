@@ -9,7 +9,7 @@ export function OfflineAccountNotice() {
   }
 
   return (
-    <output className="block rounded-lg bg-neutral-100 px-4 py-3 text-sm text-neutral-700 dark:bg-neutral-900 dark:text-neutral-200">
+    <output className="shadow-surface block rounded-2xl bg-white px-4 py-3 text-sm text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
       <Trans>Working offline. Your account will refresh when you reconnect.</Trans>
     </output>
   );

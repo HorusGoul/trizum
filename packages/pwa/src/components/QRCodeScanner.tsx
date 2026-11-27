@@ -45,7 +45,7 @@ type ScannerState =
 const QRCodeFrameHandle = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
-    className={cn("border-l-3 border-t-3 size-4 rounded-tl-lg border-neutral-50", className)}
+    className={cn("border-l-3 border-t-3 size-4 rounded-tl-lg border-white", className)}
   />
 );
 
@@ -341,7 +341,7 @@ export function QRCodeScanner(props: QRCodeScannerProps) {
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.15 }}
-                      className="max-w-48 rounded-lg bg-black/60 px-3 py-1.5 text-center text-xs text-white"
+                      className="max-w-48 rounded-xl bg-black/60 px-3 py-1.5 text-center text-xs text-white"
                     >
                       {state.message}
                     </motion.span>

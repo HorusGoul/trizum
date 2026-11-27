@@ -22,13 +22,13 @@ export function PartySettingsLink({
     <Link
       to={to}
       params={{ partyId }}
-      className="-mx-3 flex min-h-20 w-[calc(100%+1.5rem)] scale-100 items-center gap-3 rounded-xl px-3 py-3 text-left outline-hidden transition-all duration-200 ease-in-out hover:bg-neutral-100/70 focus-visible:bg-neutral-100/70 focus-visible:ring-2 focus-visible:ring-neutral-500 active:scale-[0.98] dark:hover:bg-neutral-900/70 dark:focus-visible:bg-neutral-900/70 dark:focus-visible:ring-neutral-400"
+      className="shadow-surface focus-visible:ring-accent-500 dark:focus-visible:ring-accent-400 flex min-h-20 w-full scale-100 items-center gap-3 rounded-3xl bg-white px-4 py-3 text-left outline-hidden transition-all duration-200 ease-in-out hover:bg-neutral-50 focus-visible:ring-2 active:scale-[0.98] dark:bg-neutral-900 dark:hover:bg-neutral-800"
     >
       {badge}
 
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="leading-tight font-medium">{title}</span>
-        <span className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+        <span className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
           {description}
         </span>
       </span>
@@ -37,7 +37,7 @@ export function PartySettingsLink({
         icon="lucide.chevron-right"
         width={18}
         height={18}
-        className="ml-2 shrink-0 text-neutral-700 dark:text-neutral-100"
+        className="ml-2 shrink-0 text-neutral-400 dark:text-neutral-500"
       />
     </Link>
   );

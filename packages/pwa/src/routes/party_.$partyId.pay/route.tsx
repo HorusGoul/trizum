@@ -95,15 +95,15 @@ function RouteComponent() {
       </div>
 
       <div className="container flex flex-col gap-4 px-4 pt-4">
-        <div className="flex rounded-xl bg-white p-4 dark:bg-neutral-900">
+        <div className="shadow-surface flex rounded-3xl bg-white p-5 dark:bg-neutral-900">
           <div className="flex flex-1 flex-col">
-            <span className="text-lg text-neutral-400">
+            <span className="text-lg font-medium text-neutral-950 dark:text-neutral-50">
               {from.name} {fromId === me.id ? t`(me)` : ""}
             </span>
-            <span className="text-sm text-neutral-700 dark:text-neutral-300">
+            <span className="text-sm text-neutral-600 dark:text-neutral-400">
               <Trans>owes</Trans>
             </span>
-            <span className="text-lg text-neutral-400">
+            <span className="text-lg font-medium text-neutral-950 dark:text-neutral-50">
               {to.name} {toId === me.id ? t`(me)` : ""}
             </span>
           </div>
@@ -122,7 +122,7 @@ function RouteComponent() {
           <Trans>How to pay?</Trans>
         </h2>
 
-        <p className="text-lg">
+        <p className="text-lg text-neutral-600 dark:text-neutral-400">
           <Trans>Send the money using one of the methods below, then mark this debt as paid.</Trans>
         </p>
 
@@ -135,7 +135,7 @@ function RouteComponent() {
           </Alert>
         ) : null}
 
-        <div className="divide-y divide-neutral-100 rounded-xl dark:divide-neutral-800">
+        <div className="shadow-surface divide-y divide-neutral-950/5 overflow-hidden rounded-3xl bg-white dark:divide-white/10 dark:bg-neutral-900">
           {paymentMethodTypes.map((type) => {
             const details = methods[type];
 

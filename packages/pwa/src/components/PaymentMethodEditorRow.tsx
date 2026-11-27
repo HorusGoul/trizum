@@ -68,7 +68,7 @@ export function PaymentMethodEditorRow({
   });
 
   const fieldClassName =
-    "min-h-12 w-full border-0 bg-transparent px-0 py-3 text-base font-medium shadow-none outline-none placeholder:font-normal placeholder:italic placeholder:text-neutral-950/60 dark:bg-transparent dark:placeholder:text-neutral-50/55 data-[focused]:ring-0 data-[focused]:ring-offset-0";
+    "min-h-12 w-full border-0 bg-transparent px-0 py-3 text-base font-medium shadow-none outline-none placeholder:font-normal placeholder:italic placeholder:text-neutral-400 dark:bg-transparent dark:placeholder:text-neutral-500 data-[focused]:ring-0 data-[focused]:ring-offset-0";
 
   const hintClassName =
     "text-neutral-600 dark:text-neutral-400 sr-only text-xs md:not-sr-only md:block md:pb-3";
@@ -108,7 +108,7 @@ export function PaymentMethodEditorRow({
   }
 
   return (
-    <div className="group relative bg-white first:rounded-t-xl last:rounded-b-xl focus-within:z-10 focus-within:ring-2 focus-within:ring-neutral-400 focus-within:ring-inset dark:bg-neutral-900">
+    <div className="group focus-within:ring-accent-500 dark:focus-within:ring-accent-400 relative first:rounded-t-3xl last:rounded-b-3xl focus-within:z-10 focus-within:ring-2 focus-within:ring-inset">
       {isEditing ? (
         <div className="flex items-start gap-3 px-4 md:pr-17">
           {serviceLabel}
@@ -164,7 +164,7 @@ export function PaymentMethodEditorRow({
           <span className="min-w-0 flex-1">
             <span
               id={detailsId}
-              className={`block min-h-12 truncate py-3 text-base ${details.trim() ? "font-medium" : "text-neutral-950/60 italic dark:text-neutral-50/55"}`}
+              className={`block min-h-12 truncate py-3 text-base ${details.trim() ? "font-medium" : "text-neutral-400 italic dark:text-neutral-500"}`}
             >
               {details.trim() ? details : t(paymentMethodPlaceholders[type])}
             </span>
@@ -184,7 +184,7 @@ export function PaymentMethodEditorRow({
           <IconButton
             icon="lucide.ellipsis"
             aria-label={t({ message: `More ${methodName} actions` })}
-            className="absolute top-0.5 right-3 size-11 text-neutral-700 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 dark:text-neutral-200"
+            className="absolute top-0.5 right-3 size-11 text-neutral-600 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 dark:text-neutral-400"
           />
           <Popover placement="bottom end">
             <PaymentMethodPopoverContent onClose={finishClosingActions}>

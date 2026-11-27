@@ -113,7 +113,7 @@ export function Balances({
             <Trans>How should I balance?</Trans>
           </h2>
 
-          <p className="px-2 text-lg">
+          <p className="px-2 text-lg text-neutral-600 dark:text-neutral-400">
             <Trans>
               Here is a list of operations you and other party members can do to balance your
               position.
@@ -184,7 +184,7 @@ export function Balances({
 
         {allOtherDiffs.length > 0 ? (
           <>
-            <h2 className="flex items-center px-4 text-neutral-400">
+            <h2 className="flex items-center px-4 text-neutral-600 dark:text-neutral-400">
               <Icon icon="lucide.circle-help" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">

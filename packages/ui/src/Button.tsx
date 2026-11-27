@@ -5,9 +5,10 @@ import {
 } from "react-aria-components";
 import { Icon } from "./Icon.js";
 import { useActionProp, type AsyncAction } from "./useActionProp.js";
-import { cn } from "./utils.js";
+import { cn, focusRing } from "./utils.js";
+import { fieldSurface } from "./fields/Field.styles.js";
 
-type ButtonColorScheme = "transparent" | "accent" | "input-like";
+type ButtonColorScheme = "transparent" | "neutral" | "accent" | "input-like";
 
 type ButtonPressArgs = Parameters<NonNullable<AriaButtonProps["onPress"]>>;
 
@@ -20,19 +21,24 @@ const colorSchemes: Record<
   }
 > = {
   transparent: {
-    base: "bg-neutral-950/0 dark:bg-neutral-50/0",
-    focus: "bg-neutral-950/5 dark:bg-neutral-50/5",
-    pressed: "bg-neutral-950/10 dark:bg-neutral-50/10",
+    base: "bg-neutral-950/0 dark:bg-white/0",
+    focus: "bg-neutral-950/5 dark:bg-white/10",
+    pressed: "bg-neutral-950/10 dark:bg-white/15",
+  },
+  neutral: {
+    base: "bg-neutral-950/5 text-neutral-950 dark:bg-white/10 dark:text-neutral-50",
+    focus: "bg-neutral-950/10 dark:bg-white/15",
+    pressed: "bg-neutral-950/15 dark:bg-white/20",
   },
   accent: {
-    base: "text-neutral-50 bg-neutral-500 dark:bg-neutral-500",
-    focus: "bg-neutral-600 dark:bg-neutral-400",
-    pressed: "bg-neutral-700 dark:bg-neutral-300",
+    base: "bg-accent-500 text-white dark:bg-accent-500 dark:text-white",
+    focus: "bg-accent-600 dark:bg-accent-600",
+    pressed: "bg-accent-700 dark:bg-accent-700",
   },
   "input-like": {
-    base: "border border-neutral-500 bg-white ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900",
-    focus: "ring-neutral-500 dark:ring-neutral-400",
-    pressed: "ring-neutral-700 dark:ring-neutral-300",
+    base: fieldSurface,
+    focus: "bg-neutral-50 dark:bg-white/15",
+    pressed: "bg-neutral-100 dark:bg-white/20",
   },
 };
 
@@ -66,9 +72,10 @@ export function Button({
             defaultClassName,
             "relative flex h-10 w-full scale-100 cursor-pointer select-none items-center justify-center rounded-full outline-hidden transition-all duration-200 ease-in-out",
             colorStyles.base,
+            focusRing,
             (isHovered || isFocusVisible) && colorStyles.focus,
             isPressed && !isButtonPending && ["scale-90", colorStyles.pressed],
-            "data-[disabled]:cursor-not-allowed",
+            "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
             className,
           ),
       )}

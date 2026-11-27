@@ -43,9 +43,9 @@ export function PartyBoostCard({
 
   return (
     <>
-      <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 dark:border-neutral-800 dark:bg-neutral-900/45">
+      <div className="shadow-surface flex flex-col gap-4 rounded-3xl bg-white p-5 dark:bg-neutral-900">
         <div className="flex items-start gap-3">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">
+          <span className="text-accent-500 dark:text-accent-400 flex size-11 shrink-0 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800">
             <Icon icon="lucide.sparkles" width={21} height={21} />
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -54,7 +54,7 @@ export function PartyBoostCard({
                 <Trans>Party Boost</Trans>
               </h3>
               {status?.party.isBoosted ? (
-                <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-xs font-semibold text-neutral-800 dark:bg-neutral-700 dark:text-neutral-50">
+                <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-950 dark:bg-neutral-800 dark:text-neutral-50">
                   <Trans>Active</Trans>
                 </span>
               ) : null}
@@ -107,7 +107,7 @@ function PartyBoostCheckedAt({ boost }: { boost?: PartyBoostSnapshot }) {
   const checkedAt = i18n.date(date, { dateStyle: "medium", timeStyle: "short" });
 
   return (
-    <p className="text-xs text-neutral-600 dark:text-neutral-300">
+    <p className="text-xs text-neutral-400 dark:text-neutral-500">
       <time dateTime={date.toISOString()}>
         <Trans>Last checked {checkedAt}</Trans>
       </time>
@@ -191,7 +191,7 @@ function PartyBoostDescription({
 
   if (!status && isRefreshing && userId) {
     return (
-      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+      <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
         <Trans>Checking Party Boost…</Trans>
       </p>
     );
@@ -199,7 +199,7 @@ function PartyBoostDescription({
 
   if (error?.code === "premium_required" && !status?.party.isBoosted) {
     return (
-      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+      <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
         <Trans>Premium is required for Party Boost.</Trans>
       </p>
     );
@@ -207,7 +207,7 @@ function PartyBoostDescription({
 
   if (!status && error) {
     return (
-      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+      <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
         <Trans>Party Boost could not be checked. Try again when you are online.</Trans>
       </p>
     );
@@ -215,7 +215,7 @@ function PartyBoostDescription({
 
   if (status?.party.isBoostedByCurrentUser) {
     return (
-      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+      <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
         <Trans>Your Premium is boosting this party for everyone in it.</Trans>
       </p>
     );
@@ -223,7 +223,7 @@ function PartyBoostDescription({
 
   if (status?.party.isBoosted) {
     return (
-      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+      <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
         <Trans>A Premium member is boosting this party.</Trans>
       </p>
     );
@@ -231,7 +231,7 @@ function PartyBoostDescription({
 
   if (!userId) {
     return (
-      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+      <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
         <Trans>Sign in to activate Premium benefits for this party.</Trans>
       </p>
     );
@@ -241,7 +241,7 @@ function PartyBoostDescription({
     const transferableDate = formatTransferDate(assignment.transferableAt);
 
     return (
-      <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+      <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
         {canTransfer ? (
           <Trans>Your Party Boost is active elsewhere and can be moved here.</Trans>
         ) : (
@@ -252,7 +252,7 @@ function PartyBoostDescription({
   }
 
   return (
-    <p className="text-sm leading-snug text-neutral-700 dark:text-neutral-200">
+    <p className="text-sm leading-snug text-neutral-600 dark:text-neutral-400">
       <Trans>Premium owners can boost one party at a time and move it every seven days.</Trans>
     </p>
   );
@@ -273,7 +273,7 @@ function PartyBoostAction({
 }) {
   if (state.type === "signed_out") {
     return (
-      <Button color="input-like" onPress={() => void onOpenPremium()}>
+      <Button color="neutral" onPress={() => void onOpenPremium()}>
         <Trans>Sign in</Trans>
       </Button>
     );
@@ -281,7 +281,7 @@ function PartyBoostAction({
 
   if (state.type === "retry") {
     return (
-      <Button color="input-like" isDisabled={state.disabled} pressAction={onRetry}>
+      <Button color="neutral" isDisabled={state.disabled} pressAction={onRetry}>
         <Trans>Try again</Trans>
       </Button>
     );
@@ -289,7 +289,7 @@ function PartyBoostAction({
 
   if (state.type === "active") {
     return (
-      <Button color="input-like" isDisabled>
+      <Button color="neutral" isDisabled>
         <Icon icon="lucide.check" width={17} height={17} className="mr-2" />
         <Trans>Party Boost active</Trans>
       </Button>
@@ -310,7 +310,7 @@ function PartyBoostAction({
 
   if (state.type === "locked") {
     return (
-      <Button color="input-like" isDisabled>
+      <Button color="neutral" isDisabled>
         <Trans>Party Boost unavailable</Trans>
       </Button>
     );

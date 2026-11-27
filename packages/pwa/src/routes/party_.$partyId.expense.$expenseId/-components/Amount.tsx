@@ -19,7 +19,7 @@ export function Amount({
         <CurrencyText
           amount={amount}
           currency={party.currency}
-          className="text-2xl font-medium text-neutral-600 dark:text-neutral-300"
+          className="text-2xl font-medium text-neutral-600 dark:text-neutral-400"
           variant="inherit"
         />
       )}

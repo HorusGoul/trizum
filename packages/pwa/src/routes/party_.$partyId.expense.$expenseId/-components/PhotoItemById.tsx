@@ -9,11 +9,11 @@ export function PhotoItemById({ photoId, onPress }: { photoId: string; onPress: 
     <Button
       color="transparent"
       aria-label={t`View photo`}
-      className="h-auto w-auto p-0"
+      className="h-auto w-auto rounded-2xl p-0"
       onContextMenu={(e) => e.preventDefault()}
       onPress={onPress}
     >
-      <img src={url} className="block h-32 w-32 rounded-xl object-cover" alt="" />
+      <img src={url} className="block h-32 w-32 rounded-2xl object-cover" alt="" />
     </Button>
   );
 }

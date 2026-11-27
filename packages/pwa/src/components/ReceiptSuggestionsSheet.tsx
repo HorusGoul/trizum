@@ -105,7 +105,7 @@ export function ReceiptSuggestionsSheet({
                       value={title}
                       className="group/title relative flex min-h-11 shrink-0 cursor-pointer items-center outline-hidden select-none"
                     >
-                      <span className="rounded-full border border-neutral-300 px-3 py-1 text-sm leading-5 text-neutral-700 group-data-[focus-visible]/title:ring-2 group-data-[focus-visible]/title:ring-neutral-500 group-data-[focus-visible]/title:ring-offset-2 group-data-[selected]/title:border-neutral-500 group-data-[selected]/title:bg-neutral-200 group-data-[selected]/title:text-neutral-950 dark:border-neutral-700 dark:text-neutral-200 dark:group-data-[selected]/title:bg-neutral-800 dark:group-data-[selected]/title:text-neutral-50">
+                      <span className="group-data-[focus-visible]/title:ring-accent-500 group-data-[selected]/title:bg-accent-500 dark:group-data-[focus-visible]/title:ring-accent-400 dark:group-data-[selected]/title:bg-accent-500 rounded-full bg-white px-3.5 py-1.5 text-sm leading-5 text-neutral-700 transition-colors group-data-[focus-visible]/title:ring-2 group-data-[focus-visible]/title:ring-offset-2 group-data-[focus-visible]/title:ring-offset-neutral-100 group-data-[selected]/title:text-white dark:bg-neutral-800 dark:text-neutral-200 dark:group-data-[focus-visible]/title:ring-offset-neutral-900 dark:group-data-[selected]/title:text-white">
                         {title}
                       </span>
                     </Radio>
@@ -146,7 +146,7 @@ export function ReceiptSuggestionsSheet({
             !totalEnabled &&
             receipt.total !== null &&
             (suggestions.currency === undefined || suggestions.amount !== undefined) ? (
-              <p className="text-sm text-neutral-700 dark:text-neutral-300">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 {suggestions.currency ? (
                   <Trans>Select the expense currency above to apply this total.</Trans>
                 ) : (
@@ -178,7 +178,7 @@ export function ReceiptSuggestionsSheet({
             >
               <Trans>Accept suggestions</Trans>
             </Button>
-            <Button color="input-like" onPress={onDiscard}>
+            <Button color="neutral" onPress={onDiscard}>
               <Trans>Discard</Trans>
             </Button>
           </ModalSheetSection>

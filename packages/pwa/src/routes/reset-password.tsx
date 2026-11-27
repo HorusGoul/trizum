@@ -93,7 +93,7 @@ function ResetPassword() {
       <div className="pb-safe container mt-4 flex flex-col gap-6 px-4 pb-8">
         {error || !token ? (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-neutral-700 dark:text-neutral-50">
+            <p className="text-sm text-neutral-950 dark:text-neutral-50">
               <Trans>Password reset link is invalid or expired.</Trans>
             </p>
             <Button

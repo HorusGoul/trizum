@@ -17,20 +17,17 @@ export function DestinationParticipantCard({
     <button
       type="button"
       className={cn(
-        "flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors duration-200",
-        "hover:bg-neutral-50 focus-visible:bg-neutral-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500/30 dark:hover:bg-neutral-950 dark:focus-visible:bg-neutral-950",
+        "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors duration-200",
+        "hover:bg-neutral-950/5 focus-visible:bg-neutral-950/5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500 dark:hover:bg-white/10 dark:focus-visible:bg-white/10 dark:focus-visible:ring-accent-400",
       )}
       onClick={onPress}
     >
       <div className="relative shrink-0">
-        <TransferParticipantAvatar
-          participant={participant}
-          className="h-9 w-9 text-xs shadow-xs"
-        />
+        <TransferParticipantAvatar participant={participant} className="h-9 w-9 text-xs" />
         {isRecommended ? (
           <span
             aria-label={t`Recommended match`}
-            className="absolute -top-1 -right-1 inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-neutral-500 text-neutral-50 shadow-xs dark:border-neutral-900 dark:bg-neutral-400 dark:text-neutral-950"
+            className="bg-accent-500 text-accent-50 dark:bg-accent-400 dark:text-accent-950 absolute -top-1 -right-1 inline-flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white dark:ring-neutral-900"
           >
             <Icon icon="lucide.sparkles" width={9} height={9} />
           </span>

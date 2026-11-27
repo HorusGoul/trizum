@@ -14,6 +14,7 @@ import {
 } from "react-aria-components";
 
 import { cn } from "./utils.js";
+import { fieldSurface } from "./fields/Field.styles.js";
 
 import { FieldError, Label } from "./fields/Field.js";
 import { ListBoxCollection, ListBoxHeader, ListBoxItem, ListBoxSection } from "./ListBox.js";
@@ -34,7 +35,7 @@ const SelectValue = <T extends object>({ className, ...props }: AriaSelectValueP
   <AriaSelectValue
     className={composeRenderProps(className, (className) =>
       cn(
-        "min-w-0 flex-1 line-clamp-1 data-[placeholder]:text-neutral-700 dark:placeholder:text-neutral-50",
+        "min-w-0 flex-1 line-clamp-1 data-[placeholder]:text-neutral-400 dark:data-[placeholder]:text-neutral-500",
         /* Description */
         "[&>[slot=description]]:hidden",
         className,
@@ -48,11 +49,16 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
   <AriaButton
     className={composeRenderProps(className, (className) =>
       cn(
-        "flex h-10 w-full items-center justify-between gap-2 rounded-md border border-neutral-500 bg-white px-3 py-2 text-start text-sm ring-offset-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:ring-offset-neutral-900",
+        "flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-2xl px-3.5 py-2 text-start text-sm transition-shadow",
+        fieldSurface,
         /* Disabled */
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         /* Focused */
-        "data-[focus-visible]:ring-ring data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2",
+        "data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-accent-500 dark:data-[focus-visible]:ring-accent-400",
+        /* Open */
+        "data-[pressed]:ring-2 data-[pressed]:ring-accent-500 dark:data-[pressed]:ring-accent-400",
+        /* Invalid */
+        "group-data-[invalid]:ring-2 group-data-[invalid]:ring-danger-500 dark:group-data-[invalid]:ring-danger-400",
         /* Resets */
         "focus-visible:outline-hidden",
         className,
@@ -63,7 +69,10 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
     {composeRenderProps(children, (children) => (
       <>
         {children}
-        <Icon icon="lucide.chevron-down" className="size-4 shrink-0 opacity-50" />
+        <Icon
+          icon="lucide.chevron-down"
+          className="size-4 shrink-0 text-neutral-400 dark:text-neutral-500"
+        />
       </>
     ))}
   </AriaButton>
@@ -81,10 +90,7 @@ const SelectPopover = ({ className, ...props }: AriaPopoverProps) => (
 const SelectListBox = <T extends object>({ className, ...props }: AriaListBoxProps<T>) => (
   <AriaListBox
     className={composeRenderProps(className, (className) =>
-      cn(
-        "max-h-[inherit] overflow-auto p-1 outline-hidden [clip-path:inset(0_0_0_0_round_calc(var(--radius)-2px))]",
-        className,
-      ),
+      cn("max-h-[inherit] overflow-auto rounded-[inherit] p-2 outline-hidden", className),
     )}
     {...props}
   />
@@ -119,7 +125,7 @@ function AppSelect<T extends object>({
         <SelectValue />
       </SelectTrigger>
       {description && (
-        <Text className="text-sm text-neutral-950 dark:text-neutral-50" slot="description">
+        <Text className="text-sm text-neutral-600 dark:text-neutral-400" slot="description">
           {description}
         </Text>
       )}

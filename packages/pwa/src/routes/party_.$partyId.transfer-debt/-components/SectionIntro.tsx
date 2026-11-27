@@ -9,7 +9,7 @@ export function SectionIntro({
 }) {
   return (
     <div>
-      <div className="text-xs font-semibold tracking-[0.18em] text-neutral-500 uppercase dark:text-neutral-400">
+      <div className="text-xs font-semibold tracking-[0.18em] text-neutral-600 uppercase dark:text-neutral-400">
         {eyebrow}
       </div>
       <h2 id={titleId} className="mt-2 text-2xl font-semibold tracking-tight">

@@ -189,7 +189,7 @@ function ExpenseDeleteConfirmationDialog({
       >
         <Dialog
           aria-label={t`Delete expense`}
-          className="rounded-lg border border-neutral-200 bg-white shadow-2xl outline-hidden dark:border-neutral-800 dark:bg-black"
+          className="shadow-overlay rounded-3xl bg-white outline-hidden dark:bg-neutral-800"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
             <div className="flex flex-col gap-3">
@@ -200,7 +200,7 @@ function ExpenseDeleteConfirmationDialog({
                 <h2 className="text-lg font-medium">
                   <Trans>Delete expense?</Trans>
                 </h2>
-                <p className="text-sm text-neutral-700 dark:text-neutral-50">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   <Trans>
                     This expense will be permanently deleted. This action cannot be undone.
                   </Trans>
@@ -224,7 +224,7 @@ function ExpenseDeleteConfirmationDialog({
               <Button
                 // eslint-disable-next-line jsx-a11y/no-autofocus -- Focus the safe action when this destructive dialog opens
                 autoFocus
-                color="input-like"
+                color="neutral"
                 isDisabled={isPending}
                 onPress={() => onOpenChange(false)}
                 type="button"

@@ -16,7 +16,7 @@ function renderPrivacyPolicyContent() {
       <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/about" }} />
 
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium text-neutral-900 dark:text-neutral-100">
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium text-neutral-950 dark:text-neutral-50">
           Privacy Policy
         </h1>
       </div>
@@ -26,17 +26,17 @@ function renderPrivacyPolicyContent() {
           <Trans>Last updated: November 9, 2026</Trans>
         </p>
 
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           This Privacy Policy describes how trizum (&quot;we&quot;, &quot;our&quot;, or
           &quot;us&quot;) collects, uses, and protects your information when you use our expense
           splitting application (&quot;Service&quot;).
         </p>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Usage analytics</Trans>
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>
               We use self-hosted, cookie-free analytics on our Cloudflare infrastructure to
               understand page visits and feature usage. We exclude names, amounts, expense details,
@@ -44,7 +44,7 @@ function renderPrivacyPolicyContent() {
               privacy signals.
             </Trans>
           </p>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>
               When analytics are enabled, a random identifier links usage across your synced devices
               and connects it with diagnostic logs and error reports sent to Sentry. Turning off
@@ -55,10 +55,10 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>ChatGPT and other agents</Trans>
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>
               You can create and use shared expense groups through connected agents without signing
               in. The group and expense details you provide are synchronized through the same
@@ -66,7 +66,7 @@ function renderPrivacyPolicyContent() {
               provider processes your conversation under its own privacy policy.
             </Trans>
           </p>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>
               We count completed agent actions using anonymous, self-hosted analytics. These counts
               contain no user identifier, client network address, user agent, group identifier,
@@ -79,26 +79,26 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             1. Information We Collect
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               1.1 Information You Provide
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               When you use trizum, you may provide the following information:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+            <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Party Information:
                 </strong>{" "}
                 Names of parties/groups, descriptions, and currency preferences
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Participant Information:
                 </strong>{" "}
                 <Trans>
@@ -109,20 +109,20 @@ function renderPrivacyPolicyContent() {
                 </Trans>
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Expense Data:
                 </strong>{" "}
                 Details about expenses including amounts, dates, descriptions, who paid, and how
                 expenses are split
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Media Files:
                 </strong>{" "}
                 Photos and receipts you attach to expenses
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Account and Sign-In Information:
                 </strong>{" "}
                 If you use trizum cloud, we collect information needed to create and manage your
@@ -131,7 +131,7 @@ function renderPrivacyPolicyContent() {
                 requests
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Cloud Account Settings:
                 </strong>{" "}
                 If you use trizum cloud, we store the document pointer that connects your account to
@@ -141,31 +141,31 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               1.2 Automatically Collected Information
             </h3>
-            <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+            <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Technical Data:
                 </strong>{" "}
                 Device information, browser type, operating system, and usage patterns
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Error Reports:
                 </strong>{" "}
                 When errors occur, we may collect diagnostic information through Sentry to help
                 improve the Service
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Sync Data:
                 </strong>{" "}
                 Information about data synchronization between your devices
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Authentication Data:
                 </strong>{" "}
                 Session identifiers, cookies or native app bearer tokens, IP address, user agent,
@@ -176,10 +176,10 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               <Trans>1.3 Mobile Advertising Data</Trans>
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 The installed Android and iOS apps may display advertising supplied through Google
                 AdMob. The browser app and installed Progressive Web App do not display ads. Subject
@@ -190,7 +190,7 @@ function renderPrivacyPolicyContent() {
                 identifier (IDFA) is available only if you grant Apple&apos;s tracking permission.
               </Trans>
             </p>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 AdMob may create a pseudonymous Publisher First-Party ID that recognizes a device
                 within our apps when third-party identifiers are unavailable. We do not connect
@@ -198,7 +198,7 @@ function renderPrivacyPolicyContent() {
                 data to this identifier, and we disable optional third-party identifier sharing.
               </Trans>
             </p>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 We do not intentionally provide Google AdMob with group names, participant names,
                 expense descriptions or amounts, currencies, receipts or other attached media, phone
@@ -210,10 +210,10 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               <Trans>1.4 Purchase and Premium Data</Trans>
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 When you sign in to the installed Android or iOS app, purchase, restore, or manage
                 Premium, or use Party Boost, we provide RevenueCat with your trizum account ID and
@@ -223,7 +223,7 @@ function renderPrivacyPolicyContent() {
                 RevenueCat your party, participant, expense, receipt, or synced document contents.
               </Trans>
             </p>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 Apple or Google processes your payment through your store account. trizum and
                 RevenueCat do not receive your full payment card details.
@@ -231,10 +231,10 @@ function renderPrivacyPolicyContent() {
             </p>
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               <Trans>1.5 Receipt Suggestions</Trans>
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 When you attach a receipt while signed in to a Boosted party, we send the prepared
                 image to Cloudflare Workers AI to extract the business name, total, currency, and
@@ -248,13 +248,13 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             2. How We Use Your Information
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             We use the information we collect to:
           </p>
-          <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+          <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
             <li>Provide and maintain the Service</li>
             <li>Create, authenticate, secure, and manage trizum cloud accounts</li>
             <li>Send sign-in links, email verification links, and password reset emails</li>
@@ -281,10 +281,10 @@ function renderPrivacyPolicyContent() {
           </ul>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               <Trans>2.1 Legal Bases for Advertising</Trans>
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 Where applicable law requires consent, we use Google&apos;s User Messaging Platform
                 to request it before using local storage or personal data for personalized
@@ -299,15 +299,15 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             3. Data Storage and Synchronization
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               3.1 Local Storage
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               trizum uses an offline-first architecture. Your data is primarily stored locally on
               your device using IndexedDB. This means your expense data is available even when
               you&apos;re offline. trizum may also use browser storage, cookies, or native app
@@ -316,19 +316,19 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               3.2 trizum cloud
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               To enable synchronization across your devices and collaboration with others, your data
               is synchronized via WebSocket connections to our servers. This synchronization allows:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+            <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
               <li>Real-time updates when multiple users access the same expense group</li>
               <li>Access to your data from multiple devices</li>
               <li>Automatic conflict resolution when changes occur simultaneously</li>
             </ul>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               If you sign in to trizum cloud, your account data and cloud account settings are
               stored in Cloudflare D1. Cloud account settings include the party list document
               pointer associated with your account. This lets your signed-in devices find the same
@@ -337,10 +337,10 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               3.3 Data Encryption
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               Data transmitted between your device and our servers is encrypted using HTTPS and
               secure WebSocket connections (WSS). OAuth tokens stored by our authentication system
               are encrypted. However, please note that expense data, media files, and sync documents
@@ -351,10 +351,10 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               3.4 Access Model
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               trizum uses a link-based access model for expense groups (parties). Anyone who has
               access to a party link can view and modify the expense group associated with that
               link. A trizum cloud account lets you sign in and load your cloud party list across
@@ -366,15 +366,15 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             4. Data Sharing and Access
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               4.1 Sharing with Other Users
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 trizum uses a peer-to-peer sharing model. When you create an expense group (party),
                 it is accessible to anyone who has the link to that group. This means that anyone
@@ -384,8 +384,8 @@ function renderPrivacyPolicyContent() {
                 share them with people you trust.
               </Trans>
             </p>
-            <p className="text-neutral-700 dark:text-neutral-300">
-              <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+            <p className="text-neutral-600 dark:text-neutral-400">
+              <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                 Important:
               </strong>{" "}
               You can use trizum without creating an account. Accounts are used for trizum cloud
@@ -396,15 +396,15 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               4.2 Third-Party Services
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               We use the following third-party services:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+            <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Cloudflare:
                 </strong>{" "}
                 We use Cloudflare Workers, D1, Send Email, logs, and related infrastructure to host
@@ -412,7 +412,7 @@ function renderPrivacyPolicyContent() {
                 and operate trizum cloud.
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Google:
                 </strong>{" "}
                 If you choose to continue with Google or link Google as a sign-in method, Google
@@ -420,7 +420,7 @@ function renderPrivacyPolicyContent() {
                 identifier.
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Apple:
                 </strong>{" "}
                 If you choose to continue with Apple or link Apple as a sign-in method, Apple
@@ -428,7 +428,7 @@ function renderPrivacyPolicyContent() {
                 identifier.
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   Sentry:
                 </strong>{" "}
                 We use Sentry for error tracking and performance monitoring. Sentry may collect
@@ -437,14 +437,14 @@ function renderPrivacyPolicyContent() {
                   href="https://sentry.io/privacy/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
                 >
                   Sentry&apos;s Privacy Policy
                 </a>
                 .
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   <Trans>Google AdMob:</Trans>
                 </strong>{" "}
                 <Trans>
@@ -457,7 +457,7 @@ function renderPrivacyPolicyContent() {
                   href="https://policies.google.com/technologies/partner-sites"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
                 >
                   <Trans>How Google uses information from partner apps</Trans>
                 </a>{" "}
@@ -466,7 +466,7 @@ function renderPrivacyPolicyContent() {
                   href="https://policies.google.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
                 >
                   <Trans>Google&apos;s Privacy Policy</Trans>
                 </a>{" "}
@@ -475,14 +475,14 @@ function renderPrivacyPolicyContent() {
                   href="https://business.safety.google/privacy/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
                 >
                   <Trans>Business Data Responsibility information</Trans>
                 </a>
                 .
               </li>
               <li>
-                <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+                <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                   <Trans>RevenueCat:</Trans>
                 </strong>{" "}
                 <Trans>
@@ -496,7 +496,7 @@ function renderPrivacyPolicyContent() {
                   href="https://www.revenuecat.com/privacy/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
                 >
                   <Trans>RevenueCat&apos;s Privacy Policy</Trans>
                 </a>
@@ -506,10 +506,10 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               4.3 Legal Requirements
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               We may disclose your information if required by law or in response to valid legal
               requests, such as court orders or subpoenas.
             </p>
@@ -517,26 +517,26 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             5. Your Rights and Choices
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               5.1 Access and Deletion
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               You can access, modify, or delete your data at any time through the Service. To delete
               your data:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+            <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
               <li>Delete individual expenses or participants within the app</li>
               <li>Delete entire expense groups</li>
               <li>Clear your local data by clearing your browser&apos;s IndexedDB storage</li>
               <li>Sign out of trizum cloud on a device from cloud settings</li>
               <li>Delete your trizum cloud account from cloud settings</li>
             </ul>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               Deleting your trizum cloud account deletes your account profile, sessions, linked
               sign-in methods, and cloud account settings. It does not automatically delete expense
               group data that is still available through shared links or synchronized with other
@@ -545,20 +545,20 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               5.2 Data Portability
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               Your data is stored in a standard format. You can export your data through the
               Service&apos;s export functionality, if available.
             </p>
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               5.3 Error Reporting and Operational Logs
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               Error reporting through Sentry is only active in production builds. trizum cloud also
               uses operational logs and traces to run authentication, cloud settings, and sync
               services. These logs are intended for security, abuse prevention, debugging, and
@@ -568,10 +568,10 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+            <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
               <Trans>5.4 Advertising and Tracking Choices</Trans>
             </h3>
-            <p className="text-neutral-700 dark:text-neutral-300">
+            <p className="text-neutral-600 dark:text-neutral-400">
               <Trans>
                 When required, the mobile app displays Privacy and cookie settings so you can review
                 or withdraw consent and exercise applicable opt-out rights. Under some US state
@@ -586,29 +586,29 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             6. Data Retention
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             We retain your data to provide the Service. Data stored locally on your device will
             persist until you delete it or clear your browser&apos;s storage. Data stored on our
             synchronization servers is retained to enable synchronization across devices and
             collaboration between users.
           </p>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             trizum cloud account data is retained while your account remains active. Authentication
             sessions and verification or reset records expire according to the authentication
             system&apos;s security rules. Cloud account settings are deleted when you delete your
             trizum cloud account.
           </p>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             Expense group and sync data that has not been accessed for 12 months may be
             automatically deleted from our synchronization servers. When you delete an expense group
             or its data through the Service, the deletion is synchronized to other devices that can
             access the group. Please note that this policy may change in the future with the
             introduction of paid plans and freemium limits.
           </p>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>
               The mobile app keeps a device-local record of first-use completion and the most recent
               full-screen ad to enforce advertising frequency limits. It is not synchronized and
@@ -617,7 +617,7 @@ function renderPrivacyPolicyContent() {
               advertising choices.
             </Trans>
           </p>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>
               RevenueCat retains purchase and entitlement records under its agreement and privacy
               practices, while Apple and Google retain store transaction records under their own
@@ -628,10 +628,10 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             7. Children&apos;s Privacy
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             trizum is not intended for users under the age of 18. We do not knowingly collect
             personal information from children. If you believe we have collected information from a
             child, please contact us immediately.
@@ -639,10 +639,10 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             8. International Data Transfers
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>
               Our infrastructure, sign-in, purchase, monitoring, and advertising providers may
               process data outside your country of residence. Where required, these transfers rely
@@ -655,13 +655,13 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             9. Security
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             We implement reasonable security measures to protect your data, including:
           </p>
-          <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+          <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
             <li>Encrypted data transmission (HTTPS and WSS)</li>
             <li>Secure cookies for web sign-in where supported</li>
             <li>Bearer token handling for native app sign-in</li>
@@ -669,17 +669,17 @@ function renderPrivacyPolicyContent() {
             <li>Secure server infrastructure</li>
             <li>Regular security assessments</li>
           </ul>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             However, no method of transmission or storage is 100% secure. While we strive to protect
             your data, we cannot guarantee absolute security.
           </p>
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             10. Changes to This Privacy Policy
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             We may update this Privacy Policy from time to time. We will notify you of any material
             changes by posting the new Privacy Policy on this page and updating the &quot;Last
             updated&quot; date. You are advised to review this Privacy Policy periodically for any
@@ -688,15 +688,15 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             11. Contact Us
           </h2>
-          <div className="rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900">
-            <p className="mb-2 text-neutral-700 dark:text-neutral-300">
+          <div className="shadow-surface rounded-3xl bg-white p-5 dark:bg-neutral-900">
+            <p className="mb-2 text-neutral-600 dark:text-neutral-400">
               If you have any questions about this Privacy Policy, please contact us:
             </p>
-            <p className="text-neutral-700 dark:text-neutral-300">
-              <strong className="font-semibold text-neutral-900 dark:text-neutral-100">
+            <p className="text-neutral-600 dark:text-neutral-400">
+              <strong className="font-semibold text-neutral-950 dark:text-neutral-50">
                 Horus Lugo López
               </strong>
               <br />
@@ -707,7 +707,7 @@ function renderPrivacyPolicyContent() {
               Email:{" "}
               <a
                 href="mailto:hola@horus.dev"
-                className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
               >
                 hola@horus.dev
               </a>
@@ -716,16 +716,16 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             12. Jurisdiction and Governing Law
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             This Privacy Policy is governed by the laws of Spain and the European Union. As trizum
             is operated from Spain, we comply with the General Data Protection Regulation (GDPR) and
             Spanish data protection laws. If you are located in the European Economic Area (EEA),
             you have certain rights under GDPR, including:
           </p>
-          <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+          <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
             <li>The right to access your personal data</li>
             <li>The right to rectification of inaccurate data</li>
             <li>The right to erasure (&quot;right to be forgotten&quot;)</li>
@@ -733,7 +733,7 @@ function renderPrivacyPolicyContent() {
             <li>The right to data portability</li>
             <li>The right to object to processing</li>
           </ul>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             To exercise these rights, please contact us using the information provided in Section
             11. You also have the right to lodge a complaint with the Spanish Data Protection Agency
             (AEPD) if you believe your data rights have been violated.

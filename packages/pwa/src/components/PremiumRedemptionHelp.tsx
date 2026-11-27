@@ -5,7 +5,7 @@ import { Icon } from "@trizum/ui/Icon";
 import { StoreRedemptionAction } from "./StoreRedemptionAction.tsx";
 
 const helpLinkClassName =
-  "font-semibold underline decoration-current underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2";
+  "font-semibold text-accent-600 underline decoration-current underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500 dark:text-accent-400 dark:focus-visible:outline-accent-400";
 
 export function PremiumRedemptionHelp({
   code,
@@ -27,13 +27,16 @@ export function PremiumRedemptionHelp({
   onOpenPremium: () => void;
 }) {
   return (
-    <div className="divide-y divide-neutral-200 border-t border-neutral-200 text-sm dark:divide-neutral-800 dark:border-neutral-800">
+    <div className="divide-y divide-neutral-950/5 border-t border-neutral-950/5 text-sm dark:divide-white/10 dark:border-white/10">
       <details className="group">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-neutral-950 dark:text-neutral-50 [&::-webkit-details-marker]:hidden">
           <Trans>How do I redeem my code?</Trans>
-          <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
+          <Icon
+            icon="lucide.chevron-down"
+            className="size-4 shrink-0 text-neutral-400 group-open:rotate-180 dark:text-neutral-500"
+          />
         </summary>
-        <ol className="list-decimal space-y-2 pb-3 pl-5 leading-relaxed text-neutral-900 dark:text-neutral-100">
+        <ol className="list-decimal space-y-2 pb-3 pl-5 leading-relaxed text-neutral-600 dark:text-neutral-400">
           {!isSignedIn ? (
             <li>
               <Trans>
@@ -50,7 +53,7 @@ export function PremiumRedemptionHelp({
               <Trans>
                 Copy your code, then open{" "}
                 <StoreRedemptionAction
-                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+                  className={`inline h-auto w-auto rounded-lg ${helpLinkClassName}`}
                   platform="ios"
                   code={code}
                   redeemAction={redeemAction}
@@ -64,7 +67,7 @@ export function PremiumRedemptionHelp({
               <Trans>
                 Copy your code, then open{" "}
                 <StoreRedemptionAction
-                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+                  className={`inline h-auto w-auto rounded-lg ${helpLinkClassName}`}
                   platform="android"
                   code={code}
                   redeemAction={redeemAction}
@@ -78,7 +81,7 @@ export function PremiumRedemptionHelp({
               <Trans>
                 Open this link on your phone and copy your code. Choose{" "}
                 <StoreRedemptionAction
-                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+                  className={`inline h-auto w-auto rounded-lg ${helpLinkClassName}`}
                   platform="ios"
                   code={code}
                 >
@@ -86,7 +89,7 @@ export function PremiumRedemptionHelp({
                 </StoreRedemptionAction>{" "}
                 for iPhone or iPad, or{" "}
                 <StoreRedemptionAction
-                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+                  className={`inline h-auto w-auto rounded-lg ${helpLinkClassName}`}
                   platform="android"
                   code={code}
                 >
@@ -117,9 +120,12 @@ export function PremiumRedemptionHelp({
         <details className="group">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-neutral-950 dark:text-neutral-50 [&::-webkit-details-marker]:hidden">
             <Trans>Code not working in Google Play?</Trans>
-            <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
+            <Icon
+              icon="lucide.chevron-down"
+              className="size-4 shrink-0 text-neutral-400 group-open:rotate-180 dark:text-neutral-500"
+            />
           </summary>
-          <p className="pb-3 leading-relaxed text-neutral-900 dark:text-neutral-100">
+          <p className="pb-3 leading-relaxed text-neutral-600 dark:text-neutral-400">
             <Trans>
               Some offers need to be redeemed at checkout. Open{" "}
               <HelpButton onPress={onOpenPremium} isDisabled={isDisabled || isOffline}>
@@ -135,9 +141,12 @@ export function PremiumRedemptionHelp({
       <details className="group">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-neutral-950 dark:text-neutral-50 [&::-webkit-details-marker]:hidden">
           <Trans>Already redeemed?</Trans>
-          <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
+          <Icon
+            icon="lucide.chevron-down"
+            className="size-4 shrink-0 text-neutral-400 group-open:rotate-180 dark:text-neutral-500"
+          />
         </summary>
-        <p className="pb-3 leading-relaxed text-neutral-900 dark:text-neutral-100">
+        <p className="pb-3 leading-relaxed text-neutral-600 dark:text-neutral-400">
           <Trans>
             Open{" "}
             <HelpButton onPress={onOpenPremium} isDisabled={isDisabled || isOffline}>
@@ -162,7 +171,7 @@ function HelpButton({
 }) {
   return (
     <Button
-      className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+      className={`inline h-auto w-auto rounded-lg ${helpLinkClassName}`}
       onPress={onPress}
       isDisabled={isDisabled || !onPress}
     >

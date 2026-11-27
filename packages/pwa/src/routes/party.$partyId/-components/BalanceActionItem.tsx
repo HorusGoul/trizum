@@ -29,16 +29,16 @@ export function BalanceActionItem({
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-neutral-900">
+    <div className="shadow-surface flex flex-col gap-4 rounded-3xl bg-white p-5 dark:bg-neutral-900">
       <div className="flex">
         <div className="flex flex-1 flex-col">
-          <span className="text-lg text-neutral-400">
+          <span className="text-lg font-medium text-neutral-950 dark:text-neutral-50">
             {from.name} {fromId === me.id ? t`(me)` : ""}
           </span>
-          <span className="text-sm text-neutral-700 dark:text-neutral-300">
+          <span className="text-sm text-neutral-600 dark:text-neutral-400">
             <Trans>owes</Trans>
           </span>
-          <span className="text-lg text-neutral-400">
+          <span className="text-lg font-medium text-neutral-950 dark:text-neutral-50">
             {to.name} {toId === me.id ? t`(me)` : ""}
           </span>
         </div>
@@ -50,8 +50,8 @@ export function BalanceActionItem({
 
       <div className="flex flex-col gap-1">
         <Button
-          color="input-like"
-          className="h-8 rounded-lg px-3 font-semibold"
+          color="neutral"
+          className="h-10 rounded-full px-4 font-semibold"
           onPress={() =>
             void navigate({
               to: "/party/$partyId/pay",
@@ -72,7 +72,7 @@ export function BalanceActionItem({
         {isFromMe && canTransferDebt ? (
           <Button
             color="transparent"
-            className="h-8 rounded-lg px-3 text-sm font-medium text-neutral-500 hover:text-neutral-400 dark:text-neutral-300 dark:hover:text-neutral-200"
+            className="h-10 rounded-full px-4 text-sm font-medium text-neutral-600 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-neutral-50"
             onPress={() =>
               void navigate({
                 to: "/party/$partyId/transfer-debt",

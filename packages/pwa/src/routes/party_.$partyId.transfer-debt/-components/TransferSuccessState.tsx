@@ -21,7 +21,7 @@ export function TransferSuccessState({
         />
 
         <m.div
-          className="bg-success-500 text-success-50 relative flex h-24 w-24 items-center justify-center rounded-full shadow-lg dark:shadow-none"
+          className="bg-success-500 text-success-50 shadow-raised relative flex h-24 w-24 items-center justify-center rounded-full"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 240, damping: 18 }}
@@ -40,7 +40,7 @@ export function TransferSuccessState({
         <Trans>Debt transferred</Trans>
       </h2>
 
-      <p className="mt-3 max-w-sm text-sm leading-6 text-neutral-800 dark:text-neutral-200">
+      <p className="mt-3 max-w-sm text-sm leading-6 text-neutral-600 dark:text-neutral-400">
         <Trans>
           The new debt is now in <span className="font-semibold">{destinationPartyName}</span>,
           where <span className="font-semibold">{destinationCounterpartyName}</span> is owed by{" "}

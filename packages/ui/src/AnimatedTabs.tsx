@@ -227,7 +227,16 @@ export function AnimatedTabs({
             items={tabs}
           >
             {(tab) => (
-              <Tab className="flex flex-1 cursor-pointer touch-none items-center justify-center px-4 py-2.5 outline-hidden transition select-none">
+              <Tab
+                className={({ isSelected }) =>
+                  cn(
+                    "flex flex-1 cursor-pointer touch-none items-center justify-center rounded-full px-4 py-2.5 outline-hidden transition select-none",
+                    isSelected
+                      ? "text-neutral-950 dark:text-neutral-50"
+                      : "text-neutral-600 dark:text-neutral-400",
+                  )
+                }
+              >
                 {({ isSelected, isFocusVisible }) => (
                   <>
                     <Icon icon={tab.icon} width={20} height={20} className="mr-3" />
@@ -235,7 +244,7 @@ export function AnimatedTabs({
                     {isFocusVisible && isSelected && (
                       // Focus ring.
                       <motion.span
-                        className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
+                        className="ring-accent-500 dark:ring-accent-400 absolute inset-0 z-10 rounded-full ring-2"
                         style={{ x, width }}
                       />
                     )}
@@ -247,7 +256,7 @@ export function AnimatedTabs({
           {/* Selection indicator. */}
           <motion.span
             className={cn(
-              "absolute -bottom-2 z-10 h-0.5 rounded-full bg-neutral-500",
+              "absolute -bottom-2 z-10 h-0.5 rounded-full bg-accent-500 dark:bg-accent-400",
               isSelectionPending && "animate-pulse",
             )}
             style={{ x, width }}
@@ -261,7 +270,7 @@ export function AnimatedTabs({
             {(tab) => (
               <TabPanel
                 shouldForceMount
-                className="no-scrollbar box-border flex w-full shrink-0 snap-start flex-col overflow-y-auto overscroll-y-contain rounded-sm outline-hidden -outline-offset-2 focus-visible:outline-black"
+                className="no-scrollbar focus-visible:outline-accent-500 dark:focus-visible:outline-accent-400 box-border flex w-full shrink-0 snap-start flex-col overflow-y-auto overscroll-y-contain rounded-lg outline-hidden -outline-offset-2 focus-visible:outline-2 focus-visible:outline-solid"
                 ref={tab.panelRef}
               >
                 {tab.node}

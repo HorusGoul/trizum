@@ -596,7 +596,7 @@ export function ExpenseParticipantsSection({
   return (
     <div className={cn("mt-4 flex flex-col gap-2", className)}>
       {onIncludeAllChange ? (
-        <div className="flex items-center justify-between border-x border-transparent px-3">
+        <div className="flex items-center justify-between px-4">
           <Checkbox
             isSelected={shareCount === participants.length}
             isIndeterminate={shareCount > 0 && shareCount < participants.length}
@@ -604,7 +604,7 @@ export function ExpenseParticipantsSection({
           >
             {t`Include all`}
           </Checkbox>
-          <span className="text-xs font-medium text-neutral-600 dark:text-neutral-300">
+          <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
             {currency}
           </span>
         </div>
@@ -759,13 +759,13 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="grid h-10 grid-cols-[minmax(0,1fr)_auto] items-center justify-between rounded-lg border border-neutral-500 bg-white pr-3 dark:border-neutral-700 dark:bg-neutral-900"
+      className="shadow-surface grid h-12 grid-cols-[minmax(0,1fr)_auto] items-center justify-between rounded-2xl bg-white pr-3 dark:bg-neutral-900"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
           isSelected={!!shares[participant.id]}
           onChange={onSelectParticipant}
-          className="h-full flex-1 pl-3"
+          className="h-full flex-1 pl-4"
         >
           {participant.name}
         </Checkbox>
@@ -782,7 +782,7 @@ function ParticipantItem({
                   className="h-7 w-7"
                   iconClassName="size-3.5"
                   onPress={onDecrementSharesPress}
-                  color="input-like"
+                  color="neutral"
                 />
                 <AppNumberField
                   className="h-7 w-7 shrink-0"
@@ -818,13 +818,13 @@ function ParticipantItem({
                   className="h-7 w-7"
                   iconClassName="size-3.5"
                   onPress={onIncrementSharesPress}
-                  color="input-like"
+                  color="neutral"
                 />
               </>
             ) : (
               <TooltipTrigger>
                 <IconButton
-                  color="input-like"
+                  color="neutral"
                   icon="lucide.split"
                   aria-label={t`Switch to fractional split`}
                   onPress={() => {
@@ -908,7 +908,7 @@ function ParticipantSplitAmountField({
       minValue={0}
       onChange={onChange}
       className="w-20"
-      inputClassName="h-7 px-0 text-right border-t-0 border-x-0 rounded-none border-b"
+      inputClassName="h-7 rounded-lg px-2 text-right"
       onFocus={(event) => {
         // Select all text
         const input = event.currentTarget;
@@ -1001,7 +1001,7 @@ function ReceiptPhotosField({
         }}
       >
         {value.length === 0 ? (
-          <div className="flex h-32 w-32 flex-col items-center justify-center rounded-xl bg-neutral-50 p-4 dark:bg-neutral-900 dark:text-neutral-500">
+          <div className="shadow-surface flex h-32 w-32 flex-col items-center justify-center rounded-2xl bg-white p-4 text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
             <span className="text-center text-sm">
               <Trans>Upload or capture an image of your receipt</Trans>
             </span>
@@ -1010,7 +1010,7 @@ function ReceiptPhotosField({
 
         {value.map((photoId, index) => (
           <div key={photoId} className="relative isolate shrink-0">
-            <Suspense fallback={<Skeleton className="h-32 w-32" />}>
+            <Suspense fallback={<Skeleton className="h-32 w-32 rounded-2xl" />}>
               <CurrentPhoto
                 key={photoId}
                 photoId={photoId}
@@ -1024,7 +1024,7 @@ function ReceiptPhotosField({
             {scanningPhotoIds.includes(photoId) ? (
               <div
                 aria-hidden="true"
-                className="receipt-scan-border pointer-events-none absolute inset-0 overflow-hidden rounded-xl"
+                className="receipt-scan-border pointer-events-none absolute inset-0 overflow-hidden rounded-2xl"
               />
             ) : null}
           </div>
@@ -1150,7 +1150,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       <Button
         onPress={() => void openCamera()}
         color="input-like"
-        className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
+        className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-3 text-xs"
       >
         <Icon icon="lucide.camera" className="h-5 w-5" />
         <Trans>Take photo</Trans>
@@ -1159,7 +1159,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       <Button
         onPress={openGallery}
         color="input-like"
-        className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
+        className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-3 text-xs"
       >
         <Icon icon="lucide.image-up" className="h-5 w-5" />
         <Trans>Upload photo</Trans>
@@ -1215,15 +1215,15 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
       <Button
         color="transparent"
         aria-label={t`View photo`}
-        className="h-auto w-auto p-0"
+        className="h-auto w-auto rounded-2xl p-0"
         onContextMenu={(e) => e.preventDefault()}
         onPress={handleViewPhoto}
       >
-        <img src={url} className="block h-32 w-32 rounded-xl object-cover" alt="" />
+        <img src={url} className="block h-32 w-32 rounded-2xl object-cover" alt="" />
       </Button>
       <Button
-        color="input-like"
-        className="absolute -top-2 -right-2 z-10 h-auto w-auto rounded-full p-1"
+        color="transparent"
+        className="shadow-raised absolute -top-2 -right-2 z-10 h-auto w-auto rounded-full bg-white p-1 text-neutral-950 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-50 dark:hover:bg-neutral-700"
         onPress={onRemove}
         aria-label={t`Remove photo`}
       >

@@ -33,34 +33,29 @@ interface StatusAppearance {
 
 const statusAppearances: Record<ExpenseEditorValidationStatus, StatusAppearance> = {
   pristine: {
-    className:
-      "border-neutral-400 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200",
+    className: "bg-white text-neutral-600 shadow-surface dark:bg-neutral-900 dark:text-neutral-400",
     icon: "lucide.badge-info",
   },
   incomplete: {
-    className:
-      "border-neutral-400 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200",
+    className: "bg-white text-neutral-600 shadow-surface dark:bg-neutral-900 dark:text-neutral-400",
     icon: "lucide.badge-info",
   },
   valid: {
-    className:
-      "border-success-400 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-950/40 dark:text-success-200",
+    className: "bg-success-50 text-success-700 dark:bg-success-950/40 dark:text-success-200",
     icon: "lucide.circle-check",
   },
   warning: {
-    className:
-      "border-warning-500 bg-warning-50 text-warning-800 dark:border-warning-700 dark:bg-warning-950/40 dark:text-warning-200",
+    className: "bg-warning-50 text-warning-800 dark:bg-warning-950/40 dark:text-warning-200",
     icon: "lucide.triangle-alert",
   },
   error: {
-    className:
-      "border-danger-500 bg-danger-50 text-danger-700 dark:border-danger-700 dark:bg-danger-950/40 dark:text-danger-200",
+    className: "bg-danger-50 text-danger-700 dark:bg-danger-950/40 dark:text-danger-200",
     icon: "lucide.circle-alert",
   },
 };
 
 const statusBarClassName =
-  "flex h-auto min-h-12 w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-medium";
+  "flex h-auto min-h-12 w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium";
 
 export function ExpenseEditorValidationStatus({
   isOpen,
@@ -117,13 +112,13 @@ export function ExpenseEditorValidationStatus({
                       cn(
                         statusBarClassName,
                         appearance.className,
-                        "justify-start rounded-lg",
+                        "justify-start rounded-2xl",
                         !isOpen &&
                           (isHovered || isFocusVisible) &&
                           "brightness-95 dark:brightness-110",
                         !isOpen &&
                           isFocusVisible &&
-                          "ring-2 ring-current ring-offset-2 ring-offset-white dark:ring-offset-neutral-950",
+                          "ring-2 ring-accent-500 ring-offset-2 ring-offset-neutral-100 dark:ring-accent-400 dark:ring-offset-black",
                         !isOpen && isPressed && "brightness-90 dark:brightness-125",
                         isOpen && "scale-100 brightness-100 dark:brightness-100",
                       )
@@ -193,7 +188,7 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
       >
         <Dialog
           aria-label={t`Expense checks`}
-          className="max-h-[inherit] overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-2xl outline-hidden dark:border-neutral-800 dark:bg-black"
+          className="shadow-overlay max-h-[inherit] overflow-y-auto rounded-3xl bg-white outline-hidden dark:bg-neutral-800"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
             <div className="flex flex-col gap-3">
@@ -205,7 +200,7 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
               </h2>
             </div>
 
-            <ul className="flex flex-col divide-y divide-neutral-200 border-y border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
+            <ul className="flex flex-col divide-y divide-neutral-950/5 dark:divide-white/10">
               {issues.map((issue) => (
                 <ExpenseEditorValidationIssueItem issue={issue} key={issue.code} />
               ))}
@@ -231,7 +226,7 @@ function ExpenseEditorValidationIssueItem({ issue }: { issue: ExpenseEditorValid
           <h3 className="font-medium">
             <Trans>Split total does not match</Trans>
           </h3>
-          <p className="mt-1 text-sm text-neutral-700 dark:text-neutral-200">
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
             <Trans>
               Shares sum up to{" "}
               <CurrencyText

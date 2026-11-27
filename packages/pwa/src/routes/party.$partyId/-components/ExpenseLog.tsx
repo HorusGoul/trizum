@@ -119,7 +119,7 @@ export function ExpenseLog() {
             aria-label={t`Add an expense`}
             icon="lucide.plus"
             color="accent"
-            className="pointer-events-auto h-14 w-14 shadow-md"
+            className="shadow-raised pointer-events-auto h-14 w-14"
             onPress={onAddExpensePress}
           />
         </div>
@@ -154,13 +154,13 @@ export function ExpenseLog() {
                       className={cn(
                         "inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent transition-colors",
                         participant.alwaysUseDefaultExpenseTemplate
-                          ? "bg-neutral-500"
-                          : "bg-neutral-800",
+                          ? "bg-accent-500 dark:bg-accent-400"
+                          : "bg-neutral-200 dark:bg-neutral-700",
                       )}
                     >
                       <span
                         className={cn(
-                          "bg-neutral-50 block size-5 rounded-full shadow-lg transition-transform",
+                          "block size-5 rounded-full bg-white shadow-sm transition-transform",
                           participant.alwaysUseDefaultExpenseTemplate && "translate-x-5",
                         )}
                       />
@@ -241,22 +241,22 @@ function ExpenseTemplateSheetAction({
       onPress={onPress}
       className={({ isFocusVisible, isHovered, isPressed }) =>
         cn(
-          "grid min-h-16 w-full grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-3 rounded-[1.35rem] px-safe-or-4 py-3 text-left outline-hidden transition-all sm:px-safe-or-5",
-          (isHovered || isFocusVisible) && "bg-neutral-100 dark:bg-neutral-900",
-          isFocusVisible && "ring-neutral-300 dark:ring-neutral-700 ring-2",
-          isPressed && "bg-neutral-200 dark:bg-neutral-800 scale-[0.98]",
+          "grid min-h-16 w-full grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-3 rounded-3xl px-safe-or-4 py-3 text-left outline-hidden transition-all sm:px-safe-or-5",
+          (isHovered || isFocusVisible) && "bg-neutral-950/5 dark:bg-white/10",
+          isFocusVisible && "ring-2 ring-accent-500 dark:ring-accent-400",
+          isPressed && "scale-[0.98] bg-neutral-950/10 dark:bg-white/15",
         )
       }
     >
       <span
         aria-hidden="true"
-        className="flex size-10 items-center justify-center rounded-full bg-neutral-100 text-xl dark:bg-neutral-800"
+        className="shadow-surface flex size-10 items-center justify-center rounded-full bg-white text-xl dark:bg-neutral-800"
       >
         {symbol}
       </span>
       <span className="flex min-w-0 flex-col gap-1">
         <span className="truncate font-medium text-neutral-950 dark:text-neutral-50">{name}</span>
-        <span className="truncate text-sm text-neutral-700 dark:text-neutral-200">
+        <span className="truncate text-sm text-neutral-600 dark:text-neutral-400">
           {description}
         </span>
       </span>

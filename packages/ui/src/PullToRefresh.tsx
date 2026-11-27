@@ -259,7 +259,7 @@ export function PullToRefresh({
           style={{ height: pullDistance }}
         >
           <motion.div
-            className="mb-3 flex size-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-600 shadow-xs dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
+            className="shadow-raised mb-3 flex size-10 items-center justify-center rounded-full bg-white text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300"
             style={{
               opacity: indicatorOpacity,
               scale: indicatorScale,

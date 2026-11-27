@@ -26,7 +26,7 @@ function PartySettings() {
             to="/party/$partyId/settings/details"
             partyId={partyId}
             badge={
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-xl text-neutral-700 dark:bg-neutral-900 dark:text-neutral-50">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-xl text-neutral-950 dark:bg-neutral-800 dark:text-neutral-50">
                 {party.symbol || DEFAULT_PARTY_SYMBOL}
               </span>
             }
@@ -40,7 +40,7 @@ function PartySettings() {
             to="/party/$partyId/settings/participants"
             partyId={partyId}
             badge={
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-900 dark:text-neutral-50">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-950 dark:bg-neutral-800 dark:text-neutral-50">
                 <Icon icon="lucide.user-cog" width={22} height={22} />
               </span>
             }
@@ -54,7 +54,7 @@ function PartySettings() {
             to="/party/$partyId/settings/expense-templates"
             partyId={partyId}
             badge={
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-900 dark:text-neutral-50">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-950 dark:bg-neutral-800 dark:text-neutral-50">
                 <Icon icon="lucide.layout-template" width={22} height={22} />
               </span>
             }

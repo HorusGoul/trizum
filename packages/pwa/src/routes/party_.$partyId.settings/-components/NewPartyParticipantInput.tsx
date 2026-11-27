@@ -47,7 +47,7 @@ export function NewPartyParticipantInput({
         icon="lucide.plus"
         aria-label={t`Add participant`}
         className="shrink-0"
-        color="accent"
+        color="neutral"
         onPress={addNewParticipant}
       />
     </div>

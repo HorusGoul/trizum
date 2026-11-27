@@ -113,6 +113,7 @@ export function Settings() {
                   <IconButton
                     icon="lucide.check"
                     aria-label={isSubmitting ? t`Submitting...` : t`Save`}
+                    color="accent"
                     type="submit"
                     form={formId}
                     isDisabled={isSubmitting}
@@ -289,13 +290,13 @@ function SettingsFormFields({
 
       <PremiumSection />
 
-      <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+      <section className="flex flex-col gap-3 pt-4">
+        <h2 className="text-lg font-semibold text-neutral-950 dark:text-neutral-50">
           <Trans>Privacy</Trans>
         </h2>
         <UsageAnalyticsSetting />
         {privacyOptionsRequired ? (
-          <Button type="button" color="input-like" pressAction={showPrivacyOptions}>
+          <Button type="button" color="neutral" pressAction={showPrivacyOptions}>
             <Trans>Privacy and cookie settings</Trans>
           </Button>
         ) : null}
@@ -367,12 +368,12 @@ function PremiumSection() {
   }
 
   return (
-    <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+    <section className="flex flex-col gap-3 pt-4">
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-lg font-semibold text-neutral-950 dark:text-neutral-50">
           <Trans>Premium</Trans>
         </h2>
-        <p className="text-sm text-neutral-700 dark:text-neutral-300">
+        <p className="text-sm text-neutral-600 dark:text-neutral-400">
           <PremiumStatusDescription
             isLoading={isLoading}
             isPremium={isPremium}
@@ -383,7 +384,7 @@ function PremiumSection() {
       </div>
       <Button
         type="button"
-        color="input-like"
+        color="neutral"
         isDisabled={isLoading}
         onPress={sessionStatus === "unavailable" ? undefined : () => void openPremium()}
         pressAction={sessionStatus === "unavailable" ? openPremium : undefined}

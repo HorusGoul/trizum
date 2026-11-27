@@ -49,7 +49,9 @@ function OpenGallery() {
   const gallery = use(MediaGalleryContext);
 
   return (
-    <Button onPress={() => gallery.open({ items, index: 0 })}>Open full-screen gallery</Button>
+    <Button color="neutral" onPress={() => gallery.open({ items, index: 0 })}>
+      Open full-screen gallery
+    </Button>
   );
 }
 

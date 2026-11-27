@@ -29,7 +29,7 @@ function About() {
         {/* App Info Section */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-4xl font-bold text-neutral-900 dark:text-neutral-100">trizum</h2>
+            <h2 className="text-4xl font-bold text-neutral-950 dark:text-neutral-50">trizum</h2>
             <div className="flex items-center justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
               <p>
                 <Trans>Version</Trans> {version}
@@ -39,7 +39,7 @@ function About() {
                   href={`https://github.com/HorusGoul/trizum/commit/${commit}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-sm bg-neutral-100 px-1 pt-1 font-mono leading-none text-neutral-700 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100"
+                  className="focus-visible:ring-accent-500 dark:focus-visible:ring-accent-400 rounded-lg bg-neutral-950/5 px-1.5 pt-1 pb-0.5 font-mono leading-none text-neutral-700 outline-hidden hover:bg-neutral-950/10 hover:text-neutral-950 focus-visible:ring-2 dark:bg-white/10 dark:text-neutral-300 dark:hover:bg-white/15 dark:hover:text-neutral-50"
                 >
                   {commit}
                 </a>
@@ -47,7 +47,7 @@ function About() {
             </div>
           </div>
 
-          <p className="text-center text-lg text-neutral-700 dark:text-neutral-300">
+          <p className="text-center text-lg text-neutral-600 dark:text-neutral-400">
             <Trans>
               Split bills with friends and family. Track, calculate, and settle expenses together.
             </Trans>
@@ -56,7 +56,7 @@ function About() {
 
         {/* Features Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Features</Trans>
           </h3>
           <ul className="flex flex-col gap-3">
@@ -80,10 +80,10 @@ function About() {
 
         {/* Links Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Links</Trans>
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="shadow-surface flex flex-col divide-y divide-neutral-950/5 overflow-hidden rounded-3xl bg-white dark:divide-white/10 dark:bg-neutral-900">
             <AboutLink
               href="https://github.com/HorusGoul/trizum"
               icon="brand.github"
@@ -122,10 +122,10 @@ function About() {
 
         {/* Contributors Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Contributors</Trans>
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="shadow-surface flex flex-col divide-y divide-neutral-950/5 overflow-hidden rounded-3xl bg-white dark:divide-white/10 dark:bg-neutral-900">
             <Contributor username="HorusGoul" website="https://horus.dev" />
             <Contributor username="marionauta" />
           </div>
@@ -133,22 +133,24 @@ function About() {
 
         {/* Credits Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h3 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Credits</Trans>
           </h3>
-          <p className="text-neutral-700 dark:text-neutral-300">
+          <p className="text-neutral-600 dark:text-neutral-400">
             <Trans>This project uses various open source libraries and tools.</Trans>
           </p>
-          <AboutLink
-            href="/about/third-party-licenses"
-            icon="lucide.book-open"
-            label={<Trans>View Third-Party Licenses</Trans>}
-            isInternal
-          />
+          <div className="shadow-surface flex flex-col divide-y divide-neutral-950/5 overflow-hidden rounded-3xl bg-white dark:divide-white/10 dark:bg-neutral-900">
+            <AboutLink
+              href="/about/third-party-licenses"
+              icon="lucide.book-open"
+              label={<Trans>View Third-Party Licenses</Trans>}
+              isInternal
+            />
+          </div>
         </section>
 
         {/* Footer */}
-        <section className="mt-8 border-t border-neutral-200 pt-6 text-center text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
+        <section className="mt-8 pt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
           <p>
             <Trans>© {currentYear} trizum</Trans>
           </p>

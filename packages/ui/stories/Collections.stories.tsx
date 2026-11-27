@@ -108,7 +108,7 @@ export const Sections: Story = {
 export const Actions: Story = {
   render: () => (
     <MenuTrigger>
-      <Button>Open menu</Button>
+      <Button color="neutral">Open menu</Button>
       <Popover>
         <Menu aria-label="Actions">
           <MenuItem id="edit">Edit</MenuItem>

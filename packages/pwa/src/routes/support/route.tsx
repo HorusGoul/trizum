@@ -16,7 +16,7 @@ function Support() {
       <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/" }} />
 
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium text-neutral-900 dark:text-neutral-100">
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium text-neutral-950 dark:text-neutral-50">
           <Trans>Support</Trans>
         </h1>
       </div>
@@ -25,7 +25,7 @@ function Support() {
         {/* Header Section */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800">
+            <div className="shadow-surface flex h-16 w-16 items-center justify-center rounded-full bg-white dark:bg-neutral-900">
               <Icon
                 icon="lucide.circle-help"
                 width={32}
@@ -33,7 +33,7 @@ function Support() {
                 className="text-neutral-700 dark:text-neutral-300"
               />
             </div>
-            <p className="text-lg text-neutral-700 dark:text-neutral-300">
+            <p className="text-lg text-neutral-600 dark:text-neutral-400">
               <Trans>Need help with trizum? We&apos;re here to assist you.</Trans>
             </p>
           </div>
@@ -41,7 +41,7 @@ function Support() {
 
         {/* Contact Options */}
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Contact Us</Trans>
           </h2>
           <div className="flex flex-col gap-3">
@@ -57,7 +57,7 @@ function Support() {
 
         {/* Report Issues */}
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Report Issues</Trans>
           </h2>
           <div className="flex flex-col gap-3">
@@ -82,7 +82,7 @@ function Support() {
 
         {/* FAQ Section */}
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-xl font-semibold text-neutral-950 dark:text-neutral-50">
             <Trans>Frequently Asked Questions</Trans>
           </h2>
           <div className="flex flex-col gap-4">
@@ -102,7 +102,7 @@ function Support() {
         </section>
 
         {/* Footer */}
-        <section className="mt-8 border-t border-neutral-200 pt-6 text-center text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
+        <section className="mt-8 pt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
           <p>
             <Trans>Thank you for using trizum. Your feedback helps us improve!</Trans>
           </p>

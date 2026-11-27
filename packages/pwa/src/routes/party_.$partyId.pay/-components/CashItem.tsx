@@ -3,12 +3,12 @@ import { Icon } from "@trizum/ui/Icon";
 
 export function CashItem() {
   return (
-    <div className="flex items-start gap-3 bg-white px-4 py-3 first:rounded-t-xl last:rounded-b-xl dark:bg-neutral-900">
+    <div className="flex items-start gap-3 px-4 py-3">
       <Icon
         icon="lucide.banknote"
         width={20}
         height={20}
-        className="mt-1 shrink-0 text-neutral-700 dark:text-neutral-200"
+        className="mt-1 shrink-0 text-neutral-600 dark:text-neutral-400"
       />
       <div className="min-w-0 flex-1">
         <h3 className="text-lg font-semibold">

@@ -10,16 +10,15 @@ export function ProfileSetupCard() {
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex scale-100 items-start gap-4 rounded-xl border border-neutral-400 bg-neutral-50 p-4 text-start outline-hidden transition-all duration-200 ease-in-out dark:border-neutral-500 dark:bg-black",
-          (isHovered || isFocusVisible) &&
-            "border-neutral-500 shadow-md dark:border-neutral-400 dark:bg-neutral-900 dark:shadow-none",
-          isPressed &&
-            "scale-95 border-neutral-600 bg-neutral-50/90 shadow-lg dark:border-neutral-300 dark:bg-neutral-800/90 dark:shadow-none",
+          "shadow-surface flex scale-100 items-start gap-4 rounded-3xl bg-white p-4 text-start outline-hidden transition-all duration-200 ease-in-out dark:bg-neutral-900",
+          isHovered && "bg-neutral-50 dark:bg-neutral-800/50",
+          isFocusVisible && "ring-2 ring-accent-500 dark:ring-accent-400",
+          isPressed && "scale-95 bg-neutral-50 dark:bg-neutral-800/50",
         )
       }
     >
       <div className="-mt-0.5 flex h-8 w-8 shrink-0 justify-center">
-        <Icon icon="lucide.user-round-pen" className="text-neutral-600 dark:text-neutral-400" />
+        <Icon icon="lucide.user-round-pen" className="text-neutral-500 dark:text-neutral-400" />
       </div>
       <div className="flex flex-1 flex-col gap-0.5">
         <span className="text-lg leading-tight font-semibold text-neutral-950 dark:text-neutral-50">

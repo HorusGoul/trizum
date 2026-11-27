@@ -17,16 +17,16 @@ export function ReviewPartyRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <div className="text-xs font-semibold tracking-[0.16em] text-neutral-500 uppercase dark:text-neutral-400">
+          <div className="text-xs font-semibold tracking-[0.16em] text-neutral-600 uppercase dark:text-neutral-400">
             {caption}
           </div>
-          <div className="h-px min-w-4 flex-1 bg-neutral-200/80 dark:bg-neutral-800" />
+          <div className="h-px min-w-4 flex-1 bg-neutral-950/5 dark:bg-white/10" />
         </div>
         <div className="mt-1 truncate text-base font-semibold text-neutral-950 dark:text-neutral-50">
           {party.name}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-5 text-neutral-700 dark:text-neutral-300">
+        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
           {children}
         </div>
       </div>

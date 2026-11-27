@@ -7,6 +7,13 @@ export function cn(...className: ClassName[]) {
   return twMerge(clsx(className));
 }
 
+/**
+ * Accent focus ring for React Aria elements that expose `data-focus-visible`.
+ * Uses an offset outline so it stays visible on accent fills and any surface.
+ */
+export const focusRing =
+  "data-[focus-visible]:outline-solid data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-accent-500 dark:data-[focus-visible]:outline-accent-400";
+
 const isBoolean = <Value>(maybeBoolean: Value): maybeBoolean is Value & boolean =>
   maybeBoolean === true || maybeBoolean === false;
 

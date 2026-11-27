@@ -6,7 +6,7 @@ import { cn } from "./utils.js";
 const QRCodeFrameHandle = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
-    className={cn("size-3 rounded-tl border-l-2 border-t-2 border-neutral-400", className)}
+    className={cn("size-3 rounded-tl-md border-l-2 border-t-2 border-neutral-400", className)}
   />
 );
 

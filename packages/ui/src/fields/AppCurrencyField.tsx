@@ -125,7 +125,7 @@ export function AppCurrencyField({
         <Input inputMode={inputMode ?? "decimal"} className={cn(inputClassName)} />
       )}
       {description && (
-        <Text className="text-sm text-neutral-700 dark:text-neutral-50" slot="description">
+        <Text className="text-sm text-neutral-600 dark:text-neutral-400" slot="description">
           {description}
         </Text>
       )}

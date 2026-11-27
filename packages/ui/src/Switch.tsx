@@ -50,13 +50,13 @@ const Switch = ({
         <>
           <div
             className={cn(
-              "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors",
+              "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors",
               /* Focus Visible */
-              "group-data-[focus-visible]:ring-ring group-data-[focus-visible]:outline-hidden group-data-[focus-visible]:ring-2 group-data-[focus-visible]:ring-offset-2 group-data-[focus-visible]:ring-offset-neutral-50",
+              "group-data-[focus-visible]:outline-solid group-data-[focus-visible]:outline-2 group-data-[focus-visible]:outline-offset-2 group-data-[focus-visible]:outline-accent-500 dark:group-data-[focus-visible]:outline-accent-400",
               /* Disabled */
               "group-data-[disabled]:cursor-not-allowed group-data-[disabled]:opacity-50",
               /* Selected */
-              "bg-neutral-800 group-data-[selected]:bg-neutral-500",
+              "bg-neutral-950/15 group-data-[selected]:bg-accent-500 dark:bg-white/20",
               /* Readonly */
               "group-data-[readonly]:cursor-default",
               /* Resets */
@@ -65,7 +65,7 @@ const Switch = ({
           >
             <div
               className={cn(
-                "pointer-events-none block size-5 rounded-full bg-neutral-50 shadow-lg ring-0 transition-transform",
+                "pointer-events-none block size-5 rounded-full bg-white shadow-raised ring-0 transition-transform",
                 /* Selected */
                 "translate-x-0 group-data-[selected]:translate-x-5",
                 isPending && "animate-pulse",

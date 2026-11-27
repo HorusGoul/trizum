@@ -75,14 +75,14 @@ function ThirdPartyLicenses() {
       </div>
 
       <div className="container flex flex-1 flex-col gap-4 px-4">
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             This application uses the following open source libraries and tools. Below are their
             licenses and attributions.
           </Trans>
         </p>
 
-        <pre className="overflow-x-auto rounded-lg bg-neutral-50 p-4 text-xs leading-relaxed break-words whitespace-pre-wrap text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
+        <pre className="shadow-surface mb-8 overflow-x-auto rounded-3xl bg-white p-5 text-xs leading-relaxed break-words whitespace-pre-wrap text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50">
           {content}
         </pre>
       </div>

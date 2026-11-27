@@ -52,7 +52,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
       </header>
       <main className="mx-auto w-full max-w-[480px] px-4 pt-2 pb-8">
         {user ? (
-          <output className="mb-4 flex min-h-10 min-w-0 items-center gap-2 text-sm text-neutral-800 dark:text-neutral-200">
+          <output className="mb-4 flex min-h-10 min-w-0 items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
             <Icon icon="lucide.check" className="size-4 shrink-0" />
             <span className="min-w-0 break-words">
               <Trans>Signed in as {email}</Trans>
@@ -67,7 +67,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           onOpenPremium={dialogs.openPremium}
         />
         {premium.isPremium ? (
-          <output className="mt-4 flex items-center gap-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+          <output className="mt-4 flex items-center gap-2 text-sm font-medium text-neutral-950 dark:text-neutral-50">
             <Icon icon="lucide.check" className="size-4" />
             <Trans>Premium is active.</Trans>
           </output>

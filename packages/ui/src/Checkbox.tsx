@@ -63,15 +63,15 @@ const Checkbox = ({
         <>
           <div
             className={cn(
-              "ring-offset-background flex size-4 shrink-0 items-center justify-center rounded-xs border border-neutral-500 text-current dark:border-neutral-700",
+              "flex size-5 shrink-0 items-center justify-center rounded-lg bg-neutral-950/5 text-current inset-ring-2 inset-ring-neutral-950/15 dark:bg-white/10 dark:inset-ring-white/20",
               /* Focus Visible */
-              "group-data-[focus-visible]/checkbox:ring-ring group-data-[focus-visible]/checkbox:outline-hidden group-data-[focus-visible]/checkbox:ring-2 group-data-[focus-visible]/checkbox:ring-offset-2",
+              "group-data-[focus-visible]/checkbox:outline-solid group-data-[focus-visible]/checkbox:outline-2 group-data-[focus-visible]/checkbox:outline-offset-2 group-data-[focus-visible]/checkbox:outline-accent-500 dark:group-data-[focus-visible]/checkbox:outline-accent-400",
               /* Selected */
-              "group-data-[indeterminate]/checkbox:bg-neutral-500 group-data-[selected]/checkbox:bg-neutral-500 group-data-[indeterminate]/checkbox:text-neutral-50 group-data-[selected]/checkbox:text-neutral-50",
+              "group-data-[indeterminate]/checkbox:bg-accent-500 group-data-[selected]/checkbox:bg-accent-500 group-data-[indeterminate]/checkbox:text-white group-data-[selected]/checkbox:text-white group-data-[indeterminate]/checkbox:inset-ring-0 group-data-[selected]/checkbox:inset-ring-0",
               /* Disabled */
               "group-data-[disabled]/checkbox:cursor-not-allowed group-data-[disabled]/checkbox:opacity-50",
               /* Invalid */
-              "group-data-[invalid]/checkbox:border-danger-500 group-data-[invalid]/checkbox:group-data-[selected]/checkbox:bg-danger-500 group-data-[invalid]/checkbox:group-data-[selected]/checkbox:text-danger-50",
+              "group-data-[invalid]/checkbox:inset-ring-danger-500 dark:group-data-[invalid]/checkbox:inset-ring-danger-400 group-data-[invalid]/checkbox:group-data-[selected]/checkbox:bg-danger-500 group-data-[invalid]/checkbox:group-data-[selected]/checkbox:text-white",
               /* Resets */
               "focus:outline-hidden focus-visible:outline-hidden",
               "transition-transform duration-200 ease-in-out",
@@ -80,9 +80,9 @@ const Checkbox = ({
             )}
           >
             {renderProps.isIndeterminate ? (
-              <Icon icon="lucide.minus" className="size-4" />
+              <Icon icon="lucide.minus" className="size-3.5" />
             ) : renderProps.isSelected ? (
-              <Icon icon="lucide.check" className="size-4" />
+              <Icon icon="lucide.check" className="size-3.5" />
             ) : null}
           </div>
           {children}
@@ -118,7 +118,7 @@ function JollyCheckboxGroup({
           <Label>{label}</Label>
           {children}
           {description && (
-            <Text className="text-muted-foreground text-sm" slot="description">
+            <Text className="text-sm text-neutral-600 dark:text-neutral-400" slot="description">
               {description}
             </Text>
           )}

@@ -64,11 +64,11 @@ function RouteComponent() {
       </div>
 
       <div className="container mt-16 flex flex-1 flex-col items-center">
-        <div className="relative flex aspect-square w-full max-w-60 items-center justify-center">
+        <div className="shadow-surface relative flex aspect-square w-full max-w-60 items-center justify-center rounded-3xl bg-white p-4 dark:bg-neutral-900">
           <QRCode
             value={shareUrl}
             size="xl"
-            className="rounded-lg text-neutral-50"
+            className="rounded-xl text-neutral-950 dark:text-neutral-50"
             options={{
               image: getQRCodeImage(),
               imageOptions: {
@@ -88,7 +88,7 @@ function RouteComponent() {
 
         <Button
           color="accent"
-          className="mt-8 w-full max-w-56 rounded-lg font-medium"
+          className="mt-8 w-full max-w-56 font-medium"
           onPress={() => void onShareParty()}
         >
           {canShare ? (

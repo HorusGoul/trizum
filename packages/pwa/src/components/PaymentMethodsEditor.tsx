@@ -40,8 +40,7 @@ export function PaymentMethodsEditor({
   const available = paymentMethodTypes.filter((type) => value[type] === undefined);
   const hasMethods = available.length < paymentMethodTypes.length;
 
-  const addButtonClassName =
-    "text-neutral-950 dark:text-neutral-50 min-h-11 w-auto self-start gap-2 rounded-xl px-4 font-medium";
+  const addButtonClassName = "min-h-11 w-auto self-start gap-2 px-4 font-medium";
 
   function addMethod(type: PaymentMethodType) {
     pendingMethod.current = type;
@@ -71,12 +70,12 @@ export function PaymentMethodsEditor({
   });
 
   return (
-    <section className="flex flex-col gap-3 border-y border-neutral-200 py-6 dark:border-neutral-800">
+    <section className="flex flex-col gap-3 py-6">
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold">
           <Trans>Get paid</Trans>
         </h2>
-        <p className="text-sm text-neutral-700 dark:text-neutral-300">
+        <p className="text-sm text-neutral-600 dark:text-neutral-400">
           <Trans>
             Your payment details are shared with people in your groups to help them settle debts
             with you.
@@ -84,7 +83,7 @@ export function PaymentMethodsEditor({
         </p>
       </div>
       {hasMethods ? (
-        <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+        <div className="shadow-surface divide-y divide-neutral-950/5 overflow-hidden rounded-3xl bg-white dark:divide-white/10 dark:bg-neutral-900">
           {paymentMethodTypes.map((type) => {
             const details = value[type];
 
@@ -107,7 +106,7 @@ export function PaymentMethodsEditor({
       {available.length > 0 ? (
         isDesktop ? (
           <MenuTrigger isOpen={isPickerOpen} onOpenChange={setIsPickerOpen}>
-            <Button color="input-like" className={addButtonClassName}>
+            <Button color="neutral" className={addButtonClassName}>
               <Icon icon="lucide.plus" width={18} height={18} />
               <Trans>Add payment method</Trans>
             </Button>
@@ -120,7 +119,7 @@ export function PaymentMethodsEditor({
         ) : (
           <>
             <Button
-              color="input-like"
+              color="neutral"
               className={addButtonClassName}
               onPress={() => setIsPickerOpen(true)}
             >

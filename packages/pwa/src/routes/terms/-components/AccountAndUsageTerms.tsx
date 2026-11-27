@@ -5,22 +5,22 @@ export function AccountAndUsageTerms() {
   return (
     <>
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
           <Trans>1. Acceptance of These Terms</Trans>
         </h2>
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             By accessing or using the Service, you agree to these Terms and our{" "}
             <Link
               to="/privacy-policy"
-              className="text-neutral-600 underline hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+              className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
             >
               Privacy Policy
             </Link>
             . If you do not agree, do not use the Service.
           </Trans>
         </p>
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             You must be at least 18 years old to use trizum. If you use the Service on behalf of an
             organization, you confirm that you have authority to accept these Terms for that
@@ -30,10 +30,10 @@ export function AccountAndUsageTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
           <Trans>2. What trizum Does</Trans>
         </h2>
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             trizum helps people record shared expenses, calculate balances, and coordinate
             settlements within groups. The Service is a record-keeping and calculation tool. It is
@@ -41,7 +41,7 @@ export function AccountAndUsageTerms() {
             collection service, and it does not hold or transfer money between participants.
           </Trans>
         </p>
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             You are responsible for checking expense entries, balances, exchange rates, and
             settlement instructions before relying on them or making a payment. trizum does not
@@ -52,10 +52,10 @@ export function AccountAndUsageTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
           <Trans>3. Accounts, Devices, and Group Access</Trans>
         </h2>
-        <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+        <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
           <li>
             <Trans>
               You are responsible for keeping your account credentials, devices, and sign-in methods
@@ -83,10 +83,10 @@ export function AccountAndUsageTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
           <Trans>4. Your Content and Responsibilities</Trans>
         </h2>
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             You retain ownership of information and files you add to the Service, including group
             details, participant information, expenses, descriptions, receipts, and images
@@ -95,7 +95,7 @@ export function AccountAndUsageTerms() {
             support, and improve the Service.
           </Trans>
         </p>
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             You are responsible for User Content you add or share. You must have the necessary
             rights and permissions to use it, including permission to share personal information
@@ -106,13 +106,13 @@ export function AccountAndUsageTerms() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
           <Trans>5. Acceptable Use</Trans>
         </h2>
-        <p className="text-neutral-700 dark:text-neutral-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>You may not use the Service to:</Trans>
         </p>
-        <ul className="ml-6 list-disc space-y-2 text-neutral-700 dark:text-neutral-300">
+        <ul className="ml-6 list-disc space-y-2 text-neutral-600 dark:text-neutral-400">
           <li>
             <Trans>Break the law or infringe another person&apos;s rights</Trans>
           </li>
