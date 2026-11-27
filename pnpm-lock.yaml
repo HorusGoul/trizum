@@ -140,8 +140,8 @@ catalogs:
       specifier: 1.64.1
       version: 1.64.1
     '@revenuecat/purchases-capacitor':
-      specifier: 13.7.6
-      version: 13.7.6
+      specifier: 14.2.0
+      version: 14.2.0
     '@revenuecat/purchases-capacitor-ui':
       specifier: 13.7.6
       version: 13.7.6
@@ -667,10 +667,10 @@ importers:
         version: 0.1.4(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)
+        version: 14.2.0(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.2.0(@capacitor/core@8.5.3))
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -776,10 +776,10 @@ importers:
         version: '@jsr/opentf__std@0.12.0'
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)
+        version: 14.2.0(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.2.0(@capacitor/core@8.5.3))
       '@sentry/cloudflare':
         specifier: 10.76.2
         version: 10.76.2(wrangler@4.166.0(@types/node@26.6.5)(vitest@5.0.5))
@@ -4572,13 +4572,16 @@ packages:
       '@capacitor/core': '>=8.0.0'
       '@revenuecat/purchases-capacitor': 13.7.6
 
-  '@revenuecat/purchases-capacitor@13.7.6':
-    resolution: {integrity: sha512-Ynwsno3yhW1QbfICVlx8jXwmnVV933ADSl+d0kCV56tENxb4kwT7lXLReCc7HmrbVs2cfGaLYLEAVF8zYzREnw==}
+  '@revenuecat/purchases-capacitor@14.2.0':
+    resolution: {integrity: sha512-7B3pOkvksPKqLb6L+pu7PCaOi9ZD2Hn1cuUu4yDcZy1jgEY9SwblRCtbO5D2KXOSIVH3J2Bn+BHzNgHomdMgYw==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0':
     resolution: {integrity: sha512-OUTgB/sqKKr4Wu/u1MT9dYWjc2mw1FRgwes4y/xyboQb781rDZ3yy7ICb8u+B/6bMDG7s0EzcUPLRLNdRz1bJw==}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.14.0':
+    resolution: {integrity: sha512-wV2HhQmFBmB2dER3RuMmRj42IqAJCp21xI90BT3JnpeZxwMCso3YpD1j2ZwiIUzGtojNEJBt7Ghjv7RABk+JTg==}
 
   '@robingenz/zli@0.2.0':
     resolution: {integrity: sha512-LME7G4xkEFuqyVg/MYTB3xoJnvWb955aEfZ7J7yRstzyULs3HBdxz0l5QiP8gmMMMZ434cb8Wn/DdHqeNTT2fA==}
@@ -6189,6 +6192,7 @@ packages:
   all-contributors-cli@7.0.0:
     resolution: {integrity: sha512-Ng5BzMGjyd5BOKONQLkZ0udJBuda65t+CmhGoURhHmfuztvCjLw/CkRuA/lj1+FgqWvzv06IOEgxt6h+7GlSBQ==}
     engines: {node: '>=22.22.0'}
+    deprecated: This package has been renamed to @all-contributors/cli. Please replace your current usage with the new package to continue receiving updates.
     hasBin: true
 
   ansi-colors@4.1.3:
@@ -10833,10 +10837,12 @@ packages:
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zod-to-json-schema@3.25.2:
     resolution: {integrity: sha512-O/PgfnpT1xKSDeQYSCfRI5Gy3hPf91mKVDuYLUHZJMiDFptvP41MSnWofm8dnCm0256ZNfZIM7DSzuSMAFnjHA==}
@@ -13852,18 +13858,20 @@ snapshots:
 
   '@resvg/resvg-wasm@2.4.0': {}
 
-  '@revenuecat/purchases-capacitor-ui@13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))':
+  '@revenuecat/purchases-capacitor-ui@13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.2.0(@capacitor/core@8.5.3))':
     dependencies:
       '@capacitor/core': 8.5.3
-      '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
+      '@revenuecat/purchases-capacitor': 14.2.0(@capacitor/core@8.5.3)
       '@revenuecat/purchases-typescript-internal-esm': 19.15.0
 
-  '@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3)':
+  '@revenuecat/purchases-capacitor@14.2.0(@capacitor/core@8.5.3)':
     dependencies:
       '@capacitor/core': 8.5.3
-      '@revenuecat/purchases-typescript-internal-esm': 19.15.0
+      '@revenuecat/purchases-typescript-internal-esm': 20.14.0
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0': {}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.14.0': {}
 
   '@robingenz/zli@0.2.0(zod@4.0.17)':
     dependencies:
@@ -14728,8 +14736,8 @@ snapshots:
       '@logtape/sentry': 2.4.2(@logtape/logtape@2.4.2)(@sentry/core@10.76.2)
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
-      '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
-      '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+      '@revenuecat/purchases-capacitor': 14.2.0(@capacitor/core@8.5.3)
+      '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.2.0(@capacitor/core@8.5.3))
       '@sentry/cloudflare': 10.76.2(wrangler@4.166.0(@types/node@26.6.5)(vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-preview@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5(vitest@5.0.5))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.5)(@typescript/typescript6@6.0.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.1))(jsdom@30.1.3(@noble/hashes@2.4.0))))
       '@sentry/react': 10.76.2(react@19.3.1)
       '@sentry/vite-plugin': 5.4.1(rollup@4.65.1)(supports-color@10.2.2)
