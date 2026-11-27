@@ -31,7 +31,7 @@ export const Route = createFileRoute("/about_/third-party-licenses")({
       </div>
 
       <div className="container flex flex-1 flex-col items-center justify-center gap-4 px-4 py-6">
-        <div className="text-accent-600 dark:text-accent-400">
+        <div className="text-neutral-600 dark:text-neutral-400">
           <Trans>Loading licenses...</Trans>
         </div>
       </div>
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/about_/third-party-licenses")({
           <Trans>Failed to load licenses. Please try again later.</Trans>
         </p>
         {error instanceof Error && (
-          <p className="text-accent-600 dark:text-accent-400 text-center text-sm">
+          <p className="text-center text-sm text-neutral-600 dark:text-neutral-400">
             {error.message}
           </p>
         )}
@@ -75,14 +75,14 @@ function ThirdPartyLicenses() {
       </div>
 
       <div className="container flex flex-1 flex-col gap-4 px-4">
-        <p className="text-accent-700 dark:text-accent-300">
+        <p className="text-neutral-600 dark:text-neutral-400">
           <Trans>
             This application uses the following open source libraries and tools. Below are their
             licenses and attributions.
           </Trans>
         </p>
 
-        <pre className="bg-accent-50 text-accent-900 dark:bg-accent-900 dark:text-accent-100 overflow-x-auto rounded-lg p-4 text-xs leading-relaxed break-words whitespace-pre-wrap">
+        <pre className="shadow-surface mb-8 overflow-x-auto rounded-3xl bg-white p-5 text-xs leading-relaxed break-words whitespace-pre-wrap text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50">
           {content}
         </pre>
       </div>

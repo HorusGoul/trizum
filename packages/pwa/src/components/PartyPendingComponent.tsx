@@ -82,30 +82,30 @@ export function PartyPendingComponent() {
     <div className="pt-safe-offset-24 flex min-h-full flex-col items-center px-6">
       {/* Animated Logo - swing rotation */}
       <div className="relative mb-8">
-        <TrizumSpinner size={80} className="text-accent-600 dark:text-accent-400" />
+        <TrizumSpinner size={80} className="text-accent-500 dark:text-accent-400" />
       </div>
 
       {/* Main title */}
-      <h2 className="text-accent-800 dark:text-accent-200 text-center text-xl font-semibold">
+      <h2 className="text-center text-xl font-semibold text-neutral-950 dark:text-neutral-50">
         <Trans>Syncing party information...</Trans>
       </h2>
 
       {/* Subtitle */}
-      <p className="text-accent-600 dark:text-accent-400 mt-2 text-center text-sm">
+      <p className="mt-2 text-center text-sm text-neutral-600 dark:text-neutral-400">
         <Trans>Please wait while we fetch the latest data</Trans>
       </p>
 
       {/* Tips section - visible immediately */}
       <div className="mt-8 w-full max-w-sm">
-        <div className="border-accent-200 from-accent-50 to-accent-100 dark:border-accent-800 dark:from-accent-900/80 dark:to-accent-900/40 relative overflow-hidden rounded-2xl border bg-gradient-to-br p-5">
-          <div className="text-accent-300 dark:text-accent-700 absolute top-3 right-3">
+        <div className="shadow-surface relative overflow-hidden rounded-3xl bg-white p-5 dark:bg-neutral-900">
+          <div className="absolute top-4 right-4 text-neutral-300 dark:text-neutral-600">
             <Icon icon="lucide.lightbulb" width={20} height={20} />
           </div>
-          <span className="text-accent-500 dark:text-accent-400 mb-2 block text-xs font-semibold tracking-wider uppercase">
+          <span className="mb-2 block text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
             <Trans>Did you know?</Trans>
           </span>
           <p
-            className="text-accent-700 dark:text-accent-300 h-10 pr-6 text-sm leading-relaxed"
+            className="h-10 pr-6 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400"
             key={currentTipIndex}
             style={{
               animation: "fade-in-up 0.4s ease-out",
@@ -128,16 +128,12 @@ export function PartyPendingComponent() {
         <div className="flex flex-col gap-4">
           {/* Action buttons - now above insights */}
           <div className="flex gap-3">
-            <Button
-              color="input-like"
-              className="flex-1 rounded-xl font-medium"
-              onPress={handleGoHome}
-            >
+            <Button color="neutral" className="flex-1 font-medium" onPress={handleGoHome}>
               <Icon icon="lucide.arrow-left" width={18} height={18} className="mr-2" />
               <Trans>Go back</Trans>
             </Button>
 
-            <Button color="accent" className="flex-1 rounded-xl font-medium" onPress={handleReload}>
+            <Button color="accent" className="flex-1 font-medium" onPress={handleReload}>
               <Icon icon="lucide.refresh-cw" width={18} height={18} className="mr-2" />
               <Trans>Retry</Trans>
             </Button>
@@ -146,10 +142,10 @@ export function PartyPendingComponent() {
           {/* Collapsible insights */}
           <Disclosure>
             {({ isExpanded }) => (
-              <div className="border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-900/50 rounded-xl border">
+              <div className="shadow-surface rounded-3xl bg-white dark:bg-neutral-900">
                 <AriaButton
                   slot="trigger"
-                  className="text-accent-600 dark:text-accent-400 flex w-full items-center justify-between gap-2 p-4 outline-hidden"
+                  className="data-[focus-visible]:ring-accent-500 dark:data-[focus-visible]:ring-accent-400 flex w-full items-center justify-between gap-2 rounded-3xl px-5 py-4 text-neutral-600 outline-hidden data-[focus-visible]:ring-2 dark:text-neutral-400"
                 >
                   <div className="flex items-center gap-2">
                     <Icon icon="lucide.circle-help" width={18} height={18} />
@@ -166,14 +162,14 @@ export function PartyPendingComponent() {
                 </AriaButton>
 
                 <DisclosurePanel className="overflow-hidden">
-                  <div className="px-4 pb-4">
+                  <div className="px-5 pb-5">
                     <ul className="space-y-2">
                       {troubleshootingReasons.map((reason) => (
                         <li
                           key={reason.id}
-                          className="text-accent-600 dark:text-accent-400 flex items-start gap-2.5 text-sm"
+                          className="flex items-start gap-2.5 text-sm text-neutral-600 dark:text-neutral-400"
                         >
-                          <span className="bg-accent-400 dark:bg-accent-600 mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" />
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400 dark:bg-neutral-600" />
                           <span>{reason.label()}</span>
                         </li>
                       ))}

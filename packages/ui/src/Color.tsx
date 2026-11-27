@@ -21,7 +21,7 @@ import {
   composeRenderProps,
 } from "react-aria-components";
 
-import { cn } from "./utils.js";
+import { cn, focusRing } from "./utils.js";
 
 const ColorSlider = AriaColorSlider;
 
@@ -53,7 +53,7 @@ function ColorArea({ className, ...props }: AriaColorAreaProps) {
   return (
     <AriaColorArea
       className={composeRenderProps(className, (className) =>
-        cn("border-border size-[192px] shrink-0 rounded-md border shadow-md", className),
+        cn("size-[192px] shrink-0 rounded-2xl shadow-surface", className),
       )}
       {...props}
     />
@@ -64,7 +64,7 @@ function SliderTrack({ className, ...props }: AriaSliderTrackProps) {
   return (
     <AriaSliderTrack
       className={composeRenderProps(className, (className) =>
-        cn("border-border h-7 w-[192px] rounded-md border", className),
+        cn("h-7 w-[192px] rounded-full", className),
       )}
       {...props}
     />
@@ -76,9 +76,9 @@ function ColorThumb({ className, ...props }: AriaColorThumbProps) {
     <AriaColorThumb
       className={composeRenderProps(className, (className) =>
         cn(
-          "z-10 box-border size-5 rounded-[50%] border-2 border-white shadow-md",
+          "z-10 box-border size-5 rounded-full shadow-raised inset-ring-[3px] inset-ring-white",
           /* Focus Visible */
-          "data-[focus-visible]:size-6",
+          "data-[focus-visible]:size-6 data-[focus-visible]:outline-solid data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-accent-500 dark:data-[focus-visible]:outline-accent-400",
           className,
         ),
       )}
@@ -103,13 +103,13 @@ function ColorSwatchPickerItem({ className, ...props }: AriaColorSwatchPickerIte
     <AriaColorSwatchPickerItem
       className={composeRenderProps(className, (className) =>
         cn(
-          "ring-offset-background size-8 overflow-hidden rounded-md border-2 transition-colors",
+          "size-8 overflow-hidden rounded-full outline-hidden transition-[outline-color]",
           /* Selected */
-          "data-[selected]:border-white",
+          "data-[selected]:outline-solid data-[selected]:outline-2 data-[selected]:outline-offset-2 data-[selected]:outline-neutral-950 dark:data-[selected]:outline-white",
           /* Disabled */
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           /* Focus Visible */
-          "data-[focus-visible]:ring-ring data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2",
+          focusRing,
           className,
         ),
       )}
@@ -121,7 +121,7 @@ function ColorSwatchPickerItem({ className, ...props }: AriaColorSwatchPickerIte
 function ColorSwatch({ className, ...props }: AriaColorSwatchProps) {
   return (
     <AriaColorSwatch
-      className={composeRenderProps(className, (className) => cn("size-8", className))}
+      className={composeRenderProps(className, (className) => cn("size-8 rounded-lg", className))}
       {...props}
     />
   );

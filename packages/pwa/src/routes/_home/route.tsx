@@ -185,7 +185,7 @@ function Home() {
                   aria-label={t`Add or create`}
                   icon="lucide.plus"
                   color="accent"
-                  className="h-14 w-14 shadow-md"
+                  className="shadow-raised h-14 w-14"
                 />
 
                 <Popover placement="top end" offset={16}>

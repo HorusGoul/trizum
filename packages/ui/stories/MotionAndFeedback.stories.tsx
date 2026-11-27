@@ -80,13 +80,20 @@ export const Toasts: Story = {
       <Toaster />
       <div className="flex flex-col gap-2">
         <Button
+          color="neutral"
           onPress={() => toast.success("Saved", { description: "Changes are stored locally" })}
         >
           Success
         </Button>
-        <Button onPress={() => toast.error("Unable to save")}>Error</Button>
-        <Button onPress={() => toast.warning("Check your connection")}>Warning</Button>
-        <Button onPress={() => toast.info("Update available")}>Information</Button>
+        <Button color="neutral" onPress={() => toast.error("Unable to save")}>
+          Error
+        </Button>
+        <Button color="neutral" onPress={() => toast.warning("Check your connection")}>
+          Warning
+        </Button>
+        <Button color="neutral" onPress={() => toast.info("Update available")}>
+          Information
+        </Button>
       </div>
     </>
   ),

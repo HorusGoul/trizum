@@ -118,6 +118,7 @@ function Who() {
                 <IconButton
                   icon="lucide.check"
                   aria-label={isSubmitting ? t`Submitting...` : t`Save`}
+                  color="accent"
                   type="submit"
                   form={formId}
                   isDisabled={isSubmitting}
@@ -136,7 +137,7 @@ function Who() {
         }}
         className="container mt-2 flex flex-col gap-4 px-2"
       >
-        <p className="px-2 whitespace-pre-wrap">
+        <p className="px-2 whitespace-pre-wrap text-neutral-600 dark:text-neutral-400">
           {needsToJoin ? (
             <Trans>
               To join the <span className="font-medium">{partyName}</span>, please select who you
@@ -164,23 +165,28 @@ function Who() {
                   value={participant.id}
                   className={({ isFocusVisible, isSelected, isPressed }) =>
                     cn(
-                      "group relative flex cursor-default rounded-xl bg-clip-padding px-4 py-3 shadow-lg outline-hidden",
-                      isFocusVisible && "ring-2 ring-accent-600 ring-offset-1 ring-offset-white/80",
-                      isSelected ? "bg-accent-600 text-white" : "border-transparent",
-                      isPressed && !isSelected ? "bg-accent-50 dark:bg-accent-800" : "",
-                      !isSelected && !isPressed ? "bg-accent-50 dark:bg-accent-900" : "",
+                      "group shadow-surface relative flex cursor-default rounded-2xl bg-white px-4 py-3 outline-hidden transition-colors dark:bg-neutral-900",
+                      isSelected && "ring-2 ring-accent-500 ring-inset dark:ring-accent-400",
+                      isFocusVisible &&
+                        "ring-2 ring-accent-500 ring-offset-2 ring-offset-neutral-100 dark:ring-accent-400 dark:ring-offset-black",
+                      isPressed && "bg-neutral-50 dark:bg-neutral-800",
                     )
                   }
                 >
                   {({ isSelected }) => (
                     <div className="flex w-full items-center justify-between gap-3">
                       <div className="flex shrink-0 items-center">
-                        <Icon icon={isSelected ? "lucide.circle-check" : "lucide.circle"} />
+                        <Icon
+                          icon={isSelected ? "lucide.circle-check" : "lucide.circle"}
+                          className={
+                            isSelected
+                              ? "text-accent-500 dark:text-accent-400"
+                              : "text-neutral-400 dark:text-neutral-500"
+                          }
+                        />
                       </div>
                       <div className="flex flex-1 flex-col">
-                        <div className="text-accent-10 text-lg font-semibold">
-                          {participant.name}
-                        </div>
+                        <div className="text-lg font-semibold">{participant.name}</div>
                       </div>
                     </div>
                   )}

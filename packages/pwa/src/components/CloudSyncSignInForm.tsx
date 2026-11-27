@@ -13,7 +13,7 @@ import {
 } from "./CloudSyncDialogs.tsx";
 
 const AUTH_SECONDARY_BUTTON_CLASS_NAME =
-  "h-9 text-sm font-medium text-accent-700 dark:text-accent-50";
+  "h-9 text-sm font-medium text-neutral-600 dark:text-neutral-300";
 
 export type AuthPendingAction =
   | "apple"
@@ -93,7 +93,7 @@ export function CloudSyncSignInForm({
           value={authState.email}
         />
         {authState.passwordResetMessage ? (
-          <p className="text-accent-700 dark:text-accent-50 text-sm">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
             {authState.passwordResetMessage}
           </p>
         ) : null}
@@ -132,7 +132,7 @@ export function CloudSyncSignInForm({
     <>
       <div className="flex flex-col gap-3">
         <Button
-          color="input-like"
+          color="neutral"
           isDisabled={status.isPending}
           onPress={() => {
             onSocialSignIn("apple");
@@ -144,7 +144,7 @@ export function CloudSyncSignInForm({
           </span>
         </Button>
         <Button
-          color="input-like"
+          color="neutral"
           isDisabled={status.isPending}
           onPress={() => {
             onSocialSignIn("google");
@@ -157,10 +157,10 @@ export function CloudSyncSignInForm({
         </Button>
       </div>
 
-      <div className="text-accent-600 dark:text-accent-300 flex items-center gap-3 text-xs font-medium uppercase">
-        <span className="bg-accent-200 dark:bg-accent-700 h-px flex-1" />
+      <div className="flex items-center gap-3 text-xs font-medium text-neutral-400 uppercase dark:text-neutral-500">
+        <span className="h-px flex-1 bg-neutral-950/10 dark:bg-white/10" />
         <Trans>or use email</Trans>
-        <span className="bg-accent-200 dark:bg-accent-700 h-px flex-1" />
+        <span className="h-px flex-1 bg-neutral-950/10 dark:bg-white/10" />
       </div>
 
       {mode === "password" ? (
@@ -259,7 +259,7 @@ function PasswordSignInForm({
           <Trans>Sign in with password</Trans>
         </span>
       </Button>
-      <Button color="input-like" isDisabled={isAuthPending} onPress={onUseMagicLink} type="button">
+      <Button color="neutral" isDisabled={isAuthPending} onPress={onUseMagicLink} type="button">
         <span className="flex items-center gap-2">
           <Icon icon="lucide.mail" width={18} height={18} />
           <Trans>Sign in with magic link</Trans>
@@ -316,7 +316,7 @@ function MagicLinkSignInForm({
           <Trans>Email me a sign-in link</Trans>
         </span>
       </Button>
-      <Button color="input-like" isDisabled={isAuthPending} onPress={onUsePassword} type="button">
+      <Button color="neutral" isDisabled={isAuthPending} onPress={onUsePassword} type="button">
         <span className="flex items-center gap-2">
           <Icon icon="lucide.key-round" width={18} height={18} />
           <Trans>Sign in with password</Trans>

@@ -95,6 +95,7 @@ function PartyDetailsSettings() {
                   <IconButton
                     icon="lucide.check"
                     aria-label={isSubmitting ? t`Submitting...` : t`Save`}
+                    color="accent"
                     type="submit"
                     form={formId}
                     isPending={isSubmitting}

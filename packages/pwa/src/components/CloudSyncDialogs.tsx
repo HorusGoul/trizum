@@ -33,7 +33,7 @@ export function CloudSyncSwitchDialog({
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -50,18 +50,18 @@ export function CloudSyncSwitchDialog({
       >
         <Dialog
           aria-label={t`Use trizum cloud on this device?`}
-          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 rounded-lg border bg-white shadow-2xl outline-hidden"
+          className="shadow-overlay rounded-3xl bg-white outline-hidden dark:bg-neutral-800"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
             <div className="flex flex-col gap-3">
-              <span className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50 flex size-10 items-center justify-center rounded-full">
+              <span className="flex size-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-50">
                 <Icon icon="lucide.cloud-download" width={20} height={20} />
               </span>
               <div className="flex flex-col gap-2">
                 <h2 className="text-lg font-medium">
                   <Trans>Use trizum cloud on this device?</Trans>
                 </h2>
-                <p className="text-accent-700 dark:text-accent-50 text-sm">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   <Trans>
                     This device already has local data. Using trizum cloud here will switch this
                     device to your cloud data. Your local data on this device will stop being used.
@@ -79,7 +79,7 @@ export function CloudSyncSwitchDialog({
               </Button>
               <Button
                 className="text-danger-700 dark:text-danger-300 font-semibold"
-                color="input-like"
+                color="neutral"
                 onPress={onSignOut}
               >
                 <span className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export function AuthCallbackErrorDialog({
       onOpenChange={onOpenChange}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -130,7 +130,7 @@ export function AuthCallbackErrorDialog({
       >
         <Dialog
           aria-label={content?.title ?? t`Authentication error`}
-          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 rounded-lg border bg-white shadow-2xl outline-hidden"
+          className="shadow-overlay rounded-3xl bg-white outline-hidden dark:bg-neutral-800"
         >
           {content ? (
             <div className="flex flex-col gap-5 p-5 sm:p-6">
@@ -140,7 +140,7 @@ export function AuthCallbackErrorDialog({
                 </span>
                 <div className="flex flex-col gap-2">
                   <h2 className="text-lg font-medium">{content.title}</h2>
-                  <p className="text-accent-700 dark:text-accent-50 text-sm">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     {content.description}
                   </p>
                 </div>
@@ -186,7 +186,7 @@ export function CloudSyncSignInDialog({
       }}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-stretch justify-center bg-accent-950/35 p-0 backdrop-blur-md sm:items-center sm:px-safe-or-4 sm:py-safe-offset-6",
+          "fixed inset-0 z-50 flex items-stretch justify-center bg-black/40 dark:bg-black/60 p-0 backdrop-blur-md sm:items-center sm:px-safe-or-4 sm:py-safe-offset-6",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -203,7 +203,7 @@ export function CloudSyncSignInDialog({
       >
         <Dialog
           aria-label={t`Sign in`}
-          className="sm:border-accent-200 dark:bg-accent-950 dark:sm:border-accent-800 relative flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-white shadow-2xl outline-hidden sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg sm:border"
+          className="shadow-overlay relative flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-white outline-hidden sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl dark:bg-neutral-800"
         >
           <IconButton
             aria-label={t`Close sign-in`}
@@ -216,7 +216,7 @@ export function CloudSyncSignInDialog({
               <div className="flex flex-col items-center gap-3 text-center">
                 <img
                   alt=""
-                  className="size-12 rounded-xl"
+                  className="size-12 rounded-2xl"
                   height={48}
                   src="/pwa-64x64.png"
                   width={48}
@@ -270,12 +270,12 @@ export function CloudAuthLoadingState() {
       >
         <motion.span
           animate={{ rotate: 360 }}
-          className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50 flex size-12 items-center justify-center rounded-full"
+          className="flex size-12 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-50"
           transition={{ duration: 0.9, ease: "linear", repeat: Infinity }}
         >
           <Icon icon="lucide.loader-circle" width={24} height={24} />
         </motion.span>
-        <p className="text-accent-700 dark:text-accent-50 text-sm font-medium">
+        <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
           <Trans>Finishing sign in</Trans>
         </p>
       </output>
@@ -310,11 +310,11 @@ export function MagicLinkSentState({
         </motion.span>
         <div className="flex flex-col gap-2">
           <h3 className="text-base font-medium">{message}</h3>
-          <p className="text-accent-700 dark:text-accent-50 text-sm">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
             <Trans>We sent a sign-in link to {email}. Open it to finish signing in.</Trans>
           </p>
         </div>
-        <Button color="input-like" onPress={onTryAgain} type="button">
+        <Button color="neutral" onPress={onTryAgain} type="button">
           <span className="flex items-center gap-2">
             <Icon icon="lucide.refresh-cw" width={18} height={18} />
             <Trans>Try another email</Trans>
@@ -329,7 +329,7 @@ export function SignInSuccessOverlay({ exitAnimationMs }: { exitAnimationMs: num
   return (
     <LazyMotion features={domAnimation}>
       <motion.div
-        className="py-safe-offset-6 px-safe-or-4 dark:bg-accent-950/90 fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-md"
+        className="py-safe-offset-6 px-safe-or-4 fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-md dark:bg-black/90"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -402,7 +402,7 @@ export function CloudActionConfirmationDialog({
       onOpenChange={onOpenChange}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -419,14 +419,14 @@ export function CloudActionConfirmationDialog({
       >
         <Dialog
           aria-label={config?.title ?? t`Confirm action`}
-          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 rounded-lg border bg-white shadow-2xl outline-hidden"
+          className="shadow-overlay rounded-3xl bg-white outline-hidden dark:bg-neutral-800"
         >
           {config && action ? (
             <div className="flex flex-col gap-5 p-5 sm:p-6">
               <div className="flex flex-col gap-3">
                 <span
                   className={cn(
-                    "flex size-10 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50",
+                    "flex size-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-50",
                     config.tone === "danger" &&
                       "bg-danger-50 text-danger-500 dark:bg-danger-950/50 dark:text-danger-300",
                   )}
@@ -435,7 +435,7 @@ export function CloudActionConfirmationDialog({
                 </span>
                 <div className="flex flex-col gap-2">
                   <h2 className="text-lg font-medium">{config.title}</h2>
-                  <p className="text-accent-700 dark:text-accent-50 text-sm">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     {config.description}
                   </p>
                 </div>
@@ -460,7 +460,7 @@ export function CloudActionConfirmationDialog({
                   </span>
                 </Button>
                 <Button
-                  color="input-like"
+                  color="neutral"
                   isDisabled={isPending}
                   onPress={() => {
                     onOpenChange(false);
@@ -575,7 +575,7 @@ export function DeleteAccountDialog({
       onOpenChange={onOpenChange}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -592,14 +592,14 @@ export function DeleteAccountDialog({
       >
         <Dialog
           aria-label={t`Delete account`}
-          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 rounded-lg border bg-white shadow-2xl outline-hidden"
+          className="shadow-overlay rounded-3xl bg-white outline-hidden dark:bg-neutral-800"
         >
           <form className="flex flex-col gap-5 p-5 sm:p-6" onSubmit={onSubmit}>
             <div className="flex flex-col gap-2">
               <h2 className="text-lg font-medium">
                 <Trans>Delete account?</Trans>
               </h2>
-              <p className="text-accent-700 dark:text-accent-50 text-sm">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 <Trans>
                   This permanently deletes your trizum cloud account, sign-in methods, and cloud
                   settings. Your local data on this device will remain. Deleting your account does
@@ -632,7 +632,7 @@ export function DeleteAccountDialog({
                 </span>
               </Button>
               <Button
-                color="input-like"
+                color="neutral"
                 isDisabled={isPending}
                 onPress={() => {
                   onOpenChange(false);

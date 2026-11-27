@@ -33,7 +33,7 @@ type Story = StoryObj;
 export const Help: Story = {
   render: () => (
     <TooltipTrigger delay={0}>
-      <Button>Hover or focus</Button>
+      <Button color="neutral">Hover or focus</Button>
       <Tooltip>Additional information</Tooltip>
     </TooltipTrigger>
   ),
@@ -42,7 +42,7 @@ export const Help: Story = {
 export const Details: Story = {
   render: () => (
     <PopoverTrigger>
-      <Button>Open details</Button>
+      <Button color="neutral">Open details</Button>
       <Popover>
         <PopoverDialog aria-label="Details">Popover content</PopoverDialog>
       </Popover>
@@ -55,7 +55,9 @@ function SheetExample({ isDismissable = true }: { isDismissable?: boolean }) {
 
   return (
     <>
-      <Button onPress={() => setOpen(true)}>Open sheet</Button>
+      <Button color="neutral" onPress={() => setOpen(true)}>
+        Open sheet
+      </Button>
       <ModalSheet isOpen={open} onOpenChange={setOpen} isDismissable={isDismissable}>
         <ModalSheetHeader>
           <ModalSheetTitle>Sheet title</ModalSheetTitle>

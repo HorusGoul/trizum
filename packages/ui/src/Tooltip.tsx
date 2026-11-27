@@ -14,7 +14,7 @@ const Tooltip = ({ className, offset = 4, ...props }: AriaTooltipProps) => (
     offset={offset}
     className={composeRenderProps(className, (className) =>
       cn(
-        "z-50 overflow-hidden rounded-md border-accent-500 bg-white px-3 py-1.5 text-sm text-accent-900 shadow-md animate-in fade-in-0 dark:border-accent-700 dark:bg-accent-900 dark:text-accent-50",
+        "z-50 overflow-hidden rounded-2xl bg-white px-3 py-1.5 text-sm text-neutral-950 shadow-overlay animate-in fade-in-0 dark:bg-neutral-800 dark:text-neutral-50",
         /* Entering */
         "data-[entering]:zoom-in-95",
         /* Exiting */

@@ -561,7 +561,7 @@ function CurrencyFieldWithCalculator({
         inputClassName={cn(
           props.inputClassName,
           !calculatorButtonClassName && "pr-12",
-          isCalculatorActive && "ring-ring ring-2 ring-offset-2",
+          isCalculatorActive && "ring-2 ring-accent-500 dark:ring-accent-400",
         )}
         inputEndAdornment={
           <CalculatorFieldButton

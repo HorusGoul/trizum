@@ -117,7 +117,7 @@ function CloudSettingsSection({
     <section className="flex flex-col gap-2">
       <div
         className={cn(
-          "flex items-center gap-2 px-1 text-sm font-semibold text-accent-700 dark:text-accent-200",
+          "flex items-center gap-2 px-1 text-sm font-semibold text-neutral-600 dark:text-neutral-400",
           tone === "danger" && "text-danger-600 dark:text-danger-300",
         )}
       >
@@ -152,7 +152,7 @@ function CloudSettingsItem({
     <span className="flex w-full items-center gap-3">
       <span
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50",
+          "flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-neutral-700 shadow-surface dark:bg-neutral-900 dark:text-neutral-50",
           tone === "danger" &&
             "bg-danger-50 text-danger-600 dark:bg-danger-950/50 dark:text-danger-300",
         )}
@@ -171,7 +171,7 @@ function CloudSettingsItem({
         {description ? (
           <span
             className={cn(
-              "whitespace-normal break-words text-sm leading-snug text-accent-700 dark:text-accent-200",
+              "whitespace-normal break-words text-sm leading-snug text-neutral-600 dark:text-neutral-400",
               tone === "danger" && "text-danger-700 dark:text-danger-300",
             )}
           >
@@ -182,7 +182,7 @@ function CloudSettingsItem({
       {onPress ? (
         <span
           className={cn(
-            "ml-2 flex shrink-0 items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-100",
+            "ml-2 flex shrink-0 items-center gap-1 text-sm font-medium text-neutral-400 dark:text-neutral-500",
             tone === "danger" && "text-danger-600 dark:text-danger-300",
           )}
         >
@@ -191,7 +191,7 @@ function CloudSettingsItem({
       ) : statusLabel ? (
         <span
           className={cn(
-            "ml-2 shrink-0 rounded-full bg-accent-100 px-2.5 py-1 text-xs font-medium text-accent-700 dark:bg-accent-900 dark:text-accent-100",
+            "ml-2 shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-neutral-600 shadow-surface dark:bg-neutral-900 dark:text-neutral-300",
             tone === "danger" &&
               "bg-danger-50 text-danger-700 dark:bg-danger-950/50 dark:text-danger-300",
           )}
@@ -200,7 +200,7 @@ function CloudSettingsItem({
         </span>
       ) : isConnected ? (
         <Icon
-          className="text-accent-600 dark:text-accent-200"
+          className="text-accent-600 dark:text-accent-400"
           icon="lucide.check"
           width={18}
           height={18}
@@ -210,8 +210,8 @@ function CloudSettingsItem({
   );
 
   const className = cn(
-    "-mx-3 h-auto min-h-16 w-[calc(100%+1.5rem)] justify-start rounded-xl px-3 py-3 text-left",
-    "hover:bg-accent-100/70 dark:hover:bg-accent-900/70",
+    "-mx-3 h-auto min-h-16 w-[calc(100%+1.5rem)] justify-start rounded-2xl px-3 py-3 text-left",
+    "hover:bg-neutral-950/5 dark:hover:bg-white/10",
     tone === "danger" && "hover:bg-danger-50 dark:hover:bg-danger-950/40",
   );
 
@@ -230,7 +230,7 @@ function CloudSettingsItem({
   }
 
   return (
-    <div className="-mx-3 flex min-h-16 w-[calc(100%+1.5rem)] items-center rounded-xl px-3 py-3 text-left">
+    <div className="-mx-3 flex min-h-16 w-[calc(100%+1.5rem)] items-center rounded-2xl px-3 py-3 text-left">
       {content}
     </div>
   );

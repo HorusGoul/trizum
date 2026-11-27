@@ -120,7 +120,7 @@ export function ExpenseCurrencyFields({
                 isReadOnly
                 minValue={0}
                 className="min-w-0"
-                inputClassName="cursor-default border-dashed border-accent-300 bg-accent-100/50 font-semibold text-accent-600 dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200"
+                inputClassName="cursor-default bg-neutral-50 font-semibold text-neutral-600 dark:bg-white/5 dark:text-neutral-300"
               />
             )}
           </form.Field>

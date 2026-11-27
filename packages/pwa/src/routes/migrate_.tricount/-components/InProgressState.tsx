@@ -7,10 +7,10 @@ export function InProgressState({ name, progress }: { name: string; progress: nu
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Migration in progress</Trans>
         </h1>
-        <p className="text-accent-700 dark:text-accent-200 my-4 text-sm font-semibold">{name}</p>
+        <p className="my-4 text-sm font-semibold text-neutral-950 dark:text-neutral-50">{name}</p>
 
         <Progress value={progress} />
-        <p className="mt-4 text-xs">
+        <p className="mt-4 text-xs text-neutral-600 dark:text-neutral-400">
           <Trans>Please don&apos;t close the app while we migrate your data</Trans>
         </p>
       </div>
@@ -25,7 +25,7 @@ function Progress({ value }: { value: number }) {
         className="bg-accent-500 dark:bg-accent-400 absolute top-0 left-0 h-2 rounded-full"
         style={{ width: `${value * 100}%` }}
       />
-      <div className="bg-accent-200 dark:bg-accent-800 h-2 w-full rounded-full" />
+      <div className="h-2 w-full rounded-full bg-neutral-950/10 dark:bg-white/15" />
     </div>
   );
 }

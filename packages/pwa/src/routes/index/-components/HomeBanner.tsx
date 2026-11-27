@@ -61,11 +61,11 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
           {needsProfileSetup ? (
             <ProfileSetupCard />
           ) : (
-            <div className="border-accent-400 bg-accent-50 dark:border-accent-500 dark:bg-accent-950 flex items-start rounded-xl border">
+            <div className="shadow-surface flex items-start rounded-3xl bg-white dark:bg-neutral-900">
               <Button
                 onPress={openPremium}
                 isDisabled={dialogs.dialog.kind !== "closed"}
-                className="text-accent-950 dark:text-accent-50 hover:bg-accent-100 focus-visible:bg-accent-100 dark:hover:bg-accent-900 dark:focus-visible:bg-accent-900 focus-visible:ring-accent-500 flex min-w-0 flex-1 cursor-pointer items-start gap-4 rounded-xl p-4 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-inset"
+                className="focus-visible:ring-accent-500 dark:focus-visible:ring-accent-400 flex min-w-0 flex-1 cursor-pointer items-start gap-4 rounded-3xl p-4 text-start text-neutral-950 outline-hidden hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-inset dark:text-neutral-50 dark:hover:bg-neutral-800/50"
               >
                 <div className="-mt-0.5 flex h-8 w-8 shrink-0 justify-center">
                   <Icon icon="lucide.sparkles" className="text-accent-600 dark:text-accent-400" />
@@ -74,7 +74,7 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
                   <span className="text-lg leading-tight font-semibold">
                     <Trans>Enjoy trizum ad-free</Trans>
                   </span>
-                  <span className="text-accent-700 dark:text-accent-300 text-sm">
+                  <span className="text-sm text-neutral-600 dark:text-neutral-400">
                     <Trans>Explore Premium</Trans>
                   </span>
                 </span>
@@ -87,7 +87,7 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
                   trackEvent("premium_banner_dismissed");
                 }}
                 isDisabled={dialogs.dialog.kind !== "closed"}
-                className="text-accent-600 dark:text-accent-400 mt-2 mr-2 shrink-0"
+                className="mt-2 mr-2 shrink-0 text-neutral-500 dark:text-neutral-400"
                 iconClassName="size-5"
               />
             </div>

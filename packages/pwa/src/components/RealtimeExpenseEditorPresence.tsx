@@ -416,7 +416,7 @@ function AvatarWrapper({
     <Avatar
       url={url}
       name={name}
-      className="bg-accent-500 absolute z-50 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-white shadow-xl transition-all duration-500 ease-in-out"
+      className="bg-accent-500 shadow-raised absolute z-50 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-white transition-all duration-500 ease-in-out"
       style={{
         top,
         left,

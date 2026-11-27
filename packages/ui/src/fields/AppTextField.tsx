@@ -33,7 +33,7 @@ export function AppTextField({
       {label ? <Label>{label}</Label> : null}
       {textArea ? <TextArea /> : <Input />}
       {description && (
-        <Text className="text-accent-700 dark:text-accent-50 text-sm" slot="description">
+        <Text className="text-sm text-neutral-600 dark:text-neutral-400" slot="description">
           {description}
         </Text>
       )}

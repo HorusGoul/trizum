@@ -6,7 +6,7 @@ import { cn } from "./utils.js";
 const QRCodeFrameHandle = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
-    className={cn("size-3 rounded-tl border-l-2 border-t-2 border-accent-400", className)}
+    className={cn("size-3 rounded-tl-md border-l-2 border-t-2 border-neutral-400", className)}
   />
 );
 
@@ -14,7 +14,7 @@ export const GradientScan = ({ className, ...props }: HTMLAttributes<HTMLDivElem
   <div
     {...props}
     className={cn(
-      "absolute bottom-0 h-1/2 w-full border-t border-accent-400 bg-accent-400/10",
+      "absolute bottom-0 h-1/2 w-full border-t border-neutral-400 bg-neutral-400/10",
       className,
     )}
     style={{

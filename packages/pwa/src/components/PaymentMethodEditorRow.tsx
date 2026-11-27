@@ -68,13 +68,13 @@ export function PaymentMethodEditorRow({
   });
 
   const fieldClassName =
-    "min-h-12 w-full border-0 bg-transparent px-0 py-3 text-base font-medium shadow-none outline-none placeholder:font-normal placeholder:italic placeholder:text-accent-950/60 dark:bg-transparent dark:placeholder:text-accent-50/55 data-[focused]:ring-0 data-[focused]:ring-offset-0";
+    "min-h-12 w-full border-0 bg-transparent px-0 py-3 text-base font-medium shadow-none outline-none placeholder:font-normal placeholder:italic placeholder:text-neutral-400 dark:bg-transparent dark:placeholder:text-neutral-500 data-[focused]:ring-0 data-[focused]:ring-offset-0";
 
   const hintClassName =
-    "text-accent-600 dark:text-accent-400 sr-only text-xs md:not-sr-only md:block md:pb-3";
+    "text-neutral-600 dark:text-neutral-400 sr-only text-xs md:not-sr-only md:block md:pb-3";
 
   const serviceLabel = (
-    <span className="text-accent-700 dark:text-accent-200 flex min-h-12 w-5 shrink-0 items-center justify-center self-start md:w-28 md:justify-start md:gap-2">
+    <span className="flex min-h-12 w-5 shrink-0 items-center justify-center self-start text-neutral-700 md:w-28 md:justify-start md:gap-2 dark:text-neutral-200">
       <PaymentMethodIcon type={type} size={20} />
       <span className="hidden text-sm font-medium md:block">{methodName}</span>
     </span>
@@ -108,7 +108,7 @@ export function PaymentMethodEditorRow({
   }
 
   return (
-    <div className="group dark:bg-accent-900 focus-within:ring-accent-400 relative bg-white first:rounded-t-xl last:rounded-b-xl focus-within:z-10 focus-within:ring-2 focus-within:ring-inset">
+    <div className="group focus-within:ring-accent-500 dark:focus-within:ring-accent-400 relative first:rounded-t-3xl last:rounded-b-3xl focus-within:z-10 focus-within:ring-2 focus-within:ring-inset">
       {isEditing ? (
         <div className="flex items-start gap-3 px-4 md:pr-17">
           {serviceLabel}
@@ -164,7 +164,7 @@ export function PaymentMethodEditorRow({
           <span className="min-w-0 flex-1">
             <span
               id={detailsId}
-              className={`block min-h-12 truncate py-3 text-base ${details.trim() ? "font-medium" : "text-accent-950/60 dark:text-accent-50/55 italic"}`}
+              className={`block min-h-12 truncate py-3 text-base ${details.trim() ? "font-medium" : "text-neutral-400 italic dark:text-neutral-500"}`}
             >
               {details.trim() ? details : t(paymentMethodPlaceholders[type])}
             </span>
@@ -184,7 +184,7 @@ export function PaymentMethodEditorRow({
           <IconButton
             icon="lucide.ellipsis"
             aria-label={t({ message: `More ${methodName} actions` })}
-            className="text-accent-700 dark:text-accent-200 absolute top-0.5 right-3 size-11 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+            className="absolute top-0.5 right-3 size-11 text-neutral-600 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 dark:text-neutral-400"
           />
           <Popover placement="bottom end">
             <PaymentMethodPopoverContent onClose={finishClosingActions}>

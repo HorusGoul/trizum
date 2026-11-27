@@ -28,7 +28,7 @@ export function Photos({ photos = EMPTY_PHOTOS, onOpenGallery }: PhotosProps) {
 
       <dd className="-mx-4 -my-4 flex gap-4 overflow-x-auto px-4 py-4">
         {photos.map((photoId, index) => (
-          <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
+          <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32 rounded-2xl" />}>
             <PhotoItemById photoId={photoId} onPress={() => onOpenGallery(index)} />
           </Suspense>
         ))}

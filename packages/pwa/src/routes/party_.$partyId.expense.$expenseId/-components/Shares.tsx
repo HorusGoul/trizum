@@ -19,8 +19,8 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmo
         <span className="font-medium">{t`Shares`}</span>
       </dt>
 
-      <dd className="-mx-2 overflow-hidden rounded-lg">
-        <ul>
+      <dd className="shadow-surface overflow-hidden rounded-3xl bg-white dark:bg-neutral-900">
+        <ul className="divide-y divide-neutral-950/5 dark:divide-white/10">
           {Object.entries(unitAmounts)
             .sort(([a], [b]) =>
               party.participants[a].name.localeCompare(party.participants[b].name, i18n.locale),
@@ -37,15 +37,12 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmo
                   : undefined;
 
               return (
-                <li
-                  key={userId}
-                  className="bg-accent-50 even:bg-accent-50/80 dark:bg-accent-900 dark:even:bg-accent-900/60 flex justify-between p-2 px-3"
-                >
+                <li key={userId} className="flex justify-between px-4 py-3">
                   <span className="flex items-center gap-1 font-medium">
                     {party.participants[userId].name}
 
                     {isMe ? (
-                      <span className="bg-accent-500 text-accent-50 h-4 rounded-xs px-1 text-xs font-semibold uppercase">
+                      <span className="bg-accent-500 text-accent-50 h-4 rounded-full px-1.5 text-xs font-semibold uppercase">
                         {t`Me`}
                       </span>
                     ) : null}
@@ -60,7 +57,7 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy" | "originalAmo
                       <CurrencyText
                         amount={amount}
                         currency={party.currency}
-                        className="text-accent-600 dark:text-accent-300 text-xs"
+                        className="text-xs text-neutral-600 dark:text-neutral-400"
                         variant="inherit"
                       />
                     ) : null}

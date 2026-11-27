@@ -776,7 +776,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
   if (!optimisticAuthUser && (sessionStatus === "pending" || sessionStatus === "unavailable")) {
     const accountStatus = (
       <div className="container flex flex-col gap-4 p-4">
-        <output className="text-accent-700 dark:text-accent-300 text-sm">
+        <output className="text-sm text-neutral-600 dark:text-neutral-400">
           {sessionStatus === "pending" ? (
             <Trans>Checking account…</Trans>
           ) : (
@@ -805,7 +805,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     }
 
     return (
-      <div className="bg-accent-50 dark:bg-accent-950 fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto">
+      <div className="fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto bg-neutral-100 dark:bg-black">
         <div className="mt-safe container flex h-16 items-center px-2">
           <BackButton fallbackOptions={{ to: "/" }} />
           <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -945,7 +945,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
   }
 
   return (
-    <div className="bg-accent-50 dark:bg-accent-950 fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto bg-neutral-100 dark:bg-black">
       <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/" }} />
 

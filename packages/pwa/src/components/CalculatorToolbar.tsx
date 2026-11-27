@@ -1102,7 +1102,7 @@ export function CalculatorToolbar({
       role="application"
       aria-label={t`Calculator`}
       data-presence-proxy-element-id={presenceElementId}
-      className="border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 overflow-y-auto rounded-lg border bg-white shadow-lg"
+      className="shadow-overlay fixed z-50 overflow-y-auto rounded-3xl bg-white dark:bg-neutral-800"
       style={{
         top: desktopPopoverPosition.top,
         left: desktopPopoverPosition.left,
@@ -1205,7 +1205,7 @@ function CalculatorMobileAttachmentContent({
     <>
       <m.div
         data-calculator-attachment-toolbar=""
-        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950 pointer-events-auto absolute inset-x-0 top-0 z-10 bg-white shadow-sm"
+        className="pt-safe shadow-raised pointer-events-auto absolute inset-x-0 top-0 z-10 bg-white dark:bg-neutral-900"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -1215,7 +1215,7 @@ function CalculatorMobileAttachmentContent({
         <div
           role="toolbar"
           aria-label={t`Attachments`}
-          className="border-accent-200/80 px-safe-or-4 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
+          className="px-safe-or-4 flex h-16 items-center gap-2"
         >
           <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto py-2">
             {photoIds.map((photoId, index) => (
@@ -1246,7 +1246,7 @@ function CalculatorMobileAttachmentContent({
         {activeIndex !== null ? (
           <m.section
             aria-label={t`Attachment preview`}
-            className="bg-accent-950/85 pointer-events-auto absolute inset-x-0 z-0 overflow-hidden backdrop-blur-sm"
+            className="pointer-events-auto absolute inset-x-0 z-0 overflow-hidden bg-neutral-950/85 backdrop-blur-sm"
             style={{
               top: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE,
               bottom: 0,
@@ -1302,14 +1302,14 @@ function CalculatorMobileAttachmentButton({
       })}
       onPress={() => onSelect(index)}
       className={cn(
-        "border-accent-200 bg-accent-50 dark:bg-accent-900 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-accent-700",
-        isActive && "ring-accent-500 dark:ring-accent-400 ring-2 ring-inset",
+        "h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-neutral-100 p-0 dark:bg-neutral-800",
+        isActive && "ring-2 ring-accent-500 ring-inset dark:ring-accent-400",
       )}
     >
       <span
         className={cn(
           "pointer-events-none absolute overflow-hidden",
-          isActive ? "inset-[3px] rounded-[0.35rem]" : "inset-px rounded-[0.45rem]",
+          isActive ? "inset-[3px] rounded-[0.5625rem]" : "inset-0 rounded-xl",
         )}
       >
         <img src={url} alt="" className="block h-full w-full object-cover" />
@@ -1359,7 +1359,7 @@ function CalculatorContent({
         <div className="flex justify-center">
           <span
             aria-hidden="true"
-            className="bg-accent-200 dark:bg-accent-700 h-1.5 w-12 rounded-full"
+            className="h-1.5 w-12 rounded-full bg-neutral-300 dark:bg-neutral-700"
           />
         </div>
       ) : null}
@@ -1367,7 +1367,7 @@ function CalculatorContent({
       <div className="flex min-h-8 items-center gap-2 px-1">
         {fieldLabel ? (
           <span
-            className="text-accent-700 dark:text-accent-200 min-w-0 flex-1 truncate text-sm font-medium"
+            className="min-w-0 flex-1 truncate text-sm font-medium text-neutral-600 dark:text-neutral-400"
             title={fieldLabel}
           >
             {fieldLabel}
@@ -1438,7 +1438,7 @@ function CalculatorPreview({
   return (
     <div className="flex h-8 min-w-0 shrink-0 items-center justify-end">
       {previewValue !== null && expression ? (
-        <span className="text-accent-600 dark:text-accent-400 text-sm font-medium">
+        <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
           = {formatCalculatorPreviewValue(previewValue, currency)}
         </span>
       ) : null}
@@ -1481,7 +1481,7 @@ function CalculatorExpressionDisplay({
   return (
     <div
       ref={expressionRef}
-      className="border-accent-400 bg-accent-50 dark:border-accent-600 dark:bg-accent-800 flex cursor-text touch-none items-center overflow-hidden rounded-md border px-3 py-2 select-none"
+      className="shadow-surface flex cursor-text touch-none items-center overflow-hidden rounded-2xl bg-white px-4 py-2 inset-ring inset-ring-neutral-950/5 select-none dark:bg-white/10 dark:inset-ring-0"
     >
       <span
         ref={expressionScrollRef}
@@ -1490,7 +1490,7 @@ function CalculatorExpressionDisplay({
         aria-label={t`Calculator expression`}
       >
         {!expression ? (
-          <span className="animate-blink">|</span>
+          <span className="animate-blink text-accent-500 dark:text-accent-400">|</span>
         ) : (
           <span ref={expressionContentRef} className="relative inline-flex">
             {expression.split("").map((char, index) => (
@@ -1502,11 +1502,11 @@ function CalculatorExpressionDisplay({
                   activeSelectionRange &&
                     index >= activeSelectionRange.start &&
                     index < activeSelectionRange.end &&
-                    "bg-accent-300 text-accent-950 dark:bg-accent-700 dark:text-accent-50",
+                    "bg-accent-500/25 text-neutral-950 dark:bg-accent-400/30 dark:text-neutral-50",
                 )}
               >
                 {!activeSelectionRange && index === cursorPosition ? (
-                  <span className="animate-blink absolute top-0 left-0 h-full w-0">
+                  <span className="animate-blink text-accent-500 dark:text-accent-400 absolute top-0 left-0 h-full w-0">
                     <span className="absolute -translate-x-1/2">|</span>
                   </span>
                 ) : null}
@@ -1514,7 +1514,7 @@ function CalculatorExpressionDisplay({
               </span>
             ))}
             {!activeSelectionRange && cursorPosition === expression.length ? (
-              <span className="animate-blink absolute top-0 right-0 h-full w-0">
+              <span className="animate-blink text-accent-500 dark:text-accent-400 absolute top-0 right-0 h-full w-0">
                 <span className="absolute -translate-x-1/2">|</span>
               </span>
             ) : null}
@@ -1531,13 +1531,17 @@ function CalculatorKeypad({
   onCommit,
   onInsert,
 }: Pick<CalculatorToolbarProps, "onBackspace" | "onClear" | "onCommit" | "onInsert">) {
-  const utilityButtonClassName = "h-12 touch-manipulation rounded-xl text-lg font-medium";
-  const digitButtonClassName = "h-12 touch-manipulation rounded-xl text-xl font-medium";
+  const utilityButtonClassName = "h-12 touch-manipulation rounded-2xl text-lg font-medium";
+
+  const operatorButtonClassName =
+    "h-12 touch-manipulation rounded-2xl bg-neutral-950/10 text-xl font-semibold data-[hovered]:bg-neutral-950/15 data-[pressed]:bg-neutral-950/20 dark:bg-white/15 dark:data-[hovered]:bg-white/20 dark:data-[pressed]:bg-white/25";
+
+  const digitButtonClassName = "h-12 touch-manipulation rounded-2xl text-xl font-medium";
 
   return (
     <div className="grid grid-cols-4 gap-1.5">
       <Button
-        color="input-like"
+        color="neutral"
         aria-label={t`Clear all`}
         onPress={onClear}
         className={utilityButtonClassName}
@@ -1545,7 +1549,7 @@ function CalculatorKeypad({
         AC
       </Button>
       <Button
-        color="input-like"
+        color="neutral"
         aria-label={t`Open parenthesis`}
         onPress={() => onInsert("(")}
         className={utilityButtonClassName}
@@ -1553,7 +1557,7 @@ function CalculatorKeypad({
         (
       </Button>
       <Button
-        color="input-like"
+        color="neutral"
         aria-label={t`Close parenthesis`}
         onPress={() => onInsert(")")}
         className={utilityButtonClassName}
@@ -1561,10 +1565,10 @@ function CalculatorKeypad({
         )
       </Button>
       <Button
-        color="accent"
+        color="neutral"
         aria-label={t`Divide`}
         onPress={() => onInsert("/")}
-        className={utilityButtonClassName}
+        className={operatorButtonClassName}
       >
         ÷
       </Button>
@@ -1581,10 +1585,10 @@ function CalculatorKeypad({
         </Button>
       ))}
       <Button
-        color="accent"
+        color="neutral"
         aria-label={t`Multiply`}
         onPress={() => onInsert("*")}
-        className={utilityButtonClassName}
+        className={operatorButtonClassName}
       >
         ×
       </Button>
@@ -1601,10 +1605,10 @@ function CalculatorKeypad({
         </Button>
       ))}
       <Button
-        color="accent"
+        color="neutral"
         aria-label={t`Subtract`}
         onPress={() => onInsert("-")}
-        className={utilityButtonClassName}
+        className={operatorButtonClassName}
       >
         −
       </Button>
@@ -1621,10 +1625,10 @@ function CalculatorKeypad({
         </Button>
       ))}
       <Button
-        color="accent"
+        color="neutral"
         aria-label={t`Add`}
         onPress={() => onInsert("+")}
-        className={utilityButtonClassName}
+        className={operatorButtonClassName}
       >
         +
       </Button>
@@ -1646,7 +1650,7 @@ function CalculatorKeypad({
         .
       </Button>
       <Button
-        color="input-like"
+        color="neutral"
         aria-label={t`Backspace`}
         onPress={onBackspace}
         className={utilityButtonClassName}

@@ -22,7 +22,7 @@ export function NewPartyParticipantsField({
         <Trans>Participants</Trans>
       </h2>
 
-      <p className="mt-2">
+      <p className="mt-2 text-neutral-600 dark:text-neutral-400">
         <Trans>Who is invited to this party? You can add more participants later.</Trans>
       </p>
 
@@ -109,7 +109,7 @@ export function NewPartyParticipantsField({
                 icon="lucide.plus"
                 aria-label={t`Add participant`}
                 className="shrink-0"
-                color="accent"
+                color="neutral"
                 onPress={addNewParticipant}
               />
             </div>

@@ -30,7 +30,7 @@ export function OnlyUseCustomTemplatesSheet({
         </ModalSheetSection>
       </ModalSheetHeader>
       <ModalSheetContent>
-        <ModalSheetSection className="text-accent-700 dark:text-accent-200 pb-3 text-sm">
+        <ModalSheetSection className="pb-3 text-sm text-neutral-600 dark:text-neutral-400">
           <Trans>
             {templateName} will become the default. New expenses will always start from a custom
             template.

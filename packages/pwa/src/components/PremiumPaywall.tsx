@@ -126,7 +126,7 @@ export function PremiumPaywall({
       }}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-stretch justify-center bg-accent-950/55 backdrop-blur-md sm:items-center sm:px-safe-or-4 sm:py-safe-offset-6 motion-reduce:animate-none",
+          "fixed inset-0 z-50 flex items-stretch justify-center bg-black/40 backdrop-blur-md dark:bg-black/60 sm:items-center sm:px-safe-or-4 sm:py-safe-offset-6 motion-reduce:animate-none",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-out animate-out fade-out",
         )
@@ -143,11 +143,11 @@ export function PremiumPaywall({
       >
         <Dialog
           aria-label={t`trizum Premium`}
-          className="text-accent-950 sm:border-accent-200 dark:bg-accent-950 dark:text-accent-50 dark:sm:border-accent-800 relative flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-white shadow-2xl outline-hidden sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-[1.75rem] sm:border"
+          className="shadow-overlay relative flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-white text-neutral-950 outline-hidden sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl dark:bg-neutral-800 dark:text-neutral-50"
         >
           <IconButton
             aria-label={t`Close Premium`}
-            className="right-safe-offset-3 top-safe-offset-3 text-accent-700 dark:text-accent-200 absolute z-10 sm:top-3 sm:right-3"
+            className="right-safe-offset-3 top-safe-offset-3 absolute z-10 text-neutral-600 sm:top-3 sm:right-3 dark:text-neutral-300"
             icon="lucide.x"
             iconClassName="size-5"
             onPress={close}
@@ -160,7 +160,7 @@ export function PremiumPaywall({
                   <span className="text-xl leading-none font-bold tracking-tight" translate="no">
                     trizum
                   </span>
-                  <span className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-200 rounded-full px-2.5 py-1 text-xs leading-none font-semibold">
+                  <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs leading-none font-semibold text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200">
                     <Trans>Premium</Trans>
                   </span>
                 </div>
@@ -186,18 +186,18 @@ export function PremiumPaywall({
                   {currentLoadState.status === "loading" ? <PremiumPlansSkeleton /> : null}
 
                   {currentLoadState.status === "error" ? (
-                    <div className="border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-900 flex min-h-40 flex-col items-center justify-center gap-4 rounded-3xl border p-5 text-center">
+                    <div className="flex min-h-40 flex-col items-center justify-center gap-4 rounded-3xl bg-neutral-100 p-5 text-center dark:bg-neutral-700/60">
                       <div className="flex flex-col gap-1.5">
                         <p className="font-semibold">
                           <Trans>Premium options are unavailable</Trans>
                         </p>
-                        <p className="text-accent-700 dark:text-accent-300 text-sm">
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
                           <Trans>Check your connection and try again.</Trans>
                         </p>
                       </div>
                       <Button
                         className="max-w-40 font-semibold"
-                        color="input-like"
+                        color="neutral"
                         isDisabled={activeAction !== null}
                         onPress={retryLoading}
                       >
@@ -243,7 +243,7 @@ export function PremiumPaywall({
                     </Button>
 
                     <Button
-                      className="text-accent-600 dark:text-accent-300 mx-auto h-9 w-auto px-4 text-sm font-semibold"
+                      className="mx-auto h-9 w-auto px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400"
                       isDisabled={!userId || activeAction !== null}
                       isPending={activeAction === "restore"}
                       onPress={() => onActionPress("restore")}
@@ -253,7 +253,7 @@ export function PremiumPaywall({
                       <Trans>Restore purchases</Trans>
                     </Button>
                     <Button
-                      className="text-accent-600 dark:text-accent-300 mx-auto h-9 w-auto px-4 text-sm font-semibold"
+                      className="mx-auto h-9 w-auto px-4 text-sm font-semibold text-neutral-600 dark:text-neutral-400"
                       isDisabled={activeAction !== null}
                       aria-expanded={showRedemption}
                       onPress={() => {
@@ -277,11 +277,11 @@ export function PremiumPaywall({
                 </div>
               </div>
 
-              <footer className="text-accent-500 dark:text-accent-400 mt-5 flex flex-col gap-2 text-center text-xs leading-relaxed">
+              <footer className="mt-5 flex flex-col gap-2 text-center text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
                 <PremiumRenewalDisclosure plan={selectedPlan} />
                 <p>
                   <a
-                    className="decoration-accent-400 underline underline-offset-2"
+                    className="text-accent-600 decoration-accent-600/40 dark:text-accent-400 dark:decoration-accent-400/40 underline underline-offset-2"
                     href={getAppLink("/terms")}
                     rel="noopener noreferrer"
                     target="_blank"
@@ -290,7 +290,7 @@ export function PremiumPaywall({
                   </a>
                   <span aria-hidden="true"> · </span>
                   <a
-                    className="decoration-accent-400 underline underline-offset-2"
+                    className="text-accent-600 decoration-accent-600/40 dark:text-accent-400 dark:decoration-accent-400/40 underline underline-offset-2"
                     href={getAppLink("/privacy-policy")}
                     rel="noopener noreferrer"
                     target="_blank"
@@ -322,13 +322,13 @@ function PremiumPlanOption({ plan }: { plan: PremiumPlan }) {
       value={plan.id}
       className={({ isFocusVisible, isHovered, isPressed, isSelected }) =>
         cn(
-          "relative grid min-h-18 cursor-pointer grid-cols-[1.25rem_minmax(0,1fr)_auto] items-center gap-x-3 rounded-2xl border-2 px-4 py-3 text-left outline-hidden transition-[scale,background-color,border-color,color] duration-200 ease-in-out motion-reduce:transition-none",
+          "relative grid min-h-18 cursor-pointer grid-cols-[1.25rem_minmax(0,1fr)_auto] items-center gap-x-3 rounded-2xl px-4 py-3 text-left outline-hidden transition-[scale,background-color,box-shadow,color] duration-200 ease-in-out motion-reduce:transition-none",
           isSelected
-            ? "border-accent-500 bg-accent-100 text-accent-950 dark:border-accent-400 dark:bg-accent-800 dark:text-accent-50"
-            : "border-accent-200 bg-accent-50 text-accent-900 dark:border-accent-800 dark:bg-accent-900 dark:text-accent-100",
-          isHovered && !isSelected && "border-accent-400 dark:border-accent-600",
+            ? "bg-neutral-100 text-neutral-950 ring-2 ring-accent-500 dark:bg-neutral-700/60 dark:text-neutral-50 dark:ring-accent-400"
+            : "bg-neutral-100 text-neutral-900 dark:bg-neutral-700/60 dark:text-neutral-100",
+          isHovered && !isSelected && "bg-neutral-200/70 dark:bg-neutral-700",
           isFocusVisible &&
-            "ring-2 ring-accent-500 ring-offset-2 ring-offset-white dark:ring-offset-accent-950",
+            "ring-2 ring-accent-500 ring-offset-2 ring-offset-white dark:ring-accent-400 dark:ring-offset-neutral-800",
           isPressed && "scale-[0.985]",
         )
       }
@@ -341,7 +341,7 @@ function PremiumPlanOption({ plan }: { plan: PremiumPlan }) {
               "flex size-5 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-200 ease-in-out motion-reduce:transition-none",
               isSelected
                 ? "border-accent-500 bg-accent-500 text-white"
-                : "border-accent-300 dark:border-accent-700",
+                : "border-neutral-300 dark:border-neutral-500",
             )}
           >
             <Icon
@@ -357,7 +357,7 @@ function PremiumPlanOption({ plan }: { plan: PremiumPlan }) {
             <span className="text-sm leading-5 font-bold">
               <PremiumPlanName planId={plan.id} />
             </span>
-            <span className="text-accent-600 dark:text-accent-300 text-xs leading-4 tabular-nums">
+            <span className="text-xs leading-4 text-neutral-600 tabular-nums dark:text-neutral-400">
               <PremiumPlanCadence plan={plan} />
             </span>
           </span>
@@ -563,7 +563,7 @@ function PremiumPlansSkeleton() {
       {[0, 1, 2].map((item) => (
         <div
           key={item}
-          className="border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-900 min-h-18 animate-pulse rounded-2xl border-2 motion-reduce:animate-none"
+          className="min-h-18 animate-pulse rounded-2xl bg-neutral-100 motion-reduce:animate-none dark:bg-neutral-700/60"
         />
       ))}
     </div>

@@ -30,14 +30,14 @@ export function TransferReviewCard({
   const destinationCreditorName = destinationCreditor?.name ?? "";
 
   return (
-    <div className="grid gap-7">
+    <div className="shadow-surface grid gap-7 rounded-3xl bg-white p-5 dark:bg-neutral-900">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-accent-700 dark:text-accent-300 text-sm font-medium">
+          <div className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
             <Trans>Debt being moved</Trans>
           </div>
           <div className="mt-1 text-xl font-semibold tracking-tight">
-            {fromName} <span className="text-accent-500">→</span> {toName}
+            {fromName} <span className="text-neutral-400 dark:text-neutral-500">→</span> {toName}
           </div>
         </div>
 

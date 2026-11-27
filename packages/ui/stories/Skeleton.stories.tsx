@@ -19,4 +19,4 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = { args: { className: "h-6 w-48" } };
-export const Card: Story = { args: { className: "h-32 w-full rounded-xl" } };
+export const Card: Story = { args: { className: "h-32 w-full rounded-3xl" } };

@@ -21,13 +21,13 @@ function DateSegment({ className, ...props }: AriaDateSegmentProps) {
     <AriaDateSegment
       className={composeRenderProps(className, (className) =>
         cn(
-          "inline rounded-sm p-0.5 caret-transparent outline outline-0 type-literal:px-0",
+          "inline rounded-md p-0.5 caret-transparent outline outline-0 type-literal:px-0",
           /* Placeholder */
-          "data-[placeholder]:text-accent-700 dark:data-[placeholder]:text-accent-50",
+          "data-[placeholder]:text-neutral-400 dark:data-[placeholder]:text-neutral-500",
           /* Disabled */
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
           /* Focused */
-          "data-[focused]:bg-accent-500 data-[focused]:text-accent-50",
+          "data-[focused]:bg-accent-500 data-[focused]:text-white dark:data-[focused]:bg-accent-500 dark:data-[focused]:text-white data-[focused]:data-[placeholder]:text-white/80",
           /* Invalid */
           "data-[invalid]:data-[focused]:bg-danger-500 data-[invalid]:data-[focused]:data-[placeholder]:text-danger-50 data-[invalid]:data-[focused]:text-danger-50 data-[invalid]:data-[placeholder]:text-danger-500 data-[invalid]:text-danger-500",
           className,

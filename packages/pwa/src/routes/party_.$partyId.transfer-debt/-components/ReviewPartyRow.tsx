@@ -17,16 +17,16 @@ export function ReviewPartyRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <div className="text-accent-500 dark:text-accent-400 text-xs font-semibold tracking-[0.16em] uppercase">
+          <div className="text-xs font-semibold tracking-[0.16em] text-neutral-600 uppercase dark:text-neutral-400">
             {caption}
           </div>
-          <div className="bg-accent-200/80 dark:bg-accent-800 h-px min-w-4 flex-1" />
+          <div className="h-px min-w-4 flex-1 bg-neutral-950/5 dark:bg-white/10" />
         </div>
-        <div className="text-accent-950 dark:text-accent-50 mt-1 truncate text-base font-semibold">
+        <div className="mt-1 truncate text-base font-semibold text-neutral-950 dark:text-neutral-50">
           {party.name}
         </div>
 
-        <div className="text-accent-700 dark:text-accent-300 mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-5">
+        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
           {children}
         </div>
       </div>
@@ -42,7 +42,7 @@ export function ReviewParticipantInline({
   children: React.ReactNode;
 }) {
   return (
-    <span className="text-accent-950 dark:text-accent-50 inline-flex max-w-full items-center gap-1.5 leading-5">
+    <span className="inline-flex max-w-full items-center gap-1.5 leading-5 text-neutral-950 dark:text-neutral-50">
       <TransferParticipantAvatar
         participant={participant}
         className="h-5 w-5 shrink-0 text-[0.5rem]"

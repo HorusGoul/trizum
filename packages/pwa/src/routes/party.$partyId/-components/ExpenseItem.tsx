@@ -26,9 +26,10 @@ export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Ex
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex min-h-24 w-full scale-100 rounded-xl bg-white p-4 text-start outline-hidden transition-all duration-200 ease-in-out dark:bg-accent-900",
-          (isHovered || isFocusVisible) && "shadow-md dark:bg-accent-800 dark:shadow-none",
-          isPressed && "scale-95 bg-white/90 shadow-lg dark:bg-accent-700/90 dark:shadow-none",
+          "shadow-surface flex min-h-24 w-full scale-100 rounded-3xl bg-white px-5 py-4 text-start outline-hidden transition-all duration-200 ease-in-out dark:bg-neutral-900",
+          (isHovered || isFocusVisible) && "bg-neutral-50 dark:bg-neutral-800",
+          isFocusVisible && "ring-2 ring-accent-500 dark:ring-accent-400",
+          isPressed && "scale-[0.97] bg-neutral-50 dark:bg-neutral-800",
         )
       }
     >
@@ -46,11 +47,13 @@ export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Ex
           <CurrencyText
             amount={getExpenseTotalAmount(expense)}
             currency={party.currency}
-            className="text-accent-600 dark:text-accent-300 text-sm"
+            className="text-sm text-neutral-600 dark:text-neutral-400"
             variant="inherit"
           />
         ) : null}
-        <span className="text-sm">{expense.paidAt.toLocaleDateString()}</span>
+        <span className="text-sm text-neutral-600 dark:text-neutral-400">
+          {expense.paidAt.toLocaleDateString()}
+        </span>
         <span className="text-sm">
           <Trans>
             Impact on my balance:&nbsp;

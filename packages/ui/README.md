@@ -53,8 +53,9 @@ body,
 ```
 
 Set `lang` and `dir` on the document. Apply `.dark` to `html` for the existing dark
-variant. `setThemeHue` from `@trizum/ui/theme` changes the accent variables and
-updates an existing `meta[name="theme-color"]`. The default hue is 250. Consumers
+variant. `setThemeHue` from `@trizum/ui/theme` changes the accent variables. The default
+hue is 250. The canvas is neutral (black in dark mode), so the app sets
+`meta[name="theme-color"]` statically rather than deriving it from the hue. Consumers
 own saved theme preferences and when to apply them. Importing the package does
 not initialize preferences or change the theme.
 

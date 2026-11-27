@@ -25,9 +25,9 @@
 
 .dark .receipt-scan-border::before {
   background: conic-gradient(
-    var(--color-accent-600) 0deg 240deg,
+    var(--color-accent-400) 0deg 240deg,
     var(--color-accent-100) 300deg,
-    var(--color-accent-600) 360deg
+    var(--color-accent-400) 360deg
   );
 }
 

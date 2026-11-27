@@ -11,7 +11,7 @@ interface AboutLinkProps {
 
 export function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
   const className =
-    "flex items-center gap-3 rounded-lg bg-accent-50 px-4 py-3 text-accent-900 outline-hidden transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:text-accent-100 dark:hover:bg-accent-800";
+    "flex min-h-13 items-center gap-3 px-4 py-3 text-neutral-950 outline-hidden transition-colors hover:bg-neutral-950/5 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-inset dark:text-neutral-50 dark:hover:bg-white/10 dark:focus-visible:ring-accent-400";
 
   const content = (
     <>
@@ -22,7 +22,7 @@ export function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
           icon="lucide.external-link"
           width={16}
           height={16}
-          className="text-accent-600 dark:text-accent-400"
+          className="text-neutral-400 dark:text-neutral-500"
         />
       )}
     </>

@@ -24,6 +24,14 @@ export const Accent: Story = {
   args: { icon: "lucide.plus", "aria-label": "Add", color: "accent" },
 };
 
+export const Neutral: Story = {
+  args: { icon: "lucide.plus", "aria-label": "Add", color: "neutral" },
+};
+
+export const InputLike: Story = {
+  args: { icon: "lucide.plus", "aria-label": "Add", color: "input-like" },
+};
+
 export const Pending: Story = {
   args: { icon: "lucide.plus", "aria-label": "Add", isPending: true },
 };

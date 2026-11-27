@@ -18,7 +18,7 @@ import {
   useLocale,
 } from "react-aria-components";
 import { use } from "react";
-import { cn } from "./utils.js";
+import { cn, focusRing } from "./utils.js";
 import { IconButton } from "./IconButton.js";
 
 const Calendar: typeof AriaCalendar = AriaCalendar;
@@ -32,16 +32,16 @@ const CalendarHeading = (props: React.HTMLAttributes<HTMLElement>) => {
     <header className="flex w-full items-center gap-1 px-1 pb-4" {...props}>
       <IconButton
         slot="previous"
-        color="input-like"
-        className="size-7 pr-0.5"
+        color="neutral"
+        className="size-8 pr-0.5"
         icon={direction === "rtl" ? "lucide.chevron-right" : "lucide.chevron-left"}
         iconClassName="size-4"
       />
       <AriaHeading className="grow text-center text-sm font-medium" />
       <IconButton
         slot="next"
-        color="input-like"
-        className="size-7 pl-0.5"
+        color="neutral"
+        className="size-8 pl-0.5"
         icon={direction === "rtl" ? "lucide.chevron-left" : "lucide.chevron-right"}
         iconClassName="size-4"
       />
@@ -63,7 +63,7 @@ const CalendarGridHeader = ({ ...props }: AriaCalendarGridHeaderProps) => (
 const CalendarHeaderCell = ({ className, ...props }: AriaCalendarHeaderCellProps) => (
   <AriaCalendarHeaderCell
     className={cn(
-      "w-9 rounded-md text-[0.8rem] font-normal text-accent-700 dark:text-accent-50",
+      "w-9 text-[0.8rem] font-medium text-neutral-500 dark:text-neutral-400",
       className,
     )}
     {...props}
@@ -79,40 +79,44 @@ const CalendarCell = ({ className, ...props }: AriaCalendarCellProps) => {
 
   return (
     <AriaCalendarCell
-      className={composeRenderProps(className, (className, renderProps) =>
-        cn(
-          "data-[hovered]:bg-accent-500/20 data-[hovered]:text-accent-50", // TODO: replace this with button ghost variant or something
-          "relative flex size-9 items-center justify-center p-0 text-sm font-normal",
-          /* Disabled */
-          renderProps.isDisabled && "text-accent-700 opacity-50 dark:text-accent-50",
+      className={composeRenderProps(className, (className, renderProps) => {
+        const isToday = renderProps.date.compare(today(getLocalTimeZone())) === 0;
+
+        const isRangeMiddle =
+          renderProps.isSelected &&
+          isRange &&
+          !renderProps.isSelectionStart &&
+          !renderProps.isSelectionEnd;
+
+        return cn(
+          "relative flex size-9 cursor-default items-center justify-center rounded-full p-0 text-sm font-normal text-neutral-950 outline-hidden transition-colors dark:text-neutral-50",
+          focusRing,
+          /* Hover */
+          renderProps.isHovered && !renderProps.isSelected && "bg-neutral-950/5 dark:bg-white/10",
+          /* Current Date */
+          isToday &&
+            !renderProps.isSelected &&
+            "font-semibold text-accent-600 dark:text-accent-400",
           /* Selected */
           renderProps.isSelected &&
-            "bg-accent-500 text-accent-50 data-[focused]:bg-accent-500 data-[focused]:text-accent-50",
-          /* Hover */
-          renderProps.isHovered &&
-            renderProps.isSelected &&
-            (renderProps.isSelectionStart || renderProps.isSelectionEnd || !isRange) &&
-            "data-[hovered]:bg-accent-400 data-[hovered]:text-accent-50",
-          /* Selection Start/End */
+            "bg-accent-500 font-medium text-white dark:bg-accent-500 dark:text-white",
           renderProps.isSelected &&
-            isRange &&
-            !renderProps.isSelectionStart &&
-            !renderProps.isSelectionEnd &&
-            "rounded-none bg-accent-500 text-accent-50",
+            renderProps.isHovered &&
+            !isRangeMiddle &&
+            "bg-accent-600 dark:bg-accent-600",
+          /* Range middle */
+          isRangeMiddle &&
+            "rounded-none bg-accent-500/15 font-normal text-neutral-950 dark:bg-accent-400/20 dark:text-neutral-50",
           /* Outside Month */
-          renderProps.isOutsideMonth &&
-            "text-accent-700 opacity-50 data-[selected]:bg-accent-500/50 data-[selected]:text-accent-50 data-[selected]:opacity-30 dark:text-accent-50",
-          /* Current Date */
-          renderProps.date.compare(today(getLocalTimeZone())) === 0 &&
-            !renderProps.isSelected &&
-            "bg-accent-600 text-accent-50 data-[hovered]:bg-accent-400 data-[hovered]:text-accent-50",
+          renderProps.isOutsideMonth && "text-neutral-400 opacity-50 dark:text-neutral-500",
+          /* Disabled */
+          renderProps.isDisabled && "text-neutral-400 opacity-50 dark:text-neutral-500",
           /* Unavailable Date */
-          renderProps.isUnavailable && "cursor-default text-danger-500",
-          renderProps.isInvalid &&
-            "bg-danger-500 text-danger-50 data-[focused]:bg-danger-500 data-[hovered]:bg-danger-500 data-[focused]:text-danger-50 data-[hovered]:text-danger-50",
+          renderProps.isUnavailable && "cursor-default text-danger-500 line-through",
+          renderProps.isInvalid && "bg-danger-500 text-white dark:bg-danger-500 dark:text-white",
           className,
-        ),
-      )}
+        );
+      })}
       {...props}
     />
   );

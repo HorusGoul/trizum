@@ -105,7 +105,7 @@ export function ModalSheet({
           </FocusScope>
 
           <Sheet.Backdrop
-            className={cn("bg-accent-950/45 backdrop-blur-[2px]", overlayClassName)}
+            className={cn("bg-black/40 backdrop-blur-[2px] dark:bg-black/60", overlayClassName)}
             onContextMenu={(event) => {
               onContextMenu?.(event);
               event.preventDefault();
@@ -223,7 +223,7 @@ export function ModalSheetHeader({
           <div className="flex justify-center">
             <span
               aria-hidden="true"
-              className="bg-accent-200 dark:bg-accent-700 h-1.5 w-12 rounded-full"
+              className="h-1.5 w-10 rounded-full bg-neutral-950/15 dark:bg-white/20"
             />
           </div>
         )}
@@ -250,7 +250,7 @@ export function ModalSheetTitle({ className, ...props }: HeadingProps) {
       id={context.titleId}
       slot="title"
       className={cn(
-        "text-base font-semibold tracking-tight text-accent-950 dark:text-accent-50",
+        "text-base font-semibold tracking-tight text-neutral-950 dark:text-neutral-50",
         className,
       )}
       {...props}
@@ -272,7 +272,7 @@ export function ModalSheetDescription({ className, ...props }: ComponentPropsWit
   return (
     <p
       id={context.descriptionId}
-      className={cn("text-sm text-accent-700 dark:text-accent-300", className)}
+      className={cn("text-sm text-neutral-600 dark:text-neutral-400", className)}
       {...props}
     />
   );
@@ -297,17 +297,21 @@ function sheetRowFeedback(
 ) {
   return cn(
     "outline-hidden transition-[scale,background-color,box-shadow] duration-200 ease-in-out motion-reduce:scale-100 motion-reduce:transition-none",
-    tone === "danger" ? "text-rose-700 dark:text-rose-300" : "text-accent-950 dark:text-accent-50",
+    tone === "danger"
+      ? "text-rose-700 dark:text-rose-300"
+      : "text-neutral-950 dark:text-neutral-50",
     state.isHovered &&
-      (tone === "danger" ? "bg-rose-50 dark:bg-rose-950/30" : "bg-accent-100 dark:bg-accent-900"),
+      (tone === "danger"
+        ? "bg-rose-500/10 dark:bg-rose-400/10"
+        : "bg-neutral-950/5 dark:bg-white/10"),
     state.isFocusVisible &&
       (tone === "danger"
-        ? "bg-rose-50 ring-2 ring-rose-300 dark:bg-rose-950/30 dark:ring-rose-800"
-        : "bg-accent-100 ring-2 ring-accent-300 dark:bg-accent-900 dark:ring-accent-700"),
+        ? "bg-rose-500/10 ring-2 ring-rose-500 dark:bg-rose-400/10 dark:ring-rose-400"
+        : "bg-neutral-950/5 ring-2 ring-accent-500 dark:bg-white/10 dark:ring-accent-400"),
     state.isPressed &&
       (tone === "danger"
-        ? "scale-[0.98] bg-rose-100 dark:bg-rose-950/50"
-        : "scale-[0.98] bg-accent-200 dark:bg-accent-800"),
+        ? "scale-[0.98] bg-rose-500/15 dark:bg-rose-400/15"
+        : "scale-[0.98] bg-neutral-950/10 dark:bg-white/15"),
   );
 }
 
@@ -341,7 +345,7 @@ export function ModalSheetAction({
       className={(state) =>
         cn(
           state.defaultClassName,
-          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-[1.35rem] py-4 text-left px-safe-or-4 sm:px-safe-or-5",
+          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-2xl py-4 text-left px-safe-or-4 sm:px-safe-or-5",
           sheetRowFeedback(state, tone),
           className,
         )
@@ -356,7 +360,7 @@ export function ModalSheetAction({
           "col-start-1 row-start-1 shrink-0",
           tone === "danger"
             ? "text-rose-600 dark:text-rose-300"
-            : "text-accent-700 dark:text-accent-200",
+            : "text-neutral-600 dark:text-neutral-400",
         )}
       />
       <span className="col-start-2 row-start-1 min-w-0 text-base leading-tight font-medium">
@@ -382,9 +386,10 @@ export function ModalSheetChoice({
       {...props}
       className={composeRenderProps(className, (className, state) =>
         cn(
-          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl border border-accent-500 bg-white px-3 py-2.5 text-left ring-offset-white dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
-          state.isSelected && "border-accent-600 dark:border-accent-400",
+          "min-h-16 w-full flex-row-reverse gap-4 rounded-2xl bg-white px-4 py-2.5 text-left shadow-surface dark:bg-neutral-800",
           sheetRowFeedback(state, "default"),
+          (state.isHovered || state.isFocusVisible) && "bg-neutral-50 dark:bg-neutral-700",
+          state.isPressed && "bg-neutral-100 dark:bg-neutral-700",
           className,
         ),
       )}
@@ -394,10 +399,10 @@ export function ModalSheetChoice({
           icon={icon}
           width={20}
           height={20}
-          className="text-accent-700 dark:text-accent-200 col-start-1 row-span-2 row-start-1 size-5 self-center"
+          className="col-start-1 row-span-2 row-start-1 size-5 self-center text-neutral-600 dark:text-neutral-400"
         />
-        <span className="text-accent-700 dark:text-accent-300 text-sm font-normal">{label}</span>
-        <span className="text-accent-950 dark:text-accent-50 col-start-2 text-base font-semibold break-words">
+        <span className="text-sm font-normal text-neutral-600 dark:text-neutral-400">{label}</span>
+        <span className="col-start-2 text-base font-semibold break-words text-neutral-950 dark:text-neutral-50">
           {children}
         </span>
       </span>

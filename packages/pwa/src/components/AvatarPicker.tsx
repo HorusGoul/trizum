@@ -150,8 +150,8 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
         )}
         {value && (
           <Button
-            color="input-like"
-            className="absolute top-1 right-1 h-auto w-auto rounded-full p-1"
+            color="transparent"
+            className="shadow-raised absolute top-1 right-1 h-auto w-auto rounded-full bg-white p-1 text-neutral-950 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-50 dark:hover:bg-neutral-700"
             onPress={handleRemoveAvatar}
             isDisabled={isUploading}
             aria-label={t`Remove avatar`}
@@ -165,7 +165,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
         <Button
           onPress={() => void openCamera()}
           color="input-like"
-          className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
+          className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-3 text-xs"
         >
           <Icon icon="lucide.camera" className="h-5 w-5" />
           <Trans>Take photo</Trans>
@@ -174,7 +174,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
         <Button
           onPress={openGallery}
           color="input-like"
-          className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
+          className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-3 text-xs"
         >
           <Icon icon="lucide.image-up" className="h-5 w-5" />
           <Trans>Upload photo</Trans>

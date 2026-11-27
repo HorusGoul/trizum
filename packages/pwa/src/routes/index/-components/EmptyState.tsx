@@ -13,7 +13,7 @@ export function EmptyState() {
       <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 [@media(max-height:600px)]:gap-2! [@media(max-height:720px)]:gap-3">
         <Icon
           icon="illustration.shared-expenses"
-          className="text-accent-600 dark:text-accent-400 h-auto w-full max-w-72 [--shared-expenses-surface:var(--color-accent-100)] dark:[--shared-expenses-surface:var(--color-accent-950)] [@media(max-height:600px)]:max-w-40! [@media(max-height:720px)]:max-w-48"
+          className="h-auto w-full max-w-72 text-neutral-500 [--shared-expenses-surface:var(--color-white)] dark:text-neutral-400 dark:[--shared-expenses-surface:var(--color-neutral-900)] [@media(max-height:600px)]:max-w-40! [@media(max-height:720px)]:max-w-48"
           width={620}
           height={560}
         />
@@ -22,7 +22,7 @@ export function EmptyState() {
           <h2 className="text-3xl font-bold tracking-tight [@media(max-height:720px)]:text-2xl">
             <Trans>Split expenses, stay even.</Trans>
           </h2>
-          <p className="text-accent-700 dark:text-accent-300 max-w-sm text-base leading-relaxed [@media(max-height:600px)]:hidden [@media(max-height:720px)]:text-sm [@media(max-height:720px)]:leading-snug">
+          <p className="max-w-sm text-base leading-relaxed text-neutral-600 dark:text-neutral-400 [@media(max-height:600px)]:hidden [@media(max-height:720px)]:text-sm [@media(max-height:720px)]:leading-snug">
             <Trans>
               Create a party in seconds, track who paid, and settle up without the awkward maths.
             </Trans>
@@ -44,14 +44,14 @@ export function EmptyState() {
           className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
-              "border-accent-200 bg-accent-100/60 dark:border-accent-800 dark:bg-accent-900 flex w-full scale-100 items-center gap-3 rounded-2xl border p-4 text-start outline-hidden transition-all duration-200 [@media(max-height:720px)]:gap-2 [@media(max-height:720px)]:p-3 [@media(max-height:600px)]:p-2!",
-              (isHovered || isFocusVisible) &&
-                "border-accent-400 bg-accent-100 dark:border-accent-600 dark:bg-accent-800",
+              "shadow-surface flex w-full scale-100 items-center gap-3 rounded-3xl bg-white p-4 text-start outline-hidden transition-all duration-200 dark:bg-neutral-900 [@media(max-height:720px)]:gap-2 [@media(max-height:720px)]:p-3 [@media(max-height:600px)]:p-2!",
+              isHovered && "bg-neutral-50 dark:bg-neutral-800/50",
+              isFocusVisible && "ring-2 ring-accent-500 dark:ring-accent-400",
               isPressed && "scale-[0.98]",
             )
           }
         >
-          <span className="bg-accent-200 text-accent-700 dark:bg-accent-800 dark:text-accent-200 flex size-11 shrink-0 items-center justify-center rounded-full [@media(max-height:720px)]:size-10">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 [@media(max-height:720px)]:size-10">
             <Icon
               icon={isSignedIn ? "lucide.cloud-check" : "lucide.cloud"}
               width={22}
@@ -62,7 +62,7 @@ export function EmptyState() {
             <span className="font-semibold">
               <Trans>Keep every party in sync</Trans>
             </span>
-            <span className="text-accent-700 dark:text-accent-300 text-sm leading-snug [@media(max-height:600px)]:hidden">
+            <span className="text-sm leading-snug text-neutral-600 dark:text-neutral-400 [@media(max-height:600px)]:hidden">
               {isSignedIn ? (
                 <Trans>Manage your cloud account and synced data.</Trans>
               ) : (
@@ -70,7 +70,7 @@ export function EmptyState() {
               )}
             </span>
           </span>
-          <span className="border-accent-400 text-accent-700 dark:border-accent-600 dark:text-accent-300 shrink-0 rounded-full border px-3 py-1.5 text-sm font-semibold">
+          <span className="shrink-0 rounded-full bg-neutral-950/5 px-3 py-1.5 text-sm font-semibold text-neutral-950 dark:bg-white/10 dark:text-neutral-50">
             {isSignedIn ? <Trans>Manage</Trans> : <Trans>Sign in</Trans>}
           </span>
         </Link>
@@ -80,8 +80,9 @@ export function EmptyState() {
           className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
-              "text-accent-700 dark:text-accent-300 flex scale-100 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium outline-hidden transition-all",
-              (isHovered || isFocusVisible) && "bg-accent-950/5 dark:bg-accent-50/5",
+              "text-neutral-600 dark:text-neutral-400 flex scale-100 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium outline-hidden transition-all",
+              isHovered && "bg-neutral-950/5 dark:bg-white/10",
+              isFocusVisible && "ring-2 ring-accent-500 dark:ring-accent-400",
               isPressed && "scale-95",
             )
           }
@@ -97,12 +98,12 @@ export function EmptyState() {
 function ActionLink({
   href,
   icon,
-  color = "input-like",
+  color = "neutral",
   children,
 }: {
   href: React.ComponentProps<typeof Link>["href"];
   icon: React.ComponentProps<typeof Icon>["icon"];
-  color?: "accent" | "input-like";
+  color?: "accent" | "neutral";
   children: React.ReactNode;
 }) {
   return (
@@ -111,14 +112,16 @@ function ActionLink({
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex h-12 w-full scale-100 items-center justify-center gap-2 rounded-full border font-semibold outline-hidden transition-all duration-200",
+          "flex h-12 w-full scale-100 items-center justify-center gap-2 rounded-full font-semibold outline-hidden transition-all duration-200",
           color === "accent"
-            ? "border-accent-500 bg-accent-500 text-accent-50"
-            : "border-accent-500 bg-white dark:border-accent-700 dark:bg-accent-900",
-          (isHovered || isFocusVisible) &&
+            ? "bg-accent-500 text-accent-50"
+            : "bg-neutral-950/5 text-neutral-950 dark:bg-white/10 dark:text-neutral-50",
+          isHovered &&
             (color === "accent"
-              ? "border-accent-600 bg-accent-600 dark:border-accent-400 dark:bg-accent-400"
-              : "ring-accent-500 dark:ring-accent-400 ring-2"),
+              ? "bg-accent-600 dark:bg-accent-400"
+              : "bg-neutral-950/10 dark:bg-white/15"),
+          isFocusVisible &&
+            "ring-2 ring-accent-500 ring-offset-2 ring-offset-neutral-100 dark:ring-accent-400 dark:ring-offset-black",
           isPressed && "scale-95",
         )
       }

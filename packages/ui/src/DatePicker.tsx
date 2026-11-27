@@ -37,7 +37,7 @@ const DatePickerContent = ({
   ...props
 }: AriaDialogProps & { popoverClassName?: AriaPopoverProps["className"] }) => (
   <Popover
-    className={composeRenderProps(popoverClassName, (className) => cn("w-auto p-2", className))}
+    className={composeRenderProps(popoverClassName, (className) => cn("w-auto p-3", className))}
     placement="bottom end"
   >
     <AriaDialog
@@ -75,13 +75,13 @@ function AppDatePicker<T extends AriaDateValue>({
         <DateInput className="flex-1" variant="ghost" />
         <IconButton
           color="transparent"
-          className="mr-1 size-6 data-[focus-visible]:ring-offset-0"
+          className="-mr-1.5 size-7 text-neutral-500 data-[focus-visible]:outline-offset-0 dark:text-neutral-400"
           icon="lucide.calendar"
           iconClassName="size-4"
         />
       </FieldGroup>
       {description && (
-        <Text className="text-accent-700 dark:text-accent-50 text-sm" slot="description">
+        <Text className="text-sm text-neutral-600 dark:text-neutral-400" slot="description">
           {description}
         </Text>
       )}

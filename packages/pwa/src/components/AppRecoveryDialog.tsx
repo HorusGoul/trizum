@@ -30,7 +30,7 @@ export function AppRecoveryDialog() {
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -47,7 +47,7 @@ export function AppRecoveryDialog() {
       >
         <Dialog
           aria-label={t`Restart trizum`}
-          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 rounded-lg border bg-white shadow-2xl outline-hidden"
+          className="shadow-overlay rounded-3xl bg-white outline-hidden dark:bg-neutral-800"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
             <div className="flex flex-col gap-3">
@@ -58,7 +58,7 @@ export function AppRecoveryDialog() {
                 <h2 className="text-lg font-medium">
                   <Trans>Restart trizum</Trans>
                 </h2>
-                <p className="text-accent-700 dark:text-accent-50 text-sm">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   <Trans>
                     Something is not working properly. Restart trizum to recover. If this keeps
                     happening, check for updates or contact support.

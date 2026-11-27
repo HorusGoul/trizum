@@ -435,7 +435,7 @@ function ExpenseTemplateEditor() {
                   </span>
                   <span
                     id={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
-                    className="text-accent-500 text-sm"
+                    className="text-sm text-neutral-600 dark:text-neutral-400"
                   >
                     <Trans>Select everyone now and automatically include new participants.</Trans>
                   </span>
@@ -468,7 +468,7 @@ function ExpenseTemplateEditor() {
         {!isNew ? (
           <Button
             type="button"
-            className="text-rose-700 dark:text-rose-300"
+            className="text-danger-600 dark:text-danger-400"
             onPress={() => setIsDeleteSheetOpen(true)}
           >
             <Trans>Delete template</Trans>

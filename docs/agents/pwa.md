@@ -34,7 +34,8 @@ manual browser history entries for shared modal sheets.
   workspace root when user-facing copy changes.
 - Follow the [locale guide](../../packages/pwa/locale/AGENTS.md) when changing
   translations.
-- Use the `accent` color scale and explicit `dark:` variants in the PWA.
+- Follow the [design language](./design-language.md): neutral surfaces with
+  explicit `dark:` variants, sparing `accent`, no borders, and large radii.
 
 ## Motion and interaction design
 
