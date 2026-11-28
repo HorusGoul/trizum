@@ -22,11 +22,11 @@ android {
         applicationId "app.trizum.capacitor"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10150600
+        versionCode 10150700
         if (trizumVersionCodeOverride != null) {
             versionCode trizumVersionCodeOverride.toString().toInteger()
         }
-        versionName "1.15.6"
+        versionName "1.15.7"
         resValue "string", "admob_app_id", selectedAdMobConfig.appId
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
