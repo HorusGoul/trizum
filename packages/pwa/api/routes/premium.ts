@@ -12,7 +12,7 @@ import { extractReceipt } from "../premium/receiptExtraction";
 import { createReceiptTiming } from "../premium/receiptTiming";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Context } from "hono";
-import { createAuth } from "../auth";
+import { createAuth, getSessionWithoutRefresh } from "../auth";
 import { activatePartyBoostRoute, getPartyBoostRoute } from "../contracts/premium";
 import { getApiDb, schema } from "../db/client";
 import { isUniqueConstraintError } from "../db/errors";
@@ -50,7 +50,7 @@ const premiumApp = $(
     .use("*", async (c, next) => {
       const auth = createAuth(c.env, c.executionCtx, c.req.raw);
       const startedAt = performance.now();
-      const session = await auth.api.getSession({ headers: c.req.raw.headers });
+      const session = await getSessionWithoutRefresh(auth, c.req.raw.headers);
 
       if (c.req.path.endsWith("/receipts"))
         c.header("Server-Timing", `session;dur=${(performance.now() - startedAt).toFixed(1)}`);

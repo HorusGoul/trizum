@@ -185,6 +185,16 @@ export function createAuth(
   });
 }
 
+/**
+ * Reads the session for API middleware without renewing it. Middleware
+ * responses drop Better Auth's replacement session cookie, so a renewal here
+ * would extend the database row while the browser keeps the old cookie
+ * deadline. The client's `/api/auth/get-session` requests renew instead.
+ */
+export function getSessionWithoutRefresh(auth: ReturnType<typeof createAuth>, headers: Headers) {
+  return auth.api.getSession({ headers, query: { disableRefresh: true } });
+}
+
 function createSocialProviders(env: ApiEnv): NonNullable<BetterAuthOptions["socialProviders"]> {
   const providers: NonNullable<BetterAuthOptions["socialProviders"]> = {};
   const googleClientId = getGoogleClientId(env);
