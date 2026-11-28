@@ -13,6 +13,10 @@ import { AUTH_PROVIDER_CONFIG } from "../src/lib/authConfig.js";
 
 const LOCAL_DEVELOPMENT_SECRET = "local-development-only-secret-change-before-production";
 
+// Sessions expire after 30 days of inactivity; Better Auth slides the expiry
+// forward at most once per day (default `updateAge`) while the session is used.
+const SESSION_EXPIRES_IN_SECONDS = 30 * 24 * 60 * 60;
+
 export { isTrustedOrigin } from "./auth-origins";
 
 interface BackgroundTaskContext {
@@ -69,6 +73,9 @@ export function createAuth(
       protocol: "auto",
     },
     trustedOrigins,
+    session: {
+      expiresIn: SESSION_EXPIRES_IN_SECONDS,
+    },
     account: {
       accountLinking: {
         allowDifferentEmails: false,
@@ -176,6 +183,16 @@ export function createAuth(
           },
     },
   });
+}
+
+/**
+ * Reads the session for API middleware without renewing it. Middleware
+ * responses drop Better Auth's replacement session cookie, so a renewal here
+ * would extend the database row while the browser keeps the old cookie
+ * deadline. The client's `/api/auth/get-session` requests renew instead.
+ */
+export function getSessionWithoutRefresh(auth: ReturnType<typeof createAuth>, headers: Headers) {
+  return auth.api.getSession({ headers, query: { disableRefresh: true } });
 }
 
 function createSocialProviders(env: ApiEnv): NonNullable<BetterAuthOptions["socialProviders"]> {

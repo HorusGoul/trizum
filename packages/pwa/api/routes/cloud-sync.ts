@@ -7,7 +7,7 @@ import {
   saveCloudUserSettingsResponseSchema,
 } from "../../src/lib/api/cloudSyncContract";
 import { eq } from "drizzle-orm";
-import { createAuth } from "../auth";
+import { createAuth, getSessionWithoutRefresh } from "../auth";
 import { getApiDb, schema } from "../db/client";
 import type { ApiEnv, ApiHonoEnv } from "../env";
 import { getLogger } from "../../src/lib/log.js";
@@ -55,9 +55,10 @@ export function createCloudSyncRoute({
     context: Pick<ExecutionContext, "waitUntil">,
     request: Request,
   ) => {
-    const session = await createAuth(env, context, request).api.getSession({
-      headers: request.headers,
-    });
+    const session = await getSessionWithoutRefresh(
+      createAuth(env, context, request),
+      request.headers,
+    );
 
     return session?.user.id ?? null;
   },
