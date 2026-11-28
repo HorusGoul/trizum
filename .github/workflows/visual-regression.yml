@@ -63,7 +63,7 @@ jobs:
 
   visual:
     name: Visual parity with main
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [playwright-image]
     container:
       image: ${{ needs.playwright-image.outputs.image }}

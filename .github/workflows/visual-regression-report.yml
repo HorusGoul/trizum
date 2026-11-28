@@ -16,7 +16,7 @@ concurrency:
 jobs:
   report:
     if: ${{ github.event.workflow_run.event == 'pull_request' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     permissions:
       actions: read
@@ -30,7 +30,7 @@ jobs:
           ref: ${{ github.workflow_sha }}
           persist-credentials: false
           sparse-checkout: packages/pwa/e2e/visual
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "26"
       - name: Download data-only visual report
