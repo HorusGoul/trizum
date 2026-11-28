@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.15.7
+
+### Patch Changes
+
+- [#680](https://github.com/HorusGoul/trizum/pull/680) [`bb7bbab`](https://github.com/HorusGoul/trizum/commit/bb7bbabba322deb24efbe5f7a263f0f5adbac52a) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep cloud account sign-ins active for 30 days of inactivity instead of 7, so you are signed out less often.
+
 ## 1.15.6
 
 ### Patch Changes
